@@ -1,0 +1,702 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 人员管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css"/>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.chooseUser{width:1000px;height:530px;}
+	.sgreen{background:#EDF4FF;border:dashed 1px #72BBFF;}
+	.sred{background:#FFFF99;border:dashed 1px #FF9900;}
+	#lay3{display:none;}
+</style>
+</head>
+
+<body ng-app="mdu" ng-controller="ctrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">项目变更</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">项目属性</a>
+			<a href="#lay2" class="tab">市场属性</a>
+<!-- 			<a href="#lay3" class="tab">指标工作量</a> -->
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+				<tr>
+					<th>项目名称</th>
+					<td width="300">
+						<input type="hidden" name="companyCode" value="{{projectInfo.companyCode}}"/>
+						<input type="text" name="proName" value="{{projectInfo.proName}}"/></td>
+						<input type="hidden" name="change" value="0"/>
+					<th>项目编号</th>
+					<td width="300">
+						<input type="text" name="proCode" maxlength="32" value="{{projectInfo.proCode}}"/>
+						<input type="hidden" name="proNo" readonly="readonly" class="required" maxlength="32" value="{{projectInfo.proNo}}"/>
+					</td>
+				</tr>
+				<tr>
+					<th>项目类别</th>
+					<td>
+						<input type="text" name="categoryName" class="required dropDownProjectType" placeholder="请选择" value="{{projectInfo.categoryName}}"/>
+						<input type="hidden" name="categoryCode" value="{{projectInfo.categoryCode}}"/>
+					</td>
+					<th>项目年份</th>
+					<td><input type="text" name="proYear" class="number" value="{{projectInfo.proYear}}"/></td>
+				</tr>
+				<tr>
+					<th>地区</th>
+					<td><input type="text" name="city" class="required dropDownArea" placeholder="请选择" value="{{projectInfo.city}}"/></td>
+					<th>县级市</th>
+					<td><input type="text" name="district" class="required dropDownArea2" placeholder="请选择" value="{{projectInfo.district}}"/></td>
+				</tr>
+				<tr>
+					<th>负责人</th>
+					<td>
+						<input type="hidden" name="employeecode" value="{{projectInfo.employeecode}}"/>
+						<input type="text" name="proManager" class="required chooseUserCom" placeholder="请选择" ng-click="chooseUser()"  value="{{projectInfo.proManager}}"/>
+					</td>
+					<th>人员需求</th>
+					<td><input type="text" name="demandStaff" class="number" value="{{projectInfo.demandStaff}}"/></td>
+				</tr>
+				<tr>
+					<th>管理部门</th>
+					<td>
+						<input type="hidden" name="manageDept" value="{{projectInfo.manageDept}}"/>
+						<input type="text" name="manageDeptName" value="{{projectInfo.manageDeptName}}" class="required dropDownList" placeholder="请选择"/>
+					</td>
+					<th>区域经理</th>
+					<td>
+						<input type="hidden" name="districtManager" value="{{projectInfo.districtManager}}"/>
+						<input type="text" name="districtManagerName" value="{{projectInfo.districtManagerName}}" class="required chooseUserCom" placeholder="请选择" ng-click="chooseDistrictManager()"/>
+					</td>
+				</tr>
+				<tr>
+					<th>总工作量</th>
+					<td><input type="text" name="totalWorkload" class="number" value="{{projectInfo.totalWorkload}}"/></td>
+					<th>单位 </th>
+					<td><input type="text" name="unitWorkload" class="" value="{{projectInfo.unitWorkload}}"/></td>
+				</tr>
+			<!--	<tr>
+					<th>内业比例</th>
+					<td><input type="text" name="iwProportion" class="number" value="{{projectInfo.iwProportion}}"/></td>
+					<th>外业比例 </th>
+					<td><input type="text" name="owProportion" class="number" value="{{projectInfo.owProportion}}"/></td>
+				</tr>-->
+				<tr>
+					<th>是否召开启动会</th>
+					<td>
+						<input type="hidden" name="startMetting" value="{{projectInfo.startMetting}}"/>
+						<input type="text" name="startMettingName" class="required dropDownList" value="{{projectInfo.startMettName}}"/>
+					</td>
+					<th>是否需要试运行</th>
+					<td>
+						<input type="hidden" name="testRun"  value="{{projectInfo.testRun}}"/>
+						<input type="text" name="testRunName" class="required dropDownList"  value="{{projectInfo.testRunName}}"/>
+					</td>
+				</tr>
+				<tr>
+					<th>开始时间</th>
+					<td><input type="text" name="sdate" class="required date dateComponent" placeholder="请选择" onclick="new Calendar().show(this)" value="{{projectInfo.sdate}}"/></td>
+					<th>结束时间</th>
+					<td><input type="text" name="edate" class="required date dateComponent" placeholder="请选择" onclick="new Calendar().show(this)" value="{{projectInfo.edate}}"/></td>
+				</tr>
+				<tr>
+					<th>项目周期/月</th>
+					<td><input type="text" name="ppm" class="number" value="{{projectInfo.ppm}}"/></td>
+					<th>项目周期/天</th>
+					<td><input type="text" name="ppw" class="number" value="{{projectInfo.ppw}}"/></td>
+				</tr>
+				<tr>
+					<th>项目状态</th>
+					<td>
+						<input type="hidden" name="proStatus" value="{{projectInfo.proStatus}}"/>
+						<input type="text" name="proStatusName" value="{{projectInfo.proStatus==1?'登记':projectInfo.proStatus==2?'激活':projectInfo.proStatus==3?'关闭':''}}" class="required dropDownList"/>
+					</td>
+					<th>项目阶段</th>
+					<td>
+						<input type="hidden" name="proPhase" value="{{projectInfo.proPhase}}"/>
+						<input type="text" name="proPhaseName" value="{{showProPhase(projectInfo.proPhase)}}" class="required dropDownList"/>
+						
+						<input type="hidden" name="proStepName1" value="{{showProPhase(projectInfo.proPhase)}}"/>
+						
+						
+					</td>
+				</tr>
+			<!--	<tr>
+					<th>初始工作量</th>
+					<td><input type="text" name="initWorkload" class="number" value="{{projectInfo.initWorkload}}"/></td>
+					<th>核查标准量（周）</th>
+					<td><input type="text" name="qcMin" class="number" value="{{projectInfo.qcMin}}"/></td>
+				</tr>-->
+				<tr>
+					<th>进度计算方式</th>
+					<td>
+						<input type="text" name="progressModeName" value="{{projectInfo.progressModeName}}" class="required dropDownList"/>
+						<input type="hidden" name="progressMode" value="{{projectInfo.progressMode}}"/>
+					</td>
+					<th></th>
+					<td></td>
+				</tr>
+				<tr>
+					<th>备注</th>
+					<td colspan="3">
+						<textarea name="remarks" cols="98" rows="4">{{projectInfo.remarks}}</textarea>
+					</td>
+				</tr>
+			</table>
+			
+		</div>
+		
+		<div class="form_div" id="lay2">
+			<table>
+				<tr>
+					<th>合同总价</th>
+					<td width="300"><input type="text" name="tprice" value="{{projectInfo.tprice}}"/></td>
+					<th>单价</th>
+					<td width="300"><input type="text" name="uprice" value="{{projectInfo.uprice}}"/></td>
+				</tr>
+				<tr>
+					<th>预算收入</th>
+					<td><input type="text" name="income" value="{{projectInfo.income}}"/></td>
+					<th>结算方式</th>
+					<td><input type="text" name="clearform" value="{{projectInfo.clearform}}"/></td>
+				</tr>
+				<tr>
+					<th>合同编号</th>
+					<td><input type="text" name="contractNo" value="{{projectInfo.contractNo}}"/></td>
+					<th>合同日期</th>
+					<td><input type="text" name="contractDate" value="{{projectInfo.contractDate}}" class="date dateComponent" placeholder="请选择" onclick="new Calendar().show(this)"/></td>
+				</tr>
+			</table>
+		</div>
+		
+		<div class="form_div" id="lay3">
+<!-- 			<table> -->
+<!-- 				<tr ng-repeat="item in kpiList" ng-class="{'sgreen':item.kpiType==1, 'sred':item.kpiType==2}"> -->
+<!-- 					<th> -->
+<!-- 						<span ng-if="item.kpiType==1">（外业指标）</span> -->
+<!-- 						<span ng-if="item.kpiType==2">（内业指标）</span> -->
+<!-- 						{{item.kpiName}} -->
+<!-- 					</th> -->
+<!-- 					<td><input type="text" name="{{item.kpiCode}}" group="kpi" class="number" value="{{item.kpiValue}}"/>{{item.kpiUnit}}</td> -->
+<!-- 					<td >标准工作量：<input type="text" name="{{item.kpiCode}}_standardHours" class="number" value="{{item.standardHours}}"/>{{item.kpiUnit}}/8小时</td> -->
+<!-- <!-- 				ng-if="item.kpiType!=3"	<td ng-if="item.kpiType==3"><input type="hidden" name="{{item.kpiCode}}_standardHours" class="number" value="{{item.standardHours}}"/></td> --> -->
+<!-- 					<td colspan="2">{{item.kpiDesc}}</td> -->
+<!-- 				</tr> -->
+<!-- 			</table> -->
+<!-- 			<input type="hidden" name="kpiData"/> -->
+		</div>
+
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+function getUrlParams(){
+	var params={};
+	var url = location.href;
+	var start = url.indexOf("?", 0)+1;
+	var paramsStr = url.substring(start, url.length);
+	var paramsArr = paramsStr.split("&");
+	for(var i=0;i<paramsArr.length;i++){
+		var kv = paramsArr[i].split("=");
+		var k = kv[0];
+		var v = kv[1];
+		params[k]=v;
+	}
+	return params;
+}
+var selectedUnitCode="";
+var validator;
+var userData;
+
+var ngScope;
+var app = angular.module("mdu", []);
+app.controller("ctrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.projectInfo={};
+	$scope.kpiList=[];
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	var params = getUrlParams();
+	
+	/* 视图渲染 */
+	$(".tabs>a").each(function(){
+		var layId = $(this).attr("href");
+		var idx = $(".tabs>a").index($(this));
+		if(idx!=0){
+			$(layId).hide();
+			$(layId).attr("data-show", "0");
+		}else{
+			$(layId).attr("data-show", "1");
+		}
+		$(this).click(function(){
+			$(".tabs>.selected").removeClass("selected");
+			$(this).addClass("selected");
+			var layId = $(this).attr("href");
+			$("div[data-show=1]").hide();
+			$("div[data-show=1]").attr("data-show", "0");
+			$(layId).show();
+			$(layId).attr("data-show", "1");
+			
+		});
+	});
+	
+	/* Validate */
+	validator = $("#saveForm").validate({
+		onsubmit: false,
+		focusInvalid: false,
+		focusCleanup: true,
+		errorElement: "span",
+		ignore:".ignore",
+		invalidHandler: function(form, validator) {
+			var errors = validator.numberOfInvalids();
+			if (errors) {
+				
+			} 
+		}
+	});
+	
+	/* 单位选择 */
+	new DropDownList().init({
+		mode:"page",
+		renderTo:"input[name=manageDeptName]",
+		url:"../../component/orgTree.html?required=true&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$("input[name=manageDeptName]").val(result.unitName);
+			$("input[name=manageDept]").val(result.unitCode);
+			$("input[name=manageDeptName]").focus();
+		}
+	});
+	
+	/* 区域 */
+	new DropDownList().init({
+		renderTo:".dropDownArea",
+		url:"../../component/areaList.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownArea").val(result.name);
+			$(".dropDownArea").focus();
+		}
+	});
+	/* 县级市 */
+	new DropDownList().init({
+		renderTo:".dropDownArea2",
+		url:"../../component/areaList.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownArea2").val(result.name);
+			$(".dropDownArea2").focus();
+		}
+	});
+	
+	/* 项目负责人 */
+	$scope.chooseUser=function(){
+		new ShowDlog().showFrame("../../component/chooseUser.html", "选择员工", function(data){
+			if(data && data.length>0){
+				$("input[name=proManager]").val(data[0].employeename);
+				$("input[name=employeecode]").val(data[0].employeecode);
+				$("input[name=proManager]").focus();
+			}
+		}, "chooseUser");
+	};
+	/* 区域经理 */
+	$scope.chooseDistrictManager=function(){
+		new ShowDlog().showFrame("../../component/chooseUser.html", "选择区域经理", function(data){
+			if(data && data.length>0){
+				$("input[name=districtManagerName]").val(data[0].employeename);
+				$("input[name=districtManager]").val(data[0].employeecode);
+				$("input[name=districtManagerName]").focus();
+			}
+		}, "chooseUser");
+	};
+	/* 项目类型 */
+	new DropDownList().init({
+		renderTo:".dropDownProjectType",
+		url:"../../component/projectType.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$("input[name=categoryName]").val(result.categoryName);
+			$("input[name=categoryCode]").val(result.categoryCode);
+			$scope.loadKpiListFromLib(result.categoryCode);
+			$("input[name=categoryName]").focus();
+		}
+	});
+	
+	/* 项目状态 */
+	new DropDownList().init({
+		renderTo:"input[name=proStatusName]",
+		data:[{code:1, name:'登记'},{code:2, name:'激活'},{code:3, name:'关闭'},{code:4, name:'已汇款'},{code:5, name:'已结题'}],
+		textField:"name",
+		onSelected:function(result){
+			$("input[name=proStatusName]").val(result.name);
+			$("input[name=proStatus]").val(result.code);
+			$("input[name=proStatusName]").focus();
+		}
+	});
+
+    //是否状态
+    new DropDownList().init({
+        renderTo:"input[name=testRunName]",
+        data:[{code:0, name:'否'},{code:1, name:'是'}],
+        textField:"name",
+        onSelected:function(result){
+            $("input[name=testRunName]").val(result.name);
+            $("input[name=testRun]").val(result.code);
+            $("input[name=testRunName]").focus();
+        }
+    });
+
+    new DropDownList().init({
+        renderTo:"input[name=startMettingName]",
+        data:[{code:0, name:'否'},{code:1, name:'是'}],
+        textField:"name",
+        onSelected:function(result){
+            $("input[name=startMettingName]").val(result.name);
+            $("input[name=startMetting]").val(result.code);
+            $("input[name=startMettingName]").focus();
+        }
+    });
+	
+	/* 项目阶段 */
+	new DropDownList().init({
+		renderTo:"input[name=proPhaseName]",
+		data:[{code:1, name:'前期'},{code:2, name:'中期'},{code:3, name:'后期'},
+		      {code:4, name:'更新类'},{code:5, name:'维护类'},{code:6, name:'已竣工'},
+		      {code:7, name:'项目暂停'},{code:8, name:'暂未开展'},{code:9, name:'试点中'},
+		      {code:10, name:'作废取消'},{code:11, name:'外包'},{code:12, name:'备注'}],
+		textField:"name",
+		height:"150px",
+		onSelected:function(result){
+			$("input[name=proPhaseName]").val(result.name);
+			$("input[name=remarks]").val(result.name);
+			$("input[name=proPhase]").val(result.code);
+			$("input[name=proPhaseName]").focus();
+			$("input[name=remarks]").focus();
+
+
+            var myDate = new Date();
+            var timestamp =myDate.toLocaleDateString();
+            console.log(timestamp);
+			var _text = "&nbsp;&nbsp;"+myDate.toLocaleDateString()+":项目阶段变更为" + result.name;
+            console.log(_text);
+			var remarks = $("textarea[name=remarks]").val();
+            console.log(remarks);
+			$("textarea[name=remarks]").html(remarks + _text);
+            console.log($("textarea[name=remarks]").html(remarks + _text));
+		}
+	});
+	/* 进度计算方式 */
+	new DropDownList().init({
+		renderTo:"input[name=progressModeName]",
+		data:[{id:1,name:"按时间"},{id:2,name:"按工作量"}],
+		textField:"name",
+		onSelected:function(result){
+			$("input[name=progressModeName]").val(result.name);
+			$("input[name=progressMode]").val(result.id);
+		}
+		
+	});
+	
+	/* HTTP GET */
+	$scope.httpGet = function(_conf){
+		var commonParams = "currentPage="+$scope.currentPage+"&ticket="+$scope.ticket;
+		var params = "";
+		if(_conf.data){
+			params = toUrlParams(_conf.data);
+		}
+		if(_conf.url.indexOf("?")==-1){
+			if(params.length>0){
+				params="?"+params;
+				commonParams="&"+commonParams;
+			}else{
+				commonParams="?"+commonParams;
+			}
+		}else{
+			params="&"+params;
+			commonParams="&"+commonParams;
+		}
+		$http.get(serviceBasePath+_conf.url+params+commonParams).success(function(response){
+				if(response.statusCode==401){
+					new ShowDlog().prompt({
+						icon:"warning",
+						msg:"用户登录过期！请重新登录！",
+						done:function(){
+							window.noLogin(location.href);
+						},
+						t:2800
+					});
+					return;
+				}
+				_conf.success(response);
+				if(_conf.pageChange){
+					$scope.createPageBar(response.totalPage, response.currentPage, _conf.pageChange);
+				}
+			});
+	};
+	
+	/* 指标列表 */
+	$scope.loadKpiListFromPlan=function(proNo){
+		$scope.httpGet({
+			url:"eap/pmsServices/pm/planKpi/listAll",
+			data:{"proNo":proNo, "planNo":"-1"},
+			success:function(res){
+				$scope.kpiList = $scope.filterPerCnt(res.list);
+				if($scope.kpiList.length==0){
+					$scope.loadKpiListFromLib($scope.projectInfo.categoryCode);
+				}
+			}
+		});
+	};
+	$scope.loadKpiListFromLib=function(categoryCode){
+		$scope.httpGet({
+			url:"eap/pmsServices/pm/kpiLib/listAll",
+			data:{"categoryCode":categoryCode},
+			success:function(res){
+				$scope.kpiList = $scope.filterPerCnt(res.list);
+			}
+		});
+	};
+	$scope.filterPerCnt=function(arr){
+		var arrN=[];
+		for(var i=0; i<arr.length; i++){
+			var item = arr[i];
+			if(item.isPerCnt==1){
+				continue;
+			}
+			arrN.push(item);
+		}
+		return arrN;
+	};
+	/* 数据加载 */
+	$scope.loadProject=function(proNo){
+		$http.get(serviceBasePath+"eap/pmsServices/pm/baseMgr/pmBase/get?proNo="
+			+proNo+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../login.html";
+				return;
+			}
+			$scope.projectInfo = response.data;
+			if($scope.projectInfo.startMetting==1){
+				$scope.projectInfo.startMettName="是";
+			}else if($scope.projectInfo.startMetting==0){
+				$scope.projectInfo.startMetting="否";
+			}
+			if($scope.projectInfo.testRun==1){
+				$scope.projectInfo.testRunName="是";
+			}else if($scope.projectInfo.testRun==0){
+				$scope.projectInfo.testRunName="否";
+			}
+			$scope.loadKpiListFromPlan($scope.projectInfo.proNo);
+		});
+	};
+	/* 初始加载 */
+	$scope.loadProject(params.proNo);
+	
+	/* 保存 */
+	$scope.onSave = function(){
+		var proCode = $("input[name=proCode]").val();
+		var proNo = $("input[name=proNo]").val();
+		
+		var proPhase=$scope.projectInfo.proPhase;
+		
+		var proPhase1=$("input[name=proPhase]").val();
+		
+		var tempstatus=0;
+		if(proPhase1==proPhase){
+			tempstatus=0;
+		}else{
+			tempstatus=1;
+		}
+		$("input[name=companyCode]").val(userData.companyCode);
+		// Kpi
+		var kpiData = "";
+		$("input[group=kpi]").each(function(){
+			var k = $(this).attr("name");
+			var v = $(this).val();
+			var h = $("input[name="+k+"_standardHours]").val();
+			v=v+","+h;
+			if(kpiData.length>0){
+				kpiData+="&";
+			}
+			kpiData+=k+"="+v;
+		});
+		$("input[name=kpiData]").val(kpiData);
+		//
+		var formData = $("#saveForm").serialize();
+
+		if($("#saveForm").valid()){
+			$http.get(serviceBasePath+"eap/pmsServices/pm/baseMgr/pmBase/getByProCode?proCode="+proCode+"&ticket="+ticket).success(function(res){
+// 				console.log(res.statusCode+", "+res.data.proNo+", "+proNo);
+// 				console.log(res.statusCode=="200" && res.data && res.data.proNo!=proNo);
+				if(res.statusCode=="200" && res.data && res.data.proNo!=proNo){
+					new ShowDlog().prompt({
+						icon:"error",
+						msg:"项目编号已经存在！",
+						done:function(){
+							
+						},
+						t:1500
+					});
+					return;
+				}else{
+					$scope.doSave();
+				}
+			}).error(function(){
+				
+			});
+		}
+	};
+	/* 保存 */
+	$scope.doSave = function(){
+		
+		var proPhase=$scope.projectInfo.proPhase;
+		
+		
+		var proPhase1=$("input[name=proPhase]").val();
+		
+		var tempstatus=0;
+		if(proPhase1==proPhase){
+			tempstatus=0;
+		}else{
+			tempstatus=1;
+		}
+		$("input[name=companyCode]").val(userData.companyCode);
+		// Kpi
+		var kpiData = "";
+		$("input[group=kpi]").each(function(){
+			var k = $(this).attr("name");
+			var v = $(this).val();
+			var h = $("input[name="+k+"_standardHours]").val();
+			v=v+","+h;
+			if(kpiData.length>0){
+				kpiData+="&";
+			}
+			kpiData+=k+"="+v;
+		});
+		$("input[name=kpiData]").val(kpiData);
+		//
+		var formData = $("#saveForm").serialize();
+		
+		if(validator.checkForm()){
+			$.ajax({
+				url:serviceBasePath+"eap/pmsServices/pm/baseMgr/pmBase/update?tempstatus="+tempstatus,
+				cache:false,
+				method:"POST",
+				data:formData,
+				success:function(res){
+					if(res.statusCode==200){
+						//
+						new ShowDlog().prompt({msg:"修改成功！",
+							icon:"success",
+							done:function(){
+								location.href="projectModify.html";
+							},
+							t:1500
+						});
+					}else{
+						//
+						new ShowDlog().prompt({msg:"修改失败！",
+							icon:"warning",
+							done:function(){
+								
+							},
+							t:1500
+						});
+					}
+				},
+				error:function(){
+					new ShowDlog().prompt({msg:"修改失败，服务器异常！",
+						icon:"error",
+						done:function(){
+							
+						},
+						t:1500
+					});
+				}
+			});
+			
+		}else{
+			new ShowDlog().prompt({msg:"表单未填写完整！",
+				done:function(){
+				},
+				t:1500
+			});
+		}
+	};
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		if(params.from){
+			location.href=params.from;
+		}else{
+			history.go(-1);
+		}
+	};
+	
+	$scope.showProPhase=function(proPhase){
+		return proPhase==1?'前期':
+			proPhase==2?'中期':
+			proPhase==3?'后期':
+			proPhase==4?'更新类':
+			proPhase==5?'维护类':
+			proPhase==6?'已竣工':
+			proPhase==7?'项目暂停':
+			proPhase==8?'暂未开展':
+			proPhase==9?'试点中':
+			proPhase==10?'作废取消':
+			proPhase==11?'外包':
+			proPhase==12?'备注':''
+	};
+	
+});
+</script>
+</body>
+</html>

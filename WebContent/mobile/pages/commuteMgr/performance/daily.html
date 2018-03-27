@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>通勤绩效-统计日报 </title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+	<script src="../../../js/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../../css/bxyw1.css"/>
+	<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+	<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="../../../js/PageBar.js"></script>
+	<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css"/>
+	<script type="text/javascript" src="../../../js/Calendar.js"></script>
+	<script type="text/javascript" src="../../../js/config.js"></script>
+	<script type="text/javascript" src="../../../js/util.js"></script>
+	<script type="text/javascript" src="../../../js/ViewState.js"></script>
+	<script type="text/javascript" src="../../../js/ng-base.js"></script>
+	<script type="text/javascript" src="../../../../js/SimpleDateFormat.js"></script>
+	<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+	<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+	<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+	<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+	<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+	
+	<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+	
+	<style>
+		header{position:fixed;z-index:10}
+		section{padding:60px 0 65px 0}
+		.sort li{text-align:center}
+		.fenye_warp span.fen_btn{padding: 8px 9px;line-height: normal;background: #ededed;color:#a7a7a7}
+		.fl{height:inherit}
+		.filter li .filter_no{width: 47%;}
+		.dblist_cons .martp5 span.do{display:inline-block;width:23%;text-align:center}
+		.mr_20{margin-top:20px}
+		.more_filter{text-align:center;color:#02a2ff}
+		.disnone{display:none}
+		#date{width:200px;height:30px;display: inline-block;border:1px solid #ccc;background:none;line-height:30px;text-indent:5px}
+		.dblist_cons .martp5 span.do{width:45%}
+		.setJudging{width:90%;min-height:400px}
+		.dlog-showPic{width:90%;min-height:500px}
+	</style>
+</head>
+<body id="dblist" ng-app="userMgr" ng-controller="userMgrCtrl">
+	<header>
+		<div class="return"><img src="../../../../img/return.png"/></div>
+		统计日报
+	</header>
+	<section>
+		<ul class="cz_selpx ov" >
+			<li class="fl" style="width:100%">筛选<img src="../../../img/down_icon.png"/></li>
+		</ul>
+		<div class="filter_sort">
+			<ul class="filter sor_fil"  style="display: none;">
+				<li class="ov">
+					<div class="filter_con">
+						<div class="filter_search">
+							<div class="search_int">
+								<input type="text" name="search" id="search" viewstate="search" placeholder="姓名搜索"/>
+								<a class="clear_search">x</a>
+							</div>
+							<span ng-click="doQuery()">搜索</span>
+						</div>
+					</div>
+				</li>
+				<li style="height:auto;">
+					<div class="filter_con">
+						<span class="fl tspan">项目类型</span>
+						<div class="fl" style="width:100%">
+							<input type="hidden" viewstate="categoryCode">
+							<input type="hidden" viewstate="categoryName">
+							<div class="fl filter_no" onclick="filter(this)" ng-repeat="item in projectType" ng-click="selectCategory(item.categoryCode,item.categoryName)">
+							   <img src="../../../img/task_nonselete_icon.png" class="fl"/>
+							   <div class="fl">{{item.categoryName}}</div>
+							</div>
+							<div style="clear:both"></div>
+						</div>
+						<div style="clear:both"></div>
+					</div>
+				</li>
+				<li style="height:auto;">
+					<div class="filter_con">
+						<span class="fl tspan">项目名称</span>
+						<div class="fl" style="width:100%">
+							<input type="hidden" viewstate="proNo">
+							<input type="hidden" viewstate="proName">
+							<div class="fl filter_no" onclick="filter(this)" ng-if="item.proName.length>8" style="width:100%" ng-repeat="item in projectList" ng-click="selectPro(item.proNo,item.proName)">
+							   <img src="../../../img/task_nonselete_icon.png" class="fl"/>
+							   <div class="fl">{{item.proName}}</div>
+							</div>
+							<div class="fl filter_no" onclick="filter(this)" ng-if="item.proName.length<8"  ng-repeat="item in projectList" ng-click="selectPro(item.proNo,item.proName)">
+							   <img src="../../../img/task_nonselete_icon.png" class="fl"/>
+							   <div class="fl">{{item.proName}}</div>
+							</div>
+							<div style="clear:both"></div>
+						</div>
+						<div style="clear:both"></div>
+					</div>
+				</li>
+				<li class="more_filter">
+					<div class="filter_con">
+						<span class="fl tspan">日期</span><input type="date" id="date" placeholder="请选项时间"/>
+					</div>
+				</li>
+				<li class="ov" style="height:auto;line-height:normal">
+					<a href="#" class="filterbtn fl" ng-click="doQuery()" >确定</a>
+					<a href="#" class="filterclose fr" ng-click="quxido()">重置</a>
+				</li>
+			</ul>
+			<!-- <ul class="sort sor_fil" style="display: none;">
+				<li>
+					<div class="fenye_warp">
+						<span class="fen_btn up_page" ng-click="home_page()">首页</span>
+						<span class="fen_btn up_page" ng-click="up_page()">上一页</span>
+						<span><input type="text" style="width:30px;text-align:center"></span>
+						<span>/</span>
+						<span style="display:inline-block;width:35px">{{totalPage}}</span>
+						<span class="fen_btn down_page" ng-click="down_page()">下一页</span>
+						<span class="fen_btn up_page" ng-click="last_page()">末页</span>
+					</div>
+				</li>
+			</ul> -->
+		</div>
+		<div id="warp_id">
+			
+			<div class="con_list" ng-repeat="data in datalist1">
+				<div class="title1">
+					{{data.proName}}	
+				</div>
+				<div class="dblist_cons">
+					<div class="martp5"><span>员工：{{data.employeename}}</span><span style="float: right;margin-right: 20px;">签到日期：{{data.checkDate}}</span></div>
+					<div class="martp5"><span>签到时间：{{data.checkinTime}}</span></div>
+					<div class="martp5"><span>签退时间：{{data.checkoutTime}}</span></div>
+					<div class="martp5">
+						<span style="float: right;margin-right:20px;">工作时长(小时)：{{data.checkoutTime}}</span>
+						<span ng-if="data.commuteStatus==1">状态：正常</span>
+						<span ng-if="data.commuteStatus==0">状态：<a style="color:#FF5400">异常</a></span>
+					</div>
+					<div class="martp5"><span>异常判定：{{data.judgingName}} &nbsp;&nbsp;&nbsp;{{data.judgingDescr}}</span></div>
+					<div class="martp5 mr_20">
+						<span class="do"><img src="../../../img/viewimg.png" title="查看图片 " ng-click="showPic(data)"></span>
+						<span class="do" ng-hide="roleCode=='004' && data.judgingName!=null && data.judgingName!=''"><img src="../../../img/check.png" title="判定" ng-click="toCheck(data, $index)"></span>
+					</div>
+				</div>				
+			</div>
+			
+		</div>
+	</section>
+	<footer>
+		<p>
+			共查询到日志&nbsp;&nbsp;<span>{{datalist1.length}}</span>&nbsp;&nbsp;项
+		</p>
+	</footer>
+	<script type="text/javascript">
+	var app = angular.module("userMgr", []);
+	app.controller("userMgrCtrl", function($scope, $http){
+		/* init */
+		ngScope = $scope;
+		$scope.projectType=[];
+		$scope.curUnit={};
+		$scope.projectList=[];
+		$scope.mctlistArr ="";
+		var urlParams = getUrlParams();
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		
+		
+		if(!userDataStr){
+			
+			location.href="../../../pages/login.html";
+			return;
+		}
+		
+		var viewstate = new ViewState();
+		
+		var userData = jQuery.parseJSON(userDataStr);
+		$scope.roleCode = userData.roleCode;
+		var companyCode = userData.companyCode;
+		var ticket=userData.ticket;
+		if(ticket==""||ticket==undefined){
+			var ticket = $.cookie("pmsWeb_ticket");
+		}
+		var employeecode = "";
+		var proStatus="";
+		var mb_mctCode="";
+		var searchName="";
+		var mb_proNo="";
+		
+		var accountCode="";
+		$scope.mctlistArr ="";
+		$scope.totalPage="";
+		var enamearr=[];
+		var currentPage=1;
+		$scope.totalRecord=0;
+		/*根据角色判断是否传accountCode */
+		if(userData.roleCode=="004"){
+			accountCode=userData.accountCode;
+		}
+		if(userData.roleCode=="R20161107150600707427"){
+			employeecode =userData.employeeCode;
+		}
+		
+		
+		
+		/* 获取项目类型  */
+		$http.get(serviceBasePath+"eap/pmsServices/pwsCommon/categorys?accountCode="+accountCode+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==200){
+				$scope.projectType= response.list;
+			}else if(response.statusCode==401){
+				location.href="../../../pages/login.html";
+			}else{
+			}
+		});
+		$scope.cond_categoryName=""
+		var cond_categoryCode="";
+		$scope.selectCategory=function(categoryCode,categoryName){
+			$scope.cond_categoryName=categoryName;
+			cond_categoryCode=categoryCode;
+			$("input[viewstate=categoryCode]").val(categoryCode);
+			$("input[viewstate=categoryName]").val(categoryName);
+			$scope.loadproName(accountCode,categoryCode,companyCode,proStatus,employeecode);
+		}
+		
+		/* 获取项目名称  */
+		$scope.loadproName=function(accountCode,categoryCode,companyCode,proStatus,employeecode){
+			$http.get(serviceBasePath+"eap/pmsServices/pwsCommon/activePro?accountCode="+accountCode+"&categoryCode="+categoryCode+"&companyCode="+companyCode+"&proStatus="+proStatus+"&employeecode="+employeecode+"&ticket="+ticket).success(function(res){
+				$scope.projectList = res.list;
+			});
+		}	
+		
+		$scope.cond_proName="";
+		$scope.selectPro=function(proNo,proName){
+			mb_proNo=proNo;
+			$scope.cond_proName=proName;
+			$("input[viewstate=proNo]").val(proNo);
+			$("input[viewstate=proName]").val(proName);
+			
+		}
+	
+		
+		/* 数据加载 */
+	 	$scope.loadData=function(companyCode,proNo,date,searchName){
+	 		new ShowDlog().prompt({
+	 			icon:"waitting",
+	 			msg:"正在加载...",
+	 			done:function(){},
+	 			t:600000
+	 		}); 	 
+			$http.get(serviceBasePath+"eap/pmsServices/commuteMgr/performance/statistic/dailySheet?companyCode="+companyCode+"&proNo="+proNo+"&date="+date+"&ticket="+ticket+"&currentPage="+1+"&searchName="+searchName+"&perpage=1000").success(function(res){
+				if(res.statusCode==200){
+					$dlog.close();
+					$scope.datalist1 = res.list;
+					$scope.datares=res;
+				}else if(res.statusCode==401){
+					window.parent.location.href="../../../pages/login.html";
+				}else if(res.statusCode==404){
+					$scope.datalist1=[];
+				}
+			})
+		}; 
+		var date = new SimpleDateFormat({formatString:"yyyy-MM-dd"}).format(new Date());
+		$("#date").val(date);
+
+		$scope.loadData(companyCode,mb_proNo,date,searchName);
+		
+		$scope.doQuery=function(){
+			var date =$("#date").val();
+			searchName=$("#search").val();
+			$("#warp_id").show();
+			$(".cz_selpx li").each(function(){
+				var n = $(this).index();
+				$(".filter_sort .sor_fil").eq(n).hide();
+				$(this).attr("isopen", "");
+			});
+			$scope.loadData(companyCode,mb_proNo,date,searchName);
+			$(".filter").hide();
+		};
+		/* 查看图片 */
+		$scope.showPic=function(item){
+			var date=$("#date").val();
+			new ShowDlog().showFrame("imags.html?accountCode="+item.accountCode+"&date="+date, "查看图片", function(){}, "dlog-showPic");
+		};
+		/* 判定 */
+		$scope.toCheck=function(item, index){
+			item.checkDate=$("#date").val();;
+			var itemStr = toUrlParams(item);
+			new ShowDlog().showFrame("setJudging.html?"+itemStr, "判定", function(res){
+				if("SUCCESS"==res){
+					new ShowDlog().prompt({
+						icon:"success",
+						msg:"已判定！",
+						done:function(){
+							$scope.doQuery();
+						},
+						t:1500
+					});
+				}else if("FAIL"==res){
+					new ShowDlog().prompt({
+						msg:"判定失败！",
+						done:function(){
+						},
+						t:1500
+					});
+				}
+			}, "setJudging");
+		};
+
+		$scope.quxido=function(){
+			window.location.reload();
+		};
+		
+		$(".return").click(function(){
+			if(urlParams.web==1){
+				window.history.back() 
+			}else{
+				window.top.exitApp();
+			}
+			
+		});	
+		
+		
+	})
+	
+	
+		$(".clear_search").click(function(){
+		
+			$(".search_int input").val("");
+		});
+		
+		function filter(obj){
+			$(obj).find("img").attr("src","../../../img/task_selete_icon.png");
+			$(obj).siblings().find("img").attr("src","../../../img/task_nonselete_icon.png");
+		}
+				
+		$(".cz_selpx li").click(function(){
+			var isopen = $(this).attr("isopen");
+			if(isopen != "1"){
+				var n = $(this).index();
+				$(".filter_sort .sor_fil").eq(n).show().siblings().hide();
+				$(this).attr("isopen", "1");
+				$(this).siblings().attr("isopen", "");
+				if(n==0){
+					$("#warp_id").hide();
+				}else{
+					$("#warp_id").show();
+				}
+			}else{
+				var n = $(this).index();
+				$(".filter_sort .sor_fil").eq(n).hide();
+				$(this).attr("isopen", "");
+				if(n==0){
+					$("#warp_id").show();
+				}else{
+					$("#warp_id").show();
+				}
+			}
+		});
+	
+
+	</script>
+</body>
+</html>

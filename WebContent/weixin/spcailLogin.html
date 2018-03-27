@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>量为石电网智能运维管控云服务平台</title>
+	<link rel="stylesheet" type="text/css" href="css/index.css"/>
+	<link rel="shortcut icon" href="images/glens.png" type="image/x-icon"/>
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="js/config.js"></script>
+	<script type="text/javascript" src="angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="js/showDlog/showDlog-blue.css" />
+</head>
+<body style="overflow: hidden;">
+<div class="sp_login">
+	<p></p>
+	<ul>
+		<li>
+			<label>用户名</label> 
+			<input type="text" placeholder="请输入用户名" name="uname1" id="uname1">
+		</li>
+		<li style="margin-bottom:0">
+			<label>密码</label>
+			<input type="password" placeholder="请输入密码" name="upass1"  id="upass1">
+		</li>
+		<li style="margin-bottom:0">
+			<label></label>
+			<span id="error_meg"></span>
+		</li>
+		<li style="text-align:center">
+			<span class="logintt" onclick="doLogin()">登录</span>
+		</li>
+	</ul>
+</div>
+<script type="text/javascript">
+	/* document.getElementById("upass1").value=""; */
+	/* $('#upass1').val('');
+	$('#upass1').focus(); */
+	/* var app = angular.module("pmsWeb", []);
+	app.controller("knowLedgeCtrl", function($scope, $http){
+
+	})	 */
+	function doLogin(){
+			var $uname = $("input[name=uname1]");
+			var $upass = $("input[name=upass1]");
+			// check
+			if(!$uname.val() || $uname.val().length==0){
+				$("#error_meg").html("请输入用户名！");
+				$uname.focus();
+				return false;
+			}
+			if(!$upass.val() || $upass.val().length==0){
+				$("#error_meg").html("请输入密码！");
+				$upass.focus();
+				return false;
+			}
+			// login
+			$.ajax({
+				url:serviceBasePath+"eap/pmsServices/loginService/wxlogin",
+				method:"GET",
+				data:{"userName":$uname.val(),"psw":$upass.val()},
+				cache:false,
+				success:function(res){
+					if(!res){
+						$("#error_meg").html("服务器无响应信息！");
+						return;
+					}
+					if(res.statusCode=="200"){
+						// 200
+						parent.$dlog.data="SUCCESS";
+						parent.$dlog.close();
+					}else{
+						$("#error_meg").html("用户名或密码错误！");
+					}
+				},
+				error:function(){
+					$("#error_meg").html("服务器访问失败");
+				}
+			});
+		}
+
+</script>
+</body>
+</html>

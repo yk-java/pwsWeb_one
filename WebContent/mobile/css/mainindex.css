@@ -1,0 +1,66 @@
+*{padding: 0;margin: 0;font-family:"microsoft yahei";font-size: 14px;color:#666666}
+body{background: #f5f5f5;}
+ul,li{list-style: none;}
+a{text-decoration: none;}
+.ov{overflow: hidden;}
+.fl{float:left;height:30px;}
+.fr{float:right;}
+/* header{font-size:16px}
+header .return{top:4px;}
+header .return img{width: 10px;} */
+/*  我的工作  */
+.wall{background:#02a2ff;height:150px;text-align:center;}
+.wall img{width:176px;margin-top:10px}
+.nav_bar p{text-indent:20px;line-height:45px}
+.nav_bar ul{overflow:hidden;background:#fff;border-top:1px solid #eee;}
+.nav_bar ul li{width:33%;text-align:center;float:left;height:105px;border-right:1px solid #eee;border-bottom:1px solid #eee}
+.nav_bar ul li label{display:block;}
+.nav_bar ul li img{width:30px;margin-top:30px}
+
+/*消息*/
+header ul li{line-height:60px;width:33.3%;background:#02a2ff;border-bottom:2px solid #02a2ff;color:#fff;}
+header ul li.act{border-bottom:2px solid #fff;}
+.tabwarp{padding:20px 0;}
+.tabwarp ul li{border-left:1px solid #ccc;width:90%;margin:0 auto;padding:10px 0;position:relative}
+.tabwarp ul li *{text-indent:20px;}
+.tabwarp ul li span.circle{display: inline-block;width:8px;height:8px;border-radius:50%;border:1px solid #cb7262;position:absolute;left: -5px;top:17px}
+.tabwarp ul li span.title{margin-left:20px;font-size:16px}
+.tabwarp ul li p{color:#02a2ff;position:relative;line-height:50px}
+.tabwarp ul li p img{margin-left:50px;position:absolute;top:10px}
+
+/*我的*/
+.well_tx{background:#02a2ff;height:150px;text-align:center}
+.well_tx label{display:block;margin-top:10px;color:#fff}
+.well_tx img{width:80px;margin-top: 20px;}
+.my_main{padding:10px 0}
+.my_main li{background:#fff url(../img/list_icon_forward.png) no-repeat 98% center;line-height:50px;height:50px;text-indent:35px;position:relative;margin-bottom:1px;background-size:2%}
+.my_main li img.set_logo{width:20px;position:absolute;left: 10px;top: 15px;}
+.my_main li a{display:block;}
+
+/* 设置 */
+.myset{padding:10px 0}
+.myset_ul li{line-height:50px;background:#fff;text-indent:20px;margin-bottom:1px}
+.myset_ul li.outlogin{text-align:center;text-indent:0px;margin-top:20px}
+.myset_ul li a{display:block;}
+
+/* 个人信息 */
+.my_main ul li span.msg_name{float:right;margin-right:30px;display:block;color:#ccc;font-size:12px}
+.my_main ul li.ownMsg{text-indent:15px;}
+
+/* 修改个人信息 */
+.myMsg ul.myset_ul li{width:95%;margin:0 auto;text-indent:0;overflow: hidden;}
+.myMsg ul.myset_ul li span.sel_sex{float:right;overflow:hidden}
+.myMsg ul.myset_ul li span.sel_sex *{float:left}
+.myMsg ul.myset_ul li span.sel_sex img{width:30px;display: block;margin:5px 10px 0 10px;}
+.myMsg ul.myset_ul li.btn_upta{margin-top:20px;text-align:center;background:#02a2ff;color:#fff;text-indent:0px}
+.myMsg ul.myset_ul li input{width: 99%;height: 40px;text-indent: 10px;background: #ebf7fd;border: none;}
+
+/* 修改密码 */
+.movepass li{background: #ebf7fd;margin-bottom:10px !important;text-indent:15px !important}
+.movepass li input{background:none;width: 60% !important;outline: none;list-style: none;}
+.movepass li span{display: inline-block;width: 30%;}
+
+
+
+
+

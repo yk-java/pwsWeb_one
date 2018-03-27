@@ -1,0 +1,261 @@
+<!DOCTYPE HTML>
+<html ng-app="board">
+<head>
+<title> 通勤看板 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../js/echarts-all.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+
+<style type="text/css">
+	body{
+		margin:0px;
+		padding:0px;
+		font-size:12px;
+		font-family:"微软雅黑";
+	}
+
+	.table,.table td,.table th{border:1px solid #EDEDED;border-collapse:collapse;}
+	.tr1{height:30px;background:#E6E6E6;font-family: 微软雅黑;color:#1A1A1A;font-size:12px;font-weight:normal;}
+	.tr2{height:30px;background:#fff;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.tr2:hover{background:#F5F5F5;}
+	.tr3{height:30px;background:#F5F5F5;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.tr3:hover{background:#F5F5F5;}
+	.tr4{height:30px;background:#EFD397;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.operationImg{cursor: pointer;}
+
+	.list{position: absolute;left:13px;right:13px;top:13px;bottom:10px;border:solid 0px;background:#E5F0FF;}
+	.list .list_title{width:100%;height:68px;background:#4CA9FF;}
+	.list .list_title > input{width:200px;height:30px;border:solid 0px;margin-left:40px;margin-top:19px;float:left;color:#6E6E6E;padding-left:4px;}
+	.list .list_title .search_div{width:80px;height:30px;background:#3385FF;color:#fff;line-height:30px;text-align:center;float:left;margin-left:30px;margin-top:20px;font-size:14px;font-weight: bold;cursor: pointer;}
+
+	.list .list_content{width:100%;height:44%;border:solid 0px;margin-top:10px;min-height:270px;position: relative;}
+	.list .list_content .content_left{position: absolute;left:0px;top:0px;bottom:0px;right:350px;border:solid 0px;background:#fff;}
+	.list .list_content .content_left .left_title{width:100%;height:30px;border-bottom:solid 1px #FFE2B2;border-left:solid 2px #3385FF;line-height:30px;}
+	.list .list_content .content_left .left_title > img{margin-left:10px;vertical-align:middle}
+	.list .list_content .content_left .left_title .label_1{font-weight:bold;margin-left:20px;}
+	.list .list_content .content_left .left_title .label_2{margin-left:40px;color:#999999;}
+	.list .list_content .content_left .left_chart{position: absolute;left:0px;right:0px;bottom:0px;top:30px;border:solid 0px;}
+	.list .list_content .content_right{position: absolute;width:340px;top:0px;bottom:0px;right:0px;border:solid 0px;background:#fff;}
+	.list .list_content .content_right .right_title{width:338px;height:30px;border-bottom:solid 1px #FFFFFF;border-left:solid 2px #FF5F00;line-height:30px;background:#FF9600;}
+	.list .list_content .content_right .right_title > img{margin-left:10px;vertical-align:middle}
+	.list .list_content .content_right .right_title .label_1{font-weight:bold;margin-left:10px;color:#fff;}
+	.list .list_content .content_right .right_title .label_2{margin-left:20px;color:#fff;font-size: 4px;}
+	.list .list_content .content_right .right_table{position: absolute;left:0px;right:0px;bottom:0px;top:30px;border:solid 0px;}
+	.dropDownTree{width:200px;background-image:url(../../../img/open--icon.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	.dropDownList{background-image:url(../../../img/open--icon.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	#page_bar .page_btn{display:inline-black;margin:0 4px;}
+	#page_bar .selected{font-weight:bold;}
+</style>
+</head>
+
+<body ng-controller="boardCtrl">
+	
+	<div class="list">
+		
+		<div class="list_title">
+			<input type="text" class="select_1 dropDownTree" placeholder="请选择部门"/>
+			<input type="text" id="beginDate" class="select_2 dropDownList" onclick="new Calendar().show(this)" placeholder="请选择日期"/>
+			<input type="text" id="endDate" class="select_2 dropDownList" onclick="new Calendar().show(this)" placeholder="请选择日期"/>
+			<div class="search_div" onclick="doQuery()">
+					<img src="../../../img/list-_header-search.png">&nbsp;查 询
+			</div>
+		</div>
+		<div class="list_content">
+			<div class="content_left">
+				<div class="left_title">
+					<img src="../../../img/items_Sign.png">
+					<label class="label_1">签 到 合 格 率</label>
+					<label class="label_2">显示组织/部门一个自然月内的签到合格率</label>
+				</div>
+				<div class="left_chart" id="chart1">
+					
+				</div>
+			</div>
+			<div class="content_right">
+				<div class="right_title">
+					<img src="../../../img/list_header-nonnormal.png">
+					<label class="label_1">签 到 异 常</label>
+					<label class="label_2">显示组织/部门签到异常人员 TOP10</label>
+				</div>
+				<div class="right_table">
+					<table width="100%" border="0" cellspacing="0" cellpadding="2" class="table">
+					   <tr class="tr1">
+						<th width="50%"><div align="left">&nbsp;&nbsp;姓名</div></th>
+						<th width="25%"><div align="center">异常次数</div></th>
+						<th width="25%"><div align="center">合格率</div></th>
+					  </tr>
+					  <tr class="tr2" ng-repeat="item in signPerOfPassTop10">
+						<td align="left">{{item.employeename}}</td>
+						<td align="center">{{item.signAbnormalCount}}</td>
+						<td align="center">{{item.signPerOfPass}}%</td>
+					  </tr>
+					 </table>
+				</div>
+			</div>
+		</div>
+		<div class="list_content">
+			<div class="content_left">
+				<div class="left_title">
+					<img src="../../../img/items_Report.png">
+					<label class="label_1">上 报 合 格 率</label>
+					<label class="label_2">显示组织/部门一个自然月内的签到合格率</label>
+				</div>
+				<div class="left_chart" id="chart2">
+					
+				</div>
+			</div>
+			<div class="content_right">
+				<div class="right_title">
+					<img src="../../../img/list_header-nonnormal-02.png">
+					<label class="label_1">上 报 异 常</label>
+					<label class="label_2">显示组织/部门签到异常人员 TOP10</label>
+				</div>
+				<div class="right_table">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+					   <tr class="tr1">
+						<th width="50%"><div align="left">&nbsp;&nbsp;姓名</div></th>
+						<th width="25%"><div align="center">异常次数</div></th>
+						<th width="25%"><div align="center">合格率</div></th>
+					  </tr>
+					  <tr class="tr2">
+						<td><div align="left">&nbsp;&nbsp;张化生</div></th>
+						<td><div align="center">25</div></td>
+						<td><div align="center">45%</div></td>
+					  </tr>
+					  <tr class="tr2">
+						<td><div align="left">&nbsp;&nbsp;张化生</div></th>
+						<td><div align="center">25</div></td>
+						<td><div align="center">45%</div></td>
+					  </tr>
+					 </table>
+				</div>
+			</div>
+		</div>
+
+	</div>
+<script type="text/javascript">
+
+function doQuery(){
+	
+}
+
+var ngScope;
+var app = angular.module("board", []);
+app.controller("boardCtrl", function($scope, $http){
+	/* 变量定义 */
+	ngScope = $scope;
+	$scope.signPerOfPassTop10=[];
+	$scope.userData;
+	$scope.ticket;
+	
+	
+	/* 加载签到异常Top10 */
+	$scope.loadTop10=function(unitCode, beginDate, endDate){
+		$http.get(serviceBasePath+"eap/pmsServices/commuteMgr/performance/digitalSignage/checkin?&unitCode="
+					+unitCode+"&beginDate="+beginDate+"&endDate="+endDate+"&ticket="+$scope.ticket).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$scope.signPerOfPassTop10 = response.list;
+		});
+	};
+	
+	/* 加载图表 */
+	$scope.loadChart=function(unitCode, beginDate, endDate){
+		var chartData={};
+		var chart1_category=[];
+		var chart1_data=[];
+		var option1 = {
+			yAxis : [
+				{
+					type : 'value',
+					boundaryGap : [0, 0.01]
+				}
+			],
+			xAxis : [
+				{
+					type : 'category',
+					data : chart1_category
+				}
+			],
+			series : [
+				{
+					name:'签到合格率',
+					type:'bar',
+					data:chart1_data
+				}
+			]
+		};
+		
+		$.ajax({
+			url:serviceBasePath+"eap/pmsServices/commuteMgr/performance/digitalSignage/checkinRatio?&unitCode="
+				+unitCode+"&beginDate="+beginDate+"&endDate="+endDate+"&ticket="+$scope.ticket,
+			method:"GET",
+			cache:false,
+			success:function(res){
+				if(res.statusCode!=200){
+					alert("请求服务器失败！");
+					return;
+				}
+				chartData = res.list;
+				//
+				for(var i=0;i<chartData.length; i++){
+					var item = chartData[i];
+					chart1_category.push(item.unitName);
+					chart1_data.push(item.signPerOfPass);
+				}
+				//
+				var chart = echarts.init(document.getElementById('chart1'));
+				chart.setOption(option1);
+		
+				var chart2 = echarts.init(document.getElementById('chart2'));
+				chart2.setOption(option1);
+			},
+			error:function(){
+				alert("请求服务器失败！");
+			}
+		});
+	};
+	
+	/* 初始化 */
+	(function(){
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		$scope.userData = jQuery.parseJSON(userDataStr);
+		$scope.ticket = $.cookie("pmsWeb_ticket");
+		/* 加载机构树 */
+		new DropDownList().init({
+			renderTo:".dropDownTree",
+			url:"../component/orgTree.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				selectedUnitCode=result.unitCode;
+				$(".dropDownTree").val(result.unitName);
+				var beginDate = $("#beginDate").val();
+				var endDate = $("#endDate").val();
+				//ngScope.loadStatistic("", result.unitCode, date, 1);
+			},
+			css:{
+				top:50,
+				left:40
+			}
+		});
+		$scope.userData.unitCode=9;//////TEST
+		$scope.loadTop10($scope.userData.unitCode, "", "");
+		$scope.loadChart($scope.userData.unitCode, "", "");
+	})();
+});
+</script>
+</body>
+</html>

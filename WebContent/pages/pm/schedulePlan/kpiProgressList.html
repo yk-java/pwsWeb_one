@@ -1,0 +1,226 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 项目资产清单 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+
+<style type="text/css">
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+	
+	.detailDialog{width:900px;height:400px;}
+	td a{text-decoration:underline;color:blue;}
+	td{color:#000;}
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" id="projectType" class="dropDownList" placeholder="请项目类型"><!-- 项目类型 -->
+				<input type="text" id="projectList" style="width:260px;" name="proName" class="dropDownList" placeholder="请选择项目"/><!-- 项目名称 -->
+				<input ng-show="0" type="text" id="beginDate" class="dateComponent" onclick="new Calendar().show(this)" placeholder="起始日期"/>
+				<input ng-show="0" type="text" id="endDate" class="dateComponent" onclick="new Calendar().show(this)" placeholder="结束日期"/>
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				<div class="query_div" ng-click="doExport()">
+					导出
+				</div>
+				&nbsp;&nbsp;
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id=dataTable>
+			   <tr class="tr1">
+				<th rowspan="2">序号</th>
+				<th rowspan="2" colspan="2">项目名称</th>
+				<th rowspan="2">指标合计</th>
+				<th colspan="{{outKpiData.length}}">外业指标</th>
+				<th colspan="{{inKpiData.length}}">内业指标</th>
+			  </tr>
+			  <tr class="tr1">
+			  	<th ng-repeat="kpi in outKpiData"><div align="center">{{kpi.kpiName}}</div></th>
+			  	<th ng-repeat="kpi in inKpiData"><div align="center">{{kpi.kpiName}}</div></th>
+			  </tr>
+			  <tr class="tr22" ng-repeat-start="item in dataList.proProgressList" style="background:{{colorList[$index]}};">
+				<td rowspan="3"><div align="center">{{$index+1}}</div></td>
+				<td rowspan="3"><div align="center">{{item.proName}}（{{item.proManager}}）</div></td>
+				<td><div align="center"><b>总量</b></div></td>
+				<td><div align="center">{{item.totalWordload}}</div></td>
+				<td ng-repeat="kpi in outKpiData">
+					<div align="center">{{getVal(item, kpi.kpiCode, 'totalVal')}}</div>
+				</td>
+				<td ng-repeat="kpi in inKpiData">
+					<div align="center">{{getVal(item, kpi.kpiCode, 'totalVal')}}</div>
+				</td>
+			  </tr>
+			  <tr class="tr22" style="background:{{colorList[$index]}};">
+			  	<td><div align="center"><b>完成</b></div></td>
+			  	<td><div align="center">{{decim(item.allAccumulativeWordload,2)}}</div></td>
+			  	<td ng-repeat="kpi in outKpiData">
+					<div align="center">{{getVal(item, kpi.kpiCode, 'completedVal')}}</div>
+				</td>
+				<td ng-repeat="kpi in inKpiData">
+					<div align="center">{{getVal(item, kpi.kpiCode, 'completedVal')}}</div>
+				</td>
+			  </tr>
+			  <tr class="tr22"  style="background:{{colorList[$index]}};" ng-repeat-end>
+			  	<td><div align="center"><b>占比</b></div></td>
+			  	<td><div align="center">{{decim(item.allAccumulativeProgress, 2)}}<span ng-if="item.allAccumulativeProgress">%</span></div></td>
+			  	<td ng-repeat="kpi in outKpiData">
+					<div align="center">{{getVal(item, kpi.kpiCode, 'percentVal')}}<span ng-if="getVal(item, kpi.kpiCode, 'percentVal')">%</span></div>
+				</td>
+				<td ng-repeat="kpi in inKpiData">
+					<div align="center">{{getVal(item, kpi.kpiCode, 'percentVal')}}<span ng-if="getVal(item, kpi.kpiCode, 'percentVal')">%</span></div>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+
+
+var cond_categoryCode="", cond_proNos="", cond_beginDate="", cond_endDate="";
+
+simpleController({
+	init:function($scope, $http){
+		$scope.dataList={};
+		$scope.outKpiData=[];
+		$scope.inKpiData=[];
+		
+		$scope.colorList=["#C8E8FF","#E8FFE8","#E8C8FF","#FFBAB9","#FFE769","#69FF69","#C8E8FF","#E8FFE8","#E8C8FF","#FFBAB9","#FFE769","#69FF69","#FF888D"];
+		
+		/* 项目类型 */
+		new DropDownList().init({
+			renderTo:"#projectType",
+			url:"../../component/projectType.html",
+			height:"200px",
+			onSelected:function(result){
+				$("#projectType").val(result.categoryName);
+				cond_categoryCode = result.categoryCode;
+				$scope.loadData(cond_categoryCode, cond_beginDate, cond_endDate, cond_proNos);
+				/* 联动 */
+				dpdlst_project.setConfig("url", "../../component/projectListCheck.html?categoryCode="+cond_categoryCode);
+			}
+		});
+		
+		/* 项目列表 */
+		var dpdlst_project = new DropDownList();
+		dpdlst_project.init({
+			renderTo:"#projectList",
+			url:"../../component/projectListCheck.html?categoryCode="+cond_categoryCode,
+			height:"200px",
+			onSelected:function(results){
+				var proNos=[];
+				var proNames=[];
+				for(var i=0; i<results.length; i++){
+					var item = results[i];
+					proNos.push(item.proNo);
+					proNames.push(item.proName);
+				}
+				$("#projectList").val(arrToStr(proNames));
+				cond_proNos=arrToStr(proNos);
+				$scope.loadData(cond_categoryCode, cond_beginDate, cond_endDate, cond_proNos);
+			}
+		});
+		
+		/* 加载数据 */
+		$scope.loadData=function(categoryCode, beginDate, endDate, proNos){
+			if(!categoryCode || categoryCode.length==0)
+				return;// 不选择项目分类不查询
+			$scope.httpGet({
+				url:"eap/pmsServices/pm/schedulePlan/pmDayKpi/queryProKpiProgress?categoryCode="+categoryCode+
+						"&beginDate="+beginDate+"&endDate="+endDate+"&proNos="+proNos,
+				success:function(response){
+					$scope.dataList = response.data;
+					$scope.outKpiData = $scope.getOutKpiData($scope.dataList.kpiList);
+					$scope.inKpiData = $scope.getInKpiData($scope.dataList.kpiList);
+				}
+			});
+		};
+		
+		/* 查询 */
+		$scope.doQuery=function(){
+			cond_beginDate = $("#beginDate").val();
+			cond_endDate = $("#endDate").val();
+			$scope.loadData(cond_categoryCode, cond_beginDate, cond_endDate, cond_proNos);
+		};
+		
+		/* 导出 */
+		$scope.doExport=function(){
+			excelExport("dataTable");
+		};
+		
+		/* 筛选外业指标 */
+		$scope.getOutKpiData=function(kpiList){
+			var outKpi=[];
+			for(var i=0; i<kpiList.length; i++){
+				var kpi = kpiList[i];
+				if(kpi.isPerCnt==1)
+					continue;// 过滤掉人数
+				if(kpi.kpiType==1){
+					outKpi.push(kpi);
+				}
+			}
+			return outKpi;
+		};
+		
+		/* 筛选内业指标 */
+		$scope.getInKpiData=function(kpiList){
+			var inKpi=[];
+			for(var i=0; i<kpiList.length; i++){
+				var kpi = kpiList[i];
+				if(kpi.isPerCnt==1)
+					continue;// 过滤掉人数
+				if(kpi.kpiType==2){
+					inKpi.push(kpi);
+				}
+			}
+			return inKpi;
+		};
+		
+		$scope.getVal=function(item, kpiCode, field){
+			for(var i=0; i<item.kpiProgressList.length; i++){
+				var kpi = item.kpiProgressList[i];
+				if(kpi.kpiCode==kpiCode){
+					return kpi[field];
+				}
+			}
+			return '';
+		};
+		
+		$scope.decim=function(num, len){
+			return decim(num,len);
+		};
+	}
+});
+	
+</script>
+</body>
+</html>

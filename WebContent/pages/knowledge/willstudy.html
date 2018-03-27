@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 设备属性管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../../bootstrap-3.3.5-dist/css/bootstrap.min.css"/>
+<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.windstagball.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css" />
+
+<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+
+<style type="text/css">
+	.right_warp #tab_cloud{position:relative; width:100%; height:350px; border:1px solid #f7f7f7; margin: 20px auto 0; }
+	.right_warp #tab_cloud a{position:absolute; top:0px; left:0px; font-family: Microsoft YaHei; color:#000; font-weight:bold; text-decoration:none; padding: 3px 6px; }
+	.right_warp #tab_cloud a:hover {border: 1px solid #eee; background: #FFF; }
+	.right_warp #tab_cloud .blue{color:blue;}
+	.right_warp #tab_cloud .red{color:red;}
+	.right_warp #tab_cloud .green{color:green;}
+	.list{overflow: hidden;border: solid 1px #f7f7f7;}
+	.list .list_content{top:60px}
+	.table, .table td, .table th{border: 1px solid #f7f7f7;}
+	.list .list_content .title_div.hot_title{background:none !important;border:1px solid #f7f7f7;}
+	.list .list_content .title_div{line-height: 40px;background: #f7f7f7;text-indent: 20px;color: #008FF5;font-size: 16px;border:none}
+	.list_title{position: absolute;left: 0;top: 0;line-height: 40px;background: #f7f7f7;width: 100%;text-indent: 20px;color: #008FF5;font-size: 18px;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<p class="list_title">·&nbsp;&nbsp;综合学习</p>
+	<div class="list_content">
+		<div class="col-xs-9">
+			<div class="title_div">
+				最近更新
+			</div>
+			
+			<div class="table_div">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+				   <tr>
+					<th><div align="center">序号</div></th>
+					<th><div align="center">文档名称</div></th>
+					<th><div align="center">时间</div></th>
+				  </tr>
+				  <tr class="tr2" ng-repeat="item in userList">
+					<td><div align="center">{{$index+1}}</div></td>
+					<td><div align="center">{{item.fileTitle}}</div></td>
+					<td><div align="center">{{item.sysCreateTime}}</div></td>
+				  </tr>
+				</table>
+				
+			</div>
+			
+			<div class="title_div">
+				知识推送
+			</div>
+			
+			<div class="table_div">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+				   <tr>
+					<th><div align="center">序号</div></th>
+					<th><div align="center">文档名称</div></th>
+					<th><div align="center">时间</div></th>
+				  </tr>
+				  <tr>
+					<td><div align="center">1</div></td>
+					<td><div align="center">关于项目技能的培训</div></td>
+					<td><div align="center">2016-6-12</div></td>
+				  </tr>
+				  <tr>
+					<td><div align="center">2</div></td>
+					<td><div align="center">关于项目业务数据相关的培训</div></td>
+					<td><div align="center">2016-6-12</div></td>
+				  </tr>
+				</table>
+			</div>
+		</div>
+		<div class="col-xs-3 right_warp">
+			<div class="title_div hot_title">
+				热门文档
+			</div>
+			<div id="tab_cloud">
+				<a href="#">项目管理</a>
+				<a href="#" class="red">物资管理</a>
+				<a href="#">人资管理</a>
+				<a href="#">财务管理</a>
+				<a href="#" class="blue">基本管理</a>
+				<a href="#">进度计划</a>
+				<a href="#" class="red">日常管理</a>
+				<a href="#" class="green">任务管理</a>
+				<a href="#">项目管理</a>
+				<a href="#" class="red">进度计划</a>
+				<a href="#" class="blue">日常管理</a>
+			</div>
+		</div>
+	</div>
+	
+</div>
+<script>
+
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	
+	companyCode=userData.companyCode;
+	$http.get(serviceBasePath+"eap/pmsServices/km/kmbase/kmbase/getTop5?companyCode="
+			+companyCode).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$scope.userList=response.list;
+			console.log(response.list)
+		});
+	
+	
+});
+
+$(document).ready(function(){
+    $("#tab_cloud").windstagball({
+            radius:120,
+            speed:10
+        });
+    });
+</script>
+</body>
+</html>

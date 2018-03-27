@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.pm.scene.dao.PmSceneMonitoringMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.pm.scene.vo.PmSceneMonitoring" >
+    <id column="ROWID" property="rowid" jdbcType="BIGINT" />
+    <result column="COMPANY_CODE" property="companyCode" jdbcType="VARCHAR" />
+    <result column="PRO_NO" property="proNo" jdbcType="VARCHAR" />
+    <result column="SPOT_CODE" property="spotCode" jdbcType="VARCHAR" />
+    <result column="REPORT_EMPLOYEECODE" property="reportEmployeecode" jdbcType="VARCHAR" />
+    <result column="REPORT_DATE" property="reportDate" jdbcType="DATE" />
+    <result column="CATCH_TIME" property="catchTime" jdbcType="TIMESTAMP" />
+    <result column="CARD_NO" property="cardNo" jdbcType="VARCHAR" />
+    <result column="PRO_NAME" property="proName" jdbcType="VARCHAR" />
+    <result column="REPORT_EMPLOYEENAME" property="reportEmployeename" jdbcType="VARCHAR" />
+    <result column="EMPLOYEECODE" property="employeecode" jdbcType="VARCHAR" />
+    <result column="EMPLOYEENAME" property="employeename" jdbcType="VARCHAR" />
+    <result column="CATCH_COUNT" property="catchCount" jdbcType="INTEGER" />
+    
+    <result column="DISTANCE" property="distance" jdbcType="FLOAT" />
+    <result column="LONGITUDE" property="longitude" jdbcType="VARCHAR" />
+    <result column="LATITUDE" property="latitude" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ROWID, COMPANY_CODE, PRO_NO,SPOT_CODE, REPORT_EMPLOYEECODE, REPORT_DATE, CATCH_TIME, CARD_NO
+  </sql>
+  
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    	t1.ROWID, t1.COMPANY_CODE, t1.PRO_NO, t1.REPORT_EMPLOYEECODE, t1.REPORT_DATE, t1.CATCH_TIME, t1.CARD_NO,
+    	t2.PRO_NAME,
+    	t3.EMPLOYEENAME as REPORT_EMPLOYEENAME,
+    	t4.EMPLOYEECODE,
+    	t5.EMPLOYEENAME
+    from pm_scene_monitoring t1
+    left join pm_base t2 on t1.pro_no = t2.pro_no
+    left join md_employee t3 on t1.report_employeecode = t3.employeecode
+    left join pm_employee_card t4 on t1.card_no = t4.card_no
+    left join md_employee t5 on t4.employeecode = t5.employeecode
+    where t1.ROWID = #{rowid,jdbcType=BIGINT}
+  </select>
+  
+  <select id="queryForCount" resultType="int" parameterType="map" >
+    select 
+    	count(*)
+    from pm_scene_monitoring t1
+    left join pm_base t2 on t1.pro_no = t2.pro_no
+    left join md_employee t3 on t1.report_employeecode = t3.employeecode
+    left join pm_employee_card t4 on t1.card_no = t4.card_no
+    left join md_employee t5 on t4.employeecode = t5.employeecode
+    where 1=1
+    <if test="proNo != null and proNo != ''">
+    and t1.PRO_NO = #{proNo,jdbcType=VARCHAR}
+    </if>
+    <if test="cardNo != null and cardNo != ''">
+    and t1.CARD_NO = #{cardNo,jdbcType=VARCHAR}
+    </if>
+    <if test="startTime != null and startTime != ''">
+    and t1.REPORT_DATE &gt;= #{startTime, jdbcType=VARCHAR}
+    </if>
+    <if test="endTime != null and endTime != ''">
+    and t1.REPORT_DATE &lt;= #{endTime, jdbcType=VARCHAR}
+    </if>
+  </select>
+  
+  <select id="queryForPage" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    	t1.ROWID, t1.COMPANY_CODE, t1.PRO_NO, t1.REPORT_EMPLOYEECODE, t1.REPORT_DATE, date_format(t1.CATCH_TIME, '%H:%i:%s') as CATCH_TIME, t1.CARD_NO,
+    	t2.PRO_NAME,
+    	t3.EMPLOYEENAME as REPORT_EMPLOYEENAME,
+    	t4.EMPLOYEECODE,
+    	t5.EMPLOYEENAME
+    from pm_scene_monitoring t1
+    left join pm_base t2 on t1.pro_no = t2.pro_no
+    left join md_employee t3 on t1.report_employeecode = t3.employeecode
+    left join pm_employee_card t4 on t1.card_no = t4.card_no
+    left join md_employee t5 on t4.employeecode = t5.employeecode
+    where 1=1
+    <if test="proNo != null and proNo != ''">
+    and t1.PRO_NO = #{proNo,jdbcType=VARCHAR}
+    </if>
+    <if test="cardNo != null and cardNo != ''">
+    and t1.CARD_NO = #{cardNo,jdbcType=VARCHAR}
+    </if>
+    <if test="startTime != null and startTime != ''">
+    and t1.REPORT_DATE &gt;= #{startTime, jdbcType=VARCHAR}
+    </if>
+    <if test="endTime != null and endTime != ''">
+    and t1.REPORT_DATE &lt;= #{endTime, jdbcType=VARCHAR}
+    </if>
+    order by t1.CATCH_TIME desc
+    limit #{firstResult},#{maxResult} 
+  </select>
+  
+  <select id="querySceneList" resultType="map" parameterType="map">
+	SELECT
+		c.PRO_NO,
+		d.PRO_NAME,
+		c.cnt
+	FROM
+		(
+			SELECT
+				b.PRO_NO,
+				count(DISTINCT b.CARD_NO) cnt
+			FROM
+				pm_scene_monitoring b
+			WHERE
+				b.REPORT_DATE = #{startTime}
+			GROUP BY
+				b.PRO_NO
+		) c
+	LEFT JOIN pm_base d ON c.PRO_NO = d.PRO_NO  	
+	where 1=1
+	<if test="proNo!=null and proNo!=''">
+		and d.PRO_NO=#{proNo}
+	</if>	
+   </select>
+   
+   <select id="queryHisList" resultType="map" parameterType="map">
+	SELECT DISTINCT
+	b.CARD_NO,
+	d.WORKER_CODE,
+	d.WORKER_NAME
+	FROM
+		pm_scene_monitoring b
+	LEFT JOIN pro_workers d ON b.CARD_NO = d.WORKER_CARD
+	WHERE
+	d.SYS_PROCESS_FLAG = '1'
+	and b.PRO_NO = #{proNo}
+		and b.SPOT_CODE=#{spotCode}
+   </select>
+   
+   <select id="queryHeatHisList" resultType="map" parameterType="map">
+	SELECT DISTINCT
+	b.LONGITUDE,
+	b.LATITUDE
+	FROM
+		pm_scene_monitoring b
+	WHERE
+		b.PRO_NO = #{proNo}
+	and b.SPOT_CODE=#{spotCode}
+	and b.REPORT_DATE=#{startTime}
+   </select>
+  
+  <select id="queryForList" resultType="map" parameterType="map" >
+	SELECT
+	b.ROWID,
+	date_format(b.REPORT_DATE, '%Y-%m-%d') REPORT_DATE,
+	date_format(b.CATCH_TIME, '%H:%i:%s') CATCH_TIME,
+	b.LATITUDE,
+	b.LONGITUDE,
+	b.DISTANCE
+	FROM
+	pm_scene_monitoring b
+	WHERE
+		b.PRO_NO =#{proNo}
+	AND b.REPORT_DATE =#{startTime}
+	AND b.CARD_NO =#{cardNo}
+	ORDER BY
+		b.CATCH_TIME  	
+  </select>
+  
+  <select id="statistics" resultType="map" parameterType="map" >
+	  SELECT
+		b.PRO_NO,
+		b.PRO_NAME,
+		b.SPOT_CODE,
+		b.SPOT_NAME,
+		c.REPORT_EMPLOYEECODE,
+		date_format(c.REPORT_DATE,'%Y-%m-%d') REPORT_DATE,
+		c.CARD_NO,
+		c.CNT,
+		d.EMPLOYEENAME,
+		e.WORKER_NAME
+	FROM
+		pro_spot b
+	LEFT JOIN (
+		SELECT
+			b.PRO_NO,
+			b.SPOT_CODE,
+			b.REPORT_EMPLOYEECODE,
+			b.CARD_NO,
+			b.REPORT_DATE,
+			count(1) CNT
+		FROM
+			pm_scene_monitoring b
+		WHERE
+			b.REPORT_DATE = #{startTime}
+		GROUP BY
+			b.PRO_NO,
+			b.SPOT_CODE,
+			b.REPORT_EMPLOYEECODE,
+			b.CARD_NO
+	) c ON b.PRO_NO = c.PRO_NO
+	AND b.SPOT_CODE = c.SPOT_CODE
+	LEFT JOIN md_employee d ON c.REPORT_EMPLOYEECODE = d.EMPLOYEECODE
+	LEFT JOIN pro_workers e ON c.CARD_NO = e.WORKER_CARD
+	WHERE
+		b.SYS_PROCESS_FLAG = '1'
+		AND c.CNT IS NOT NULL
+ 		<if test="proNo!=null and proNo!=''">
+ 			and b.PRO_NO=#{proNo}
+ 		</if>
+ 		<if test="spotCode!=null and spotCode!=''">
+ 			and b.SPOT_CODE=#{spotCode}
+ 		</if>
+  </select>
+  
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from pm_scene_monitoring
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </delete>
+  
+  <insert id="insert" parameterType="com.glens.pwCloudOs.pm.scene.vo.PmSceneMonitoring" >
+    insert into pm_scene_monitoring (COMPANY_CODE, PRO_NO, SPOT_CODE,
+      REPORT_EMPLOYEECODE, REPORT_DATE, CATCH_TIME, 
+      CARD_NO,DISTANCE,LONGITUDE,LATITUDE)
+    values (#{companyCode,jdbcType=VARCHAR}, #{proNo,jdbcType=VARCHAR}, #{spotCode,jdbcType=VARCHAR},
+      #{reportEmployeecode,jdbcType=VARCHAR}, now(), #{catchTime,jdbcType=TIMESTAMP}, 
+      #{cardNo,jdbcType=VARCHAR},#{distance},#{longitude},#{latitude})
+  </insert>
+  
+  <select id="queryReport" parameterType="map" resultType="map">
+	SELECT
+		f.worker_name,
+		f.worker_code,
+		e.*
+	FROM
+		(
+			SELECT
+				d.card_no,
+				sum(d.work_count) work_days,
+				ceil(sum(d.dif_min)) total_min,
+				ceil(avg(d.avg_min)) avg_min
+			FROM
+				(
+					SELECT
+						c.card_no,
+						c.rq,
+						c.work_count,
+						c.min_time,
+						c.max_time,
+						c.dif_min,
+						c.dif_min / c.work_count avg_min
+					FROM
+						(
+							SELECT
+								b.CARD_NO,
+								LEFT (b.CATCH_TIME, 10) RQ,
+								count(
+									DISTINCT LEFT (b.CATCH_TIME, 10)
+								) WORK_COUNT,
+								min(b.CATCH_TIME) MIN_TIME,
+								MAX(b.CATCH_TIME) MAX_TIME,
+								(
+									UNIX_TIMESTAMP(MAX(b.CATCH_TIME)) - UNIX_TIMESTAMP(min(b.CATCH_TIME))
+								) / 60 DIF_MIN
+							FROM
+								pm_scene_monitoring b
+							WHERE 
+							    1=1
+							    <if test="spotCode!=null and spotCode!=''">
+							    and b.SPOT_CODE = #{spotCode}
+							    </if>
+								<if test="endTime!=null and endTime!=''">
+								AND LEFT (b.CATCH_TIME, 10) &lt;=#{endTime}
+								</if>
+								<if test="startTime!=null and startTime!=''">
+								AND LEFT (b.CATCH_TIME, 10) >=#{startTime}
+								</if>
+								GROUP BY
+									b.CARD_NO,
+									LEFT (b.CATCH_TIME, 10)
+						) c
+				) d
+			GROUP BY
+				d.card_no
+		) e
+	JOIN pro_workers f ON e.card_no = f.worker_card
+	AND f.SYS_PROCESS_FLAG = '1'  
+  </select>
+</mapper>

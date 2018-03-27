@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 项目管理——日常管理——资产管理——车辆加油登记 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+
+<script type="text/javascript" src="../../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">车辆加油登记</label>
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+		</div>
+<!-- 		<div class="tabs"> -->
+<!-- 			<a href="#lay1" class="tab selected">项目属性</a> -->
+<!-- 			<a href="#lay2" class="tab">市场属性</a> -->
+<!-- 		</div> -->
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+				<tr>
+					<th>项目名称</th>
+					<td width="300">
+						<input type="hidden" name="companyCode"/><!-- 公司编号 -->
+						<input type="hidden" name="proNo"/><!-- 项目编号 -->
+						<input type="hidden" name="assetCode"/><!-- 资产编号 -->
+						<input type="text" name="proName" class="required readonly" readonly="readonly" maxlength="25"/><!-- 选择项目名称 -->
+					</td>
+					<th>车牌号</th><!-- 选择 -->
+					<td width="300">
+						<input type="text" name="vehicleNo" class="required readonly" readonly="readonly" maxlength="15"/>
+					</td>
+				</tr>
+				<tr>
+					<th>加油网点</th>
+					<td>
+						<input type="text" name="fcPlace" class="required" maxlength="25"/>
+					</td>
+					<th>加油金额</th>
+					<td><input type="text" name="fcAmount" class="required number" maxlength="6"/> 元</td>
+				</tr>
+				<tr>
+					<th>加油时间</th>
+					<td><input type="text" name="fcDate" class="required dateComponent" placeholder="请选择日期" onclick="new Calendar().show(this)"/></td>
+					<th>当前公里数</th>
+					<td><input type="text" name="fcVolume" class="required number" maxlength="6"/> KM</td>
+				</tr>
+				<tr>
+					<th>加油量</th>
+					<td><input type="text" name="curPrice" class="required number" maxlength="6"/> 升</td>
+					<th>当前单价</th>
+					<td><input type="text" name="curMileage" class="required number" maxlength="6"/> 元/升</td>
+				</tr>
+			</table>
+			
+		</div>
+
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+var validator;
+var ngScope;
+var userData;
+
+var params_proNo="",params_proName="",params_assetCode="";
+
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.userList=[];
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	var params = getUrlParams();
+	params_proNo = params.proNo;
+	params_proName = strDecode(params.proName);
+	var vehicleNo = strDecode(params.vehicleNo);
+	params_assetCode = params.assetCode;
+	
+	$("input[name=companyCode]").val(userData.companyCode);
+	$("input[name=proNo]").val(params_proNo);
+	$("input[name=proName]").val(params_proName);
+	$("input[name=assetCode]").val(params_assetCode);
+	$("input[name=vehicleNo]").val(vehicleNo);
+	
+	/* 表单验证 */
+	validator = $("#saveForm").validate({
+		onsubmit: false,
+		focusInvalid: false,
+		focusCleanup: true,
+		errorElement: "span",
+		ignore:".ignore",
+		invalidHandler: function(form, validator) {
+			var errors = validator.numberOfInvalids();
+			if (errors) {
+				
+			} 
+		}
+	});
+	
+	/* 保存 */
+	$scope.onSave = function(){
+		var formData = $("#saveForm").serialize();
+		
+		if(validator.checkForm()){
+			$.ajax({
+				url:serviceBasePath+"eap/pmsServices/pm/everydayMgr/assetsMgr/pmVehicleFuelcharge/add",
+				cache:false,
+				method:"POST",
+				data:formData,
+				success:function(res){
+					if(res.statusCode==200){
+						new ShowDlog().prompt({msg:"登记成功！",
+							done:function(){
+								location.href="refuelList.html?proNo="+params_proNo+"&proName="+strEncode(params_proName)+"&assetCode="+params_assetCode;
+							},
+							t:1500
+						});
+					}else{
+						//
+					}
+				},
+				error:function(){
+					
+				}
+			});
+		}else{
+			new ShowDlog().prompt({
+				icon:"warning",
+				msg:"表单填写异常，请检查修正!",
+				done:function(){
+					
+				},
+				t:2500
+			});
+		}
+	};
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		history.go(-1);
+	};
+	
+});
+</script>
+</body>
+</html>

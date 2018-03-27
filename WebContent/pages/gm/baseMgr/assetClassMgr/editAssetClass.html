@@ -1,0 +1,323 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 分类管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+
+
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+
+<style type="text/css">
+	
+</style>
+</head>
+
+<body ng-app="mdu" ng-controller="ctrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">分类修改</label>
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">分类属性</a>
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+				<tr>
+					<th>分类名称</th>
+					<td width="300">
+						<input type="hidden" name="assetClassCode" class="required"  readonly="readonly"  value="{{projectInfo.assetClassCode}}"/>
+						<input type="text" name="assetClassName" class="required"   maxlength="16" value="{{projectInfo.assetClassName}}"/>
+					</td>
+					<th>资产性质</th>
+					<td>
+						<input type="text" name="assetCharacterName" class="required dropDownList" id="dropDownProjectType" placeholder="请选择" value="{{projectInfo.assetCharacterName}}"/>
+						<input type="hidden" name="assetCharacterCode" value="{{projectInfo.assetCharacterCode}}"/>
+					</td>
+					
+				</tr>
+				
+				<tr>
+					<th>残值率</th>
+					<td><input type="text" readonly="readonly" name="residualRate" min="0" max="100" class="required number readonly"  value="{{projectInfo.residualRate}}"/><span style="color:#ccc">（%）</span></td>
+					<th>折旧年限</th>
+					<td><input type="text" readonly="readonly" onkeyup="keyupFn()" name="usefulLife" id="usefulLife" class=" required number readonly" value="{{projectInfo.usefulLife}}"/><span style="color:#ccc">（年）</span></td>
+				</tr>
+				<tr>
+					<th>预计使用期间</th>
+					<td><input type="text" readonly="readonly" name="eupMonth" id="eupMonth" class="number readonly" value="{{projectInfo.eupMonth}}"/><span style="color:#ccc">（月）</span></td>
+					<th>是否耗材</th>
+					<td>
+						<input type="text" name="iscmname" id="iscmname" value="{{projectInfo.iscm==0?'否':'是'}}" class="required dropDownList"  placeholder="请选择"/>
+						<input type="hidden" name="iscm" value="{{projectInfo.iscm}}" />
+					</td>	
+				</tr>
+				
+				<tr>
+					
+					<th>备注</th>
+					<td><input type="text" name="remarks" value="{{projectInfo.remarks}}" class=""/></td>	
+				</tr>
+			</table>
+			
+		</div>
+		
+		
+
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+/* function getUrlParams(){
+	var params={};
+	var url = location.href;
+	var start = url.indexOf("?", 0)+1;
+	var paramsStr = url.substring(start, url.length);
+	var paramsArr = paramsStr.split("&");
+	for(var i=0;i<paramsArr.length;i++){
+		var kv = paramsArr[i].split("=");
+		var k = kv[0];
+		var v = kv[1];
+		params[k]=v;
+	}
+	return params;
+} */
+var selectedUnitCode="";
+var validator;
+var userData;
+
+var ngScope;
+var app = angular.module("mdu", []);
+app.controller("ctrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	
+	$scope.projectInfo={};
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	var params = getUrlParams();
+	
+	/* 视图渲染 */
+	$(".tabs>a").each(function(){
+		var layId = $(this).attr("href");
+		var idx = $(".tabs>a").index($(this));
+		if(idx!=0){
+			$(layId).hide();
+			$(layId).attr("data-show", "0");
+		}else{
+			$(layId).attr("data-show", "1");
+		}
+		$(this).click(function(){
+			$(".tabs>.selected").removeClass("selected");
+			$(this).addClass("selected");
+			var layId = $(this).attr("href");
+			$("div[data-show=1]").hide();
+			$("div[data-show=1]").attr("data-show", "0");
+			$(layId).show();
+			$(layId).attr("data-show", "1");
+			
+		});
+	});
+	
+	/* Validate */
+	validator = $("#saveForm").validate({
+		onsubmit: false,
+		focusInvalid: false,
+		focusCleanup: true,
+		errorElement: "span",
+		ignore:".ignore",
+		invalidHandler: function(form, validator) {
+			var errors = validator.numberOfInvalids();
+			if (errors) {
+				
+			} 
+		}
+	});
+	
+	new DropDownList().init({
+		renderTo:"#iscmname",
+		data:[{name:'否',value:'0'},{name:'是',value:'1'}],
+		textField:"name",
+		onSelected:function(item){
+			//alert(item.name);
+			$("#iscmname").val(item.name);
+			$("input[name=iscm]").val(item.value);
+		}
+	});
+	
+	/* 区域 */
+	new DropDownList().init({
+		renderTo:".dropDownArea",
+		url:"../../../component/areaList.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownArea").val(result.name);
+		}
+	});
+	/* 县级市 */
+	new DropDownList().init({
+		renderTo:".dropDownArea2",
+		url:"../../../component/areaList.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownArea2").val(result.name);
+		}
+	});
+	/* 项目类型 */
+	new DropDownList().init({
+		renderTo:"#dropDownProjectType",
+		url:"../../../component/assetNature.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$("input[name=assetCharacterName]").val(result.assetCharacterName);
+			$("input[name=assetCharacterCode]").val(result.assetCharacterCode);
+			
+			if(result.assetCharacterName=="低值"||result.assetCharacterName=="台账"){
+				$("input[name=residualRate]").addClass("readonly");
+				$("input[name=usefulLife]").addClass("readonly");
+				$("input[name=eupMonth]").addClass("readonly");
+				$("input[name=residualRate]").attr("readonly",true);
+				$("input[name=usefulLife]").attr("readonly",true);
+				$("input[name=eupMonth]").attr("readonly",true);
+				$("input[name=residualRate]").val(0);
+				$("input[name=usefulLife]").val(0);
+				$("input[name=eupMonth]").val(0);
+			}else{
+				$("input[name=residualRate]").removeClass("readonly");
+				$("input[name=residualRate]").removeAttr("readonly");
+				$("input[name=usefulLife]").removeClass("readonly");
+				$("input[name=usefulLife]").removeAttr("readonly");
+				$("input[name=eupMonth]").removeClass("readonly");
+				$("input[name=eupMonth]").removeAttr("readonly");
+			}
+		}
+	});
+	/* 数据加载 */
+	$scope.loadProject=function(assetClassCode){
+		
+		$http.get(serviceBasePath+"eap/pmsServices/materielMg/assetMg/assetClass/get?assetClassCode="
+			+assetClassCode+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../../login.html";
+				return;
+			}
+			$scope.projectInfo = response.data;
+			if(response.data.assetCharacterName=="固定"){
+				$("input[name=residualRate]").removeClass("readonly");
+				$("input[name=residualRate]").removeAttr("readonly");
+				$("input[name=usefulLife]").removeClass("readonly");
+				$("input[name=usefulLife]").removeAttr("readonly");
+				$("input[name=eupMonth]").removeClass("readonly");
+				$("input[name=eupMonth]").removeAttr("readonly");
+			}
+				
+			
+		});
+	};
+	/* 初始加载 */
+	$scope.loadProject(params.assetClassCode);
+	
+	/* 保存 */
+	$scope.onSave = function(){
+		//$("input[name=companyCode]").val(userData.companyCode);
+		var formData = $("#saveForm").serialize();
+		
+		if($("#saveForm").valid()){
+			$.ajax({
+				url:serviceBasePath+"eap/pmsServices/materielMg/assetMg/assetClass/update",
+				cache:false,
+				method:"POST",
+				data:formData,
+				success:function(res){
+					
+					if(res.statusCode==200){
+						new ShowDlog().prompt({msg:"修改成功！",
+							done:function(){
+								hrefTo({
+									url:"AssetClassMgr.html",
+									data:getUrlParams()
+								});
+							},
+							t:1500
+						});
+					}else{
+						//
+						
+					}
+				},
+				error:function(){
+					
+				}
+			});
+			
+		}else{
+			//alert("表单填写异常，请检查修正后再提交");
+		}
+	};
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		//location.href="AssetClassMgr.html";
+		hrefTo({
+			url:"AssetClassMgr.html",
+			data:getUrlParams()
+		});
+	};
+	
+});
+
+function keyupFn(){
+	var usefulLife=$("#usefulLife").val();
+	
+	if(!isNaN(usefulLife)){
+   		$("#eupMonth").val(usefulLife*12);
+	}else{
+	   $("#eupMonth").val(0);
+	}		
+}
+</script>
+</body>
+</html>

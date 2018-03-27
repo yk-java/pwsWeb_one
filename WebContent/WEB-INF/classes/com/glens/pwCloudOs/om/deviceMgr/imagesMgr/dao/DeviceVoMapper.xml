@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.om.deviceMgr.imagesMgr.dao.DeviceVoMapper" >
+  
+  <insert id="insertFs" parameterType="map">
+  	    INSERT INTO fs_file(FILE_NAME,FILE_CODE,FILE_SUFFIX,FILE_SIZE,FILE_URL,FILE_TYPE,SYS_CREATE_TIME)
+		VALUES(#{fileName},#{fileCode},#{fileSuffix},#{fileSize},#{fileUrl},0,now())
+  </insert>
+  
+  
+</mapper>

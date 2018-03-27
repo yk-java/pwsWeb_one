@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.cj.base.dao.CjXlghMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.cj.base.vo.CjXlgh" >
+    <id column="GT_COLLECT_ID" property="gtCollectId" jdbcType="VARCHAR" />
+    <id column="XL_COLLECT_ID" property="xlCollectId" jdbcType="VARCHAR" />
+    <result column="GH" property="gh" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    GT_COLLECT_ID, XL_COLLECT_ID, GH
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.glens.pwCloudOs.cj.base.vo.CjXlgh" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_cj_xlgh
+    where GT_COLLECT_ID = #{gtCollectId,jdbcType=VARCHAR}
+      and XL_COLLECT_ID = #{xlCollectId,jdbcType=VARCHAR}
+  </select>
+  <delete id="delete" parameterType="com.glens.pwCloudOs.cj.base.vo.CjXlgh" >
+    delete from t_cj_xlgh
+    where GT_COLLECT_ID = #{gtCollectId,jdbcType=VARCHAR}
+      and XL_COLLECT_ID = #{xlCollectId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="delByGtCollectId" parameterType="com.glens.pwCloudOs.cj.base.vo.CjXlgh" >
+    delete from t_cj_xlgh
+    where GT_COLLECT_ID = #{gtCollectId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.glens.pwCloudOs.cj.base.vo.CjXlgh" >
+    insert into t_cj_xlgh (GT_COLLECT_ID, XL_COLLECT_ID, GH
+      )
+    values (#{gtCollectId,jdbcType=VARCHAR}, #{xlCollectId,jdbcType=VARCHAR}, #{gh,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.glens.pwCloudOs.cj.base.vo.CjXlgh" >
+    insert into t_cj_xlgh
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="gtCollectId != null" >
+        GT_COLLECT_ID,
+      </if>
+      <if test="xlCollectId != null" >
+        XL_COLLECT_ID,
+      </if>
+      <if test="gh != null" >
+        GH,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="gtCollectId != null" >
+        #{gtCollectId,jdbcType=VARCHAR},
+      </if>
+      <if test="xlCollectId != null" >
+        #{xlCollectId,jdbcType=VARCHAR},
+      </if>
+      <if test="gh != null" >
+        #{gh,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="update" parameterType="com.glens.pwCloudOs.cj.base.vo.CjXlgh" >
+    update t_cj_xlgh
+    <set >
+      <if test="gh != null" >
+        GH = #{gh,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where GT_COLLECT_ID = #{gtCollectId,jdbcType=VARCHAR}
+      and XL_COLLECT_ID = #{xlCollectId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.glens.pwCloudOs.cj.base.vo.CjXlgh" >
+    update t_cj_xlgh
+    set GH = #{gh,jdbcType=VARCHAR}
+    where GT_COLLECT_ID = #{gtCollectId,jdbcType=VARCHAR}
+      and XL_COLLECT_ID = #{xlCollectId,jdbcType=VARCHAR}
+  </update>
+</mapper>

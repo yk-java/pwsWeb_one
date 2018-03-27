@@ -1,0 +1,441 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>人员管理</title>
+
+
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript"
+	src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+</head>
+<script type="text/javascript"
+	src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript"
+	src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript"
+	src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+
+
+<style type="text/css">
+.a4 {
+	height: 842px;
+	width: 595px;
+	margin: 0 auto;
+	position:relative;
+}
+
+* {
+	font-family: '微软雅黑';
+	
+}
+
+table {
+	border-collapse: collapse;
+	/* 关键属性：合并表格内外边框(其实表格边框有2px，外面1px，里面还有1px哦) */
+	border: solid #333; /* 设置边框属性；样式(solid=实线)、颜色(#999=灰) */
+	border-width: 1px 0 0 1px; /* 设置边框状粗细：上 右 下 左 = 对应：1px 0 0 1px */
+	font-size: 12px;
+}
+
+table th, table td {
+	border: solid #333;
+	border-width: 0 1px 1px 0;
+	padding: 2px;
+}
+
+p {
+	padding: 0px;
+	margin: 0px;
+	height: 30px;
+}
+.print{float:left;width:200px;}
+.title{width:100%;text-align: center;margin-top:60px;}
+.biaoti{font-size:20px;}
+.ticketNo{width:100%;text-align: right;font-size:12px;margin-top:5px;margin-bottom:5px;}
+.company{position: absolute;top:-50px;margin-left:-80px;}
+
+.bt{border:0px; background:#0078D7;color:#fff;font-family: '微软雅黑';cursor: pointer;width:60px;padding:5px;border-radius:4px;margin-left:20px;}
+</style>
+</head>
+
+
+
+<script type="text/javascript">
+
+function printThis(){
+	$("#btnback").hide();
+	$("#btnprint").hide();
+	window.print();
+	
+	
+	
+	$("#btnback").show();
+	$("#btnprint").show();
+	//ngScope.sta=1;
+}
+
+function doPrint() {
+	$("#btnback").hide();
+	$("#btnprint").hide();
+ 	window.print();
+ 	$("#btnback").show();
+	$("#btnprint").show();
+}
+
+
+
+
+function printPage(){
+	location.href="showBiling.html?startNo="+startNo+"&endNo="+endNo;
+}
+function getUrlParams(){
+	var params={};
+	var url = location.href;
+	var start = url.indexOf("?", 0)+1;
+	var paramsStr = url.substring(start, url.length);
+	var paramsArr = paramsStr.split("&");
+	for(var i=0;i<paramsArr.length;i++){
+		var kv = paramsArr[i].split("=");
+		var k = kv[0];
+		var v = kv[1];
+		params[k]=v;
+	}
+	return params;
+}
+
+var validator;
+var ngScope;
+var userData;
+var startNo="";
+var endNo="";
+var catalogCode="";
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.userList=[];
+	
+	var params=getUrlParams();
+	
+	startNo=params.startNo;
+	endNo=params.endNo;
+	
+	$scope.curNo=params.currentNo;
+	
+	
+	var status=params.status;
+	
+	startNo=params.startNo;
+	endNo=params.endNo;
+	
+	
+	
+	var dataList=[];
+	
+	
+	if(status==0){
+		$scope.sta=0;
+		var p={"name":params.currentNo};
+		dataList.push(p);
+
+		$scope.userList=dataList;
+		printThis();
+		
+		
+		
+	}else if(status==1){
+		
+		var p={"name":params.currentNo};
+		dataList.push(p);
+		
+		$scope.userList=dataList;
+		
+		$scope.sta=1;
+		
+	}else if(status==2){
+		
+		$scope.sta=0;
+		
+		for(var i=startNo;i<=endNo;i++){
+			
+			var p={"name":i};
+			dataList.push(p);
+			$scope.userList=dataList;
+			//$scope.curNo=i;
+			
+			
+		}
+		
+		
+		printThis();
+	}
+	
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	/* 视图渲染 */
+	$(".tabs>a").each(function(){
+		var layId = $(this).attr("href");
+		var idx = $(".tabs>a").index($(this));
+		if(idx!=0){
+			$(layId).hide();
+			$(layId).attr("data-show", "0");
+		}else{
+			$(layId).attr("data-show", "1");
+		}
+		$(this).click(function(){
+			$(".tabs>.selected").removeClass("selected");
+			$(this).addClass("selected");
+			var layId = $(this).attr("href");
+			$("div[data-show=1]").hide();
+			$("div[data-show=1]").attr("data-show", "0");
+			$(layId).show();
+			$(layId).attr("data-show", "1");
+			
+		});
+	});
+	
+	
+	
+	
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		location.href="bilingList.html";
+	};
+	
+});
+
+
+</script>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+	
+    
+	<div class="list" id="page1">
+		<div class="list_content">
+		
+			<div class="print">
+				<input ng-if="sta==1" type="button" id="btnback" class="bt" onclick="printPage()" value="返回" />
+				<input ng-if="sta==1" type="button" id="btnprint" class="bt" onClick="doPrint()" value="打印" >
+			</div>
+			<div ng-repeat="item in userList">
+				<div class="a4">
+				    <div class="title">
+				    	<div class="biaoti"><strong>电力工程部现场安全作业工作票(第二版)</strong></div>
+				        <div class="ticketNo">工作票编号:<span>{{item.name}}</span></div>
+				        <img src="../../../img/company.png" class="company" />
+				    </div>
+					<table  class="table" align="center">
+						<tr>
+							<td width="169" height="22"><div align="center">项目名称</div></td>
+							<td colspan="2"><div align="center"></div>
+								<div align="center"></div></td>
+							<td width="107">组别</td>
+							<td width="98"><div align="center"></div></td>
+						</tr>
+						<tr>
+							<td rowspan="5"><div align="center">工作类型</div></td>
+							<td colspan="2" rowspan="5" style="text-align: left">
+								<p>
+									<img src="../../../img/ckimg.png"
+										style="height: 11px; width: 11px;">&nbsp;中压电缆探测&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img
+										src="../../../img/ckimg.png" style="height: 11px; width: 11px;">&nbsp;中压精细化
+								</p>
+								<p>
+									<img src="../../../img/ckimg.png"
+										style="height: 11px; width: 11px;">&nbsp;低压PMS2.0营配贯通、线损、生产
+								</p>
+								<p>
+									<img src="../../../img/ckimg.png"
+										style="height: 11px; width: 11px;">&nbsp;采集消缺&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img
+										src="../../../img/ckimg.png" style="height: 11px; width: 11px;">&nbsp;电能表轮换
+								</p>
+	
+								<p>
+									<img src="../../../img/ckimg.png"
+										style="height: 11px; width: 11px;">&nbsp;井井通电&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img
+										src="../../../img/ckimg.png" style="height: 11px; width: 11px;">&nbsp;表箱勘察
+								</p>
+								<p>
+									<img src="../../../img/ckimg.png"
+										style="height: 11px; width: 11px;">&nbsp;一流配网&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img
+										src="../../../img/ckimg.png" style="height: 11px; width: 11px;">&nbsp;线路普查
+								</p>
+							</td>
+							<td height="30" nowrap="nowrap">当日天气</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td height="30">作业地点</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td height="30">开工时间</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td height="30">完工时间</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td height="30">作业人数</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td height="93" colspan="5"><span
+								style="float: left; margin-top: -40px;">作业分工及主要风险：</span></td>
+						</tr>
+						<tr>
+							<td height="24" colspan="5"><div align="center">
+									<strong>作业前检查</strong>
+								</div></td>
+						</tr>
+						<tr>
+							<td height="32" colspan="3"><code></code></td>
+							<td colspan="2">
+								<div align="center">
+									<code>是 否</code>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3" style="text-align: left"><code>作业人员着装是否规范、精神状态是否良好</code></td>
+							<td height="29" colspan="2"><div align="center">
+									<code>
+										<img src="../../../img/ckimg.png"
+											style="height: 11px; width: 11px;">&nbsp; <img
+											src="../../../img/ckimg.png"
+											style="height: 11px; width: 11px;">&nbsp;
+									</code>
+								</div></td>
+						</tr>
+						<tr>
+							<td colspan="3" style="text-align: left"><code>作业安全防护用品（包括个人）、用具是否齐全和完好</code></td>
+							<td height="29" colspan="2"><div align="center">
+									<code>
+										<img src="../../../img/ckimg.png"
+											style="height: 11px; width: 11px;">&nbsp; <img
+											src="../../../img/ckimg.png"
+											style="height: 11px; width: 11px;">&nbsp;
+									</code>
+								</div></td>
+						</tr>
+						<tr>
+							<td colspan="3" style="text-align: left"><code>现场所使用的工器具是否完好且符合技术安全措施要求</code></td>
+							<td height="29" colspan="2"><div align="center">
+									<code>
+										<img src="../../../img/ckimg.png"
+											style="height: 11px; width: 11px;">&nbsp; <img
+											src="../../../img/ckimg.png"
+											style="height: 11px; width: 11px;">&nbsp;
+									</code>
+								</div></td>
+						</tr>
+						<tr>
+							<td colspan="3" style="text-align: left"><code>是否编制技术安全措施</code></td>
+							<td height="29" colspan="2"><div align="center">
+									<code>
+										<img src="../../../img/ckimg.png"
+											style="height: 11px; width: 11px;">&nbsp; <img
+											src="../../../img/ckimg.png"
+											style="height: 11px; width: 11px;">&nbsp;
+									</code>
+								</div></td>
+						</tr>
+						<tr>
+							<td colspan="3" style="text-align: left"><code>作业人员对工作分工是否清楚</code></td>
+							<td height="29" colspan="2"><div align="center">
+									<code>
+										<img src="../../../img/ckimg.png"
+											style="height: 11px; width: 11px;">&nbsp; <img
+											src="../../../img/ckimg.png"
+											style="height: 11px; width: 11px;">&nbsp;
+									</code>
+								</div></td>
+						</tr>
+						<tr>
+							<td colspan="3" style="text-align: left"><code>各工作岗位人员对存在的风险、风险源是否明白</code></td>
+							<td height="29" colspan="2"><div align="center">
+									<code>
+										<img src="../../../img/ckimg.png"
+											style="height: 11px; width: 11px;">&nbsp; <img
+											src="../../../img/ckimg.png"
+											style="height: 11px; width: 11px;">&nbsp;
+									</code>
+								</div></td>
+						</tr>
+						<tr>
+							<td colspan="3" style="text-align: left"><code>预控措施是否明白</code></td>
+							<td height="29" colspan="2" align="center"><code>
+									<img src="../../../img/ckimg.png"
+										style="height: 11px; width: 11px;">&nbsp; <img
+										src="../../../img/ckimg.png" style="height: 11px; width: 11px;">&nbsp;
+								</code></td>
+						</tr>
+						<tr>
+							<td height="33" colspan="5" align="center"><strong>现场变化情况及补充安全措施</strong></td>
+						</tr>
+						<tr>
+							<td height="73" colspan="5">&nbsp;</td>
+						</tr>
+						<tr>
+							<td height="27">作业人员签字</td>
+							<td colspan="4">&nbsp;</td>
+						</tr>
+						<tr>
+							<td height="26" valign="middle">班长签字：</td>
+							<td width="171" valign="middle">&nbsp;</td>
+							<td width="141" valign="middle">外业负责人签字：</td>
+							<td colspan="2">&nbsp;</td>
+						</tr>
+						<tr>
+							<td height="26" valign="middle">项目经理签字：</td>
+							<td valign="middle">&nbsp;</td>
+							<td valign="middle">签发日期：</td>
+							<td colspan="2">&nbsp;</td>
+						</tr>
+						<tr>
+							<td height="44">备注：</td>
+							<td colspan="4">&nbsp;</td>
+						</tr>
+					</table>
+					
+				</div>
+				
+				<div style="page-break-after: always;"></div>
+			</div>
+			
+			
+
+
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		
+	</script>
+</body>
+</html>

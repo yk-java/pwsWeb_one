@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 首页 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<script type="text/javascript" src="../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../js/angular.min.js"></script>
+<script type="text/javascript" src="../js/config.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/ztree_v3/jquery.ztree.all-3.5.min.js"></script>
+<link rel="stylesheet" href="../js/ztree_v3/zTreeStyle.css" type="text/css"/>
+
+<style type="text/css">
+body{padding:0;margin:0;background:#fff;}
+.all{font-size:12px;font-family:微软雅黑;text-decoration:none;color:#666;padding-left:12px;}
+.all a{text-decoration:none;color:#666;}
+.all a:hover{text-decoration:none;color:#666;}
+.ztree span{font-size:12px;font-family:微软雅黑;}
+</style>
+</head>
+
+<body ng-app="orgTree" ng-controller="orgTreeCtrl">
+	<div class="all" ng-if="required!='true'">
+		<a href="javascript:" ng-click="onChooseBlank()">(全部)</a>
+	</div>
+	<div id="treeDemo" class="ztree">
+	</div>
+	<script type="text/javascript">
+	var setting = {
+			data:{
+				key:{
+					name:"problemName"
+				},
+				simpleData:{
+					enable:true,
+					idKey:"problemCode",
+					pIdKey:"parentProblemCode",
+					rootPid:"0"
+				}
+			},
+			callback:{
+				onClick:function(){
+					var selectedNodes = orgZTree.getSelectedNodes();
+					var problemCode = selectedNodes[0].problemCode;
+					window.frameElement.callback(selectedNodes[0]);
+					window.frameElement.close();
+					//alert(unitCode);
+				}
+			}
+		};
+	var orgZTree;
+	var ngScope;
+	var app = angular.module("orgTree", []);
+	
+	app.controller("orgTreeCtrl", function($scope, $http){
+		/* init */
+		ngScope = $scope;
+		$scope.treeNodes={};
+		var params = getUrlParams();
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		var categoryCode="";
+		var accountCode="";
+		var employeecode="";
+		var roleCode =params.roleCode;
+		var companyCode =params.companyCode;
+		var proNo="";
+		if(userDataStr==""||userDataStr==undefined){
+			userDataStr = params.userData;
+		}
+		var ticket =params.ticket;
+		
+		
+		if(ticket){
+			if(params.proNo){
+				proNo = params.proNo; 
+			}
+		}else{
+			if(!userDataStr){
+				
+				noLogin(location.href);
+				return;
+			}
+			$scope.userData = jQuery.parseJSON(userDataStr);
+			var ticket = $.cookie("pmsWeb_ticket");
+			var params = getUrlParams();
+			$scope.required = params.required;
+			var proNo ="";
+			if(params.proNo)
+				proNo=params.proNo;
+		}
+		/* 加载数据 */
+		$.ajax({
+			url:serviceBasePath+"eap/pmsServices/pm/taskMgr/deviceProblem/listAll",
+			method:"GET",
+			cache:false,
+			data:{"proNo":proNo, "ticket":ticket},
+			success:function(res){
+				if(res.statusCode==200){
+// 					$scope.treeNodes.unitName="故障问题";
+// 					$scope.treeNodes.unitCode="0";
+// 					$scope.treeNodes.parentUnit="-1";
+// 					$scope.treeNodes.children=res.list;
+// 					$scope.treeNodes.open=true;//$scope.treeNodes
+					
+					orgZTree = $.fn.zTree.init($("#treeDemo"), setting, res.list);
+				}else if(res.statusCode==401){
+					window.top.location.href=serviceBasePath+"pages/login.html";
+				}else{
+				}
+			},
+			error:function(){
+			}
+		});
+		
+		/* 选择空白 */
+		$scope.onChooseBlank=function(){
+			var obj=new Object();
+			obj.problemCode="";
+			obj.problemName="";
+			window.frameElement.callback(obj);
+			window.frameElement.close();
+		};
+		
+	});
+	</script>
+</body>
+</html>

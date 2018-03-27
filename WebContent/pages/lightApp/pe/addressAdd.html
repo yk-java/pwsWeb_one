@@ -1,0 +1,1806 @@
+<!doctype html>
+<html lang="en"  ng-app="realPosition">
+<head>
+	<meta charset="UTF-8" />
+	<title>Document</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="js/jquery.cookie.js"></script>
+	<script src="js/angular.min.js"></script>
+	<script src="js/util.js"></script>
+	<script src="js/ng-base.js?a=2"></script>
+	
+	<script type="text/javascript" src="js/jquery.form.js"></script>
+	<script type="text/javascript" src="js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="js/showDlog/showDlog-blue.css" />
+	<script type="text/javascript" src="js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+	<link rel="stylesheet" type="text/css" href="js/DropDownList-1.2/DropDownList.css"/>
+	<script type="text/javascript" src="js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="js/showDlog/showDlog-blue.css" />
+
+	<link rel="stylesheet" type="text/css" href="css/addressAdd.css"/>
+	 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=SSNeoF1lhE4QGx0oThlKXnEG"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+	<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+	
+	<style type="text/css">
+		
+	    .tast_nav li{width:25% !important;}
+		.form_list{padding: 0 !important;}
+		.tab_con{margin-top:-10px;}
+		.add_img{padding:0;}
+		.rcs{color:red;display: none}
+		.dropDownList{background-image:url(img/drop_down_list.png);background-repeat: no-repeat;background-position:right;cursor:pointer;}
+		.isnumber{display: none}
+		section input{width:80%}
+		.map{width:100%;height:502px;}
+		.btnmess{height:70px;position: absolute;top:130px; left:0px;right:0px; z-index: 9999;background:#fff;}
+		.addrChange{height:53px;position: fixed;bottom:0px; left:0px;right:0px; z-index: 999;padding-top:8px;
+		background-color:rgba(255, 255, 255, 0.9)
+		}
+		.m_posi{width:20%;float:left;text-align: center;height:100%;padding-top:8px;}
+		.editaddr{height:50px;position: absolute;top:220px; left:5px;right:5px; z-index: 9999;background:#F5F5F5;height:200px;display: none}
+		.editdianb{position: absolute;top:120px; left:5px;right:5px; z-index: 9999;background:#fff;display: none}
+		.tempAddr{width:90%;border:none;height:35px;text-indent:10px}
+		.resetanddelete{
+		  z-index: 9999;background:rgba(0,0,0,0.5);position:fixed ;bottom:0px;right:0px;left:0px; height:40px;padding-top:18px;display: none
+		}
+		.del{font-family: '微软雅黑';font-size:22px;float:left;text-align: center;color:#fff;width: 49%;border-right:1px #fff solid}
+		.retake{font-family: '微软雅黑';font-size:22px;float:left;text-align: center;color:#fff;;width: 50%}
+		
+		.showimg{position: absolute;top:0px;bottom:0px;left:0px;right:0px;z-index: 9998;display:none}
+		.btnfanhui{font-size:22px; z-index: 9999;background:rgba(0,0,0,0.5);position:fixed ;top:0px;left:0px; height:35px;padding-top:10px;display: none;width:110px;text-align: center;color:#fff;}
+		.radius{z-index:2;display:block;width:20px;height:20px;border-radius:50%;background:#ededed;font-size:10px;margin-top:10px;margin: 0 auto;position: relative;}
+		.radiusbg{background:#02A2FF;}
+		.radiusa{position: absolute;margin-left:-3.5px;margin-top:-7px;font-size:10px;}
+		.radiusawhite{color:#fff}
+		.addrChange{height:45px;position: absolute;bottom:0px; left:0px;right:0px; z-index: 9999;
+		background-color:rgba(255, 255, 255, 0.9)
+		}
+		.m_posi{width:20%;float:left;text-align: center;height:100%;padding-top:8px;}
+		.nextstep{float:right;color: white;margin-right:5px;}
+		.litext{font-size: 10px;margin-top:-5px;}
+		.blue{color:#02A2FF}
+		.bianji{color:#02A2FF;float:right;margin-right:11px;margin-top:-5px;}
+		.tast_nav ul li{position:relative}
+		.dianbiao_no{width:90%;margin:0 auto;padding:10px 0 0 0}
+		.dianbiao_no input{height:30px;width:50%;text-indent:10px;border:1px solid #ccc;}
+		.dianbiao_no span.edits{padding:6px 15px;border:1px solid #ccc;border-radius:5px}
+		.dianbiao_no img{float:right;display:block;margin-top:5px}
+		.mart_btm{margin-bottom:8px}
+		.mart_btm input.tempAddr{width: 75% !important;border:1px solid #ccc !important;text-indent:10px}
+		.hidediv{display: none !important;}
+		
+		.shangyi{width:70%; height:20px;background-color:#FBFFF7;border-radius:10px;padding-top:6px;margin-left:5px;border:1px #71be35 solid;color:#71be35}
+		.shangyi1 {
+			background-color:#71be35 !important;
+			color:#fff !important;
+		}
+		.xiayi{width:70%; height:20px;background-color:#fffaf7;border-radius:10px;padding-top:6px;margin-left:5px;border:1px #ea6005 solid;color:#ea6005}
+		.xiayi1{
+			background-color:#ea6005 !important;
+			color:#fff !important;
+		}
+		.zuoyi{width:70%; height:20px;background-color:#f7fcff;border-radius:10px;padding-top:6px;margin-left:5px;border:1px #02a2ff solid;color:#02a2ff}
+		.zuoyi1{
+			background-color:#02a2ff !important;
+			color:#fff !important;
+		}
+		.youyi{width:70%; height:20px;background-color:#f7fffe;border-radius:10px;padding-top:6px;margin-left:5px;border:1px #04bba8 solid;color:#04bba8}
+		.youyi1{
+			background-color:#04bba8 !important;
+			color:#fff !important;
+		}
+		.chongxin{width:80%; height:20px;background-color:#fff7f8;border-radius:10px;padding-top:6px;margin-left:5px;border:1px #ffccce solid;color:#ba040a}
+		.chongxin1{
+			background-color:#ba040a !important;
+			color:#fff !important;
+		}
+		.updown{width:100%;text-align: center;color: #02A2FF;height:30px;line-height:30px;border-bottom:8px solid #f5f5f5}
+		.hideorshowdiv{width:100%;display: none;}
+		.addbiao{text-align:center;line-height:50px;color:#cccccc;border:1px solid #f2f2f2;width:95%;margin:20px auto;border-radius:5px}
+		.addbiao1{text-align:center;line-height:50px;color:#4CA9FF;border:1px solid #f2f2f2;width:95%;margin:20px auto;border-radius:5px}
+		.dialogcss{width:300px;height:180px;}
+		
+		.cancar_plane{border:solid 1px #eee;width:95%;height:300px;margin: 0 auto;}
+		#canvas{width:100%;height:100%;position: relative;overflow: auto;margin: 0 auto;}
+		.floor{position:absolute;bottom:0;}
+		.floor p{text-align: center;}
+		.floor ul{padding:20px 0;background:#efe0c7;border:solid 1px #ccc;}
+		.floor ul li{line-height:30px;padding:0 10px;}
+		.floor ul li a{padding: 5px 10px; border:1px solid #ccc;margin-right:10px; color:#999999;}
+		.floor ul li a:last-child{margin-right: 0;}
+		li{list-style: none}
+	
+	</style>
+</head>
+<body ng-controller="realPositionCtrl">
+
+
+			
+<form id="saveForm" class="required-validate" action="" enctype="multipart/form-data" method="post"  name="saveForm">
+	
+			
+	<header>
+		<div class="return"><img src="img/return.png" onclick="exitThis()"/></div>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;地址采集
+		<div class="nextstep" style="cursor: pointer;" onclick="next()">
+			下一步
+		</div>
+	</header>
+	<section style="margin-top: -8px">
+		<div class="tast_nav">
+			
+			<ul class="ov" style="padding-top:10px;">
+				<li class="fl" style="height:20px;text-align: center;position: relative;" >
+					<span class="radius radiusbg sp1"> 
+						<a class="radiusa radiusawhite a1">1</a>
+					</span>
+					<hr style="position: absolute;margin-top:-10px;z-index: 1;width:150px;height:1px;border:none;border-top:1px solid #ededed;" />
+					<span class="litext blue txt1">
+						坐标
+					</span>
+				</li>
+				<li class="fl" style="height:30px;text-align: center" >
+					<span class="radius sp2">
+						<a class="radiusa a2">2</a>
+					</span>
+					<hr style="position: absolute;margin-top:-10px;z-index: 1;width:150px;height:1px;border:none;border-top:1px solid #ededed" />
+					<span class="litext txt2">
+						层户结构
+					</span>
+				</li>
+				<li class="fl" style="height:30px;text-align: center" >
+					<span class="radius sp3">
+						<a class="radiusa a3">3</a>
+					</span>
+					<hr style="position: absolute;margin-top:-10px;z-index: 1;width:150px;height:1px;border:none;border-top:1px solid #ededed" />
+					<span class="litext txt3">
+						图片
+					</span>
+				</li>
+				<li class="fl" style="height:30px;text-align: center" >
+					<span class="radius sp4">
+						<a class="radiusa a4">4</a>
+					</span>
+					<hr style="position: absolute;margin-top:-10px;z-index: 1;width:90px;height:1px;border:none;border-top:1px solid #ededed" />
+					<span class="litext txt4">
+						确认与提交
+					</span>
+				</li>
+			</ul>
+			
+			
+			
+		</div>
+		<div class="form_list">
+			
+			<div class="tab_con hcai" style="display: none;">
+				
+			</div>
+			<div class="tab_con dianbiao" id="bnum" style="display: none;padding:10px 0">
+				<div class="dianbiao_no" ng-repeat="item in biaoxiang" style="border-bottom:1px solid #f2f2f2;padding-bottom:15px">
+					<span class="mesadd"><img src="img/ece_table.png" width="30px" style="float:left;margin-right:20px;margin-top:-5px"/></span>
+					<input type="text" name="bxid" ng-if="item.HOUSEHOLD_NAME!=''" value="{{item.HOUSEHOLD_NAME}}" id="input_{{$index}}" readonly="readonly"  ng-click="surebiaod1($index)"   style="border:1px solid #fff !important" >
+					<input type="text" name="bxid" ng-if="item.HOUSEHOLD_NAME==''" value="电表号为空" id="input_{{$index}}" readonly="readonly"  ng-click="surebiaod1($index)"  style="border:1px solid #fff !important'" >
+					<img src='img/delete.png' ng-click="delbiaoxiang($index)" class="add" width="30px"/>
+				</div>
+				<p class="addbiao" ng-click="editBiaoxiang()">+添加层户结构</p>
+				
+				
+				<div class="cancar_plane">
+					<div id="canvas" ></div>
+				</div>
+				
+				
+				
+				<div class="adddianbiao" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.2);z-index:3;display:none;">
+					<div class="editdianb" style="display:block;height: inherit;background:#f4fbff;border:1px solid #0fa6fd;border-radius:8px;top:132px; z-index:3">
+						<img src="img/close.png" ng-click="quxiaoicon()" style="position:absolute;top:-64px;right:0;width:24px"/>
+						<div style="text-align: center;width:100%;padding-top:12px;font-size:16px;color:#02A2FF;height:30px;">
+							编辑层户信息
+						</div>
+						<div style="width:90%;margin:0 auto 20px;font-size:16px;color:#fff;border: 1px solid #02a2ff;border-radius:8px">
+							<div style="background:#fff;border-bottom:1px solid #b2e3ff;border-radius:8px">&nbsp;&nbsp;&nbsp;&nbsp;单元名称
+								<input name="biaonum" class="tempAddr" style="width:70% !important;border-radius: 8px;" placeholder="单元名称" />
+								
+							</div>
+							<div style="background:#fff;border-bottom:1px solid #b2e3ff">&nbsp;&nbsp;&nbsp;&nbsp;层&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数
+								<input name="hunum" class="tempAddr" style="width:70% !important" placeholder="层数" />
+							</div>
+											
+							<div style="background:#fff;border-radius:8px">&nbsp;&nbsp;&nbsp;&nbsp;户&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数
+								<input name="baddtr" class="tempAddr" style="width:70% !important;border-radius:8px" placeholder="户数" />
+							</div>
+						</div>
+						<div style="text-align: center;width:80%;padding-bottom:10px;font-size:16px;color:#fff;height:40px;border: 1px solid #0fa6fd;border-top: none;position: absolute;bottom: -50px;background: #f4fbff;left: 10%;border-radius: 0 0 8px 8px;">
+								<div ng-click="surebiaod()" style="padding:10px;width:40%;color:#fff;background:#02A2FF;border:1px #eee solid;font-size:16px;margin: 0 auto;">
+									确 定
+								</div>
+						</div>
+					</div>
+				</div>
+				
+				
+			</div>
+			<div class="tab_con add_img"  style="display: none;">
+				<div class="update_ing">
+					
+					<img src="img/add_pic_icon.png" style="width:80px;height:80px;" id="images1" name="images1" onclick="img1()" />
+					<input type="hidden" name="deviceimg1" />
+					
+					<input type="hidden" name="deviceObjName" />
+					<input type="hidden" name="AMUL_BOX_ADDR" />
+					<input type="hidden" name="x" />
+					<input type="hidden" name="y" />
+					<input type="hidden" name="companyCode" />
+					<input type="hidden" name="attrJson" />
+					
+					<img src="img/add_pic_icon.png" style="width:80px;height:80px;" id="images2" name="images2" onclick="img2()" />
+					<input type="hidden" name="deviceimg2" />
+					<img src="img/add_pic_icon.png" style="width:80px;height:80px;" id="images3" name="images3" onclick="img3()" />
+					<input type="hidden" name="deviceimg3" />			
+				</div>
+				
+				
+			</div>
+			
+			<div class="tab_con views"  style="display: none;">
+				<div style="width:100%;height:50px;border-bottom:5px #eee solid;padding-top:20px;background:#FFFCF5; text-align: center">
+					<img src="img/deviceAdd/yes.png" style="height:26px;width:26px;float: left;margin-left:30px;" />&nbsp;
+					<span style="color:#cc9829;font-size:18px;position: relative;margin-top:-10px;float: left;margin-top:4px;">地址信息采集完毕,请确认并提交！</span> 
+				</div>
+				
+				<div class="items" style="width:100%;height:40px;border-bottom:5px #eee solid;padding-top:20px;">
+					<span class="shuxing" style="float:left;font-size:14px;margin-left:8px;">坐标信息</span>
+					<span class="reedit" style="float:right;color:#cccccc;margin-right:5px;" onclick="resets(0)">返回面板修正></span>	
+				</div>
+				<div class="items" style="width:100%;height:40px;border-bottom:5px #eee solid;padding-top:20px;">
+					<span class="shuxing" style="float:left;font-size:14px;margin-left:8px;">层户信息</span>
+					<span class="reedit" style="float:right;color:#cccccc;margin-right:5px;" onclick="resets(1)">返回面板修正></span>	
+				</div>
+				<div class="items" style="width:100%;height:40px;border-bottom:5px #eee solid;padding-top:20px;">
+					<span class="shuxing" style="float:left;font-size:14px;margin-left:8px;">图片信息</span>
+					<span class="reedit" style="float:right;color:#cccccc;margin-right:5px;" onclick="resets(2)">返回面板修正></span>	
+				</div>
+				
+				<div class="up_load" ng-click="onSave()"><a>提交</a></div>
+			</div>
+			
+			
+			
+			<div class="btnfanhui" onclick="hideimg()">返 回 </div>
+			
+			<div class="showimg">
+					<img src="" style="width: 100%;height:100%" />
+			</div>
+			
+			<div class="resetanddelete">
+				<div class="del" onclick="deleteimg()"> 删 除 </div>
+				<div class="retake" onclick="takeagain()"> 重 拍 </div>
+			</div>
+			
+			<div class="tab_con map" >
+					<div id="iCenter" style="height:100%; width:100%;">
+						
+					</div>
+					
+					<div class="btnmess">
+						<div style="text-align: left;width:100%;padding-top:12px;font-size:14px;padding-left:10px;"> 
+						<img src="img/deviceAdd/circle.png" style="height:10px;width:10px;" />
+						当前位置:<span style="font-size:14px;" id="addmess"></span>
+						<span class="bianji" onclick="editAddr()">
+							<img src="img/deviceAdd/right.png" style="margin-right:4px;margin-top:4px;" />
+						</span>
+						</div>
+						<div style="float:left;text-align: left;width:100%;padding-top:8px;font-size:14px;padding-left:10px;color:#999999">经度:<span style="font-size:14px;color:#999999" id="xmess"></span>&nbsp;&nbsp;&nbsp;纬度:<span style="font-size:14px;color:#999999" id="ymess"></span></div>
+					</div>
+					
+					<div class="editaddr">
+						<div style="text-align: center;width:100%;padding-top:12px;font-size:16px;color:#fff;background:#02A2FF;height:30px;">
+								编辑地址
+						</div>
+						<div style="text-align: center;width:100%;padding-top:12px;font-size:16px;color:#fff;height:50px;">
+								<input name="tempAddr" class="tempAddr" placeholder="输入地址" />
+						</div>
+						<div style="text-align: center;width:100%;padding-top:12px;font-size:16px;color:#fff;height:40px;">
+								<div onclick="changeAddr()" style="float:right;padding:10px;width:40px;color:#fff;background:#02A2FF;border:1px #eee solid;font-size:16px;margin-right:10px;">
+									确 定
+								</div>
+								<div onclick="hideEditDialog()" style="float:right;padding:10px;width:40px;background:#ccc;border:1px #eee solid;font-size:16px;margin-right:10px;">
+									取 消
+								</div>
+						</div>
+					</div>
+					
+					<div class="addrChange">
+						<div class="m_posi">
+							<div ontouchstart="addThisClass(1,this)" ontouchend="removeThisClass(1,this)"   onclick="changeXY(0,0.00001172529394396682)" class="shangyi" >上移</div>
+						</div>
+						<div class="m_posi">
+							<div ontouchstart="addThisClass(2,this)" ontouchend="removeThisClass(2,this)" onclick="changeXY(0,-0.00001172529394396682)" class="xiayi">下移</div>
+						</div>
+						<div class="m_posi">
+							<div ontouchstart="addThisClass(3,this)" ontouchend="removeThisClass(3,this)" onclick="changeXY(-0.000008993220562150633,0)" class="zuoyi" >左移</div>
+						</div>
+						<div class="m_posi">
+							<div ontouchstart="addThisClass(4,this)" ontouchend="removeThisClass(4,this)" onclick="changeXY(0.000008993220562150633,0)" class="youyi" >右移</div>
+						</div>
+						<div class="m_posi">
+							<div ontouchstart="addThisClass(5,this)" ontouchend="removeThisClass(5,this)" onclick="getAddrName()" class="chongxin">重新获取</div>
+						</div>
+						
+					</div>
+					
+					<div id="lnglatDiv1" style="display: none; " align="center" >
+	  				<table width="95%" border="0" style="margin-top:10px;display: none; ">
+					  <tr>
+					    <td><div align="right">东经(度)：</div></td>
+					    <td><div align="left"><input type="text" id="x1" onblur="onX1BlurHandler()" style="float:left;"/><label id="x1_label" style="color:#ff0000;float: left;margin-left:30px;"></label></div></td>
+					    <td><div align="right">北纬(度)：</div></td>
+					    <td><div align="left"><input type="text" id="y1" onblur="onY1BlurHandler()" style="float:left;"/><label id="y1_label" style="color:#ff0000;float: left;margin-left:30px;"></label></div></td>
+					  </tr>
+					</table>
+	  			</div>
+	  			
+	  			<div id="lnglatDiv2"  align="center" style="display: none; ">
+	  				<table width="95%" border="0" style="margin-top:10px;">
+					  <tr>
+					    <td><div align="right">东经(度)：</div></td>
+					    <td><div align="left"><input type="text" id="x11" onblur="onX11BlurHandler()" style="width:110px;"/></div></td>
+					    <td><div align="right">东经(分)：</div></td>
+					    <td><div align="left"><input type="text" id="x12" onblur="onX12BlurHandler()" style="width:110px;"/></div></td>
+					    <td><div align="right">东经(秒)：</div></td>
+					    <td><div align="left"><input type="text" id="x13" onblur="onX13BlurHandler()" style="width:110px;"/></div></td>
+					  </tr>
+					  <tr>
+					    <td><div align="right">北纬(度)：</div></td>
+					    <td><div align="left"><input type="text" id="y11" onblur="onY11BlurHandler()" style="width:110px;"/></div></td>
+					    <td><div align="right">北纬(分)：</div></td>
+					    <td><div align="left"><input type="text" id="y12" onblur="onY12BlurHandler()" style="width:110px;"/></div></td>
+					    <td><div align="right">北纬(秒)：</div></td>
+					    <td><div align="left"><input type="text" id="y13" onblur="onY13BlurHandler()" style="width:110px;"/></div></td>
+					  </tr>
+					</table>
+					<label id="xy" style="color:#ff0000;float: left;margin-left:30px;"></label>
+	  			</div>
+			</div>
+		</div>
+		
+	</section>
+	</form>
+	<script type="text/javascript">
+	
+		var mapProxy;
+		var g_lng = 0;
+		var g_lat = 0;
+		var damName;
+		var returnx;
+		var returny;
+		var _x = "";
+		var _y = "";
+		var allList=[];
+		var areaName = "";//区名称
+		var subflag=0;// 提交标示  每个tab页一个标示
+		
+		
+		//隐藏xianshi
+		function showProperties(){
+			if($(".hideorshowdiv").css("display")=="none"){
+				
+				$(".updown").css("color","#ccc");
+				$(".updown").html("收起更多选项 • • •");
+			}else{
+				
+				
+				$(".updown").css("color","#02A2FF");
+				$(".updown").html("展开更多选项 • • •");
+			}
+			$(".hideorshowdiv").slideToggle();
+		}
+		
+		function exitThis(){
+			$(".editaddr").hide();
+			$(".adddianbiao").hide();
+			var num=0;
+			$(":input").each(function(){
+				if($(this).val()!=""){
+					num+=1;
+					
+				}
+				
+			});
+			
+			if(num>0){
+				new ShowDlog().mobileConfirm({
+					icon:"custom",
+					iconHtml:"",
+					msg:"您已填写数据,是否确认返回？",
+					ok:function(){
+						$("input[name=proNo]").val("");
+						$("input[name=proName]").val("");
+						$("input[name=companyCode]").val("");
+						$("input[name=deviceObjName]").val("");
+						$("input[name=AMUL_BOX_ADDR]").val("");
+						
+						$("input[name=mctName]").val("");
+						$("input[name=mctCode]").val("");
+						$("input[name=deviceTypeCode]").val("");
+						nativeLib.exitApp();
+					},
+					cancel:function(){
+					},
+					className:"dialogcss"
+					
+				});
+			}else{
+				nativeLib.exitApp();
+			}
+			
+		}
+
+	    var result3=0;
+	    var result=0;
+	    var result1=0;
+	    var result2=0;
+	    
+	   function addThisClass(selectNum,obj){
+	    	if(selectNum==1){
+	    		$(obj).addClass("shangyi1");
+	    	}else if(selectNum==2){
+	    		$(obj).addClass("xiayi1");
+	    	}else if(selectNum==3){
+	    		$(obj).addClass("zuoyi1");
+	    	}else if(selectNum==4){
+	    		$(obj).addClass("youyi1");
+	    	}else if(selectNum==5){
+	    		$(obj).addClass("chongxin1");
+	    	}
+	    }
+	    function removeThisClass(selectNum,obj){
+	    	if(selectNum==1){
+	    		$(obj).removeClass("shangyi1");
+	    	}else if(selectNum==2){
+	    		$(obj).removeClass("xiayi1");
+	    	}else if(selectNum==3){
+	    		$(obj).removeClass("zuoyi1");
+	    	}else if(selectNum==4){
+	    		$(obj).removeClass("youyi1");
+	    	}else if(selectNum==5){
+	    		$(obj).removeClass("chongxin1");
+	    	}
+	    }
+
+		function checkClass(){
+			result3=0;
+			$(".isnumber").hide();
+			$("input[prop='number']").each(function(){
+			   
+			    if($(this).val()!=""){
+			    
+			    	var re = /^\d+$/;
+			    	//验证
+			    	if (re.test($(this).val()))
+			    	{
+			    	    
+			    	}else{
+			    		
+			    		$(this).next().show();
+			    		result3=1;
+			    	}
+			    }
+
+			});
+		}
+		//打开修改地址框
+		function editAddr(){
+			var getaddr=$("input[name=deviceObjName]").val();
+			$("input[name=tempAddr]").val(getaddr);
+			$(".editaddr").show();
+		}
+		//取消隐藏弹出修改地址框
+		function hideEditDialog(){
+			$(".editaddr").hide();
+		}
+		
+		//确定修改地址
+		function changeAddr(){
+			var tadd=$("input[name=tempAddr]").val();
+			//$("input[name=deviceObjName]").val();
+			$("input[name=deviceObjName]").val(tadd);
+        	$("input[name=AMUL_BOX_ADDR]").val(tadd);
+        	$("#addmess").html(tadd);
+        	$(".editaddr").hide();
+		}
+		
+		//重新编辑
+		function resets(state){
+			$(".nextstep").show();
+			subflag=state;
+			if(subflag==0){
+				$(".hcai").hide();
+				$(".add_img").hide();
+				$(".map").show();
+				$(".views").hide();
+				$(".radius").removeClass("radiusbg");
+				$(".radiusa").removeClass("radiusawhite");
+				$(".litext").removeClass("blue");
+				$(".sp1").addClass("radiusbg");
+				$(".a1").addClass("radiusawhite");
+				$(".txt1").addClass("blue");
+			}else if(subflag==1){
+				$(".hcai").hide();
+				$(".add_img").hide();
+				$(".dianbiao").show();
+				$(".map").hide();
+				$(".views").hide();
+				$(".radius").removeClass("radiusbg");
+				$(".radiusa").removeClass("radiusawhite");
+				$(".litext").removeClass("blue");
+				$(".sp2").addClass("radiusbg");
+				$(".a2").addClass("radiusawhite");
+				$(".txt2").addClass("blue");
+			}else if(subflag==2){
+				$(".hcai").hide();
+				$(".add_img").show();
+				$(".dianbiao").hide();
+				$(".map").hide();
+				$(".views").hide();
+				$(".radius").removeClass("radiusbg");
+				$(".radiusa").removeClass("radiusawhite");
+				$(".litext").removeClass("blue");
+				$(".sp3").addClass("radiusbg");
+				$(".a3").addClass("radiusawhite");
+				$(".txt3").addClass("blue");
+			}else if(subflag==3){
+				$(".hcai").hide();
+				$(".add_img").hide();
+				$(".dianbiao").hide();
+				$(".map").show();
+				$(".views").hide();
+				$(".radius").removeClass("radiusbg");
+				$(".radiusa").removeClass("radiusawhite");
+				$(".litext").removeClass("blue");
+				$(".sp4").addClass("radiusbg");
+				$(".a4").addClass("radiusawhite");
+				$(".txt4").addClass("blue");
+			}
+			
+		}
+		//下一步
+		function next(){
+			//hcai  =0
+			//add_img =1 
+			//Map =3
+			//dianbiao =2
+			//sp1-radiusbg   a1 radiusawhite txt1 blue
+
+			//radius radiusa litext 
+			if(subflag==0){
+				$(".hcai").hide();
+				$(".add_img").hide();
+				$(".map").show();
+				$(".views").hide();
+				$(".radius").removeClass("radiusbg");
+				$(".radiusa").removeClass("radiusawhite");
+				$(".litext").removeClass("blue");
+				$(".sp1").addClass("radiusbg");
+				$(".a1").addClass("radiusawhite");
+				$(".txt1").addClass("blue");
+				
+				var deviceObjName=$("input[name=deviceObjName]").val();
+	        	//var AMUL_BOX_ADDR=$("input[name=AMUL_BOX_ADDR]").val();
+	        	
+	        	var waittingDlog = new ShowDlog();
+
+	        	if(deviceObjName!=""){ //表箱地址通过
+	        		
+	        		
+	        		subflag=1;
+	        		$(".hcai").hide();
+					$(".add_img").hide();
+					$(".dianbiao").show();
+					$(".map").hide();
+					$(".views").hide();
+					$(".radius").removeClass("radiusbg");
+					$(".radiusa").removeClass("radiusawhite");
+					$(".litext").removeClass("blue");
+					$(".sp2").addClass("radiusbg");
+					$(".a2").addClass("radiusawhite");
+					$(".txt2").addClass("blue");
+	        	}else{
+	        		waittingDlog.prompt({
+						icon:"warning",
+						msg:"未获取到地址,重新获取中...",
+						done:function(){
+							onScanCodeClickHandler();
+						},
+						t:2000
+					});
+	        	}
+			}else if(subflag==1){
+				$(".hcai").hide();
+				$(".add_img").show();
+				$(".dianbiao").hide();
+				$(".map").hide();
+				$(".views").hide();
+				$(".radius").removeClass("radiusbg");
+				$(".radiusa").removeClass("radiusawhite");
+				$(".litext").removeClass("blue");
+				$(".sp3").addClass("radiusbg");
+				$(".a3").addClass("radiusawhite");
+				$(".txt3").addClass("blue");
+				subflag=2;
+	        		
+			}else if(subflag==2){
+				$(".hcai").hide();
+				$(".add_img").show();
+				$(".dianbiao").hide();
+				$(".map").hide();
+				$(".views").hide();
+				$(".radius").removeClass("radiusbg");
+				$(".radiusa").removeClass("radiusawhite");
+				$(".litext").removeClass("blue");
+				$(".sp3").addClass("radiusbg");
+				$(".a3").addClass("radiusawhite");
+				$(".txt3").addClass("blue");
+
+				var deviceimg1=$("input[name=deviceimg1]").val();
+				var deviceimg2=$("input[name=deviceimg2]").val();
+				var deviceimg3=$("input[name=deviceimg3]").val();
+				if(deviceimg1=="" && deviceimg2=="" && deviceimg3==""){
+					 new ShowDlog().prompt({
+										icon:"warning",
+										msg:"请您至少拍一张照片!",
+										done:function(){
+											onScanCodeClickHandler();
+										},
+										t:2000
+					}); 
+					
+					 
+				}else{
+					subflag=3;
+	        		$(".hcai").hide();
+					$(".add_img").hide();
+					$(".dianbiao").hide();
+					$(".map").hide();
+					$(".views").show();
+					$(".radius").removeClass("radiusbg");
+					$(".radiusa").removeClass("radiusawhite");
+					$(".litext").removeClass("blue");
+					$(".sp4").addClass("radiusbg");
+					$(".a4").addClass("radiusawhite");
+					$(".txt4").addClass("blue");
+					
+				} 
+			}else if(subflag==3){
+				
+				$(".hcai").hide();
+				$(".add_img").hide();
+				$(".map").show();
+				$(".views").hide();
+				$(".dianbiao").hide();
+				$(".radius").removeClass("radiusbg");
+				$(".radiusa").removeClass("radiusawhite");
+				$(".litext").removeClass("blue");
+				$(".sp4").addClass("radiusbg");
+				$(".a4").addClass("radiusawhite");
+				$(".txt4").addClass("blue"); 
+				
+				
+				var xx=$("input[name=x]").val();
+				var yy=$("input[name=x]").val();
+				var d1=$("input[name=deviceObjName]").val();
+            	var d2=$("input[name=AMUL_BOX_ADDR]").val();
+            	if(xx=="" || yy=="" || d1=="" || d2==""){
+            		new ShowDlog().prompt({
+						icon:"warning",
+						msg:"未获取到坐标,重新获取中...",
+						done:function(){
+							onScanCodeClickHandler();
+						},
+						t:2000
+					});
+            		
+            		onScanCodeClickHandler();
+            		
+            	}else{
+            		subflag=4;
+	        		$(".hcai").hide();
+	        		$(".dianbiao").hide();
+					$(".add_img").hide();
+					$(".map").hide();
+					$(".views").show();
+					$(".radius").removeClass("radiusbg");
+					$(".radiusa").removeClass("radiusawhite");
+					$(".litext").removeClass("blue");
+					$(".sp5").addClass("radiusbg");
+					$(".a5").addClass("radiusawhite");
+					$(".txt5").addClass("blue");
+            	}
+				
+			}
+				
+				if(subflag==3){
+					$(".nextstep").hide();
+				}
+		}
+		
+		function scan(){
+			
+				
+				
+				window.top.nativeLib.scanCode({callback:function(data){
+					//alert(data)
+					
+					 $("input[name=BOX_ASSET_NO]").val(data);
+	 				$("input[name=BOX_ASSET_NO]").focus();
+				}});
+		}
+		
+		
+
+		
+		function hideimg(){
+			
+			$(".showimg").hide();
+			$(".resetanddelete").hide();
+			$(".btnfanhui").hide();
+		}
+		var selectimg=0;//放大的图片
+		
+		
+		function img1(){
+			
+			var deviceimg1=$("input[name=deviceimg1]").val();
+			
+			var image = document.getElementById('images1');
+			
+			if(deviceimg1==""){
+				
+				window.top.nativeLib.getPicture({action:"takePicture",callback:function(data){
+                	if (data && data.statusCode == "200") {
+              			image.src = "data:image/jpeg;base64," + data.base64Img;
+              			$("input[name=deviceimg1]").val(data.base64Img);
+              			
+                	}
+				}});
+			}else{
+				selectimg=1;
+				
+				$(".resetanddelete").show();
+				$(".showimg img").attr("src","data:image/jpeg;base64," + deviceimg1);
+				$(".showimg").show();
+				$(".btnfanhui").show();
+			}
+		}
+		function img2(){
+			var deviceimg2=$("input[name=deviceimg2]").val();
+			var image = document.getElementById('images2');
+			if(deviceimg2==""){
+				 window.top.nativeLib.getPicture({action:"takePicture",callback:function(data){
+	                	if (data && data.statusCode == "200") {
+	              			image.src = "data:image/jpeg;base64," + data.base64Img;
+	              			$("input[name=deviceimg2]").val(data.base64Img);	
+	                	}
+					}});
+			}else{
+				selectimg=2;
+				$(".resetanddelete").show();
+				$(".showimg img").attr("src","data:image/jpeg;base64," + deviceimg2);
+				$(".showimg").show();
+				$(".btnfanhui").show();
+			}
+			
+			
+		}
+		function img3(){
+			var deviceimg3=$("input[name=deviceimg3]").val();
+			
+			var image = document.getElementById('images3');
+			
+			if(deviceimg3==""){
+				window.top.nativeLib.getPicture({action:"takePicture",callback:function(data){
+                	if (data && data.statusCode == "200") {
+              				
+              			image.src = "data:image/jpeg;base64," + data.base64Img;
+              			
+              			$("input[name=deviceimg3]").val(data.base64Img);	
+                	}
+				}});
+			}else{
+				selectimg=3;
+				$(".resetanddelete").show();
+				$(".showimg img").attr("src","data:image/jpeg;base64," + deviceimg3);
+				$(".showimg").show();
+				$(".btnfanhui").show();
+			}
+			
+			
+		}
+		function deleteimg(){
+			if(selectimg==1){
+				var image = document.getElementById('images1');
+      			image.src = "img/add_pic_icon.png";
+      			$("input[name=deviceimg1]").val("");		
+			}else if(selectimg==2){
+				var image = document.getElementById('images2');
+      			image.src = "img/add_pic_icon.png";
+      			$("input[name=deviceimg2]").val("");
+			}else if(selectimg==3){
+				var image = document.getElementById('images3');
+      			image.src = "img/add_pic_icon.png";
+      			$("input[name=deviceimg3]").val("");
+			}
+			hideimg();
+			$(".showimg img").attr("src","");
+		}
+		
+		function takeagain(){
+		
+				hideimg();
+				$(".showimg img").attr("src","");
+				window.top.nativeLib.getPicture({action:"takePicture",callback:function(data){
+					if (data && data.statusCode == "200") {
+              			if(selectimg==1){
+            				var image = document.getElementById('images1');
+            				image.src = "data:image/jpeg;base64," + data.base64Img;
+                  			$("input[name=deviceimg1]").val(data.base64Img);		
+            			}else if(selectimg==2){
+            				var image = document.getElementById('images2');
+            				image.src = "data:image/jpeg;base64," + data.base64Img;
+                  			$("input[name=deviceimg2]").val(data.base64Img);
+            			}else if(selectimg==3){
+            				var image = document.getElementById('images3');
+            				image.src = "data:image/jpeg;base64," + data.base64Img;
+                  			$("input[name=deviceimg3]").val(data.base64Img);
+            			}
+                	}
+				}});
+			
+		}
+		
+		
+		function getAddrName(){
+
+			var inputx=$("input[name=x]").val();
+			var inputy=$("input[name=y]").val();
+			
+			
+			
+			window.top.nativeLib.getAddressName({
+				point:{x:inputx, y:inputy}, 
+				callback:function(da){
+					$("#addmess").html(da.data);
+					$("input[name=deviceObjName]").val(da.data);
+	            	$("input[name=AMUL_BOX_ADDR]").val(da.data);
+				}
+			});
+		}
+		
+		function changeXY(tempx,tempy){
+			
+			var inputx=$("input[name=x]").val();
+			var inputy=$("input[name=y]").val();
+			
+			
+			
+			
+			var numx=Number(inputx)+Number(tempx);
+			var numy=Number(inputy)+Number(tempy);
+			
+			var point = new BMap.Point(Number(numx), Number(numy));
+			/* if(locations==""){
+				mapProxy.centerAndZoom(point, 15);
+			} */
+			mapProxy.clearOverlays();
+			
+			var marker = new BMap.Marker(point);  // 创建标注
+			mapProxy.addOverlay(marker);              // 将标注添加到地图中
+			marker.enableDragging();
+			
+			setXY(numx,numy);
+			marker.addEventListener("dragend",function(e){
+
+				setXY(e.point.lng,e.point.lat);
+				returnx=e.point.lng;
+				returny=e.point.lat;
+				
+				
+				//setXY(e.point.lng,e.point.lat);
+
+				
+			});
+			
+			returnx=Number(numx);
+			returny=Number(numy);
+		}
+		
+		//坐标
+		 function onScanCodeClickHandler() {
+	        	
+			 window.top.nativeLib.getLocation({callback:function(data){
+					$("input[name=x]").val(data.lontitude);
+             	$("input[name=y]").val(data.latitude);
+             	
+             	
+             	$("input[name=deviceObjName]").val(data.addr);
+             	$("input[name=AMUL_BOX_ADDR]").val(data.addr);
+             	$("#addmess").html(data.addr);
+             	_x=data.lontitude;
+             	_y=data.latitude;
+					
+				}});
+	      }
+		
+		 function initMap(x, y) {
+				
+				mapProxy = new BMap.Map("iCenter", {
+						
+					mapType: BMAP_NORMAL_MAP,enableMapClick:false
+				});
+				mapProxy.enableScrollWheelZoom();
+				mapProxy.addControl(new BMap.MapTypeControl());
+				//var top_left_navigation = new BMap.NavigationControl();  //放大缩小
+			//	mapProxy.addControl(top_left_navigation);
+				
+				if (x && y) {
+					
+					var poi = new BMap.Point(x, y);
+					mapProxy.centerAndZoom(poi, 20);
+				}else if(areaName!="" && areaName!=undefined){
+					
+					mapProxy.centerAndZoom(areaName,15);
+				}
+				else {
+					
+					mapProxy.centerAndZoom("南京",11);
+				}
+		
+			    
+			}
+			
+			function initXY() {
+				
+				if (_x && _y) {
+					
+					setXY(_x, _y);
+					
+					drawPoint(_x, _y);
+				}
+			}
+			
+			var locations = "";
+			function drawPointHandler(event) {
+				
+			
+				var p = event.overlay;
+				if (p) {
+					
+					var lnglat = p.getPosition();
+					setXY(lnglat.lng, lnglat.lat);
+					mapProxy.clearOverlays();
+					locations = "locations";
+					drawPoint(lnglat.lng, lnglat.lat);
+					
+				}
+			}
+			
+			function drawPoint(x, y) {
+				
+				var point = new BMap.Point(Number(x), Number(y));
+				if(locations==""){
+					
+					mapProxy.centerAndZoom(point, 20);
+				}
+				
+				
+				mapProxy.clearOverlays();
+				
+				var marker = new BMap.Marker(point);  // 创建标注
+				mapProxy.addOverlay(marker);              // 将标注添加到地图中
+				marker.enableDragging();
+				marker.addEventListener("dragend",function(e){
+
+					setXY(e.point.lng,e.point.lat);
+					returnx=e.point.lng;
+					returny=e.point.lat;
+					
+					top.nativeLib.getAddressName({
+						point:{x:e.point.lng, y:e.point.lat}, 
+						callback:function(da) {
+							$("#addmess").html(da.data);
+							$("input[name=deviceObjName]").val(da.data);
+			            	$("input[name=AMUL_BOX_ADDR]").val(da.data);
+						}
+					});
+					
+				});
+			
+				returnx=Number(x);
+				returny=Number(y);
+
+			}
+			
+			
+			
+			function changeXY(tempx,tempy){
+				
+				var inputx=$("input[name=x]").val();
+				var inputy=$("input[name=y]").val();
+				
+				
+				
+				var numx=Number(inputx)+Number(tempx);
+				var numy=Number(inputy)+Number(tempy);
+				
+				var point = new BMap.Point(Number(numx), Number(numy));
+				/* if(locations==""){
+					mapProxy.centerAndZoom(point, 15);
+				} */
+				mapProxy.clearOverlays();
+				
+				var marker = new BMap.Marker(point);  // 创建标注
+				mapProxy.addOverlay(marker);              // 将标注添加到地图中
+				marker.enableDragging();
+				
+				setXY(numx,numy);
+				
+				
+				marker.addEventListener("dragend",function(e){
+
+					setXY(e.point.lng,e.point.lat);
+					returnx=e.point.lng;
+					returny=e.point.lat;
+					
+					
+					//setXY(e.point.lng,e.point.lat);
+
+					
+				});
+				
+				
+				returnx=Number(numx);
+				returny=Number(numy);
+				
+				
+			}
+			
+			Function.prototype.delayInvoke = function(o, delay, args) {
+			
+				var fn = this;
+				return setTimeout(function() {fn.apply(o, args || []);}, delay);
+			};
+			
+			function setXY(_x, _y) {
+				
+				
+			
+				$("input[name=x]").val(_x);
+				//document.getElementById("y1").value = _y;
+				$("input[name=y]").val(_y);
+				
+				$("#xmess").html(_x);
+				$("#ymess").html(_y);
+				setX123(_x);
+				setY123(_y);
+			}
+			var models = "map";
+			function onModelCheck(model) {
+				models = model;
+				switch(model) {
+					
+					case "map":
+						document.getElementById("iCenter").style.display = "block";
+						document.getElementById("lnglatDiv1").style.display = "none";
+						document.getElementById("lnglatDiv2").style.display = "none";
+						
+						if (document.getElementById("x1").value 
+						&& document.getElementById("y1").value) {
+							
+							drawPoint(document.getElementById("x1").value, document.getElementById("y1").value);
+						}
+						break;
+					case "1":
+						document.getElementById("iCenter").style.display = "none";
+						document.getElementById("lnglatDiv1").style.display = "block";
+						document.getElementById("lnglatDiv2").style.display = "none";
+						break;
+					case "2":
+						document.getElementById("iCenter").style.display = "none";
+						document.getElementById("lnglatDiv1").style.display = "none";
+						document.getElementById("lnglatDiv2").style.display = "block";
+						break;
+				}
+			}
+			
+			function setX123(x) {
+			
+				if (x) {
+					
+					var lng = Number(x);
+					var _d = Math.floor(lng);
+					var _l = (lng - _d) * 60;
+					var _m = Math.floor(_l);
+					var _s = (_l - _m) * 60;
+					
+					//document.getElementById("x2").value = _d + "." + _m + "." + _s + "''";
+					document.getElementById("x11").value = _d;
+					document.getElementById("x12").value = _l;
+					document.getElementById("x13").value = _s;
+				}
+			}
+			
+			function setY123(y) {
+				
+				var lat = Number(y);
+				var _d = Math.floor(lat);
+				var _l = (lat - _d) * 60;
+				var _m = Math.floor(_l);
+				var _s = (_l - _m) * 60;
+				
+				document.getElementById("y11").value = _d;
+				document.getElementById("y12").value = _l;
+				document.getElementById("y13").value = _s;
+			}
+			
+			function onX1BlurHandler() {
+				
+				if (document.getElementById("x1").value != "") {
+					
+					var lng = Number(document.getElementById("x1").value);
+					var _d = Math.floor(lng);
+					var _l = (lng - _d) * 60;
+					var _m = Math.floor(_l);
+					var _s = (_l - _m) * 60;
+					
+					//document.getElementById("x2").value = _d + "." + _m + "." + _s + "''";
+					document.getElementById("x11").value = _d;
+					document.getElementById("x12").value = _l;
+					document.getElementById("x13").value = _s;
+					
+					checkXYAndDrawPoint();
+				}
+			}
+			
+			function onY1BlurHandler() {
+			
+				if (!document.getElementById("y1").value || document.getElementById("y1").value == "") return;
+				
+				var lat = Number(document.getElementById("y1").value);
+				var _d = Math.floor(lat);
+				var _l = (lat - _d) * 60;
+				var _m = Math.floor(_l);
+				var _s = (_l - _m) * 60;
+				
+				document.getElementById("y11").value = _d;
+				document.getElementById("y12").value = _l;
+				document.getElementById("y13").value = _s;
+				
+				checkXYAndDrawPoint();
+			}
+			
+			function onOkClickHandler() {
+				//alert("retrunx:"+returnx+""+"retruny:"+returny);
+				
+				parent.$dlog.data={x:returnx,y:returny};
+				parent.$dlog.close();
+
+				if(models==1){
+					var x1 = document.getElementById("x1").value;
+					var y1 = document.getElementById("y1").value;
+					
+					if(x1==""){
+						document.getElementById("x1_label").innerHTML = "请输入东纬度";
+					}else if(isDecimal(x1)){
+						document.getElementById("x1_label").innerHTML = "请输入正确的东纬度";
+					}else{
+						document.getElementById("x1_label").innerHTML = "";
+					}
+					if(y1==""){
+						document.getElementById("y1_label").innerHTML = "请输入北纬度";
+					}else if(isDecimal(y1)){
+						document.getElementById("y1_label").innerHTML = "请输入正确的北纬度";
+					}else{
+						document.getElementById("x1_label").innerHTML = "";
+					}
+					if(x1!="" && y1!="" && isDecimal(x1)=="" && isDecimal(y1)==""){
+						//parent.art.dialog.data("x", document.getElementById("x1").value);
+						//parent.art.dialog.data("y", document.getElementById("y1").value);
+						//var dialogId = parent.art.dialog.data("dialogId");
+			        	//parent.art.dialog.removeData("dialogId");
+						//parent.art.dialog.close(dialogId);
+					}
+				}else if(models==2){
+					var x11 = document.getElementById("x11").value;
+					var x12 = document.getElementById("x12").value;
+					var x13 = document.getElementById("x13").value;
+					var y11 = document.getElementById("y11").value;
+					var y12 = document.getElementById("y12").value;
+					var y13 = document.getElementById("y13").value;
+					if(x11==""){
+						document.getElementById("xy").innerHTML = "请输入东经(度)";
+					}else if(isDecimal(x11)){
+						document.getElementById("xy").innerHTML = "请输入正确的东经(度)";
+					}else if(x12==""){
+						document.getElementById("xy").innerHTML = "请输入东经(分))";
+					}else if(isDecimal(x12)){
+						document.getElementById("xy").innerHTML = "请输入正确的东经(分)";
+					}else if(x13==""){
+						document.getElementById("xy").innerHTML = "请输入东经(秒)";
+					}else if(isDecimal(x13)){
+						document.getElementById("xy").innerHTML = "请输入正确的东经(秒)";
+					}else if(y11==""){
+						document.getElementById("xy").innerHTML = "请输入北纬(度)";
+					}else if(isDecimal(y11)){
+						document.getElementById("xy").innerHTML = "请输入正确的北纬(度)";
+					}else if(y12==""){
+						document.getElementById("xy").innerHTML = "请输入北纬(分)";
+					}else if(isDecimal(y12)){
+						document.getElementById("xy").innerHTML = "请输入正确的北纬(分)";
+					}else if(y13==""){
+						document.getElementById("xy").innerHTML = "请输入北纬(秒)";
+					}else if(isDecimal(y13)){
+						document.getElementById("xy").innerHTML = "请输入正确的北纬(秒)";
+					}
+					if(x11!="" && x12!="" && x13!="" && y11!="" && y12!="" && y13!="" && isDecimal(x11)=="" && isDecimal(x12)=="" && isDecimal(x13)=="" && isDecimal(y11)=="" && isDecimal(y12)=="" && isDecimal(y13)==""){
+						//parent.art.dialog.data("x", document.getElementById("x1").value);
+						//parent.art.dialog.data("y", document.getElementById("y1").value);
+						//var dialogId = parent.art.dialog.data("dialogId");
+			        	//parent.art.dialog.removeData("dialogId");
+						//parent.art.dialog.close(dialogId);
+					}
+				}else{
+					//parent.art.dialog.data("x", document.getElementById("x1").value);
+					//parent.art.dialog.data("y", document.getElementById("y1").value);
+					//var dialogId = parent.art.dialog.data("dialogId");
+		        	////parent.art.dialog.removeData("dialogId");
+					//parent.art.dialog.close(dialogId);
+				}
+			}
+			function isDecimal(str){ 
+				return str.replace(/^(\d*(\.\d*)?)$/,'')  
+			} 
+			
+			function onCancelClickHandler() {
+				
+				//var dialogId = parent.art.dialog.data("dialogId");
+	        	//parent.art.dialog.removeData("dialogId");
+				//parent.art.dialog.close(dialogId);
+				parent.$dlog.close();
+			}
+			
+			function onX11BlurHandler() {
+				
+				if (document.getElementById("x11").value && document.getElementById("x11").value != "") {
+					
+					g_lng += Number(document.getElementById("x11").value);
+					
+					checkAndSetLng();
+				}
+			}
+			
+			function onX12BlurHandler() {
+				
+				if (document.getElementById("x12").value && document.getElementById("x12").value != "") {
+					
+					g_lng += Number(document.getElementById("x12").value)/60.0;
+					
+					checkAndSetLng();
+				}
+			}
+			
+			function onX13BlurHandler() {
+				
+				if (document.getElementById("x13").value && document.getElementById("x13").value != "") {
+					
+					g_lng += Number(document.getElementById("x13").value)/3600.0;
+					
+					checkAndSetLng();
+				}
+			}
+			
+			function onY11BlurHandler() {
+				
+				if (document.getElementById("y11").value && document.getElementById("y11").value != "") {
+					
+					g_lat += Number(document.getElementById("y11").value);
+					
+					checkAndSetLat();
+				}
+			}
+			
+			function onY12BlurHandler() {
+				
+				if (document.getElementById("y12").value && document.getElementById("y12").value != "") {
+					
+					g_lat += Number(document.getElementById("y12").value)/60.0;
+					
+					checkAndSetLat();
+				}
+			}
+			
+			function onY13BlurHandler() {
+				
+				if (document.getElementById("y13").value && document.getElementById("y13").value != "") {
+					
+					g_lat += Number(document.getElementById("y13").value)/3600.0;
+					
+					checkAndSetLat();
+				}
+			}
+			
+			function checkAndSetLng() {
+				
+				if (g_lng && g_lng > 1) {
+					
+					document.getElementById("x1").value = g_lng;
+					
+					checkXYAndDrawPoint();
+				}
+			}
+			
+			function checkAndSetLat() {
+				
+				if (g_lat && g_lat > 1) {
+					
+					document.getElementById("y1").value = g_lat;
+					
+					checkXYAndDrawPoint();
+				}
+			}
+			
+			function checkXYAndDrawPoint() {
+				
+				if (document.getElementById("x1").value 
+				&& document.getElementById("x1").value != "" 
+				&& document.getElementById("y1").value 
+				&& document.getElementById("y1").value != "") {
+					
+					drawPoint(document.getElementById("x1").value, document.getElementById("y1").value);
+				}
+			}
+			
+			function getLabelHtml(options) {
+			
+				var htmls = [];
+				htmls.push("<div style='fontSize:12px;lineHeight:18px;width:100px;paddingLeft:4px;paddingRight:4px;whiteSpace:nowrap;text-align:center;");
+				if (options.className) {
+					
+					htmls.push("' class='");
+					htmls.push(options.className);
+					htmls.push("'>");
+				}
+				else {
+					
+					htmls.push("border:solid 1px #FF0000;background:#FFFFFF'>");
+					
+				}
+				htmls.push(options.text);
+				htmls.push("</div>");
+				return htmls.join("");
+			}
+			function btnok(){
+				var name=$("#areaName").val();
+				mapProxy.centerAndZoom(name,20);
+			}
+			
+			document.onkeydown=function(event){
+	            var e = event || window.event || arguments.callee.caller.arguments[0];
+	                      
+	             if(e && e.keyCode==13){ // enter 键
+	                 btnok();
+	            }
+	        }; 
+		
+		
+		var nscope;
+		simpleController({
+			moduleName:"realPosition",
+			controllerName:"realPositionCtrl",
+			init:function($scope, $http){
+				
+				//var ticket =$scope.ticket;
+				nscope=$scope;
+				$scope.deviceAttrList=[];
+				$scope.deviceAttrTrs=[];
+				
+
+				
+				
+				
+				
+					$scope.delbiaoxiang=function(index){
+						new ShowDlog().mobileConfirm({
+							icon:"custom",
+							iconHtml:"",
+							msg:"您已填写数据,是否确认删除？",
+							ok:function(){
+								removeAt($scope.biaoxiang, index);
+								$("#input_"+index).parent(".dianbiao_no").remove();
+								
+								viewCeng(JSON.stringify($scope.biaoxiang));
+							},
+							cancel:function(){},
+							className:"dialogcss"
+							
+						});
+						
+						
+						
+					};
+					$scope.editBiaoxiang=function(){
+						$(".adddianbiao").show();
+					};
+					
+					$scope.editBiaoxiang1=function(){
+						viewCeng(JSON.stringify($scope.biaoxiang));
+					};
+					
+					
+					
+					
+					/* 电表添加表号弹框取值 */
+					$scope.biaoxiang=[];
+				
+					var dianindex="x";
+					$scope.surebiaod=function(){
+						var biaonum=$("input[name=biaonum]").val();
+						var hunum=$("input[name=hunum]").val();
+						var baddtr=$("input[name=baddtr]").val();
+						//var temlenum =$("input[name=temlenum]").val();
+						if(biaonum==""&&hunum==""&&baddtr==""){
+							new ShowDlog().prompt({
+								icon:"warning",
+								msg:"您未填写任何数据",
+								done:function(){},
+								t:2000
+							});
+							return;
+						}
+						if(dianindex=="x"){
+						
+							var biaonum=$("input[name=biaonum]").val();
+							var hunum=$("input[name=hunum]").val();
+							var baddtr=$("input[name=baddtr]").val();
+							//var temlenum =$("input[name=temlenum]").val();
+							var tempobj={};
+							tempobj.HOUSE_HOLD=baddtr;
+							tempobj.HOUSEHOLD_NAME=biaonum;
+							tempobj.FLOOR_NO=hunum;
+							//tempobj.HOUSEHOLD_NAME=temlenum;
+							$scope.biaoxiang.push(tempobj);
+							/* $scope.biaoxiang[biaoxingindex].AMUL_BOX_ADDR=baddtr;
+							$scope.biaoxiang[biaoxingindex].METER_NO=biaonum;
+							$scope.biaoxiang[biaoxingindex].HOUSEHOLD_NO=hunum;
+							$scope.biaoxiang[biaoxingindex].HOUSEHOLD_NAME=temlenum; 
+							*/
+							$(".adddianbiao").hide();
+							$("input[name=biaonum]").val("");
+							$("input[name=hunum]").val("");
+							$("input[name=baddtr]").val("");
+							//$("input[name=temlenum]").val("");
+						}else{
+						
+							var biaonum=$("input[name=biaonum]").val();
+							var hunum=$("input[name=hunum]").val();
+							var baddtr=$("input[name=baddtr]").val();
+							//var temlenum =$("input[name=temlenum]").val();
+							$scope.biaoxiang[dianindex].HOUSE_HOLD=baddtr;
+							$scope.biaoxiang[dianindex].HOUSEHOLD_NAME=biaonum;
+							$scope.biaoxiang[dianindex].FLOOR_NO=hunum;
+							//$scope.biaoxiang[dianindex].HOUSEHOLD_NAME=temlenum;
+							$(".adddianbiao").hide();
+							$("input[name=biaonum]").val("");
+							$("input[name=hunum]").val("");
+							$("input[name=baddtr]").val("");
+							//$("input[name=temlenum]").val("");
+						}
+						
+						//viewCeng();
+						viewCeng(JSON.stringify($scope.biaoxiang));
+						
+						
+					};
+					
+					/* 修改 */
+					$scope.surebiaod1=function(index){
+						var biaonum=$("input[name=biaonum]").val($scope.biaoxiang[index].HOUSEHOLD_NAME);
+						var hunum=$("input[name=hunum]").val($scope.biaoxiang[index].FLOOR_NO);
+						var baddtr=$("input[name=baddtr]").val($scope.biaoxiang[index].HOUSE_HOLD);
+						//var temlenum =$("input[name=temlenum]").val($scope.biaoxiang[index].HOUSEHOLD_NAME);
+						$(".adddianbiao").show();
+						dianindex=index;
+					};
+					$scope.quxiaoicon=function(){
+						$(".adddianbiao").hide();
+						$("input[name=biaonum]").val("");
+						$("input[name=hunum]").val("");
+						$("input[name=baddtr]").val("");
+						//$("input[name=temlenum]").val("");
+						dianindex="x";
+					};
+				
+				
+				
+			
+				
+				
+				
+				 	
+			    var jsonAddr="";
+				
+				if(sessionStorage.address){
+					
+					jsonAddr = sessionStorage.address;
+					
+					$("input[name=deviceObjName]").val(jsonAddr);
+					
+					
+				}else{
+					$("input[name=deviceObjName]").val("");
+				} 
+			
+				
+				
+				/* if(sessionStorage.mctName){
+					$("input[name=mctName]").val(sessionStorage.mctName);
+				}else{
+					$("input[name=mctName]").val("");
+				}
+				
+				if(sessionStorage.mctCode){
+					$("input[name=mctCode]").val(sessionStorage.mctCode);
+				}else{
+					$("input[name=mctName]").val("");
+				}
+				
+				if(sessionStorage.deviceTypeCode){
+					$("input[name=deviceTypeCode]").val(sessionStorage.deviceTypeCode);
+				}else{
+					$("input[name=deviceTypeCode]").val("");
+				} */
+
+				$scope.onSubmitClickHandler=function(url,params) {
+					
+					$scope.httpPost({
+						url:url,
+						data:params,
+						success:function(responseData){
+							waittingDlog.close();
+							if(responseData && responseData.statusCode=="200"){
+								//var dialog1=;
+								waittingDlog.prompt({
+									icon:"success",
+									msg:"提交成功！",
+									done:function(){
+										result3=0;
+										$("input[name=attrJson]").val("");
+										$(":input[type=text]").val("");
+										$("#images1").attr("src","img/add_pic_icon.png");
+										$("#images2").attr("src","img/add_pic_icon.png");
+										$("#images3").attr("src","img/add_pic_icon.png");
+										$("input[name=deviceimg1]").val("");
+										$("input[name=deviceimg2]").val("");
+										$("input[name=deviceimg3]").val("");
+										$("input[name=proNo]").val($scope.userData.proNo);
+										$("input[name=proName]").val($scope.userData.proName);
+										$("input[name=companyCode]").val($scope.userData.companyCode);
+										$scope.biaoxiang=[];
+										$(".dianbiao_no").remove();
+										if(sessionStorage.address){
+											
+											$("input[name=deviceObjName]").val(sessionStorage.address);
+											$("input[name=AMUL_BOX_ADDR]").val(sessionStorage.address);
+	
+										}else{
+											$("input[name=deviceObjName]").val("");
+										} 
+									
+									
+										resets(0);
+									},
+									t:2000
+								}); 
+								
+							}else{
+								waittingDlog.prompt({
+									icon:"error",
+									msg:"提交失败！",
+									done:function(){
+										
+									},
+									t:2000
+								});
+							}
+						},
+						error:function(res){
+							waittingDlog.close();
+						}
+					});
+					
+				 };
+				
+				var waittingDlog = new ShowDlog();
+				/* 保存 */
+				$scope.onSave=function(){
+					var deviceObjName=$("input[name=deviceObjName]").val();
+					
+					var deviceimg1=$("input[name=deviceimg1]").val();
+					var deviceimg2=$("input[name=deviceimg2]").val();
+					var deviceimg3=$("input[name=deviceimg3]").val();
+				
+
+					
+					
+					$("input[name=companyCode]").val($scope.userData.companyCode);
+					//$("input[name=ADDR_NAME]").val(deviceObjName);
+					
+					
+					var saveArr=[];
+					for(var i in $scope.biaoxiang){
+						var objN={};
+						var obj = $scope.biaoxiang[i];
+						for(var key in obj){
+							if("$$hashKey"==key){
+								continue;
+							}
+							objN[key]=obj[key];
+						}
+						saveArr.push(objN);
+					}
+					var cond={};
+					cond["FLOOR_HOUSE"]=saveArr;
+					
+					$("input[name=attrJson]").val(JSON.stringify(cond));
+					
+					
+					var params = serializeArrayToMap($("#saveForm").serializeArray());
+					
+			
+					var deviceObjName=$("input[name=deviceObjName]").val();
+					//alert(deviceObjName)
+					var filepath=sessionStorage.serviceBasePath;
+
+					//alert(filepath)
+			        var ticket =$scope.ticket;
+					
+								sessionStorage.address =deviceObjName;
+								var ticket =$scope.ticket;
+								var tepx=$("input[name=x]").val();
+		                    	var tepy=$("input[name=y]").val();
+		                    	
+		                    	waittingDlog.close();
+		                    	
+		                    	if(tepx=="" || tepy==""){
+		                    		
+		                    		new ShowDlog().prompt({
+										icon:"warning",
+										msg:"未获取到坐标,重新获取中...",
+										done:function(){
+											onScanCodeClickHandler();
+										},
+										t:2000
+									});
+		                    		return false;
+		                    	}else{
+		                    		
+		                    		waittingDlog.prompt({
+										icon:"waitting",
+										msg:"正提交请稍等",
+										done:function(){
+											
+										},
+										t:360000
+									});
+		                    		
+		                    		
+		                    		
+									var url="eap/pmsServices/addr/addrBase/insertAddrBase";
+									
+									$scope.onSubmitClickHandler(url,params);	
+		                    	}
+
+				};
+				
+			
+			
+				
+				if(!mapProxy){
+					initMap(_x,_y);
+				}
+				var st=setTimeout(function(){
+            		initXY();	
+    			}, 1500);
+				
+				onScanCodeClickHandler();
+				
+				
+				
+				
+				
+			}
+		});
+		
+		
+
+		function scan1(){
+			window.top.nativeLib.scanCode({callback:function(data){
+				//alert(data)
+				
+				
+ 				$("input[name=biaonum]").val(data);
+				$("input[name=biaonum]").focus();
+			}});
+			
+		};
+		
+		function viewCeng(jsonStr){
+			
+			$("#canvas").html("");
+			
+			
+			var jsonarray = eval('('+jsonStr+')');
+			
+			
+			//var jsonarray = eval('('+FLOOR_HOUSE+')');
+			var floorNum="";
+			var jsonnumarr=[];
+			var prevUnitMaxNo=0;
+			/// 单元
+			for(var i=0;i<jsonarray.length;i++){
+				var div = document.createElement("div");
+				div.className="floor";
+				
+				var ul = document.createElement("ul");
+				div.appendChild(ul);
+				var p=document.createElement("p");
+				p.innerHTML=jsonarray[i].HOUSEHOLD_NAME
+				div.appendChild(p);
+				floorNum = jsonarray[i].FLOOR_NO;
+				floorNum=Number(floorNum);
+				var houseNum=jsonarray[i].HOUSE_HOLD;
+				houseNum=Number(houseNum);
+				// 楼层
+				for(var j=1;j<=floorNum;j++){
+					var li = document.createElement("li");
+					// 户
+					for(var k=1;k<=houseNum;k++){
+						var a = document.createElement("a");
+						var ch = floorNum+1-j;
+						a.innerHTML=ch+fmt(prevUnitMaxNo+k);
+						li.appendChild(a);
+						
+						if(j==floorNum && k==houseNum){
+							
+							prevUnitMaxNo=prevUnitMaxNo+houseNum;
+						}
+					}
+					ul.appendChild(li);
+				}
+				document.getElementById("canvas").appendChild(div);
+				alertV();
+			}
+			
+		}
+		
+		function alertV(){
+			var temppx=0;
+			$(".floor").each(function(index,item){
+				$(this).css("left",temppx+"px");
+				temppx=temppx+parseInt($(this).css("width").substring(0,$(this).css("width").length-2));
+			});
+		}
+		function fmt(n){
+			if(n<10){
+				return "0"+n;
+			}else{
+				return n;
+			}
+		}
+	
+		
+	</script>
+</body>
+</html>

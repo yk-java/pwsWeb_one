@@ -1,0 +1,711 @@
+<!DOCTYPE HTML>
+<html ng-app="moduleName">
+<head>
+<title> 设备管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+<style type="text/css">
+.dialog-images{width:1000px;height:600px;}
+.dialog-update{width:800px;height:400px;}
+.dialog_scheme_check{width:800px;height:620px;}
+.title_div2{border:solid 0px red;background:#4CA9FF;padding:8px 6px 8px 6px;}
+.title_div2 .condLayer1{display:block;border:solid 0px;margin:6px;}
+.title_div2 .condLayer2{border:solid 0px green;margin:0 6px;}
+.title_div2 .condLayer1 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:0 4px;padding:0 4px;font-family:微软雅黑;border-radius:3px;}
+.title_div2 .condLayer2 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:6px 4px;padding:0 4px;background-color:#DAEDFF;font-family:微软雅黑;border-radius:3px;}
+.title_div2 .btn{display:inline-block;height:30px;line-height:30px;margin:0 4px;padding:0 15px 0 15px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; 
+border-radius:4px;}
+.title_div2 .blue{background:#3385FF;color:#fff;}
+.title_div2 .blue:hover{background:#186CE7;}
+.title_div2 .pink{background:#ED7798;color:#fff;}
+.title_div2 .pink:hover{background:#E54673;}
+
+.advanced-search{display:inline-block;height:30px;line-height:30px;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF;padding:0 26px 0 6px;color:#fff;background-color:#3385FF;background-image: url(../../../img/drop_down_list2.png);
+background-repeat: no-repeat;background-position: right;border-radius:4px;}
+#advanced-search-layer{display:none;position:absolute;width:320px;max-height:400px;border:solid 1px #ccc;background:#fff;}
+#advanced-search-layer .btn-close{display:inline-block;padding:2px 4px;font-size:16px;border:solid 0px #ccc;position:absolute;top:4px;right:4px;color:#333;}
+#advanced-search-layer .btn-close:hover{color:#FF3300;}
+#advanced-search-layer li{margin:4px 4px;list-style-type:none;}
+#advanced-search-layer li input{display:inline-block;vertical-align:middle;}
+#advanced-search-layer li label{display:inline-block;margin:10px 0 4px 0;color:#3385FF;vertical-align:middle;}
+#advanced-search-layer li.btns{text-align:right;padding:4px 32px;}
+#advanced-search-layer input{border:solid 1px #ccc;}
+
+</style>
+</head>
+
+<body ng-controller="controllerName" storagekey="om.statistics.deviceQuaList">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div2">
+			<div class="condLayer1">
+				<input type="text" id="category" name="categoryName" viewstate="categoryName" class="dropDownList" style="width:180px;" placeholder="请选择项目分类"/>
+				<input type="hidden" name="categoryCode" viewstate="categoryCode"/>
+				
+				<input type="text" id="proName" name="proName" viewstate="proName" class="dropDownList" style="width:180px;" placeholder="请选择项目"/>
+				<input type="hidden" name="proNo" viewstate="proNo"/>
+				
+				<input type="text" id="mct" name="mctName" viewstate="mctName" class="dropDownList" style="width:180px;" placeholder="请选择总控表"/>
+				<input type="hidden" name="mctCode" viewstate="mctCode"/>
+				<input type="text" name="searchName" viewstate="searchName" style="width:180px;" placeholder="搜索"/>
+				
+				<!-- <a href="javascript:" class="advanced-search">高级搜索 </a>
+				<div id="advanced-search-layer">
+					<ul>
+						<li><label>采集时间</label></li>
+						<li>
+							<input type="text" name="startTime" viewstate="startTime" class="dateComponent" onclick='new Calendar().show(this)' style="width:100px;" placeholder="采集时间起"/>
+							<input type="text" name="endTime" viewstate="endTime" class="dateComponent" onclick='new Calendar().show(this)' style="width:100px;" placeholder="采集时间止"/>
+						</li>
+						<li><label>质量审核情况</label></li>
+						<li>
+							<input type="text" name="QUALITY_AUDIT_NAME" viewstate="QUALITY_AUDIT_NAME" class="dropDownList" style="width:220px;" placeholder="质量审核"/>
+							<input type="hidden" name="QUALITY_AUDIT" viewstate="QUALITY_AUDIT"/>
+						</li>
+						<li class="btns">
+							<div class="btn" ng-click="reset_handler()">重置</div>&nbsp;&nbsp;
+							<div class="btn blue" ng-click="ok_handler()">确定</div>
+						</li>
+					</ul>
+					<a href="javascript:" class="btn-close">×</a>
+				</div>
+				<a href="javascript:" class="advanced-search">列显示 </a>
+				<div id="advanced-search-layer" style="width:110px;">
+					<ul style="padding:0;margin:0;">
+						<li>
+							<input type="checkbox" name="cols_type" value="base" checked="checked" ng-click="colsType('base')">
+							<label>基本数据</label>
+						</li>
+						<li>
+							<input type="checkbox" name="cols_type" value="check" ng-click="colsType('check')">
+							<label>审核数据</label>
+						</li>
+						<li>
+							<input type="checkbox" name="cols_type" value="ext" checked="checked" ng-click="colsType('ext')">
+							<label>扩展数据</label>
+						</li>
+					</ul>
+					<a href="javascript:" class="btn-close">×</a>
+				</div> -->
+				<div class="btn blue" ng-click="doQuery()">
+					查询
+				</div>
+				<div class="btn blue" ng-click="doQuery('export')">
+					导出
+				</div>
+				
+			</div>
+			
+			<div class="condLayer2">
+				<!-- 动态条件 -->
+				<span ng-repeat="item in theadData.searchFields">
+				<input ng-if="item.dtype==4" type="text" group="cond" id="{{item.ename}}" style="width:180px;" class="dropDownList" placeholder="{{item.cname}}"/>
+				</span>
+				<!-- 动态条件 -->
+			</div>
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th colspan="2">照片</th>
+				<th colspan="2">坐标</th>
+				<th colspan="2">考核</th>
+
+				
+			  </tr>
+			  <tr class="tr1">
+				<th>有</th>
+				<th>无</th>
+				<th>有</th>
+				<th>无</th>
+				<th>合格</th>
+				<th>不合格</th>
+			  </tr>
+			  <tr ng-repeat="item in dataList" class="tr2">
+				<td align="center">{{item.pic}}</td>
+				<td align="center">{{item.pic1}}</td>
+				<td align="center">{{item.coordinate1}}</td>
+				<td align="center">{{item.coordinate}}</td>
+				<td align="center">{{item.examine}}</td>
+				<td align="center">{{item.examine1}}</td>
+				
+			  </tr>
+			</table>
+			<div ng-if="!dataList || dataList.length==0" style="border:solid 1px #ccc;padding:10px 0;margin-top:-1px;">
+		  	<span style="color:#ff6600;">&nbsp;&nbsp;请依次选择条件进行查询（项目分类、项目、总控表）</span>
+		  	</div>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		$scope.theadData=[];
+		$scope.dataList=[];
+		
+		var viewState = new ViewState();
+		
+		$scope.cond_category="";
+		$scope.cond_categoryName="";
+		$scope.cond_proNo="";
+		$scope.cond_proName="";
+		$scope.cond_mct="";
+		$scope.cond_mctName="";
+		$scope.cond_searchName="";
+		$scope.colshow_base=1;
+		$scope.colshow_check=0;
+		$scope.colshow_ext=1;
+		$scope.colsType=function(type){
+			if('base'==type){
+				if($("input[name=cols_type][value=base]")[0].checked){
+					$scope.colshow_base=1;
+				}else{
+					$scope.colshow_base=0;
+				}
+			}else if('check'==type){
+				if($("input[name=cols_type][value=check]")[0].checked){
+					$scope.colshow_check=1;
+				}else{
+					$scope.colshow_check=0;
+				}
+			}else if('ext'==type){
+				if($("input[name=cols_type][value=ext]")[0].checked){
+					$scope.colshow_ext=1;
+				}else{
+					$scope.colshow_ext=0;
+				}
+			}
+		}
+		var getAbsPoint = function (e){
+			var x = e.offsetLeft;
+			var y = e.offsetTop;
+			while(e = e.offsetParent){
+				if($(e).css("position") == "absolute" || $(e).css("position") == "relative"){
+					return {"x": x, "y": y};
+				}else{
+					x += e.offsetLeft;
+					y += e.offsetTop;
+				}
+			}
+			return {"x": x, "y": y};
+		};
+		
+		$(".advanced-search").each(function(){
+			var h = $(this).outerHeight();
+			var offset = getAbsPoint($(this)[0]);
+			$(this).next().offset({"left":offset.x, "top":offset.y+h});
+			var $host =$(this); 
+			$(this).next().find(".btn-close").click(function(){
+				$host.next().hide();
+				$host.attr("layer-open", "0");
+			});
+			$(this).click(function(){
+				var layerOpen = $(this).attr("layer-open");
+				if(layerOpen=="1"){
+					$(this).next().hide();
+					$(this).attr("layer-open", "0");
+				}else{
+					$(this).next().show();
+					$(this).attr("layer-open", "1");
+				}
+			});
+		});
+		
+		$scope.reset_handler=function(){
+			$("input[name=startTime]").val("");
+			$("input[name=endTime]").val("");
+			$("input[name=QUALITY_AUDIT_NAME]").val("");
+			$("input[name=QUALITY_AUDIT]").val("");
+		};
+		$scope.ok_handler=function(){
+			$(".advanced-search").click();
+			$scope.doQuery();
+		};
+		
+		var urlParams = getUrlParams();
+		propertyChooseCopy(urlParams, $scope, ["cond_category","cond_categoryName", "cond_proNo","cond_proName", "cond_mct","cond_mctName", "cond_searchName"]);
+		if(urlParams.cond_categoryName && urlParams.cond_categoryName.length>0){
+			$("#category").val(urlParams.cond_categoryName);
+		}
+		if(urlParams.cond_proName && urlParams.cond_proName.length>0){
+			$("#proName").val(urlParams.cond_proName);
+		}
+		if(urlParams.cond_mctName && urlParams.cond_mctName.length>0){
+			$("#mct").val(urlParams.cond_mctName);
+		}
+		if(urlParams.cond_searchName && urlParams.cond_searchName.length>0){
+			$("input[name=searchName]").val(urlParams.cond_searchName);
+		}
+		if(urlParams.cond_currentPage && urlParams.cond_currentPage.length>0){
+			$scope.currentPage=urlParams.cond_currentPage;
+		}
+		
+		
+		window.onkeyup=function(e){
+			if(e.keyCode==13){
+				$scope.doQuery();
+			}
+		};
+		/* 项目分类 */
+		new DropDownList().init({
+			mode:"page",
+			renderTo:"#category",
+			url:"../../component/projectType.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$scope.cond_category=result.categoryCode;
+				$("#category").val(result.categoryName);
+				$("input[name=categoryCode]").val(result.categoryCode);
+				$scope.cond_categoryName=result.categoryName;
+				proNameList.setConfig("url", "../../component/projectList.html?categoryCode="+result.categoryCode+"&ticket="+$scope.ticket);
+			}
+		});
+		/* 项目列表 */
+		var proNameList = new DropDownList();
+		proNameList.init({
+			mode:"page",
+			renderTo:"#proName",
+			url:"../../component/projectList.html?categoryCode="+viewState.get("categoryCode")+"&ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$scope.cond_proNo=result.proNo;
+				$("#proName").val(result.proName);
+				$("input[name=proNo]").val(result.proNo);
+				$scope.cond_proName=result.proName;
+				mctList.setConfig("url", "../../component/mctType.html?proNo="+$scope.cond_proNo);
+			}
+		});
+		
+		/* 项目总控表*/
+		var mctList = new DropDownList();
+		mctList.init({
+			renderTo:"#mct",
+			url:"../../component/mctType.html?proNo="+viewState.get("proNo"),
+			onSelected:function(item){
+				$scope.cond_mct=item.mctCode;
+				$("#mct").val(item.mctName);
+				$("input[name=mctCode]").val(item.mctCode);
+				$scope.cond_mctName=item.mctName;
+				//if($scope.cond_mct!=null && $scope.cond_mct.length>0){
+					$scope.loadTheader($scope.cond_mct);
+					$scope.doQuery();
+				//}else{
+				//	callNgFn({ctrlEl:$("body")[0], ngFn:function(scope){
+				//		scope.theadData.searchFields = [];
+				//	}});
+				//}
+			}
+		});
+		
+		
+		/* 质量审核 */
+		new DropDownList().init({
+			renderTo:"input[name=QUALITY_AUDIT_NAME]",
+			data:[{code:"", name:"(全部)"}, {code:1, name:"合格"}, {code:2, name:"不合格"}],
+			textField:"name",
+			onSelected:function(item){
+				if(item.code==""){
+					$("input[name=QUALITY_AUDIT_NAME]").val("");
+					$("input[name=QUALITY_AUDIT]").val("");
+					return;
+				}
+				$("input[name=QUALITY_AUDIT_NAME]").val(item.name);
+				$("input[name=QUALITY_AUDIT]").val(item.code);
+			}
+		});
+		
+		/* 加载条件和表头信息 */
+		$scope.loadTheader=function(mctCode){
+			var paramsData={};
+			if(mctCode){
+				paramsData["mctCode"]=mctCode;
+			}else{
+				return;
+				//paramsData["deviceTypeCode"]="01";
+			}
+			$scope.httpGet({
+				url:"eap/pmsServices/om/deviceMgr/device/mctListAttr?companyCode="+$scope.userData.companyCode,
+				data:paramsData,
+				success:function(response){
+					$scope.theadData = response.data;
+					/* 初始化搜索条件 */
+					lazyCall('t1',function(){
+						if($scope.theadData && $scope.theadData.searchFields){
+							for(var i=0; i<$scope.theadData.searchFields.length; i++){
+								(function(){
+									var searchField = $scope.theadData.searchFields[i];
+									if(searchField.dtype==4){
+										/* 搜索条件*/ 
+										searchField.enumValue.unshift("(清空)");
+										new DropDownList().init({
+											renderTo:"#"+searchField.ename,
+											data:searchField.enumValue,
+											onSelected:function(result){
+												if(result=="(清空)"){
+													$("#"+searchField.ename).val("");
+												}else{
+													$("#"+searchField.ename).val(result);
+												}
+											}
+										});
+									}
+								})();
+							}
+						}
+					}, 100);
+				}
+			});
+		};
+		
+		/* 数据加载 */
+		$scope.loadData=function(mctCode, condStr, searchName, startTime, endTime, qualityAudit){
+			var paramsData={"companyCode":$scope.userData.companyCode, 
+					"proNo":$scope.cond_proNo,
+					"attrJson":condStr, "searchName":searchName, "startTime":startTime, "endTime":endTime, "QUALITY_AUDIT":qualityAudit};
+			if(mctCode){
+				paramsData["mctCode"]=mctCode;
+			}else{
+				$scope.dataList = [];
+				return;
+				//paramsData["deviceTypeCode"]="01";
+			}
+			$scope.httpExecute({
+				method:"post",
+				url:"eap/pmsServices/om/deviceMgr/device/dataQuality",
+				data:paramsData,
+				success:function(response){
+					if(response.statusCode==200){
+						$scope.dataList = response.list;
+					}else{
+						$scope.dataList = [];
+					}
+				},
+				showPageInfo:true,
+				pageChange:function(pageNum){
+					$scope.doQuery();
+				}
+			});
+		};
+		
+		//导出图片
+		$scope.exportImgs=function(mctCode, condStr, searchName, startTime, endTime, qualityAudit){
+			var paramsData={"companyCode":$scope.userData.companyCode, 
+					"attrJson":condStr, "searchName":searchName, "startTime":startTime, "endTime":endTime, "QUALITY_AUDIT":qualityAudit};
+			if(mctCode){
+				paramsData["mctCode"]=mctCode;
+			}else{
+				paramsData["deviceTypeCode"]="01";
+			}
+			
+			
+			
+			
+			
+			var form = createForm({
+				method:"post",
+				action:serviceBasePath+"eap/pmsServices/om/deviceMgr/device/getZipFiles",
+				data:paramsData});
+			document.body.appendChild(form);
+			form.submit();
+			
+		};
+		
+		
+		/* 数据导出 */
+		$scope.exportData=function(mctCode, condStr, searchName, startTime, endTime, qualityAudit){
+			var paramsData={"companyCode":$scope.userData.companyCode, 
+					"attrJson":condStr, "searchName":searchName, "startTime":startTime, "endTime":endTime, "QUALITY_AUDIT":qualityAudit};
+			if(mctCode){
+				paramsData["mctCode"]=mctCode;
+			}else{
+				paramsData["deviceTypeCode"]="01";
+			}
+			var form = createForm({
+				method:"post",
+				action:serviceBasePath+"eap/pmsServices/om/deviceMgr/device/qualityExport",
+				data:paramsData});
+			document.body.appendChild(form);
+			form.submit();
+		};
+		
+		/* 查询 */
+		$scope.doQuery=function(mode){
+			var cond={};
+			$("input[group=cond]").each(function(){
+				var $cond = $(this);
+				var key = $cond.attr("id");
+				var val = $cond.val();
+				cond[key]=val;
+			});
+			$scope.cond_condStr=JSON.stringify(cond);
+			$scope.cond_searchName=$("input[name=searchName]").val();
+			if($scope.theadData && $scope.theadData.searchFields){
+				var vars="";
+				for(var i=0; i<$scope.theadData.searchFields.length; i++){
+					var searchField = $scope.theadData.searchFields[i];
+					if(searchField.dtype==1){
+						if(vars && vars.length>0){
+							vars+=",";
+						}
+						vars+=searchField.ename;
+					}
+				}
+				$scope.cond_searchName=vars+";"+$scope.cond_searchName;
+			}else{
+				$scope.cond_searchName=";"+$scope.cond_searchName;
+			}
+			
+			
+			viewState.collect();
+			if(viewState.get("mctCode") && viewState.get("mctCode").length>0){
+				if(mode && mode=="export"){
+					$scope.exportData(viewState.get("mctCode"), $scope.cond_condStr, $scope.cond_searchName, viewState.get("startTime"), viewState.get("endTime"), viewState.get("QUALITY_AUDIT"));
+				}else{
+					$scope.loadData(viewState.get("mctCode"), $scope.cond_condStr, $scope.cond_searchName, viewState.get("startTime"), viewState.get("endTime"), viewState.get("QUALITY_AUDIT"));
+				}
+			}
+		};
+		
+		//导出图片
+		
+		$scope.doExportImgs=function(mode){
+			var cond={};
+			$("input[group=cond]").each(function(){
+				var $cond = $(this);
+				var key = $cond.attr("id");
+				var val = $cond.val();
+				cond[key]=val;
+			});
+			$scope.cond_condStr=JSON.stringify(cond);
+			$scope.cond_searchName=$("input[name=searchName]").val();
+			if($scope.theadData.searchFields){
+				var vars="";
+				for(var i=0; i<$scope.theadData.searchFields.length; i++){
+					var searchField = $scope.theadData.searchFields[i];
+					if(searchField.dtype==1){
+						if(vars && vars.length>0){
+							vars+=",";
+						}
+						vars+=searchField.ename;
+					}
+				}
+				$scope.cond_searchName=vars+";"+$scope.cond_searchName;
+			}
+		
+			$scope.exportImgs(viewState.get("mctCode"), $scope.cond_condStr, $scope.cond_searchName, viewState.get("startTime"), viewState.get("endTime"), viewState.get("QUALITY_AUDIT"));
+				
+			
+		};
+		
+		
+		//if($scope.cond_mct!=null && $scope.cond_mct.length>0){
+			$scope.loadTheader(viewState.get("mctCode"));
+			$scope.doQuery();
+		//}
+		/* 批量修改 */
+		$scope.batchUpdate=function(){
+			var cond={};
+			$("input[group=cond]").each(function(){
+				var $cond = $(this);
+				var key = $cond.attr("id");
+				var val = $cond.val();
+				cond[key]=val;
+			});
+			$scope.cond_condStr=JSON.stringify(cond);
+			$scope.cond_searchName=$("input[name=searchName]").val();
+			if($scope.theadData.searchFields){
+				var vars="";
+				for(var i=0; i<$scope.theadData.searchFields.length; i++){
+					var searchField = $scope.theadData.searchFields[i];
+					if(searchField.dtype==1){
+						if(vars && vars.length>0){
+							vars+=",";
+						}
+						vars+=searchField.ename;
+					}
+				}
+				$scope.cond_searchName=vars+";"+$scope.cond_searchName;
+			}
+			var paramsData={"companyCode":$scope.userData.companyCode, 
+					"attrJson":$scope.cond_condStr, "searchName":$scope.cond_searchName};
+			if($scope.cond_mct){
+				paramsData["mctCode"]=$scope.cond_mct;
+			}else{
+				paramsData["deviceTypeCode"]="01";
+			}
+			var paramsStr = toUrlParams(paramsData);
+			new ShowDlog().showFrame("batchUpdate.html?"+paramsStr, "批量修改", function(data){
+				if("SUCCESS"==data){
+					hrefTo({
+						url:"deviceMgr.html",
+						data:{
+							"cond_category":$scope.cond_category, 
+							"cond_proNo":$scope.cond_proNo,
+							"cond_mct":$scope.cond_mct,
+							"cond_categoryName":$scope.cond_categoryName, 
+							"cond_proName":$scope.cond_proName,
+							"cond_mctName":$scope.cond_mctName,
+							"cond_searchName":$("input[name=searchName]").val(),
+							"cond_currentPage":$scope.currentPage
+						}
+					});
+				}
+			},"dialog-update");
+			
+		};
+		
+		/* 新增 */
+		$scope.toAdd=function(){
+			hrefTo({
+				url:"deviceAdd.html",
+				data:{
+					"cond_category":$scope.cond_category, 
+					"cond_proNo":$scope.cond_proNo,
+					"cond_mct":$scope.cond_mct,
+					"cond_categoryName":$scope.cond_categoryName, 
+					"cond_proName":$scope.cond_proName,
+					"cond_mctName":$scope.cond_mctName,
+					"cond_searchName":$("input[name=searchName]").val(),
+					"cond_currentPage":$scope.currentPage
+				}
+			});
+		};
+		/* 修改 */
+		$scope.toEdit=function(item){
+			hrefTo({
+				url:"deviceEdit.html",
+				data:{
+					"deviceObjCode":item.deviceObjCode,
+					"cond_category":$scope.cond_category, 
+					"cond_proNo":$scope.cond_proNo,
+					"cond_mct":$scope.cond_mct,
+					"cond_categoryName":$scope.cond_categoryName, 
+					"cond_proName":$scope.cond_proName,
+					"cond_mctName":$scope.cond_mctName,
+					"cond_searchName":$("input[name=searchName]").val(),
+					"cond_currentPage":$scope.currentPage
+				}
+			});
+		};
+		/* 删除 */
+		$scope.doDel=function(item){
+			new ShowDlog().confirm({
+				msg:"确定删除【"+item.deviceObjName+"】吗？",
+				ok:function(){
+					$scope.httpPost({
+						url:"eap/pmsServices/om/deviceMgr/device/deleteMctDevice",
+						data:{
+							"deviceObjCode":item.deviceObjCode
+						},
+						success:function(res){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"删除成功！",
+								done:function(){
+									location.reload();
+									/*hrefTo({
+										url:"deviceAttrFieldMgr.html",
+										data:{
+											"selectedUnitCode":$scope.selectedUnitCode, 
+											"accountType":$scope.accountType, 
+											"searchName":$scope.searchName
+										}
+									});*/
+								},
+								t:1500
+							});
+						}
+					});
+				}
+			});
+		};
+		/**/
+		$scope.toLocation=function(item){
+			hrefTo({
+				url:"deviceSetLocation.html",
+				data:{
+					"deviceObjCode":item.deviceObjCode,
+					"cond_category":$scope.cond_category, 
+					"cond_proNo":$scope.cond_proNo,
+					"cond_mct":$scope.cond_mct,
+					"cond_categoryName":$scope.cond_categoryName, 
+					"cond_proName":$scope.cond_proName,
+					"cond_mctName":$scope.cond_mctName,
+					"cond_searchName":$("input[name=searchName]").val(),
+					"cond_currentPage":$scope.currentPage,
+					"AMUL_BOX_ADDR":item.AMUL_BOX_ADDR?item.AMUL_BOX_ADDR:""
+				}
+			});
+		};
+		
+		
+		//查看图片
+		$scope.doShowImg=function(item){
+			var mctCode=item.mctCode;
+			var companyCode=item.companyCode;
+			var proNo=item.proNo;
+			var deviceObjCode=item.deviceObjCode;
+			
+			
+	
+			new ShowDlog().showFrame("../../component/imags.html?mctCode="+mctCode+"&companyCode="+companyCode+"&proNo="+proNo+"&deviceObjCode="+deviceObjCode, "图片查看", function(){
+				// 
+			},"dialog-images");
+
+		};
+		
+		/* 审核 */
+		$scope.toCheck=function(item, index){
+			new ShowDlog().showFrame("deviceQualityCheck.html?deviceObjCode="+item.deviceObjCode, 
+					item.deviceObjCode+"质量审核", 
+					function(data){
+						if(data=="SUCCESS"){
+							index++;
+							$scope.toCheckNext(index);
+						}else{
+							$scope.doQuery();
+						}
+					}, 
+					"dialog_scheme_check");
+		};
+		
+		$scope.toCheckNext=function(index){
+			if(index>=$scope.dataList.length){
+				location.reload();
+			}
+			var nextItem = $scope.dataList[index];
+			if(!nextItem.QUALITY_AUDIT || nextItem.QUALITY_AUDIT==""){
+				$scope.toCheck(nextItem, index);
+			}else{
+				index++;
+				$scope.toCheckNext(index);
+			}
+		}
+
+	}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+.hr_bottom{height:5px;background:#2AA5DF;}
+.resigter_warp p{background:#e6eff4;color:#2ba6e1;line-height:46px;font-size:18px;}
+.resigter_warp p img{margin:10px 10px 0 15px;display:inline-block}
+.resigter_plane{width:960px;margin:20px 0}
+.resigter_plane .from_plane{width:45%;}
+.resigter_plane .from_plane ul li{margin-bottom:30px}
+.resigter_plane .from_plane ul li label{display:block;width:20%;text-align:center;float:left;line-height:30px}
+.resigter_plane .from_plane ul li input{width:78%;float:left}
+.res_btn{margin-top:20px}
+
+
+/* 地名审核 */
+.addrnamecheck{position:relative;}
+.addrNameCheck_warp p{text-indent:20px;color:#2AA5DF;font-weight:bold;}
+.addrNameCheck_warp .sub_title{background:#f4f4f4;}
+.addrNameCheck_warp .sub_title h3{color:#2BA6E1;font-size:16px;line-height:40px;margin:0 20px;font-weight:normal;}
+.addrNameCheck_warp .Check_plane{padding:20px 0;}
+.addrNameCheck_warp .Check_plane li{margin:8px 0 8px 20px;}
+.addrNameCheck_warp .Check_plane li:first-child{}
+.addrNameCheck_warp .Check_plane li label{display:inline-block;width:180px;text-align:right;font-size:14px;}
+.addrNameCheck_warp .Check_plane li input{margin:0 10px;width:300px;border:solid 1px #ccc;}/*#2AA5DF*/
+.addrNameCheck_warp .Check_plane li span{cursor:pointer;display:inline-block;width:30px;height:30px;text-align:center;line-height:30px;background:#f2bb2a;color:#fff;border-radius:50%}
+.addrNameCheck_warp .res_btn{margin-top:50px}
+
+/* 审核提交完成提示 */
+.check_warp{margin-top:30px;background:#f5f1e6;text-align:center;padding-bottom: 20px;}
+.check_warp img{margin:30px 0 20px}
+.check_warp .complete_tip h3{font-size:25px;line-height:40px;font-weight:normal}
+.check_warp .complete_tip h3 span{margin-left:20px;color:#fb3838;font-size:20px}
+.check_warp .complete_tip div{margin-bottom:20px;color:#eb973f}
+
+/*验证码查询*/
+.codesearch_warp .codesearch{width:660px;margin:0 auto;text-align:center}
+.codesearch_warp img.sear_logo{margin:120px auto 60px}
+.codesearch_warp .search_con{width:100%;overflow:hidden}
+.codesearch_warp .search_con input{width:530px;height:40px;border-radius:inherit;border-right:none;border:1px solid #ccc;float:left}
+.codesearch_warp .search_con span{cursor:pointer;width:125px;height:42px;line-height:42px;color:#fff;float:left;background:url("../images/sear_btnn.png");display:inline-block}
+.search_tip{padding:40px 0 70px 0;text-align:center;background:#f5f1e6;width:960px;margin:65px auto 0}
+.search_tip img{margin-bottom:20px}
+.search_tip .tip_word{font-size:18px}
+.search_tip .tip_word.error{color:#f37171}
+.search_tip .tip_word.susscss{color:#666666}
+.search_tip .tip_word.susscss a{font-size:18px;color:#29a6de;margin-left:20px}
+.search_tip .tip_word.loading{color:#ec9842}
+
+
+
+
+
+

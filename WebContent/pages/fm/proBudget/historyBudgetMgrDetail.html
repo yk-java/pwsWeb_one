@@ -1,0 +1,307 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>项目预算</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<style type="text/css">
+	.title_tabs{list-style-type:none;padding:0;margin:0;height:39px;}
+	.title_tabs li{position:relative;padding:0;margin:0;float:left;height:39px;background:#E1E1E1;}
+	.title_tabs li>a{display:block;line-height:39px;border:solid 0px;padding:0 66px 0 50px;margin-right:-14px;
+		background:url(../../../img/list_Header2-gray.png) right no-repeat;color:#666;font-size:14px;font-weight:bold;}
+	.title_tabs li.selected{background:#4CA9FF;z-index:9;}
+	.title_tabs li.selected>a{background:url(../../../img/list_Header2-.png) right no-repeat;color:#fff;font-size:14px;font-weight:bold;}
+	.table, .table td, .table th{padding:0 !important}
+	.title_back{float: left;width: 70px;height: 28px;background: url(../../../img/bnt_back.png) repeat;line-height: 28px;text-align: center;margin-left: 30px;margin-top: 5px;color: #2D7CF0;cursor: pointer;}
+	.chooseUser{width:1000px;height:500px;}
+	.dlog-edit{width:500px;height:220px;}
+	.dlog-edit1{width:500px;height:300px;}
+	.excSave{margin-left:20px;margin-top: 6px;float: left;display: block;border:1px solid #ed7798;color:#ed7798;border-radius:15px;padding:5px 20px;cursor:pointer}
+	.excSave:hover{background:#f7bacb;color:#fff}
+	.excSave_upload{border:1px solid #ea7700;color:#ea7700}
+	.excSave_upload:hover{background:#ffc78e;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+<div class="list">
+	<div class="list_content">
+		<ul class="title_tabs">
+			<li class="selected" ng-click="loadUsers()">
+				<a href="javascript:" ui-id="#lay1">滚动预算总表</a>
+			</li>
+			
+			<li>
+				<a href="javascript:" ui-id="#lay3">人力资源成本</a>
+			</li>
+			<li style="background:#fff;margin-left:20%;border:none">
+				<div class="title_back" ng-click="goBack()">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;返回
+				</div>
+			</li>
+		</ul>
+		<form id="saveForm" class="required-validate">
+		
+			<div id="lay1">
+				<div class="table_div">
+					<div style="line-height:40px;">
+						<span>项目编号：{{urlParams.proCode}}</span><span style="margin-left:100px">项目名称：{{urlParams.proName}}</span>
+						<span style="margin-left:100px" id="budgetNo">编号：
+						 {{userList.budgetNo}}
+						 </span>
+					</div>
+					<div style="width:100%;overflow:auto;position: absolute;top: 80px;left: 0;bottom: 0;right: 0;">
+						<table width="2000px" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+						    <tr class="tr1">
+						    	<th align="center"rowspan="2" width="40px">序号</th>
+							  	<th align="center">预算期间启</th>
+								<th ng-repeat="item in sectionList" align="center">{{item.startTime}}</th>
+								<th width="5%" align="center" rowspan="2">合计</th>
+						    </tr>
+						    <tr class="tr1">
+							  	<th align="center">预算期间止</th>
+								<th ng-repeat="item in sectionList" align="center">{{item.endTime}}</th>
+						    </tr>
+						 	<tr ng-repeat="item in proCostList" class="tr2">
+						 		<td align="center">{{$index+1}}</td>
+						 		<td align="left" style="text-indent:10px">{{item.itemName}}</td>
+								<td align="right" ng-repeat="it in sectionList"><div style="padding-right:10px">{{item[it.sectionCode]}}</div></td>
+								<td align="right"><div style="padding-right:10px">{{item.total}}</div></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+			
+			<div id="lay3">
+				<div class="table_div">
+					<div style="line-height:40px">
+						<span>项目编号：{{urlParams.proNo}}</span><span style="margin-left:100px">项目名称：{{urlParams.proName}}</span>
+					</div>
+					<div style="width:100%;position: absolute;top: 80px;left: 0;bottom: 0;right: 0;">
+						<table width="60%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable2" style="border:none">
+						  <tr style="border:none" ng-repeat="tab2 in table2list">
+						  	<td style="border:none">
+						  		<table border="0" cellspacing="0" cellpadding="0" class="table" style="width: 98%;margin-bottom:20px;">
+						  			 <tr class="tr1">
+										<th colspan="7"><div align="center"><div style="font-weight: normal;">{{tab2.startTime}}至{{tab2.endTime}}</div></div></th>
+									  </tr>
+									   <tr class="tr1">
+										<th style="width:40px;"><div align="center">序号</div></th>
+										<th><div align="center">姓名</div></th>
+										<th><div align="center">岗位</div></th>
+										<th><div align="center">薪酬等级/档次</div></th>
+										<th><div align="center">人员性质</div></th>
+										<th><div align="center">项目有效工时</div></th>
+										<th><div align="center">人力资源成本</div></th>
+									  </tr>
+									  <tr class="tr2" ng-if="tab2.list==''">
+									  	<td style="text-indent:10px;color:#ff9b42" colspan="7">暂无人员</td>
+									  </tr>
+									   <tr class="tr2" ng-if="tab2.list!=''" ng-repeat="obj1 in tab2.list" >
+										<td><div align="center">{{$index+1}}</div></td>
+										<td ng-if="obj1.employeeName=='总计'" colspan="4">
+											<div align="center" ng-if="obj1.employeeName!=''">{{obj1.employeeName}}</div>
+											<div align="center" ng-if="obj1.employeeName=='' || !obj1.employeeName">人员</div>
+										</td>
+										<td ng-if="obj1.employeeName!='总计'">
+											<div align="center" ng-if="obj1.employeeName!=''">{{obj1.employeeName}}</div>
+											<div align="center" ng-if="obj1.employeeName=='' || !obj1.employeeName">人员</div>
+										</td>
+										<td ng-if="obj1.employeeName!='总计'"><div align="center">{{obj1.jobName}}</div></td>
+										<td ng-if="obj1.employeeName!='总计'">
+											<div align="center" ng-if="obj1.employeeName!='总计'">{{obj1.gradeFix}}{{obj1.salaryGrade}} / {{obj1.salaryLevel}}档</div>
+										</td>
+										<td ng-if="obj1.employeeName!='总计'"><div align="center">{{obj1.propertyName}}</div></td>
+										<td><div align="center">{{fmoney(obj1.workTime,2)}}</div></td>
+										<td><div align="center">{{fmoney(obj1.labourCost,2)}}</div></td>
+									  </tr>
+						  		</table>
+						  	</td>
+						  </tr>
+						</table>
+					</div>
+					
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+var ngScope;
+
+var versionCode="";
+var budgetCode="";
+var proNo="";
+
+var proName="";
+var categoryName="";
+var categoryCode="";
+
+
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+ngScope = $scope;
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		window.noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	var companyCode=userData.companyCode;
+	ticket = $.cookie("pmsWeb_ticket");
+	var urlParams = getUrlParams();
+	versionCode=urlParams.versionCode;
+	budgetCode=urlParams.budgetCode;
+	
+	
+	
+	$scope.urlParams=urlParams;
+	proNo =urlParams.proNo;
+	$scope.phaseCount;
+	var getCn="";
+	$scope.tableList=[];
+	$scope.newarry=[];
+	$scope.sectionList=[];
+	$scope.proCostList=[];
+	$scope.loadUsers=function(){
+		new ShowDlog().prompt({
+			icon:"waitting",
+			msg:"正在查询...",
+			done:function(){},
+			t:60*1000
+		});
+		$http.get(serviceBasePath+"eap/pmsServices/pm/pb/rollingGudget/proBudgetVersion?companyCode="+companyCode+"&proNo="+proNo+"&budgetCode="+budgetCode+"&versionCode="+versionCode).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$dlog.close();
+			$scope.userList=response.data;
+			if(response.data.budgetNo==""){
+				if(response.data.versionOrder<10){
+					$("#budgetNo").html("编号："+urlParams.proNo+"-YS0000"+response.data.versionOrder);
+				}else{
+					$("#budgetNo").html("编号："+urlParams.proNo+"-YS000"+response.data.versionOrder);
+				}
+			}
+			$scope.sectionList=$scope.userList.sectionList;
+			$scope.proCostList=$scope.userList.proCostList;
+		});
+	}; 
+	$scope.loadUsers();
+	$scope.dataList1=[];
+	$scope.sectionList1=[];
+	$scope.labourCostList = [];
+	
+	$scope.loadTab3=function(){
+		$http.get(serviceBasePath+"eap/pmsServices/pm/pb/rollingGudget/getSectionLabourCost?companyCode="+companyCode+"&proNo="+proNo+"&budgetCode="+budgetCode+"&versionCode="+versionCode).success(function(response){
+			if(response.statusCode==200){
+				$scope.tab2List=response.data;
+				$scope.table2list=$scope.tab2List.list;
+				
+				/* if ($scope.table2list && $scope.table2list.length > 0) {
+					
+					for (var i in $scope.table2list) {
+						
+						if ($scope.table2list[i].list) {
+							
+							for (var j in $scope.table2list[i].list) {
+								
+								$scope.labourCostList.push($scope.table2list[i].list[j]);
+							}
+						}
+					}
+				} */
+				//$scope.dataList2=$scope.tab3List.dataList;
+				//$scope.sectionList2=$scope.tab3List.sectionList;
+			}
+			
+		});
+	}; 
+	$scope.loadTab3();
+	
+	$scope.goBack=function(){
+		
+		
+		hrefTo({
+			url:"historyBudgetList.html",
+			data:getUrlParams()
+		});
+		
+		//location.href="historyBudgetList.html?versionCode="+versionCode+"&budgetCode="+budgetCode+"&proNo="+proNo+"&categoryName="+categoryName+"&categoryCode="+categoryCode+"&proName="+proName;
+		
+	};
+	
+	/* 初始化视图 */
+	$(".title_tabs>li>a").each(function(){
+		var layId = $(this).attr("ui-id");
+		var $li = $(this).parent();
+		var idx = $(".title_tabs>li").index($li);
+		if(idx!=0){
+			$(layId).hide();
+			$(layId).attr("data-show", "0");
+		}else{
+			$(layId).attr("data-show", "1");
+		}
+		$(this).click(function(){
+			var _this=$(this)
+			$(".title_tabs>.selected").removeClass("selected");
+			_this.parent("li").addClass("selected");
+			var layId = _this.attr("ui-id");
+			$("div[data-show=1]").hide();
+			$("div[data-show=1]").attr("data-show", "0");
+			$(layId).show();
+			$(layId).attr("data-show", "1");
+		});
+	});/* 结束 */
+	
+	$scope.decim=function(a,b){
+		return decim(a,b);
+	};
+
+	$scope.fmoney=function(s,n){
+		
+		 if(s==undefined || s=="undefined"){
+			 return "";
+			 
+		 }else{
+			 if(!isNaN(s)){
+				 n = n > 0 && n <= 20 ? n : 2;
+		         s = parseFloat((s + '').replace(/[^\d\.-]/g, '')).toFixed(n) + '';
+		         var l = s.split('.') [0].split('').reverse(),
+		             r = s.split('.') [1];
+		         var  t = '';
+		         for (var i = 0; i < l.length; i++)
+		         {
+		             t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? ',' : '');
+		         }
+		         return t.split('').reverse().join('') + '.' + r;
+				}else{
+					  return s;
+				}
+		 }
+		 
+	};
+	
+});
+</script>
+</html>

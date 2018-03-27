@@ -1,0 +1,219 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 项目资产清单 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/ExportExcel.js"></script>
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../../css/list.css" />
+
+
+<style type="text/css">
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+	
+	.detailDialog{width:900px;height:400px;}
+	td a{text-decoration:underline;color:blue;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" id="projectType" class="dropDownList" placeholder="请项目类型"><!-- 项目类型 -->
+				<input type="hidden" name="proNo"/><!-- 项目编号 -->
+				<input type="text" id="projectList" style="width:206px;" name="proName" class="dropDownList" placeholder="请选择项目"/><!-- 项目名称 -->
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				<div class="query_div" ng-click="doExport()">
+					导出
+				</div>
+				&nbsp;&nbsp;
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id=dataTable>
+			   <tr class="tr1">
+				<th rowspan="2"><div align="center">序号</div></th>
+				<th rowspan="2"><div align="center">项目编号</div></th>
+				<th rowspan="2"><div align="center">项目名称</div></th>
+				<th ng-repeat="col in dataList.assetClassList" colspan="2"><div align="center">{{col.assetClassName}}</div></th>
+				<th rowspan="2"><div align="center">总计</div></th>
+			  </tr>
+			  <tr class="tr1">
+			  	<th ng-repeat-start="col in dataList.assetClassList"><div align="center">数量</div></th>
+			  	<th ng-repeat-end><div align="center">金额</div></th>
+			  	
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in dataList.assetChecklist">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.proNo}}</div></td>
+				<td><div align="center">{{item.proName}}</div></td>
+				<td ng-repeat-start="col in dataList.assetClassList">
+					<div align="center">
+					   <a href="javascript:" title="点击查看详细" ng-click="toShowDetail(item.proNo, col.assetClassCode, getVal(item, col.assetClassCode, 'assetClassFlag'), col.assetClassName)">{{getVal(item, col.assetClassCode, 'count')}}</a>
+					</div>
+				</td>
+				<td ng-repeat-end><div align="center">{{fmoney(getVal(item, col.assetClassCode, 'amount'),2)}}</div></td>
+				<td><div align="center">{{fmoney(item.totalAmount,2)}}</div></td>
+			  </tr>
+			   <tr class="tr1" style="background: yellow">
+			  		 <th colspan="3"><div align="center">总计</div></th>
+					 <th ng-repeat-start="col in dataList.totalResultList"><div align="center">{{col.assetClassNum}}</div></th>
+					 <th ng-repeat-end><div align="center">{{fmoney(col.assetClassTotal,2)}}</div></th>
+					 <th>{{fmoney(dataList.totalResultList[0].lastTotal,2)}}</th>
+			   </tr>
+			  
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+
+
+var cond_categoryCode="", cond_proNo="";
+
+var ngScope;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.dataList={};
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	/* 项目类型 */
+	new DropDownList().init({
+		renderTo:"#projectType",
+		url:"../../../component/projectType.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$("#projectType").val(result.categoryName);
+			cond_categoryCode = result.categoryCode;
+			/* 联动 */
+			projectList1.setConfig("url", "../../../component/projectList.html?categoryCode="+cond_categoryCode+"&ticket="+ticket);
+		}
+	});
+	/* 项目列表 */
+	var projectList1 = new DropDownList();
+	projectList1.init({
+		renderTo:"#projectList",
+		url:"../../../component/projectList.html?categoryCode="+cond_categoryCode+"&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$("#projectList").val(result.proName);
+			cond_proNo=result.proNo;
+			$scope.loadProjects(cond_proNo);
+		}
+	});
+	/* 加载数据 */
+	$scope.loadProjects=function(proNo){//alert(unitCode);
+		$http.get(serviceBasePath+"eap/pmsServices/materielMg/assetMg/asset/assetChecklist?proNo="+proNo+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.noLogin(location.href);
+				return;
+			}
+			$scope.dataList = response.data;
+// 			createPageBar(response.totalPage, response.currentPage);
+		});
+	};
+	/* 查询 */
+	$scope.doQuery=function(){
+		cond_proName = $("#searchName").val();
+		$scope.loadProjects(cond_proNo);
+	};
+	
+	/* 显示详细 */
+	$scope.toShowDetail=function(proNo, classCode, classFlag, className){
+		if(classFlag==1){
+			new ShowDlog().showFrame("assetsRentList.html?proNo="+proNo+"&assetClassCode="+classCode+"&assetClassName="+strEncode(className), "查看详细", function(){
+			
+			}, "detailDialog");	
+		}else{
+			new ShowDlog().showFrame("bedRentList.html?proNo="+proNo, "查看详细", function(){
+			
+			}, "detailDialog");
+		}
+		
+	};
+	
+	$scope.getVal=function(item, classCode, field){
+		for(var i=0; i<item.assetClassInfoList.length; i++){
+			var assetClass = item.assetClassInfoList[i];
+			if(assetClass.assetClassCode==classCode){
+				return decim(assetClass[field], 3);
+				/*
+				"amount": 9500,
+                "assetClassCode": "9999",
+                "assetClassFlag": 2,
+                "assetClassName": "宿舍床位",
+                "avgAmount": 1583.33,
+                "count": 6
+				*/
+			}
+		}
+		return '';
+	};
+	$scope.doExport=function(){
+		excelExport("dataTable");
+	};
+	
+	$scope.fmoney=function(s,n){
+		
+		 if(s==undefined || s=="undefined" || s==0){
+			 return 0;
+			 
+		 }else{
+			 if(!isNaN(s)){
+				 n = n > 0 && n <= 20 ? n : 2;
+		         s = parseFloat((s + '').replace(/[^\d\.-]/g, '')).toFixed(n) + '';
+		         var l = s.split('.') [0].split('').reverse(),
+		             r = s.split('.') [1];
+		         var  t = '';
+		         for (var i = 0; i < l.length; i++)
+		         {
+		             t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? ',' : '');
+		         }
+		         return t.split('').reverse().join('') + '.' + r;
+				}else{
+					  return s;
+				}
+		 }
+		 
+	};
+
+	
+	/* 初始查询 */
+	ngScope.loadProjects(cond_proNo);
+});
+</script>
+</body>
+</html>

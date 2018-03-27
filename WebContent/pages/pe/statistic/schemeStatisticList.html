@@ -1,0 +1,507 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>项目材料类型</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.base64.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+
+<style type="text/css">
+	.dropDownArea{background-image:url(../../../img/flag.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	.dropDownProjectType{background-image:url(../../../img/type.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	.dropDownProjectType1{background-image:url(../../../img/type.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	
+	
+	.dialog_scheme_check{width:800px;height:620px;}
+	
+	.title_div2{border:solid 0px red;background:#4CA9FF;padding:8px 6px 8px 6px;}
+	.title_div2 .condLayer1{display:block;border:solid 0px;margin:6px;}
+	.title_div2 .condLayer2{border:solid 0px green;margin:6px;}
+	.title_div2 .condLayer1 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;padding:0 4px;font-family:微软雅黑;}
+	.title_div2 .condLayer2 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;padding:0 4px;background-color:#DAEDFF;font-family:微软雅黑;}
+	.title_div2 .btn{display:inline-block;height:28px;line-height:28px;margin:0 4px;padding:0 15px 0 15px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; border-radius:4px;}
+	.title_div2 .blue{background:#3385FF;color:#fff;}
+	.title_div2 .blue:hover{background:#186CE7;}
+	.title_div2 .pink{background:#ED7798;color:#fff;}
+	.title_div2 .pink:hover{background:#E54673;}
+	.table th{padding:0;}
+	.table th>div{padding:3px;}
+	
+	.col_list{border:solid 1px #ccc;background-color:#8FC4F6;background-image:url(../../../img/drop_down_list_w.png);background-repeat:no-repeat;background-position:right;color:#fff;width:382px;height:30px;}
+	.col_list label{display:inline-block;line-height:30px;margin:0 10px;}
+	
+	.col_list_content{display:none;position:absolute;z-index:1;border:solid 1px #ccc;border-top:0; background:#fff;width:382px;}
+	.col_list_content table{width:100%;padding:2px;}
+	.col_list_content table th, .col_list_content table td {padding:6px;}
+	.col_list_content table th{background:#E3EFFB;}
+	.col_list_content table td input{width:130px;}
+	
+	.cond_list{border:solid 1px #ccc;background-color:#8FC4F6;background-image:url(../../../img/drop_down_list_w.png);background-repeat:no-repeat;background-position:right;color:#fff;width:190px;height:30px;}
+	.cond_list label{display:inline-block;line-height:30px;margin:0 10px;}
+	.cond_list_content{display:none;position:absolute;z-index:1;border:solid 1px #ccc;border-top:0; background:#fff;width:190px;}
+	
+	.dropDownLayer{display:inline-block;border:solid 0px red;}
+</style>
+<script type="text/javascript">
+	function LockTableHeader(_setting){
+		this.setting=_setting;
+		this.renderToEl=$(_setting.renderTo);
+		this.newTable;
+		this.init();
+	}
+	LockTableHeader.prototype.init=function(){
+		$("#new_"+this.renderToEl.attr("id")).remove();
+		this.newTable = $("<table id='new_"+this.renderToEl.attr("id")+"' cellspacing='0' cellpadding='0' class='table' style='position:absolute;border:solid 0px red;'></table>")
+		var $ths = this.renderToEl.find("tr:has(th)");//:has(th)
+		this.newTable.append($ths.clone(true));
+		this.renderToEl.before(this.newTable);
+		renderToEl = this.renderToEl;
+		newTable = this.newTable;
+		this.renderToEl.find("th").each(function(){
+			var trs = renderToEl.find("tr:has(th)");
+			var tr = $(this).parent();
+			var trIdx = trs.index(tr);
+			var ths = tr.find("th");
+			var thIdx = ths.index($(this));
+			var mappingTh = newTable.find("tr").eq(trIdx).find("th").eq(thIdx);
+			//mappingTh.css({"width":"200px", "color":"#f00"});
+			mappingTh.find("div").width($(this).find("div").width());
+		});
+		this.renderToEl.parent().scroll(function(){
+			newTable.css({"top":$(this)[0].scrollTop});
+		});
+	}
+	LockTableHeader.prototype.reInit=function(){
+		if(this.newTable){
+			this.newTable.remove();
+		}
+		this.init();
+	}
+	LockTableHeader.prototype.resize=function(){
+		
+	}
+	LockTableHeader.prototype.scroll=function(){
+		
+	}
+	
+	
+	$(document).ready(function(){
+		$(".col_list").click(function(){
+			if($(this).attr("layer-is-show")=="1"){
+				$(this).next().hide();
+				$(this).removeAttr("layer-is-show");
+			}else{
+				$(this).next().show();
+				$(this).find("a").focus();
+				$(this).attr("layer-is-show", "1");
+			}
+		}).mouseover(function(){
+			$(this).attr("onlayer", "1");
+		}).mouseout(function(){
+			$(this).removeAttr("onlayer");
+		});
+// 		$(".col_list").find("a").focusout(function(){
+// 			if($(this).parent().attr("onlayer")!="1"){
+// 				$(this).parent().click();
+// 			}
+// 		});
+		$(".col_list").next().mouseover(function(){
+			$(this).prev().attr("onlayer", "1");
+		}).mouseout(function(){
+			$(this).prev().removeAttr("onlayer");
+		});
+		$(".cond_list").click(function(){
+			if($(this).attr("layer-is-show")=="1"){
+				$(this).next().hide();
+				$(this).removeAttr("layer-is-show");
+			}else{
+				$(this).next().show();
+				$(this).find("a").focus();
+				$(this).attr("layer-is-show", "1");
+			}
+		});
+	});
+</script>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content" style="bottom:0;border:solid 0px;">
+		<div class="title_div2">
+			<div class="condLayer1">
+				<input type="text" id="category" class="dropDownList" style="width:180px;" placeholder="请选择项目分类"/>
+				<input type="text" id="proName" class="dropDownList" style="width:180px;" placeholder="请选择项目"/>
+				<input type="text" id="mct" class="dropDownList" style="width:180px;" placeholder="请选择总控表"/>
+				<input type="text" name="searchName" style="width:180px;" placeholder="搜索"/>
+				
+				<div class="btn blue" ng-click="doQuery()">
+					查询
+				</div>
+				<div class="btn blue" ng-click="doExport()">
+					导出
+				</div>
+				
+			</div>
+			
+			<div class="condLayer2">
+				<div class="dropDownLayer">
+					<div class="col_list">
+						<label>选择列维度</label><a href="javascript:"></a>
+					</div>
+					<div class="col_list_content">
+						<table cellspacing="0">
+							<tr>
+								<th>维度</th>
+								<th>属性</th>
+								<th>成员</th>
+							</tr>
+							<tr>
+								<td>第一维度</td>
+								<td><input type="text" class="dropDownList" name="col1" placeholder="请选择字段"/></td>
+								<td><input type="text" class="dropDownList" name="col1_val" placeholder="请选择值"/></td>
+							</tr>
+							<tr>
+								<td>第二维度</td>
+								<td><input type="text" class="dropDownList" name="col2" placeholder="请选择字段"/></td>
+								<td><input type="text" class="dropDownList" name="col2_val" placeholder="请选择值"/></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<div class="dropDownLayer">
+					<div class="cond_list">
+						<label>筛选过滤</label><a href="javascript:"></a>
+					</div>
+					<div class="cond_list_content">
+						<!-- 动态条件 -->
+						<span ng-repeat="item in theadData.searchFields">
+						<input ng-if="item.dtype==4" type="text" group="cond" id="{{item.ename}}" style="width:180px;" class="dropDownList" placeholder="{{item.cname}}"/>
+						</span>
+						<!-- 动态条件 -->
+					</div>
+				</div>
+			</div>
+
+		</div>
+		
+		<div class="table_div" style="position:absolute;top:95px;bottom:0;border:solid 0px red;overflow:auto;margin-bottom:0;">
+			<table ng-if="formattedData.length>0" border="0" cellspacing="0" cellpadding="0" class="table" id="tb1">
+			   <tr class="tr1">
+				<th rowspan="2" width="150"><div align="center" style="width:150px;">项目名称</div></th>
+				<th rowspan="2" width="150"><div align="center">项目编码</div></th>
+				<th ng-repeat="item in dataList[0].data" colspan="{{item.data.length}}"><div align="center">{{item[xField]}}</div></th>
+			  </tr>
+			  <tr class="tr1">
+				<th ng-repeat="item in secondTypeList track by $index"><div align="center">{{item}}</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in formattedData">
+				<td ng-repeat="trData in item track by $index"><div align="center">{{trData}}</div></td>
+			  </tr>
+			</table>
+			<div ng-if="formattedData.length==0" style="border:solid 1px #ccc;background:#fff;">
+				<span style="color:#ff6600;display:inline-block;margin:0 20px;line-height:30px;">请依次选择条件进行查询（项目分类、项目、总控表）</span>
+			</div>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	viewStateInit:function($scope, $viewState){
+		$viewState.categoryCode="";
+		$viewState.categoryName="";
+		$viewState.proNo="";
+		$viewState.proName="";
+		$viewState.mctCode="";
+		$viewState.mctName="";
+		$viewState.searchName="";
+		$viewState.condStr="";
+	},
+	init:function($scope, $http, $viewState){
+		$scope.dataList=[];
+		$scope.secondTypeList=[];
+		$scope.formattedData=[];
+		$scope.listFields=[];
+		$scope.xField="OLD_AMULBOX_CLASS";
+		$scope.yField="REFORM_PROGRAM";
+		var urlParams = getUrlParams();
+		
+		
+		/* 项目分类 */
+		new DropDownList().init({
+			mode:"page",
+			renderTo:"#category",
+			url:"../../component/projectType.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$viewState.categoryCode=result.categoryCode;
+				$("#category").val(result.categoryName);
+				$viewState.categoryName=result.categoryName;
+				proNameList.setConfig("url", "../../component/projectList.html?categoryCode="+result.categoryCode+"&ticket="+$scope.ticket);
+			}
+		});
+		
+		/* 项目列表 */
+		var proNameList = new DropDownList();
+		proNameList.init({
+			mode:"page",
+			renderTo:"#proName",
+			url:"../../component/projectList.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$viewState.proNo=result.proNo;
+				$("#proName").val(result.proName);
+				$viewState.proName=result.proName;
+				mctList.setConfig("url", "../../component/mctType.html?proNo="+$viewState.proNo);
+			}
+		});
+		
+		/* 项目总控表*/
+		var mctList = new DropDownList();
+		mctList.init({
+			renderTo:"#mct",
+			url:"../../component/mctType.html?proNo="+$viewState.proNo,
+			onSelected:function(item){
+				$viewState.mctCode=item.mctCode;
+				$("#mct").val(item.mctName);
+				$viewState.mctName=item.mctName;
+				//if($scope.cond_mct!=null && $scope.cond_mct.length>0){
+					$scope.loadTheader($viewState.mctCode);
+					$scope.doQuery();
+				//}else{
+				//	callNgFn({ctrlEl:$("body")[0], ngFn:function(scope){
+				//		scope.theadData.searchFields = [];
+				//	}});
+				//}
+			}
+		});
+		
+		/* 加载条件和表头信息 */
+		$scope.loadTheader=function(mctCode){
+			var paramsData={};
+			if(mctCode){
+				paramsData["mctCode"]=mctCode;
+			}else{
+				return;
+				//paramsData["deviceTypeCode"]="01";
+			}
+			$scope.httpGet({
+				url:"eap/pmsServices/om/deviceMgr/device/mctListAttr?companyCode="+$scope.userData.companyCode,
+				data:paramsData,
+				success:function(response){
+					$scope.theadData = response.data;
+					/* 初始化搜索条件 */
+					lazyCall('t1',function(){
+						$scope.listFields=[];
+						for(var i=0; i<$scope.theadData.searchFields.length; i++){
+							(function(){
+								var searchField = $scope.theadData.searchFields[i];
+								if(searchField.dtype==4){
+									$scope.listFields.push(searchField);
+									/* 搜索条件*/ 
+									searchField.enumValue.unshift("(清空)");
+									new DropDownList().init({
+										renderTo:"#"+searchField.ename,
+										data:searchField.enumValue,
+										onSelected:function(result){
+											if(result=="(清空)"){
+												$("#"+searchField.ename).val("");
+											}else{
+												$("#"+searchField.ename).val(result);
+											}
+										}
+									});
+								}
+							})();
+						}
+						
+						/* 第一维度值 */
+						var col1ValList = new DropDownList();
+						col1ValList.init({
+							renderTo:"input[name=col1_val]",
+							data:$scope.listFields[0].enumValue,
+							height:"200px",
+							onSelected:function(result){
+								$("input[name=col1_val]").val(result);
+							}
+						});
+						
+						/* 第二维度值 */
+						var col2ValList = new DropDownList();
+						col2ValList.init({
+							renderTo:"input[name=col2_val]",
+							data:$scope.listFields[0].enumValue,
+							height:"200px",
+							onSelected:function(result){
+								$("input[name=col2_val]").val(result);
+							}
+						});
+						
+						// 加载维度
+						/* 第一维度 */
+						new DropDownList().init({
+							renderTo:"input[name=col1]",
+							data:$scope.listFields,
+							textField:"cname",
+							height:"200px",
+							onSelected:function(result){
+								$("input[name=col1]").val(result.cname);
+								$("input[name=col1_name]").val(result.ename);
+								$scope.xField=result.ename;
+								col1ValList.setConfig("data", result.enumValue);
+								$("input[name=col1_val]").val("");
+							}
+						});
+						
+						/* 第二维度 */
+						new DropDownList().init({
+							renderTo:"input[name=col2]",
+							data:$scope.listFields,
+							textField:"cname",
+							height:"200px",
+							onSelected:function(result){
+								$("input[name=col2]").val(result.cname);
+								$("input[name=col2_name]").val(result.ename);
+								$scope.yField=result.ename;
+								col2ValList.setConfig("data", result.enumValue);
+								$("input[name=col2_val]").val("");
+							}
+						});
+						
+					}, 100);
+				}
+			});
+		};
+
+		/* 加载数据 */
+		$scope.loadData=function(mctCode, searchName, condStr, xFieldVal, yFieldVal){
+			new ShowDlog().prompt({
+				icon:"waitting",
+				msg:"正在统计...",
+				done:function(){
+				},
+				t:120000
+			});
+			var paramsData={"companyCode":$scope.userData.companyCode,"reserveProNo":urlParams.reserveProNo,"remouldBatchCode":urlParams.remouldBatchCode,
+					"searchName":searchName, // TODO
+					"attrJson":condStr,// TODO
+					"xField":$scope.xField, "yField":$scope.yField,
+					"xFieldVal":xFieldVal, "yFieldVal":yFieldVal};
+			if(mctCode){
+				paramsData["mctCode"]=mctCode;
+			}else{
+				paramsData["deviceTypeCode"]="01";
+			}
+			// 查询
+			$scope.httpExecute({
+				method:"get",
+				url:"eap/pmsServices/pe/baseMgr/statistics",
+				data:paramsData,
+				success:function(resp){
+					//list;//
+					//var list = [{"proNo":"NJSQ_BXKC_LWS_2016_0001","proName":"量为石表箱勘测","total":16328,"data":[{"OLD_AMULBOX_CLASS":"塑料暗箱","data":[{"REFORM_PROGRAM":"方案4","count":0},{"REFORM_PROGRAM":"已改造","count":0},{"REFORM_PROGRAM":"方案3","count":0},{"REFORM_PROGRAM":"方案1","count":0},{"REFORM_PROGRAM":"线已改，门未换","count":0},{"REFORM_PROGRAM":"方案5","count":0},{"REFORM_PROGRAM":"方案2","count":0},{"REFORM_PROGRAM":"线未改，门已换","count":0},{"REFORM_PROGRAM":"","count":0}]},{"OLD_AMULBOX_CLASS":"加固良","data":[{"REFORM_PROGRAM":"方案4","count":0},{"REFORM_PROGRAM":"已改造","count":0},{"REFORM_PROGRAM":"方案3","count":0},{"REFORM_PROGRAM":"方案1","count":0},{"REFORM_PROGRAM":"线已改，门未换","count":0},{"REFORM_PROGRAM":"方案5","count":0},{"REFORM_PROGRAM":"方案2","count":0},{"REFORM_PROGRAM":"线未改，门已换","count":0},{"REFORM_PROGRAM":"","count":0}]},{"OLD_AMULBOX_CLASS":"电卡外挂","data":[{"REFORM_PROGRAM":"方案4","count":0},{"REFORM_PROGRAM":"已改造","count":0},{"REFORM_PROGRAM":"方案3","count":0},{"REFORM_PROGRAM":"方案1","count":0},{"REFORM_PROGRAM":"线已改，门未换","count":0},{"REFORM_PROGRAM":"方案5","count":0},{"REFORM_PROGRAM":"方案2","count":0},{"REFORM_PROGRAM":"线未改，门已换","count":0},{"REFORM_PROGRAM":"","count":0}]},{"OLD_AMULBOX_CLASS":"铁表箱","data":[{"REFORM_PROGRAM":"方案4","count":0},{"REFORM_PROGRAM":"已改造","count":0},{"REFORM_PROGRAM":"方案3","count":0},{"REFORM_PROGRAM":"方案1","count":0},{"REFORM_PROGRAM":"线已改，门未换","count":0},{"REFORM_PROGRAM":"方案5","count":0},{"REFORM_PROGRAM":"方案2","count":0},{"REFORM_PROGRAM":"线未改，门已换","count":0},{"REFORM_PROGRAM":"","count":0}]},{"OLD_AMULBOX_CLASS":"电卡暗箱","data":[{"REFORM_PROGRAM":"方案4","count":0},{"REFORM_PROGRAM":"已改造","count":0},{"REFORM_PROGRAM":"方案3","count":0},{"REFORM_PROGRAM":"方案1","count":0},{"REFORM_PROGRAM":"线已改，门未换","count":0},{"REFORM_PROGRAM":"方案5","count":0},{"REFORM_PROGRAM":"方案2","count":0},{"REFORM_PROGRAM":"线未改，门已换","count":0},{"REFORM_PROGRAM":"","count":0}]},{"OLD_AMULBOX_CLASS":"塑料外挂","data":[{"REFORM_PROGRAM":"方案4","count":0},{"REFORM_PROGRAM":"已改造","count":0},{"REFORM_PROGRAM":"方案3","count":0},{"REFORM_PROGRAM":"方案1","count":0},{"REFORM_PROGRAM":"线已改，门未换","count":0},{"REFORM_PROGRAM":"方案5","count":0},{"REFORM_PROGRAM":"方案2","count":0},{"REFORM_PROGRAM":"线未改，门已换","count":0},{"REFORM_PROGRAM":"","count":0}]},{"OLD_AMULBOX_CLASS":"脏乱差","data":[{"REFORM_PROGRAM":"方案4","count":0},{"REFORM_PROGRAM":"已改造","count":0},{"REFORM_PROGRAM":"方案3","count":0},{"REFORM_PROGRAM":"方案1","count":0},{"REFORM_PROGRAM":"线已改，门未换","count":0},{"REFORM_PROGRAM":"方案5","count":0},{"REFORM_PROGRAM":"方案2","count":0},{"REFORM_PROGRAM":"线未改，门已换","count":0},{"REFORM_PROGRAM":"","count":0}]},{"OLD_AMULBOX_CLASS":"铁质","data":[{"REFORM_PROGRAM":"方案4","count":0},{"REFORM_PROGRAM":"已改造","count":0},{"REFORM_PROGRAM":"方案3","count":0},{"REFORM_PROGRAM":"方案1","count":0},{"REFORM_PROGRAM":"线已改，门未换","count":0},{"REFORM_PROGRAM":"方案5","count":0},{"REFORM_PROGRAM":"方案2","count":0},{"REFORM_PROGRAM":"线未改，门已换","count":0},{"REFORM_PROGRAM":"","count":0}]},{"OLD_AMULBOX_CLASS":"","data":[{"REFORM_PROGRAM":"方案4","count":0},{"REFORM_PROGRAM":"已改造","count":0},{"REFORM_PROGRAM":"方案3","count":0},{"REFORM_PROGRAM":"方案1","count":0},{"REFORM_PROGRAM":"线已改，门未换","count":0},{"REFORM_PROGRAM":"方案5","count":0},{"REFORM_PROGRAM":"方案2","count":0},{"REFORM_PROGRAM":"线未改，门已换","count":0},{"REFORM_PROGRAM":"","count":0}]},{"OLD_AMULBOX_CLASS":"塑料集中外挂","data":[{"REFORM_PROGRAM":"方案4","count":0},{"REFORM_PROGRAM":"已改造","count":0},{"REFORM_PROGRAM":"方案3","count":0},{"REFORM_PROGRAM":"方案1","count":0},{"REFORM_PROGRAM":"线已改，门未换","count":0},{"REFORM_PROGRAM":"方案5","count":0},{"REFORM_PROGRAM":"方案2","count":0},{"REFORM_PROGRAM":"线未改，门已换","count":0},{"REFORM_PROGRAM":"","count":0}]},{"OLD_AMULBOX_CLASS":"不锈钢表箱","data":[{"REFORM_PROGRAM":"方案4","count":0},{"REFORM_PROGRAM":"已改造","count":0},{"REFORM_PROGRAM":"方案3","count":0},{"REFORM_PROGRAM":"方案1","count":0},{"REFORM_PROGRAM":"线已改，门未换","count":0},{"REFORM_PROGRAM":"方案5","count":0},{"REFORM_PROGRAM":"方案2","count":0},{"REFORM_PROGRAM":"线未改，门已换","count":0},{"REFORM_PROGRAM":"","count":0}]},{"OLD_AMULBOX_CLASS":"塑料","data":[{"REFORM_PROGRAM":"方案4","count":0},{"REFORM_PROGRAM":"已改造","count":0},{"REFORM_PROGRAM":"方案3","count":0},{"REFORM_PROGRAM":"方案1","count":0},{"REFORM_PROGRAM":"线已改，门未换","count":0},{"REFORM_PROGRAM":"方案5","count":0},{"REFORM_PROGRAM":"方案2","count":0},{"REFORM_PROGRAM":"线未改，门已换","count":0},{"REFORM_PROGRAM":"","count":0}]}]}];
+					$scope.dataList = resp.list;
+					$scope.secondTypeList=[];
+					$scope.formattedData=[];
+					if($scope.dataList && $scope.dataList.length>0){
+						// second row data
+						var types = $scope.dataList[0].data;
+						for(var i=0; i<types.length; i++){
+							var subTypes = types[i].data;
+							for(var j=0; j<subTypes.length; j++){
+								$scope.secondTypeList.push(subTypes[j][$scope.yField]);
+							}
+						}
+						// format data
+						for(var k=0; k<$scope.dataList.length; k++){
+							var trData=[];
+							trData.push($scope.dataList[k].proName);
+							trData.push($scope.dataList[k].proNo);
+							var types = $scope.dataList[k].data;
+							for(var i=0; i<types.length; i++){
+								var subTypes = types[i].data;
+								for(var j=0; j<subTypes.length; j++){
+									trData.push(subTypes[j].count);
+								}
+							}
+							$scope.formattedData.push(trData);
+						}
+					}
+					lazyCall('t1',function(){
+						new LockTableHeader({
+							renderTo:"#tb1"
+						});
+					}, 100);
+					$dlog.close();
+				}
+			});
+		};
+		
+		/* 查询 */
+		$scope.doQuery=function(){
+			if($(".col_list").attr("layer-is-show")=="1"){
+				$(".col_list").next().hide();
+				$(".col_list").removeAttr("layer-is-show");
+			}
+			if($(".cond_list").attr("layer-is-show")=="1"){
+				$(".cond_list").next().hide();
+				$(".cond_list").removeAttr("layer-is-show");
+			}
+			
+			var cond={};
+			$("input[group=cond]").each(function(){
+				var $cond = $(this);
+				var key = $cond.attr("id");
+				var val = $cond.val();
+				cond[key]=val;
+			});
+			$viewState.condStr=JSON.stringify(cond);
+			$viewState.searchName=$("input[name=searchName]").val();
+			if($scope.theadData && $scope.theadData.searchFields){
+				var vars="";
+				for(var i=0; i<$scope.theadData.searchFields.length; i++){
+					var searchField = $scope.theadData.searchFields[i];
+					if(searchField.dtype==1){
+						if(vars && vars.length>0){
+							vars+=",";
+						}
+						vars+=searchField.ename;
+					}
+				}
+				$viewState.searchName=vars+";"+$viewState.searchName;
+			}
+			var xFieldVal = $("input[name=col1_val]").val();
+			var yFieldVal = $("input[name=col2_val]").val();
+			$scope.loadData($viewState.mctCode, $viewState.searchName, $viewState.condStr, xFieldVal, yFieldVal);
+		};
+		
+		$scope.loadTheader();
+		
+		/* 初始查询 */
+		//$scope.doQuery();
+		$scope.doExport=function(){
+			excelExport("tb1");
+		};
+		
+	}
+});
+</script>
+</body>
+</html>

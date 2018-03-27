@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 角色分配</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<meta http-equiv="keywords" content=",">
+<meta http-equiv="description" content="">
+<!--link rel="stylesheet" type="text/css" href="css/common.css"/-->
+<link rel="stylesheet" href="../../css/zTreeStyle/zTreeStyle.css" type="text/css">
+<script type="text/javascript" src="../../js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.ztree.core-3.5.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script language="JavaScript" type="text/javascript">
+<!--
+	G = function(objId){return document.getElementById(objId)};
+	Gn = function(objName){return document.getElementsByName(objName)};
+	window.onload=function(){
+		var setting = {	};
+
+		var zNodes =[
+			{ name:"基础功能", open:true,
+				children: [
+					{ name:"组织人员"},
+					{ name:"警报管理"},
+					{ name:"通勤管理", open:true,
+						children: [
+							{ name:"市场部"},
+							{ name:"人力资源部"},
+							{ name:"行政部"},
+							{ name:"财务部"},
+							{ name:"商务部"}
+						]},
+				]}
+
+		];
+
+		$(document).ready(function(){
+			$.fn.zTree.init($("#treeDemo"), setting, zNodes);
+		});
+	};
+//-->
+</script>
+<style type="text/css">
+	body{
+		margin:0px;
+		padding:0px;
+		font-size:12px;
+		font-family:"微软雅黑";
+	}
+	
+	.list{position: absolute;left:13px;right:13px;top:13px;bottom:10px;border:solid 0px;}
+	.list .list_content{position: absolute;left:0px;right:0px;top:0px;bottom:0px;border:solid 0px;}
+	.list .list_content .title_div{width:100%;height:39px;border-bottom:solid 3px #3385FF;}
+	.list .list_content .title_div .title_left{width:250px;height:39px;background:#3385FF;line-height:42px;color:#fff;font-size:14px;font-weight: bold;float:left;}
+	.list .list_content .title_div .title_left > label{font-size:12px;font-weight: normal;margin-left:55px;color:#B2DDFF;}
+	.list .list_content .title_div .title_left > label > span{font-size:14px;color:#FFFFFF;}
+	.list .list_content .title_div > img{float:left;margin-top:1px;}
+	.list .list_content .title_div .title_add{float:left;width:70px;height:28px;background: url(../../img/bnt_newly-added.png) repeat;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;}
+	.list .list_content .table_div{position: absolute;left:0px;right:0px;bottom:120px;top:42px;border:solid 0px;background:#E9F2FF;}
+	.list .list_bottom{position: absolute;left:0px;right:0px;bottom:0px;height:120px;border:solid 0px;color:#4D4D4D;background:#E9F2FF;border-top:solid 1px #E6E6E6;}
+	.list .list_bottom .preserved{position: absolute;left:30px;top:20px;width:70px;height:28px;background:#3385FF;border-radius:20px;line-height:28px;color:#fff;text-align:center;font-weight:bold;cursor: pointer}
+	.list .list_bottom .return{position: absolute;left:130px;top:20px;width:70px;height:28px;border:solid 1px #3385FF;border-radius:20px;line-height:28px;color:#3385FF;text-align:center;font-weight:bold;cursor: pointer}
+	.list .list_bottom .return:hover{background:#3385FF;color:#fff;}
+</style>
+</head>
+
+<body>
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				&nbsp;&nbsp;&nbsp;&nbsp;管理角色
+				<label>\&nbsp;已分配模块数<span> 4 </span>个&nbsp;\</label>
+			</div>
+			<img src="../../img/list_Header-.png">
+		</div>
+		
+		<div class="table_div">
+				<ul id="treeDemo" class="ztree"></ul>
+		</div>
+
+		<div class="list_bottom">
+			<div class="preserved">
+				保 存
+			</div>
+			<div class="return">
+				返 回
+			</div>
+		</div>
+
+	</div>
+</div>
+
+</body>
+</html>

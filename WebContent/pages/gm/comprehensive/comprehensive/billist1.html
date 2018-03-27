@@ -1,0 +1,292 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 资产管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../../css/list.css" />
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript" src="../../../../js/time.js"></script>
+
+<style type="text/css">
+	.top{height:80px; text-align: center}
+	.top p{width:250px;margin:0 auto;font-size:24px;font-family: '微软雅黑';height:35px;}
+	.line{width:400px;margin:0 auto;height:5px;border-top:1px #666 solid;border-bottom:1px #666 solid}
+	.date{width:250px;margin:0 auto;font-size:16px;font-family: '微软雅黑';padding-top:5px;}
+	.billtable{width:100%;border-collapse: collapse;border: none;text-align: center;font-size:12px;}
+	.billtable td
+    {
+        border: solid #000 1px;
+        height:45px;
+    }
+    .bggray{background:#D9D5D2}
+    .no{float:right;font-size:20px;margin-top:-50px;margin-right:10px;}
+    .redcol{font-size:30px;color:red}
+    .btn{width:70px;padding:5px;font-size:12px;font-family:'微软雅黑';margin-left:10px;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="top">
+			<p>&nbsp;&nbsp;出&nbsp;&nbsp;库&nbsp;&nbsp;单&nbsp;&nbsp;</p>
+			<div class="line"></div>
+			<div class="date">{{nowYear}}年{{nowMonth}}月{{nowDay}}日</div>
+			
+			<div class="no">
+				No <span class="redcol">{{ticks}}</span>
+			</div>
+		</div>
+		<table class="billtable">
+			<tr>
+				<td width="10%" class="bggray">交货单位<br />(部门)</td>
+				<td width="50%" colspan="4">{{unitName}}</td>
+				
+				<td width="10%" class="bggray">仓库</td>
+				<td  width="10%" ><input style="border:0px;height:40px;font-size:14px;font-family: '微软雅黑';text-align: center;" type="text" /></td>
+				<td  width="10%"  class="bggray" >出库时间</td>
+				<td  width="10%"  colspan="3">
+				<input style="border:0px;height:40px;font-size:14px;font-family: '微软雅黑';text-align: center;" type="text" value="{{rentDate}}" />
+				</td>
+			</tr>
+			<tr class="bggray">
+				<td width="10%">资产编号</td>
+				<td width="10%">资产类型</td>
+				<td width="10%">品牌</td>
+				<td width="10%">型号</td>
+				<td width="10%">资产名称</td>
+				<td width="10%">单位</td>
+				<td width="10%">数量</td>
+				<td width="10%">单价</td>
+				<td width="10%">金额</td>
+				<td width="10%" colspan="2">备注</td>
+			</tr>
+			
+			<tr ng-repeat="item in projectList">
+				<td>{{$index+1}}</td>
+				<td >{{item.assetTypeName}}</td>
+				<td >{{item.brand}}</td>
+				<td >{{item.modelNo}}</td>
+				<td >{{item.assetName}}</td>
+				<td  >{{item.measureUnit}}</td>
+				<td  >1</td>
+				<td  >{{item.price1}}</td>
+				<td  >{{item.price1}}</td>
+				<td  colspan="2">
+					
+					<textarea cols="30" rows="3" style="border:0px;font-size:14px;font-family: '微软雅黑';text-align: center;resize: none">{{item.remarks}}</textarea>
+				</td>
+			</tr>
+			<tr >
+				<td class="bggray"  colspan="2">合计</td>
+				<td > </td>
+				<td  ></td>
+				<td  ></td>
+				<td  ></td>
+				<td  ></td>
+				<td ></td>
+				<td  >{{totalMoney}}</td>
+				<td  colspan="2"></td>
+			</tr>
+			<tr >
+				<td style="border:0px;" >
+					财会部门<br />
+					主&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;管
+				</td>
+				<td style="border:0px;">
+					<input style="border:0px;height:40px;font-size:14px;font-family: '微软雅黑';text-align: center;" type="text" />
+				</td>
+				<td style="border:0px;" >记账</td>
+				<td style="border:0px;"><input style="border:0px;height:40px;font-size:14px;font-family: '微软雅黑';text-align: center;" type="text" /></td>
+				<td style="border:0px;"   >
+					保管部门<br />
+					主&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;管
+				</td>
+				<td style="border:0px;"><input style="border:0px;height:40px;font-size:14px;font-family: '微软雅黑';text-align: center;" type="text" /></td>
+				<td style="border:0px;"  >验收</td>
+				<td style="border:0px;">
+					<input style="border:0px;height:40px;font-size:14px;font-family: '微软雅黑';text-align: center;" type="text" />
+				</td>
+				<td style="border:0px;"   >
+					单位部门<br />
+					主&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;管
+				</td>
+				<td style="border:0px;">
+					<input style="border:0px;height:40px;font-size:14px;font-family: '微软雅黑';width:100px;text-align: center;" type="text" />
+					
+				</td>
+				<td style="border:0px;width:150px;">
+					制单：{{employeeName}}
+				</td>
+			</tr>
+		</table>
+		
+		<div style="text-align: center;margin-top:20px;">
+			
+			
+			<input id="btnprint" type="image" src="../../../../img/print.png" onclick="MakeWord()"  />&nbsp;&nbsp;&nbsp;
+			<input id="btnback" type="image" src="../../../../img/back.png" onclick="goback()" />
+		</div>
+		
+		<!-- <div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">资产名称</div></th>
+				<th><div align="center">资产分类</div></th>
+				<th><div align="center">含税单价</div></th>
+				<th><div align="center">不含税单价</div></th>
+				
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in projectList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.assetName}}</div></td>
+				<td><div align="center">{{item.assetClassName}}</div></td>
+				<td><div align="center">{{item.price1}}</div></td>
+				<td><div align="center">{{item.price2}}</div></td>
+				
+			  </tr>
+			</table>
+		</div> -->
+
+		
+	</div>
+</div>
+<script type="text/javascript">
+
+
+function MakeWord()
+ {
+ 
+ 	$("#btnprint").hide();	
+ 	$("#btnback").hide();	
+ 	 window.print();
+   $("#btnprint").show();	
+ 	$("#btnback").show();	
+ 	return false;
+  
+ }
+ 
+ 
+ function goback(){
+ 	//alert(assetTypeCode+","+assetClassCode+","+fromDate+","+toDate+","+bill+","+assetTypeName+","+assetClassName)
+ 	location.href="comprehensive.html?assetTypeCode3="+assetTypeCode+"&assetClassCode3="+assetClassCode+"&fromDate3="
+ 			+fromDate+"&toDate3="+toDate+"&assetTypeName3="+assetTypeName+"&assetClassName3="
+ 			+assetClassName+"&isshow=2"+"&tempProNo="+tempProNo+"&tempProName="+tempProName+"&tempCate="+tempCate+"&tempCateName="+tempCateName;
+ 
+ 	//location.href="comprehensive.html?bill="+bill;
+ }
+
+
+
+
+
+var assetTypeCode="";
+var assetTypeName="";
+var assetClassCode="";
+var assetClassName="";
+var fromDate="";
+var toDate="";
+var assetCodes="";
+var tempProNo="";
+var tempProName="";
+var tempCate="";
+var tempCateName="";
+var ngScope;
+
+
+
+
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	
+	ngScope = $scope;
+	//$scope.curUnit={};
+	$scope.projectList=[];
+	$scope.totalMoney={};
+	$scope.rentDate={};
+	$scope.unitName={};
+	
+	$scope.nowDay=nowDay;
+	$scope.nowMonth=nowMonth+1;
+	$scope.nowYear=nowYear;
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	$scope.employeeName=userData.employeeName;
+	var params = getUrlParams();
+	
+	assetTypeCode=params.assetTypeCode;
+	assetClassCode=params.assetClassCode;
+	fromDate=params.fromDate;
+	toDate=params.toDate;
+	//bill=params.bill;
+	assetTypeName=params.assetTypeName;
+	assetClassName=params.assetClassName;
+	//$scope.bill=bill;
+	assetCodes=params.assetCodes;
+	//seltype=params.seltype;
+	tempProNo=params.tempProNo;
+	tempProName=params.tempProName;
+	tempCate=params.tempCate;
+	tempCateName=params.tempCateName;
+	
+	//alert(iscm)
+	//alert(assetTypeCode+","+assetClassCode+","+fromDate+","+toDate+","+bill+","+assetTypeName+","+assetClassName)
+	
+	$scope.ticks=nowYear+""+(nowMonth+1)+""+nowDay;
+	
+	$scope.loadProjects=function(assetTypeCode,assetClassCode,fromDate, toDate,proNo){//alert(unitCode);
+		
+			
+			$http.get(serviceBasePath+"eap/pmsServices/materielMg/comprehensiveQuery/assetExwarehouse?assetClassCode="
+					+assetClassCode+"&assetTypeCode="+assetTypeCode+"&fromDate="+fromDate+"&toDate="+toDate+"&ticket="+ticket+"&proNo="+tempProNo+"&assetCodes="+assetCodes).success(function(response){
+				if(response.statusCode==401){
+					alert("用户凭据过期！请重新登录！");
+					window.top.location.href="../../../login.html";
+					return;
+				}
+				var num=0;
+				$scope.projectList = response.list;
+				for(var i=0;i<response.list.length;i++){
+					//num+=response.list[i].price1;
+					var tempprice=0;
+					if(!isNaN(response.list[i].price1)){
+						tempprice=response.list[i].price1;
+					}
+					num+=tempprice;
+					if(response.list[i].rentDate){
+						$scope.rentDate=response.list[i].rentDate.replace(/-/g,".");
+						$scope.unitName=response.list[i].unitName;
+					}
+				}
+				$scope.totalMoney=num;
+			});
+	};
+	
+	
+	/* 初始查询 */
+	ngScope.loadProjects(assetTypeCode,assetClassCode,fromDate, toDate,tempProNo);
+});
+</script>
+</body>
+</html>

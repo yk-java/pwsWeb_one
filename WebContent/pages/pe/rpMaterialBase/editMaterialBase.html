@@ -1,0 +1,320 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 耗材管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.sel{width:204px;height:26px;font-family: '微软雅黑';line-height:24px;font-size:12px;}
+</style>
+</head>
+
+<body ng-app="mdu" ng-controller="ctrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">修改耗材</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">耗材属性</a>
+			
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+			
+				<tr>
+					
+					<th style="width:100px">耗材名称</th>
+					<td >
+						
+						<input type="text"   name="materialName" value="{{projectInfo.materialName}}" class="required"  />
+						<input type="hidden" name="materialBatchno" value="{{projectInfo.materialBatchno}}" class="required readonly" readonly="readonly" />
+					</td>
+				
+					<th style="width:100px">材料种类</th>
+					<td>
+						<input type="text" name="materialtypeName" id="dropDownProjectType1" value="{{projectInfo.materialtypeName}}"  class="required  dropDownList" placeholder="请选择"/>
+						<input type="hidden" name="materialtypeCode" value="{{projectInfo.materialtypeCode}}"  />
+					</td>
+				</tr>
+				<tr>
+					<th>品牌</th>
+					<td><input type="text"  name="brand" value="{{projectInfo.brand}}" /></td>
+					<th>型号</th>
+					<td><input type="text"  name="modelNo" value="{{projectInfo.modelNo}}" /></td>
+					
+				</tr>
+				<tr>
+					<th>含税单价</th>
+					<td><input type="text" class="number" name="price1" onkeyup="keyupFn()"  value="{{projectInfo.price1}}"/></td>
+					<th>不含税单价</th>
+					<td><input type="text" class="number" name="price2" onkeyup="keyupFn()"  value="{{projectInfo.price2}}"/></td>
+				</tr>
+				<tr>
+					<th>含税总价</th>
+					<td><input type="text" class="number readonly" name="total1" readonly="readonly" value="{{projectInfo.total1}}" /></td>
+					<th>不含税总价</th>
+					<td><input type="text" class="number readonly" name="total2" readonly="readonly" value="{{projectInfo.total2}}" /></td>
+					
+				</tr>
+				<tr>
+					<th>入库数量</th>
+					<td><input type="text" class="number" name="countStorage" value="{{projectInfo.countStorage}}" onkeyup="keyupFn()"  /></td>
+					
+					<th>采购时间</th>
+					<td><input type="text" name="datePurchase" value="{{projectInfo.datePurchase}}" class="date dateComponent" placeholder="请选择" onclick="new Calendar().show(this)"/></td>
+				</tr>
+				
+				<tr>
+					<th>入库时间</th>
+					<td><input type="text" name="dateStorage" value="{{projectInfo.dateStorage}}" class="date dateComponent" placeholder="请选择" onclick="new Calendar().show(this)"/></td>
+					<th>发票凭证</th>
+					<td><input type="text" name="bill"  value="{{projectInfo.bill}}"/></td>
+														
+				</tr>
+				<tr>
+					<th>当前库存</th>
+					<td><input type="text" name="curcountStorage" class="number" value="{{projectInfo.curcountStorage}}" /></td>
+					
+					<th>备注</th>
+					<td><input type="text" name="remarks" value="{{projectInfo.remarks}}" /></td>
+					
+				</tr>
+				
+			</table>
+			
+			
+			
+			
+		</div>
+		
+		
+
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+
+function keyupFn(){
+	var price1=$("input[name=price1]").val();
+	var price2=$("input[name=price2]").val();
+	var countStorage=$("input[name=countStorage]").val();
+	
+	//var taxAmount=$("input[name=taxAmount]").val();//税额
+	//var mount2=$("input[name=mount2]").val();//金额
+	
+	if(price1!=null && price1!="" && countStorage!=null && countStorage!=""){
+		$("input[name=total1]").val(price1*countStorage);
+	}
+	if(price2!=null && price2!="" && countStorage!=null && countStorage!=""){
+		$("input[name=total2]").val(price2*countStorage);
+	}
+	
+		
+}
+
+function getUrlParams(){
+	var params={};
+	var url = location.href;
+	var start = url.indexOf("?", 0)+1;
+	var paramsStr = url.substring(start, url.length);
+	var paramsArr = paramsStr.split("&");
+	for(var i=0;i<paramsArr.length;i++){
+		var kv = paramsArr[i].split("=");
+		var k = kv[0];
+		var v = kv[1];
+		params[k]=v;
+	}
+	return params;
+}
+var selectedUnitCode="";
+var validator;
+var userData;
+
+
+var assetClassCode="";
+var ngScope;
+var app = angular.module("mdu", []);
+app.controller("ctrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	
+	$scope.projectInfo={};
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	var params = getUrlParams();
+	
+	/* 视图渲染 */
+	$(".tabs>a").each(function(){
+		var layId = $(this).attr("href");
+		var idx = $(".tabs>a").index($(this));
+		if(idx!=0){
+			$(layId).hide();
+			$(layId).attr("data-show", "0");
+		}else{
+			$(layId).attr("data-show", "1");
+		}
+		$(this).click(function(){
+			$(".tabs>.selected").removeClass("selected");
+			$(this).addClass("selected");
+			var layId = $(this).attr("href");
+			$("div[data-show=1]").hide();
+			$("div[data-show=1]").attr("data-show", "0");
+			$(layId).show();
+			$(layId).attr("data-show", "1");
+			
+		});
+	});
+	
+	/* Validate */
+	validator = $("#saveForm").validate({
+		onsubmit: false,
+		focusInvalid: false,
+		focusCleanup: true,
+		errorElement: "span",
+		ignore:".ignore",
+		invalidHandler: function(form, validator) {
+			var errors = validator.numberOfInvalids();
+			if (errors) {
+				
+			} 
+		}
+	});
+	
+	
+	
+	//类型
+	new DropDownList().init({
+		renderTo:"#dropDownProjectType1",
+		url:"../../component/materialType.html",
+		height:"200px",
+		onSelected:function(result){
+			$("#dropDownProjectType1").val(result.materialtypeName);
+			//materialtypeCode = result.materialtypeCode;  
+			
+			$("input[name=materialtypeCode]").val(result.materialtypeCode);
+			//ngScope.loadProjects(materialName,materialtypeCode,1);
+		}
+	});
+	
+	$scope.choose=function(value){
+		$("#assetMark").val(value);
+		if(value==0){
+			/* $("input[name=vaNo]").val("");
+			$("input[name=vaOil]").val("");
+			$("input[name=vaOilConsumption]").val("");
+			$("input[name=vaInitMileage]").val(""); */
+			
+			$(".table1").hide();
+			
+		}else if(value==1){
+			$(".table1").show();
+		}
+	};
+	
+	
+	/* 数据加载 */
+	$scope.loadProject=function(materialBatchno){
+	
+		
+		
+		$http.get(serviceBasePath+"eap/pmsServices/pe/baseMgr/materiaBase/get?materialBatchno="
+			+materialBatchno+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../../login.html";
+				return;
+			}
+			$scope.projectInfo = response.data;
+			
+		});
+	};
+	/* 初始加载 */
+	$scope.loadProject(params.materialBatchno);
+	
+	$("input[name=materialBatchno]").val(params.materialBatchno);
+	/* 保存 */
+	$scope.onSave = function(){
+		//$("input[name=companyCode]").val(userData.companyCode);
+		var formData = $("#saveForm").serialize();
+		
+		if($("#saveForm").valid()){
+			$.ajax({
+				url:serviceBasePath+"eap/pmsServices/pe/baseMgr/materiaBase/update",
+				cache:false,
+				method:"POST",
+				data:formData,
+				success:function(res){
+					if(res.statusCode==200){
+						//
+						new ShowDlog().prompt({msg:"修改成功！",
+							done:function(){
+								location.href="materialBaseMgr.html";
+							},
+							t:1500
+						});
+					}else{
+						//
+						
+					}
+				},
+				error:function(){
+					
+				}
+			});
+			
+		}else{
+			//alert("表单填写异常，请检查修正后再提交");
+		}
+	};
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		location.href="materialBaseMgr.html";
+	};
+	
+});
+</script>
+</body>
+</html>

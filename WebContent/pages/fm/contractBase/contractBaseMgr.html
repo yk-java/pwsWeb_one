@@ -1,0 +1,296 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 合同管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+
+<script type="text/javascript" src="../../../js/time.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+
+
+<style type="text/css">
+	.dropDownArea{background-image:url(../../../img/flag.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+	
+	.switch_btn_group{border:solid 1px #3385FF;min-height:30px;float:left;border-radius:15px; position:absolute;right:20px;top:0px;}
+	.switch_btn_group a{display:inline-block;float:left;background:#fff;color:#3385FF;text-decoration:none;font-size:13px;
+		line-height:30px;text-align:center;margin:0 1px 0 0;min-width:60px;}
+	.switch_btn_group a.selected{background:#3385FF;color:#fff;}
+	.switch_btn_group a:first-of-type{border-top-left-radius:15px;border-bottom-left-radius:15px;}
+	.switch_btn_group a:last-of-type{border-top-right-radius:15px;border-bottom-right-radius:15px;margin:0;}
+	
+	.owWordLoad{text-decoration:underline;color:#0099ff;}
+	.owWordload-detail{border:solid 1px #666;background:#ffee99;color:#666;padding:4px 6px 4px 6px;position:absolute;display:none;margin-left:-200px;width:300px;}
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl" storagekey="fm.contrackBase.contractBaseMgr">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" viewstate="proCatelogName" class="dropDownProjectType dropDownList" placeholder="请选择项目类别"/>
+				<input type="hidden" viewstate="proNo" />	
+				<input type="hidden" viewstate="categoryCode" />	
+				<input type="hidden" viewstate="contractProjType" />
+				<input type="text" viewstate="proName"  style="width:206px;" class="dropDownTree dropDownList" placeholder="请选择项目"/>
+				<input type="text" viewstate="contractProjTypeName" style="width:206px;" placeholder="请选择合同和项目的关系类型" class="dropDownList contractProjTypeName" />
+				<input type="text" viewstate="invoiceNo" name="invoiceNo" placeholder="请输入搜索内容"  />
+				<input type="text" viewstate="fromDate" name="fromDate" class="select_2 dropDownList dateComponent" onclick="new Calendar().show(this)" placeholder="开票开始日期"/>
+				<input type="text" viewstate="toDate" name="toDate" class="select_2 dropDownList dateComponent" onclick="new Calendar().show(this)" placeholder="开票结束日期"/>
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				&nbsp;&nbsp;
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			<div class="title_add" onclick="location.href='addContractBase.html'">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新增
+			</div>
+			
+			<div class="switch_btn_group">
+					<a href="#" datatype="2" class="selected">已激活</a>
+					<a href="#" datatype="3">已关闭</a>
+				</div>
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">省-市-区/县</div></th>
+				<th><div align="center">合同名称</div></th>
+				<th><div align="center">合同签订日期</div></th>
+				<th><div align="center">合同所属项目名称</div></th>	
+				<th><div align="center">合同书面总价</div></th>
+				<th><div align="center">合同实际总价</div></th>
+				<th><div align="center">合同书面总价是否含税</div></th>
+				<th><div align="center">合同税点</div></th>
+				<th><div align="center">合同开票状况</div></th>
+				<th><div align="center">操作</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in projectList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.province}}-{{item.city}}-{{item.district}}</div></td>
+				<td><div align="center">{{item.contractName}}</div></td>
+				<td><div align="center">{{item.contractDate}}</div></td>
+				<td><div align="center">{{item.proName}}</div></td>
+				<td><div align="center">{{item.writtenPrice}}</div></td>
+				<td><div align="center">{{item.actualValue}}</div></td>
+				<td>
+					<div align="center" ng-if="item.priceIsTax==0">否</div>
+					<div align="center" ng-if="item.priceIsTax==1">是</div>
+				</td>
+				<td><div align="center">{{item.taxPoint}}</div></td>
+				<td>
+					<div align="center" ng-if="item.billingStatus==0">未开</div>
+					<div align="center" ng-if="item.billingStatus==1">已开</div>
+				</td>
+				<td width="10%">
+					<div align="center">						
+			    		<img ng-click="doUpdate(item)" class="operationImg" src="../../../img/list_item_modify-icon.png" title="修改">
+			    		<img  ng-click="doDelete(item)" class="operationImg" src="../../../img/list_delete-icon.png" title="删除">
+			    		<img class="operationImg" ng-click="doShow(item)" src="../../../img/list_see-icon.png" title="查看 ">
+			    		<img class="operationImg" ng-click="doShowMap(item)" src="../../../img/tijiaoshenqing.png" title="查看关系图">
+		    		</div>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+function createPageBar(totalPage, curPage){
+	new PageBar().init({
+		renderTo:"#page_bar",
+		totalPage:totalPage,
+		curPage:curPage,
+		prevPageText:"上一页",
+		nextPageText:"下一页",
+		onPage:function(pageNum){
+			_currentPage=pageNum;
+			ngScope.loadProjects(pageNum);
+		}
+	});
+}
+
+
+var assetCharacterCode="";
+var ticket="";
+var cond_proStatus="2";
+var _currentPage=1;
+var proNo="";
+var searchName="";
+var invoiceNo="";
+var cond_categoryCode="";
+var ngScope;
+var fromDate="";
+var toDate="";
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.projectList=[];
+	var viewState = new ViewState();
+	console.log(viewState);
+	fromDate=getMonthStartDate();
+	toDate=getMonthEndDate();
+	contractProjType="";
+	$("input[name=fromDate]").val(fromDate);
+	$("input[name=toDate]").val(toDate);
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	
+	
+	/* 合同和项目的关系 */
+	new DropDownList().init({
+		renderTo:".contractProjTypeName",
+		data:[{id:0,name:"全部"},{id:1,name:"一对一"},{id:2,name:"一对多"},{id:3,name:"多对一"},{id:4,name:"多对多"}],
+		height:"200px",
+		textField:"name",
+		onSelected:function(result){
+			contractProjType=result.id;
+			$(".contractProjTypeName").val(result.name);
+			$("input[viewstate=contractProjType]").val(result.id);
+			$scope.loadProjects(1);
+		}
+	});
+	
+	
+	/* 项目类型 */
+	new DropDownList().init({
+		renderTo:".dropDownProjectType",
+		url:"../../component/projectType.html?required=false&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownProjectType").val(result.categoryName);
+			$("input[viewstate=categoryCode]").val(result.categoryCode);
+			cond_categoryCode = result.categoryCode;
+			/* 联动 */
+			projectList.setConfig("url", "../../component/allProjectList.html?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&required=false&ticket="+ticket);
+		}
+	});
+	$(".switch_btn_group>a").each(function(){
+		$(this).click(function(){
+			$(this).addClass("selected");
+			$(this).siblings().removeClass("selected");
+			cond_proStatus = $(this).attr("datatype");
+			projectList.setConfig("url", "../../component/allProjectList.html?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&ticket="+ticket);
+			$scope.doQuery();
+		});
+		
+	});
+	/* 项目列表 */
+	var projectList = new DropDownList();
+	projectList.init({
+		renderTo:".dropDownTree",
+		url:"../../component/allProjectList.html?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&required=false&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownTree").val(result.proName);
+			$("input[viewstate=proNo]").val(result.proNo);
+			proNo=result.proNo;
+			$scope.loadProjects(1);
+		}
+	});
+	
+	/* 加载数据 */
+	$scope.loadProjects=function(currentPage){//alert(unitCode);
+		viewState.collect();
+		$http.get(serviceBasePath+"eap/pmsServices/fm/contractBase/contractBase/list?ticket="+ticket+
+			"&currentPage="+currentPage+"&proNo="+viewState.get("proNo")+"&searchName="+viewState.get("invoiceNo")+"&contractProjType="+viewState.get("contractProjType")+"&fromDate="+viewState.get("fromDate")+"&toDate="+viewState.get("toDate")).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../login.html";
+				return;
+			}
+			$scope.projectList = response.list;
+			createPageBar(response.totalPage, response.currentPage);
+		});
+	};
+	/* 查询 */
+	$scope.doQuery=function(){
+		invoiceNo = $("input[name=invoiceNo]").val();
+		fromDate=$("input[name=fromDate]").val();
+		toDate=$("input[name=toDate]").val();
+		$scope.loadProjects(1);
+	};
+	
+	$scope.sub=function(content){
+		
+		//	alert(content)
+		    
+		    if(content.length>5){
+		    	var str=content.substring(0,5);
+		    	return str;
+		    }else{
+		    	return content;
+		    }
+			
+		};
+
+	
+	/* 项目修改 */
+	$scope.doUpdate=function(item){
+		location.href="editContractBase.html?rowid="+item.rowid+"&contractNo="+item.contractNo;
+	};
+	
+	/* 项目显示 */
+	$scope.doShow=function(item){
+		
+		location.href="showContractBase.html?rowid="+item.rowid+"&contractNo="+item.contractNo;
+	};
+	
+	$scope.doShowMap=function(item){
+		location.href="showContractProMap.html?contractName="+item.contractName+"&contractNo="+item.contractNo;
+	};
+	
+	/* 项目删除 */
+	$scope.doDelete=function(item){
+		
+		new ShowDlog().confirm({
+			msg:"确定进行删除操作吗？",
+			ok:function(){
+				$http.post(serviceBasePath+"eap/pmsServices/fm/contractBase/contractBase/delete?rowid="+item.rowid).success(function(response){
+					$scope.loadProjects(proNo,invoiceNo,fromDate,toDate, _currentPage);
+				});
+			},
+			cancel:function(){}
+		});
+	};
+	
+	/* 初始查询 */
+	ngScope.loadProjects(1);
+});
+</script>
+</body>
+</html>

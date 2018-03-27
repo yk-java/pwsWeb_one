@@ -1,0 +1,457 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 合同管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">创建合同</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">合同属性</a>
+			
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table style="width:70%;">
+				<tr>
+					<th>合同编号</th>
+					<td><input type="text" name="contractNo"   class="required"  /></td>
+					<th>合同名称</th>
+					<td><input type="text" name="contractName"   class="required"  /></td>
+				</tr>
+				<tr>
+					<th>合同签订时间</th>
+					<td>
+						<input type="text" name="contractDate" class="date dateComponent required"  onclick="new Calendar().show(this)" />
+					</td>
+					<th>业务部门</th>
+					<td>
+						<input type="text" name="businessUnit" class="required dropDownList"/>
+					</td>
+				</tr>
+				<tr>
+					<th>合同和项目的关系类型</th>
+					<td>
+						<input type="text" name="contractProjTypeName" class="dropDownList required contractProjTypeName" />
+						<input type="hidden" name="contractProjType" />
+						<input type="hidden" name="attrJson"/>
+					</td>
+					<th>合同类型</th>
+					<td>
+						<input type="text" name="contractType" class="required dropDownList"/>
+					</td>
+				</tr>
+				<tr>
+					<th>合同书面总价</th>
+					<td>
+						<input type="text" ng-keyup="getdataPrice()" name="writtenPrice" class="required number" ng-model="writtenPrice"/><span style="color:#ccc">（万元）</span>
+					</td>
+					<th>合同设备单价</th>
+					<td>
+						<input type="text" name="deviceUnivalent" class=""/><span style="color:#ccc">（万元）</span>
+					</td>
+				</tr>
+				<tr>
+					<th>合同对应项目实际价值</th>
+					<td>
+						<input type="text" name="actualValue" class="required" /><span style="color:#ccc">（万元）</span>
+					</td>
+					<th>合同书面总价是否含税</th>
+					<td>
+						<input type="text" name="priceIsTaxName" class="required dropDownList priceIsTaxName"/>
+						<input type="hidden" name="priceIsTax" />
+					</td>
+				</tr>
+				<tr>
+					<th>合同税点</th>
+					<td>
+						<input type="text" name="taxPoint" class="required dropDownList" />
+					</td>
+					<th>地区</th>
+					<td>
+						<input type="text" class="dropDownArea required" name="districtName" placeholder="请选择地区"/>
+						<input type="hidden" name="province" />
+						<input type="hidden" name="city" />
+						<input type="hidden" name="district" />
+					</td>
+				</tr>
+				<tr>
+					<th>甲方单位</th>
+					<td>
+						<input type="text" name="fpUnit" class="required">
+					</td>	
+					<th>合同确定甲方单位负责人</th>
+					<td>
+					 	<input type="text" name="contractor" class="">
+				 	</td>
+				</tr>
+				<tr>
+					<th>乙方单位</th>
+					<td>
+						<input type="text" name="spUnit" class="required">
+					</td>	
+					<th>合同确定乙方单位负责人</th>
+					<td> 
+						<input type="text" name="spUnitCharger" class="">
+					 </td>
+				</tr>
+				<tr>
+					<th>合同开票状态</th>
+					<td>
+						<input type="text" name="billingStatusName" class="required dropDownList billingStatusName">
+						<input type="hidden" name="billingStatus" />
+					</td>	
+					<th>合同预计开票时间</th>
+					<td>
+						<input type="text" name="expectBillingTime" class="date dateComponent required" placeholder="请选择时间" onclick="new Calendar().show(this)">
+					 </td>
+				</tr>
+				<tr>
+					<th>开票金额</th>
+					<td>
+						<input   type="text" name="invoiceAmount" class="number required"  /><span style="color:#ccc">（万元）</span>
+					</td>
+					<th>未开票金额</th>
+					<td>
+						<input   type="text" name="nonInvoiceAmount" class="number required"  /><span style="color:#ccc">（万元）</span>
+					</td>
+				</tr>
+				<tr>
+					<th>合同回款状态</th>
+					<td>
+						<input type="text" name="paymentStatusName" class="required paymentStatusName dropDownList"  />
+						<input type="hidden" name="paymentStatus" />
+					</td>
+					<th>预计全部回款时间</th>
+					<td>
+						<input type="text" name="expectPaymentTime" class="date dateComponent required" placeholder="请选择时间" onclick="new Calendar().show(this)">
+					</td>
+				</tr>					
+				<tr>
+					<th>备注</th>
+					<td colspan="3">
+						<textarea type="text" name="remarks" class="required" style="width:83%;height:80px"></textarea>
+					</td>		
+				</tr>
+			</table>
+			
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">合同和项目的关系</a>
+			<img ng-click="adddo()" ng-if="contractProjType==2||contractProjType==4" src="../../../img/add.png"/>
+		</div>
+		<div class="form_div" id="lay1">
+			<table style="width:70%">
+				<tr ng-repeat="item in relactionArr">
+					<th>项目类型</th>
+					<td>
+						<input type="text" id="dropDownProjectTypeName{{$index}}" class="dropDownList" placeholder="请选择项目类别" ng-model="item.proTypeName"/>
+						<input type="hidden" id="dropDownProjectType{{$index}}" ng-model="item.proType" />
+					</td>
+					<th>项目名称</th>
+					<td>
+						<input type="text" id="dropDownTree{{$index}}" class="dropDownList required" placeholder="请选择项目" ng-model="item.proName"/>
+						<input type="hidden" id="dropDownTreeProNo{{$index}}" ng-model="item.proNo" />
+					</td>
+					<th>金额</th>
+					<td>
+						<input type="text" class="required number" ng-model="item.price"/><span style="color:#ccc">（万元）</span>
+						<!-- <img src="../../../img/"/> -->
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+var validator;
+var ngScope;
+var cond_categoryCode="";
+var userData;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.userList=[];
+	var currentdate=getCurrentDate();
+	$("#endtime").val(currentdate);
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	new DropDownList().init({
+		renderTo:"input[name=businessUnit]",
+		url:"../../component/orgTree.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			//selectedUnitCode=result.unitCode;
+			$("input[name=businessUnit]").val(result.unitName);
+		}
+	});
+
+	/* 区域 */
+	new DropDownList().init({
+		renderTo:".dropDownArea",
+		url:"../../component/areaList.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownArea").val(result.name);
+			$("input[name=province]").val(result.getParentNode().getParentNode().name);
+			$("input[name=city]").val(result.getParentNode().name);
+			$("input[name=district]").val(result.name);
+		}
+	});
+	$scope.contractProjType=1
+	/* 合同和项目的关系 */
+	new DropDownList().init({
+		renderTo:".contractProjTypeName",
+		data:[{id:1,name:"一对一"},{id:2,name:"一对多"},{id:3,name:"多对一"},{id:4,name:"多对多"}],
+		height:"200px",
+		textField:"name",
+		onSelected:function(result){
+			$(".contractProjTypeName").val(result.name);
+			$scope.contractProjType=result.id;
+			if($scope.contractProjType==1){
+				var writtenPrice=$("input[name=writtenPrice]").val();
+				$scope.relactionArr[0].price=writtenPrice;
+			}else{
+				$scope.relactionArr[0].price=0;
+			}
+			$scope.$apply();
+			$("input[name=contractProjType]").val(result.id);	
+		}
+	});
+	
+	
+	/* 合同税点 */
+	new DropDownList().init({
+		renderTo:"input[name=taxPoint]",
+		data:[{id:0,name:"6%"},{id:1,name:"11%"}],
+		textField:"name",
+		onSelected:function(result){
+			$("input[name=taxPoint]").val(result.name);	
+		}
+	});
+	
+	/* 是否包含税 */
+	new DropDownList().init({
+		renderTo:".priceIsTaxName",
+		data:[{id:0,name:"否"},{id:1,name:"是"}],
+		textField:"name",
+		onSelected:function(result){
+			$(".priceIsTaxName").val(result.name);
+			$("input[name=priceIsTax]").val(result.id);	
+		}
+	});
+	/* 合同开票状态 */
+	new DropDownList().init({
+		renderTo:".billingStatusName",
+		data:[{id:0,name:"未开"},{id:1,name:"已开"}],
+		textField:"name",
+		onSelected:function(result){
+			$(".billingStatusName").val(result.name);
+			$("input[name=billingStatus]").val(result.id);	
+		}
+	});
+	
+	/* 合同类型 */
+	new DropDownList().init({
+		renderTo:"input[name=contractType]",
+		data:[{id:0,name:"明确总价合同"},{id:1,name:"明确单价合同"},{id:3,name:"费率合同"}],
+		textField:"name",
+		onSelected:function(result){
+			$("input[name=contractType]").val(result.name);	
+		}
+	});
+	
+	/* 回款状态 */
+	new DropDownList().init({
+		renderTo:".paymentStatusName",
+		data:[{id:0,name:"未回款"},{id:1,name:"已回款"}],
+		textField:"name",
+		onSelected:function(result){
+			$(".paymentStatusName").val(result.name);
+			$("input[name=paymentStatus]").val(result.id);	
+		}
+	});
+	/* 表单验证 */
+	validator = $("#saveForm").validate({
+		onsubmit: false,
+		focusInvalid: false,
+		focusCleanup: true,
+		errorElement: "span",
+		ignore:".ignore",
+		invalidHandler: function(form, validator) {
+			var errors = validator.numberOfInvalids();
+			if (errors) {
+				
+			} 
+		}
+	});
+	
+	$scope.relactionArr=[];
+	$scope.getdataPrice=function(){
+		if($scope.contractProjType==1){
+			$scope.relactionArr[0].price=$scope.writtenPrice;
+		}
+	};
+	
+	$scope.add=function(item){
+		
+		$scope.relactionArr.push(item);
+		var index=$scope.relactionArr.length-1;
+		lazyCall('t1',function(){
+			/* 项目类型 */
+			new DropDownList().init({
+				renderTo:"#dropDownProjectTypeName"+index,
+				url:"../../component/projectType.html?required=false&ticket="+ticket,
+				height:"200px",
+				onSelected:function(result){
+					$scope.relactionArr[index].proTypeName=result.categoryName;
+					$scope.relactionArr[index].proType=result.categoryCode;
+				 	//$("#dropDownProjectTypeName"+index).val(result.categoryName);
+				 	//$("#dropDownProjectTyp"+index).val(result.categoryCode);
+				 	$scope.$apply();
+					cond_categoryCode = result.categoryCode;
+					/* 联动 */
+					projectList.setConfig("url", "../../component/allProjectList.html?categoryCode="+cond_categoryCode+"&required=false&ticket="+ticket);
+				}
+			});
+			/* 项目列表 */
+			var projectList = new DropDownList();
+			projectList.init({
+				renderTo:"#dropDownTree"+index,
+				url:"../../component/allProjectList.html?categoryCode="+cond_categoryCode+"&required=false&ticket="+ticket,
+				height:"200px",
+				onSelected:function(result){
+					$scope.relactionArr[index].proName=result.proName;
+					$scope.relactionArr[index].proNo=result.proNo;
+				 	$scope.$apply();
+					
+					/* $("#dropDownTree"+index).val(result.proName);
+					$("#dropDownTreeProNo"+index).val(result.proNo); */
+				}
+			});
+		}, 200);
+	};
+	$scope.adddo=function(){
+		$scope.add({proNo:"",price:0,proType:"",proTypeName:"",proName:""});	
+	};
+	
+	$scope.adddo();
+	/* 保存 */
+	$scope.onSave = function(){
+		if($("input[name=deviceUnivalent]").val()==""){
+			$("input[name=deviceUnivalent]").val("合同未说明");
+		}
+		if($("input[name=contractor]").val()==""){
+			$("input[name=contractor]").val("合同未说明");
+		}
+		if($("input[name=spUnitCharger]").val()==""){
+			$("input[name=spUnitCharger]").val("合同未说明");
+		}
+		var numPrice=0;
+		var writtenPrice=$("input[name=writtenPrice]").val();
+		for(var i=0;i<$scope.relactionArr.length;i++){
+			numPrice+=parseFloat($scope.relactionArr[i].price);
+		}
+		if(numPrice>parseFloat(writtenPrice)){
+			 new ShowDlog().prompt({msg:"合同总价大于合同书面总价！",
+				done:function(){
+				},
+				t:1500
+			});
+			 return;
+		}
+		$("input[name=attrJson]").val(JSON.stringify($scope.relactionArr));
+		//$("input[name=companyCode]").val(userData.companyCode);
+		var formData = $("#saveForm").serialize();
+		if($("#saveForm").valid()){
+			$.ajax({
+				url:serviceBasePath+"eap/pmsServices/fm/contractBase/contractBase/add",
+				cache:false,
+				method:"POST",
+				data:formData,
+				success:function(res){
+					if(res.statusCode==200){
+						 new ShowDlog().prompt({msg:"添加成功！",
+							done:function(){
+								location.href="contractBaseMgr.html";
+							},
+							t:1500
+						});
+					}else{
+						//
+					}
+				},
+				error:function(){
+					
+				}
+			});
+		}else{
+			//alert("表单填写异常，请检查修正后再提交");
+		}
+	};
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		location.href="contractBaseMgr.html";
+	};
+	
+});
+
+</script>
+</body>
+</html>

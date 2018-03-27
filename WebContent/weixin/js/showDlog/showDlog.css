@@ -1,0 +1,110 @@
+/**
+ * @author MaDx
+ * @mail makeruike@qq.com
+ */
+html{
+	height:100%;
+}
+body{
+	padding:0px;
+	margin:0px;
+	height:100%;
+}
+.dlog_C{
+	position:absolute;
+	z-index:99;
+	left:0px;
+	top:0px;
+	bottom:0px;
+	right:0px;
+	text-align:left;
+}
+.dlog_B{
+	position:absolute;
+	left:0px;
+	top:0px;
+	bottom:0px;
+	right:0px;
+	z-index:-1;
+	background:#A4AAAE;
+	filter:alpha(opacity=50);
+}
+.dlog_base{
+	position:absolute;
+}
+.dlog_msg{
+	width:250px;
+	height:50px;
+	background:url(img/dialog_bg.png) no-repeat;
+	font-size:14px;
+	font-weight:bold;
+	color:#525252;
+	text-align:center;
+}
+.dlog_dialog_base{
+	background:url(img/point.png);
+}
+.dlog_dialog_inner{border:solid 1px #666;
+	position:absolute;
+	top:3px;
+	left:3px;
+	right:3px;
+	bottom:3px;
+	background:#fff;
+}
+
+.dlog_dialog{
+	width:350px;
+	height:150px;
+	font-size:12px;
+}
+.dlog_dialog_frame{
+	width:400px;
+	height:230px;
+	font-size:12px;
+}
+.dlog_dialog_title{
+	width:100%;
+	height:25px;
+	line-height:25px;
+	background:#538AD3;
+	color:#fff;
+	font-size:14px;
+	font-weight:bold;
+	text-align:left;
+	text-indent:14px;
+	cursor:move;
+}
+.dlog_dialog_closeBtn{
+	position:absolute;
+	width:35px;
+	height:18px;
+	background:url(img/close_b02.gif) 0px 0px;
+	right:4px;
+	top:0px;
+}
+.dlog_dialog_closeBtn:hover{
+	position:absolute;
+	width:35px;
+	height:18px;
+	background:url(img/close_b02.gif) -35px 0px;
+	right:4px;
+	top:0px;
+}
+/* content */
+.dlog_content{
+	position:absolute;
+	top:25px;
+	left:0px;
+	right:0px;
+	bottom:0px;
+	margin:0px;
+	padding:0px;
+}
+.dlog_iframe{
+	position:absolute;
+	width:100%;
+	height:100%;
+	margin:0px;
+	padding:0px;
+}

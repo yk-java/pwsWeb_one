@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 类型管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+
+<style type="text/css">
+	.all{width:100%;height:100%;}
+	.chooseUser{width:1000px;height:400px;}
+	
+	
+</style>
+
+</head>
+
+<body ng-app="projectType" ng-controller="userMgrCtrl">
+
+<div class="all">
+	
+	<form id="saveForm" class="required-validate">
+		<div>
+			<input type="radio" name="rentType" />项目租用
+			<input type="radio" name="rentType" />部门租用
+		</div>
+		<div>
+			<input type="text" style="width:110px" class="proType dropDownList" placeholder="请选择项目类别"/>
+			<input type="text"  class="proNameD dropDownList" placeholder="请选择项目"/>
+		</div>
+		<div>
+			<input type="text" id="employeename"  class="required dropDownList" placeholder="请指定人员" ng-click="chooseUser()"/>&nbsp;
+			<input type="text" id="employeecode" />
+ 		</div>
+	    
+	</form>
+	
+</div>
+<script language="javascript">
+	
+  	</script>
+
+<script type="text/javascript">
+	var ngScope;
+	var app = angular.module("projectType", []);
+	var proTypes;
+	var category_Code="";
+	var category_Name="";
+	var proNo="";
+	var proName="";
+	
+	app.controller("userMgrCtrl", function($scope, $http){
+		/* init */
+		ngScope = $scope;
+		$scope.rentList=[];//租用记录
+		
+		
+		var mydate = new Date();
+		$(".currentYear").html(mydate.getFullYear());
+		
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		$scope.userData = jQuery.parseJSON(userDataStr);
+		var ticket = $.cookie("pmsWeb_ticket");
+		
+		var params = getUrlParams();
+		$scope.required = params.required;
+		
+		
+		var assetCode = "";
+		if(params.assetCode){
+			assetCode = params.assetCode; 
+			
+		}
+		
+		/* 加载数据 */
+		$http.get(serviceBasePath+"eap/pmsServices/materielMg/assetMg/asset/assetLiftCycle?ticket="+ticket+"&assetCode="+assetCode).success(function(response){
+			if(response.statusCode==200){
+				
+			
+			}
+				
+		});
+		
+		/* 指定人员 */
+		$scope.chooseUser=function(){//alert(index);
+			new ShowDlog().showFrame(
+				"../../../component/chooseUser.html",
+				"选择人员",
+				function(selectedItems){
+					$("#employeecode").val(selectedItems[0].employeecode);
+					$("#employeename").val(selectedItems[0].employeename);
+				},
+				"chooseUser");
+		};
+
+		/* 项目类型 */
+		new DropDownList().init({
+			renderTo:".proType",
+			url:"../../../component/projectType.html?required=false&ticket="+ticket,
+			height:"200px",
+			onSelected:function(result){
+				$(".proType").val(result.categoryName);
+				category_Code = result.categoryCode;
+				category_Name=result.categoryName;
+				var url = "../../../component/projectList.html?categoryCode="+category_Code+"&required=false&ticket="+ticket;
+				proTypes.setConfig("url", url);
+				
+			}
+		});
+		/* 项目列表 */
+		proTypes=new DropDownList();
+		proTypes.init({
+			renderTo:".proNameD",
+			url:"../../../component/projectList.html?categoryCode="+category_Code+"&required=false&ticket="+ticket,
+			height:"200px",
+			onSelected:function(result){
+				$(".proNameD").val(result.proName);
+				proNo=result.proNo;
+				proName=result.proName;
+				//ngScope.loadProjects(assetTypeCode, assetClassCode,fromDate, toDate,proNo);
+				//$scope.loadProjects(assetTypeCode, assetClassCode,status,1,proNo);
+			}
+		});
+		
+	});
+	</script>
+</body>
+</html>

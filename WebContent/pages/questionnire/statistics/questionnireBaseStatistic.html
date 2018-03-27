@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html ng-app="moduleName">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<title> 问卷下发情况 </title>
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/echarts-all.js"></script>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+<style type="text/css">
+.dialog-send{width:1000px;height:600px;}
+
+.title_div2{border:solid 0px red;background:#4CA9FF;padding:8px 6px 8px 6px;}
+.title_div2 .condLayer1{display:block;border:solid 0px;margin:6px;}
+.title_div2 .condLayer2{border:solid 0px green;margin:0 6px;}
+.title_div2 .condLayer1 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:0 4px;padding:0 4px;font-family:微软雅黑;border-radius:3px;}
+.title_div2 .condLayer2 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:6px 4px;padding:0 4px;background-color:#DAEDFF;font-family:微软雅黑;border-radius:3px;}
+.title_div2 .btn{display:inline-block;height:30px;line-height:30px;margin:0 4px;padding:0 15px 0 15px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; 
+border-radius:4px;}
+.title_div2 .blue{background:#3385FF;color:#fff;}
+.title_div2 .blue:hover{background:#186CE7;}
+.title_div2 .pink{background:#ED7798;color:#fff;}
+.title_div2 .pink:hover{background:#E54673;}
+
+.list .condLayer1 h2{display:inline-block;color:#FFF;margin:4px;margin-left:10px;}
+ul,li{margin:0;padding:0;list-style-type:none;}
+.list .question_list{}
+.list .question_list .question{margin-top:-1px;}
+.question .title{cursor:pointer;border:solid 1px #ccc;}
+.question .title h2{margin-left:20px;font-size:16px;}
+.question .title:hover{color:#4CA9FF;background:#f4f4f4;}
+.question .statistic_result{background:#f4f4f4;padding:10px;display:none;}
+.question .statistic_result .statistic_table{min-width:800px;}
+table{border-collapse:collapse;}
+.question .statistic_result table th{padding:4px;border:solid 1px #ccc;background:#D9E9FF;}
+.question .statistic_result table td{padding:4px;border:solid 1px #ccc;background:#fff;}
+.question .statistic_result table td .opt_answers{position:absolute;}
+.opt_answers{max-height:800px;overflow-y:auto;}
+.opt_answers table{width:90%;margin:20px auto;}
+.opt_answers table th{padding:4px;border:solid 1px #ccc;background:#D9E9FF;}
+.opt_answers table td{padding:4px;border:solid 1px #ccc;background:#fff;}
+.opt_answers table td .opt_answers{position:absolute;}
+.cnt{font-size:14px;font-weight:bold;}
+.hasLink{font-size:14px;font-weight:bold;color:#ff9900;}
+.dlog-answerList{width:800px;height:600px;}
+.dlog-userAnswerList{width:800px;height:600px;}
+.dlog-export{width:1000px;height:600px;}
+.chart{width:800px;height:400px;border:solid 1px #ccc;background:#ffffff !important;margin:0 -1px;}
+.chartTypeBtn{display:inline-block;line-height:30px;padding:0 10px;margin:10px 2px;border-radius:5px;background:#3385FF;color:#fff;}
+.submit_user{cursor:pointer;}
+.submit_user:hover{color:#4CA9FF;}
+</style>
+
+</head>
+<body ng-controller="controllerName" storagekey="questionnire.questionnireMgr.questionnireSendMgr">
+<div class="list">
+	<div class="list_content">
+		<div class="title_div2">
+			<div class="condLayer1">
+				<h2>
+					问卷名称：{{questionnire.title}} <span style="font-size:14px;">（下发：{{questionnire.sendedCnt}}人 / 提交：{{questionnire.answerSheetCnt}}人）</span>
+				</h2>
+				<div class="btn" style="float:right;" ng-click="toBack()">
+					返回
+				</div>
+				<div class="btn blue" style="float:right;" ng-click="toExport()">
+					导出
+				</div>
+				<div class="btn blue" style="float:right;" ng-click="toUserList()">
+					人员作答情况
+				</div>
+			</div>
+		</div>
+		<ul class="question_list">
+			<li class="question" ng-repeat="question in questionnire.questions" ng-if="question.type=='question'">
+				<div class="title" question-idx="{{question.idx}}">
+					<h2>{{question.num}}. {{question.title}}</h2>
+				</div>
+				<div class="statistic_result" ng-if="question.subType=='radio' || question.subType=='checkbox'">
+					<table class="statistic_table">
+						<tr>
+							<th>选项</th>
+							<th>人数</th>
+						</tr>
+						<tr ng-repeat="option in question.options">
+							<td>{{option.num}}.{{option.optionLabel}}</td>
+							<td>
+								<a href="javascript:" id="{{question.idx}}_{{option.num}}" ng-class="{'cnt':true, 'hasLink':true}" ng-click="showSupplementAnswers('#'+question.idx+'_'+option.num, option)">
+									{{option.cnt}} ({{decim((option.cnt/questionnire.answerSheetCnt)*100, 2)}}%)
+								</a>
+								<div class="opt_answers" style="display:none;">
+									<table>
+										<tr>
+											<th>作答人</th>
+											<th ng-if="option.isSupplement==1">补充内容</th>
+										</tr>
+										<tr ng-repeat="item in option.answerList">
+											<td>
+												<span class="submit_user" onclick="showUserAnswerList(this);" data-submituser="{{item.submitUser}}">{{item.employeename}}</span>
+											</td>
+											<td ng-if="option.isSupplement==1">{{item.supplement}}</td>
+										</tr>
+									</table>
+								</div>
+							</td>
+						</tr>
+					</table>
+					<a href="javascript:" class="chartTypeBtn" ng-click="changeChartType('chart_'+question.idx, 'bar')">柱状图</a>
+					<a href="javascript:" class="chartTypeBtn" ng-if="question.subType!='checkbox'" ng-click="changeChartType('chart_'+question.idx, 'pie')">饼图</a>
+					<a href="javascript:" class="chartTypeBtn" ng-click="changeChartType('chart_'+question.idx, 'line')">折线图</a>
+					<div class="chart" id="chart_{{question.idx}}">
+					</div>
+				</div>
+				<div class="statistic_result" ng-if="question.subType=='text'">
+					<table class="statistic_table">
+						<tr>
+							<th>作答人</th>
+							<th>答案</th>
+						</tr>
+						<tr ng-repeat="item in question.answerList">
+							<td>{{item.employeename}}</td>
+							<td>{{item.answer}}</td>
+						</tr>
+					</table>
+				</div>
+			</li>
+		</ul>
+		
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		$scope.dataList=[];
+		$scope.questionnire={};
+		$scope.sendedCnt=0;
+		var urlParams = getUrlParams();
+		$scope.questionnire=urlParams;
+		var viewState = new ViewState();
+		
+		
+		/* 初始（查询） */
+		$scope.doQuery=function(){
+			$scope.loadData();
+		};
+		/* 加载数据 */
+		$scope.loadData=function(){
+			viewState.collect();
+			new ShowDlog().prompt({
+				icon:"waitting",
+				msg:"正在查询...",
+				done:function(){},
+				t:20*60*1000
+			});
+			$scope.httpExecute({
+				url:"eap/pmsServices/questionnireStatistic/get",
+				method:"GET",
+				data:{questionnireCode:urlParams.questionnireCode},
+				success:function(res){
+					$dlog.close();
+					if(res.statusCode==200){
+						$scope.questionnire = res.data;
+						lazyCall("t1", function(){
+							$scope.pageInit();
+						}, 10);
+					}
+				},
+				error:function(){
+					$dlog.close();
+					new ShowDlog().prompt({
+						msg:"网络异常！",
+						done:function(){},
+						t:1500
+					});
+				}
+			});
+		};
+		
+		$scope.toBack=function(){
+			hrefTo({url:"questionnireMgr.html"});
+		};
+		$scope.doQuery();
+		
+		$scope.pageInit=function(){
+			$(".title").click(function(){
+				var $title = $(this);
+				var isopen = $title.attr("isopen");
+				if(isopen=="yes"){
+					$title.next().hide();
+					$title.attr("isopen","no");
+				}else{
+					$title.next().show();
+					$title.attr("isopen","yes");
+					var dataloaded = $title.attr("dataloaded");
+					var idx = parseInt($title.attr("question-idx"));
+					if(dataloaded=="yes"){
+						// nothing
+					}else{
+						callNgFn({ctrlEl:$("body")[0], ngFn:function(scope){
+							scope.loadQuestionStatisticData($title, idx);
+						}});
+						$title.attr("dataloaded", "yes");
+					}
+				}
+				
+			});
+		};
+		
+		$scope.loadQuestionStatisticData=function($title, idx){
+			var question = $scope.questionnire.questions[idx];
+			if("question"==question.type){ 
+				if("radio"==question.subType||"checkbox"==question.subType){
+					//loadStatistic
+					$scope.httpExecute({
+						url:"eap/pmsServices/questionnireStatistic/statisticRadioAnswer",
+						method:"GET",
+						data:{"questionCode":question.questionCode},
+						success:function(res){
+							if(res.statusCode==200){
+								var answerStat = res.data;
+								var options = question.options;
+								var xDatas=[];
+								var yDatas=[];
+								for(var i in options){
+									var option = options[i];
+									if(!option.optionLabel){
+										option.optionLabel="";
+									}
+									xDatas.push(option.optionLabel);
+									for(var j in answerStat){
+										var it = answerStat[j];
+										if(option.num==it.answer){
+											option.cnt=it.cnt;
+											break;
+										}
+									}
+									if(!option.cnt)
+										option.cnt=0;
+									yDatas.push(option.cnt);
+								}
+								$scope.drawChart("chart_"+question.idx, options, xDatas, yDatas);
+							}
+						},
+						error:function(){
+						}
+					});
+					var options = question.options;
+					for(var i in options){
+						var option = options[i];
+						//if(option.isSupplement==1){
+							(function(option){
+								$scope.httpExecute({
+									url:"eap/pmsServices/questionnireStatistic/selectSupplementByQuestionCodeAndOptCode",
+									method:"GET",
+									data:{"questionCode":question.questionCode, "optNum":option.num},
+									success:function(res){
+										if(res.statusCode==200){
+											var answerList = res.data;
+											option.answerList=answerList;
+										}
+									},
+									error:function(){
+									}
+								});
+							})(option);
+						//}
+					}
+					
+				}else if("text"==question.subType){
+					$scope.httpExecute({
+						url:"eap/pmsServices/questionnireStatistic/selectTextAnswerByQuestionCode",
+						method:"GET",
+						data:{questionCode:question.questionCode},
+						success:function(res){
+							if(res.statusCode==200){
+								var answerList = res.data;
+								question.answerList=answerList;
+							}
+						},
+						error:function(){
+						}
+					});
+				}
+			}
+		};
+		$scope.showSupplementAnswers=function(id, option){
+			//if(option.isSupplement==1){
+				var $answerList = $(id).next();
+				new ShowDlog().showDialog("<div class='opt_answers'>"+$answerList.html()+"</div>", "作答详细", function(){}, "dlog-answerList");
+			//}
+		};
+		window.showUserAnswerList=function(obj){
+			var submitUser = $(obj).attr("data-submituser");
+			$scope.showUserAnswerList(submitUser);
+		};
+		$scope.showUserAnswerList=function(submitUser){
+			$dlog.close();
+			new ShowDlog().showFrame("../questionnireMgr/questionnireSimpAnswerView.html?questionnireCode="+$scope.questionnire.questionnireCode+"&employeeCode="+submitUser,
+					"作答详细", function(){}, "dlog-userAnswerList");
+		};
+		$scope.decim=function(num, len){
+			return decim(num, len);
+		};
+		$scope.chartArr=[];
+		$scope.drawChart=function(chartElId, datas, xDatas, yDatas){
+			var option = {
+			    tooltip : {
+			        trigger: 'axis',
+			        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+			            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+			        }
+			    },
+			    grid: {
+			        left: '3%',
+			        right: '4%',
+			        bottom: '3%',
+			        containLabel: true
+			    },
+			    xAxis : [
+			        {
+			            type : 'category',
+			            data : xDatas,
+			            axisTick: {
+			                alignWithLabel: true
+			            }
+			        }
+			    ],
+			    yAxis : [
+			        {
+			            type : 'value'
+			        }
+			    ],
+			    series : [
+			        {
+			            name:'人数',
+			            type:'bar',
+			            data:yDatas,
+			            itemStyle:{
+			            	normal:{
+			            		label:{show:true}
+			            	}
+			        	}
+			        }
+			    ]
+			};
+			option.my_datas=datas;
+			option.my_xDatas=xDatas;
+			option.my_yDatas=yDatas;
+			var chart = echarts.init($("#"+chartElId)[0]);
+			$scope.chartArr[chartElId]=chart;
+			chart.setOption(option);
+		};
+		$scope.changeChartType=function(id, type){
+			var chart = $scope.chartArr[id];
+			if(chart){
+				var option = chart.getOption();
+				var datas=option.my_datas;
+				var xDatas=option.my_xDatas;
+				var yDatas=option.my_yDatas;
+				if(option.series[0].type=="bar" || option.series[0].type=="line"){
+					if(type=="line" || type=="bar"){
+						option.series[0].type=type;
+					}else if(type=="pie"){
+						var datasNew = [];
+						for(var i in datas){
+							var datItem = datas[i];
+							var objN={};
+							objN.name=datItem.optionLabel;
+							objN.value=datItem.cnt;
+							datasNew.push(objN);
+						}
+						option = {
+						    tooltip : {
+						        trigger: 'item',
+						        formatter: "{b}{a} : {c} ({d}%)"
+						    },
+						    legend: {
+						        orient: 'horizontal',
+						        left: 'left',
+						        data: xDatas
+						    },
+						    series : [
+						        {
+						            name: '人数',
+						            type: 'pie',
+						            radius : '55%',
+						            center: ['50%', '60%'],
+						            data:datasNew,
+						            itemStyle: {
+						                emphasis: {
+						                    shadowBlur: 10,
+						                    shadowOffsetX: 0,
+						                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+						                },
+						                normal:{
+					                    	label:{
+										        formatter: "{b}{a} : {c} ({d}%)"
+					                    	}
+						                }
+						            }
+						        }
+						    ]
+						};
+						option.my_datas=datas;
+						option.my_xDatas=xDatas;
+						option.my_yDatas=yDatas;
+					}
+				}else if(option.series[0].type=="pie"){
+					if(type=="line" || type=="bar"){
+						option = {
+						    tooltip : {
+						        trigger: 'axis',
+						        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+						            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+						        }
+						    },
+						    grid: {
+						        left: '3%',
+						        right: '4%',
+						        bottom: '3%',
+						        containLabel: true
+						    },
+						    xAxis : [
+						        {
+						            type : 'category',
+						            data : xDatas,
+			 			            axisTick: {
+			 			                alignWithLabel: true
+			 			            }
+						        }
+						    ],
+						    yAxis : [
+						        {
+						            type : 'value'
+						        }
+						    ],
+						    series : [
+						        {
+						            name:'人数',
+						            type:type,
+						            data:yDatas,
+						            itemStyle:{
+						            	normal:{
+						            		label:{show:true}
+						            	}
+						        	}
+						        }
+						    ]
+						};
+						option.my_datas=datas;
+						option.my_xDatas=xDatas;
+						option.my_yDatas=yDatas;
+					}
+				}
+				chart = echarts.init($("#"+id)[0]);
+				$scope.chartArr[id]=chart;
+				chart.setOption(option);
+			}
+		};
+		$scope.toExport=function(){
+			new ShowDlog().showFrame("answerDataExport.html?questionnireCode="+$scope.questionnire.questionnireCode, "答卷数据导出", function(){}, "dlog-export");
+		};
+		$scope.toUserList=function(){
+			location.href="questionnireSendMgr.html?questionnireCode="+$scope.questionnire.questionnireCode;
+		}
+	}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+body{margin:0px;padding:0px;font-size:12px;font-family:"微软雅黑";}
+a{color:#4D4D4D;text-decoration: none;}
+table,table td,table th{border:0px solid #EDEDED;border-collapse:collapse;}
+table td input[type=text]{font-size:11px;font-family:"微软雅黑";min-height:21px;min-width:200px;}
+textarea,input{font-size:11px;font-family:"微软雅黑";}
+
+/* 标题 */
+.list{position: absolute;left:13px;right:13px;top:13px;bottom:10px;border:solid 0px;}
+.list .list_content{position: absolute;left:0px;right:0px;top:0px;bottom:0px;border:solid 0px;}
+.list .list_content .title_div{width:100%;height:39px;border-bottom:solid 3px #4CA9FF;}
+.list .list_content .title_div > img{float:left;margin-top:1px;}
+.list .list_content .title_div .title_left{min-width:200px;height:39px;background:#4CA9FF;line-height:42px;color:#fff;font-size:14px;font-weight: bold;float:left;}
+.list .list_content .title_div .title_left .title{font-size:14px;font-weight:bold;padding-left:6px;}
+
+/* 选项卡 */
+.tabs{border-bottom:solid 1px #e6e6e6;}
+.tab{display:inline-block;margin:0 10px;line-height:36px;font-size:14px;}
+.tab.selected{color:#3385FF;border-bottom:solid 3px #3385FF;}
+.form_div{padding:20px 10px;}
+.form_div table th{padding:4px;font-weight:normal;text-align:right;}
+.form_div table td{padding:4px;}
+
+/* 操作按钮 */
+.form_bottom{border-top:solid 1px #e6e6e6;padding-top:20px;}
+.form_bottom .title_save{float:left;width:70px;height:28px;background: url(../img/btn_save.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;}
+.form_bottom .title_save:hover{background: url(../img/btn_save.png) no-repeat 0 -29px;}
+.form_bottom .title_save2{float:left;width:110px;height:28px;background: url(../img/btn_save2.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;}
+.form_bottom .title_save2:hover{background: url(../img/btn_save2.png) no-repeat 0 -29px;}
+
+.form_bottom .title_cancel{float:left;width:70px;height:28px;background: url(../img/btn_cancel.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#666;cursor: pointer;}
+.form_bottom .title_cancel:hover{background: url(../img/btn_cancel.png) no-repeat 0 -29px;}
+.form_bottom .title_code{float:left;width:70px;height:28px;background: url(../img/asset/code_bnt.png) no-repeat;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;}
+.form_bottom .title_cyle{float:left;width:100px;height:28px;background: url(../img/asset/lifecyle_bnt.png) no-repeat;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;}
+.form_bottom .title_print{float:left;width:70px;height:28px;background: url(../img/asset/print_bnt.png) no-repeat;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;}
+.form_bottom .title_back{float:left;width:70px;height:28px;background: url(../img/bnt_back.png) repeat;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#2D7CF0;cursor: pointer;}
+
+
+.title_div .title_save{float:left;width:70px;height:28px;background: url(../img/btn_save.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;}
+.title_div .title_save:hover{background: url(../img/btn_save.png) no-repeat 0 -29px;}
+.title_div .title_save2{float:left;width:110px;height:28px;background: url(../img/btn_save2.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;}
+.title_div .title_save2:hover{background: url(../img/btn_save2.png) no-repeat 0 -29px;}
+
+.title_div .title_cancel{float:left;width:70px;height:28px;background: url(../img/btn_cancel.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#666;cursor: pointer;}
+.title_div .title_cancel:hover{background: url(../img/btn_cancel.png) no-repeat 0 -29px;}
+.title_div .title_code{float:left;width:70px;height:28px;background: url(../img/asset/code_bnt.png) no-repeat;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;}
+.title_div .title_cyle{float:left;width:100px;height:28px;background: url(../img/asset/lifecyle_bnt.png) no-repeat;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;}
+.title_div .title_print{float:left;width:70px;height:28px;background: url(../img/asset/print_bnt.png) no-repeat;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;}
+.title_div .title_back{float:left;width:70px;height:28px;background: url(../img/bnt_back.png) repeat;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#2D7CF0;cursor: pointer;}
+
+/* 下拉或日历组件图标 */
+.dropDownList{background-image:url(../img/drop_down_list.png);background-repeat: no-repeat;background-position:right;cursor:pointer;border:solid 1px #b1b1b1;height:25px;}
+.dropDownProject{background-image:url(../img/drop_down_list.png);background-repeat: no-repeat;background-position:right;cursor:pointer;border:solid 1px #b1b1b1;height:25px;}
+.dropDownArea{background-image:url(../img/icon-flag.png);background-repeat: no-repeat;background-position:right;cursor:pointer;border:solid 1px #b1b1b1;height:25px;}
+.dropDownProjectType{background-image:url(../img/icon-type.png);background-repeat: no-repeat;background-position:right;cursor:pointer;border:solid 1px #b1b1b1;height:25px;}
+.dateComponent{background-image:url(../img/icon-calendar.png);background-repeat: no-repeat;background-position:right;cursor:pointer;border:solid 1px #b1b1b1;height:25px;}
+.chooseUserCom{background-image:url(../img/user2.png);background-repeat: no-repeat;background-position:right;cursor:pointer;border:solid 1px #b1b1b1;height:25px;}
+
+.dateComponent{border-width:1px;padding:2px 1px;background-image:url(../img/icon-calendar.png);background-repeat: no-repeat;background-position:right;cursor:pointer;}
+.dropDownArea2{border-width:1px;padding:2px 1px;background-image:url(../img/flag.png);background-repeat: no-repeat;background-position:right;cursor:pointer;}
+.dropDownTree{background-image:url(../img/open--icon.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+
+/* 只读样式 */
+.readonly{background:#e6e6e6;border:solid 1px #c3c3c3;}

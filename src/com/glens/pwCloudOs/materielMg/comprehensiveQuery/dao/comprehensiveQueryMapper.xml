@@ -1,0 +1,759 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.materielMg.comprehensiveQuery.dao.comprehensiveQueryMapper" >
+	
+	<select id="vehicleOilConsumptionStatistics" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select a.ASSET_CODE assetCode,a.VEHICLE_NO vehicleNo,ifnull(b.BRAND,'') brand,ifnull(b.MODEL_NO,'') modelNo,
+		case b.VA_OIL when 1 then '92号汽油' when 2 then '95号汽油' when 3 then '90号汽油' when 4 then '0号柴油' else '92号汽油' end vaOil,
+		c.FUELCARD_NO fuelCardNo,sum(ifnull(a.DRIVER_MILEAGE,0)) totalMileage,
+		sum(ifnull(a.DRIVER_DAYS,0)) totalDay,FORMAT(sum(ifnull(a.FC_VOLUME,0)),2) totalVolume,sum(ifnull(a.FC_AMOUNT,0)) totalAmount,
+		FORMAT(sum(ifnull(a.FC_VOLUME,0))/(sum(ifnull(a.DRIVER_MILEAGE,0))/100),2) avgMiles,
+		FORMAT(sum(ifnull(a.DRIVER_MILEAGE,0))/sum(ifnull(a.DRIVER_DAYS,0)),2) avgMileage,
+		FORMAT(avg(ifnull(a.CUR_PRICE,0)),2) avgPrice,FORMAT(sum(ifnull(a.FC_AMOUNT,0))/sum(ifnull(a.DRIVER_MILEAGE,0)),2) avgFuel
+		from PM_TM_VEHICLE_FUELCHARGE a 
+		join GM_ASSET_BASE b on a.ASSET_CODE=b.ASSET_CODE
+		join GM_VM_FUELCARD c on a.ASSET_CODE=c.ASSET_CODE
+		where a.FC_DATE&gt;=#{fromDate} and a.FC_DATE&lt;=#{toDate}
+		and a.COMPANY_CODE=#{companyCode}
+		group by a.ASSET_CODE,a.VEHICLE_NO,b.BRAND,b.MODEL_NO,b.VA_OIL,c.FUELCARD_NO
+	</select>
+	
+	<select id="selectVehicleFuelCharge" parameterType="map" resultType="map">
+		select DATE_FORMAT(FC_DATE,'%Y-%m-%d') fcDate,DRIVER_DAYS driverDays,CUR_MILEAGE curMileage,DRIVER_MILEAGE driverMileage,
+		FC_AMOUNT fcAmount,CUR_PRICE curPrice,FC_PLACE fcPlace,FC_VOLUME fcVolume
+		from PM_TM_VEHICLE_FUELCHARGE 
+		where FC_DATE&gt;=#{fromDate} and FC_DATE&lt;=#{toDate}
+		and ASSET_CODE=#{assetCode}
+		order by FC_DATE 
+	</select>
+	
+	<select id="selectAssetRepair" parameterType="map" resultType="map">
+		select a.ASSET_CODE assetCode,e.ASSET_CHARACTER_NAME assetCharacterName,c.ASSET_TYPE_NAME assetTypeName,
+		b.BRAND brand,b.MODEL_NO modelNo,c.MEASURE_UNIT measureUnit,IFNULL(DATE_FORMAT(b.DATE_STORAGE,'%Y-%m-%d'),'') dateStorage,
+		case when a.LOAN_PRO_NO is not null then a.LOAN_PRO_NAME else a.LOAN_UNIT_NAME end unitName,
+		DATE_FORMAT(a.REPORT_DATE,'%Y-%m-%d') reportDate,DATE_FORMAT(a.FINISH_DATE,'%Y-%m-%d') finishDate,
+		a.REPAIR_REASON repairReason,a.REPAIR_COST repairCost,a.REPAIR_VENDER repairVender,a.REMARKS remarks
+		from GM_ASSET_REPAIR a
+		join GM_ASSET_BASE b on a.ASSET_CODE=b.ASSET_CODE
+		join GM_ASSET_TYPE c on b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+		join GM_ASSET_CLASS d on c.ASSET_CLASS_CODE=d.ASSET_CLASS_CODE
+		join FM_ASSET_CHARACTER e on d.ASSET_CHARACTER_CODE=e.ASSET_CHARACTER_CODE
+		where a.FLOW_STATUS=4
+		<if test="assetClassCode != null and assetClassCode !=''">
+	  	and d.ASSET_CLASS_CODE=#{assetClassCode}
+	  	</if>
+	  	<if test="assetTypeCode != null and assetTypeCode !=''">
+	  	and c.ASSET_TYPE_CODE=#{assetTypeCode}
+	  	</if>
+	  	<if test="fromDate != null and fromDate != ''">
+	  	and a.REPORT_DATE &gt;= #{fromDate}
+	  	</if>
+	  	<if test="toDate != null and toDate != ''">
+	  	and a.REPORT_DATE &lt;= #{toDate}
+	  	</if>
+	  	order by a.REPORT_DATE desc
+	</select>
+	
+	<!-- 资产入库管理 -->
+	<select id="selectAssetStorage" parameterType="map" resultType="map">
+		select b.ASSET_NAME assetName,ifnull(b.BILL,'') bill,e.ASSET_CHARACTER_NAME assetCharacterName,c.ASSET_TYPE_NAME assetTypeName,
+		ifnull(b.BRAND,'') brand,ifnull(b.MODEL_NO,'') modelNo,c.MEASURE_UNIT measureUnit,c.ASSET_TYPE_SHORTNAME assetTypeShortName,
+		b.PRICE1 price1,b.PRICE2 price2,IFNULL(DATE_FORMAT(b.DATE_STORAGE,'%Y-%m-%d'),'') dateStorage,
+		b.STATUS status,ifnull(b.LOAN_EMPLOYEENAME,'') loanEmployeeName,ifnull(b.LOAN_UNIT_NAME,'') loanUnitName,
+		ifnull(b.LOAN_PRO_NAME,'') loanProName,ifnull(b.REMARKS,'') remarks
+		from GM_ASSET_BASE b
+		join GM_ASSET_TYPE c on b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+		join GM_ASSET_CLASS d on c.ASSET_CLASS_CODE=d.ASSET_CLASS_CODE
+		join FM_ASSET_CHARACTER e on d.ASSET_CHARACTER_CODE=e.ASSET_CHARACTER_CODE
+		where b.SYS_PROCESS_FLAG='1'
+		<if test="assetClassCode != null and assetClassCode !=''">
+	  	and d.ASSET_CLASS_CODE=#{assetClassCode}
+	  	</if>
+	  	<if test="assetTypeCode != null and assetTypeCode !=''">
+	  	and c.ASSET_TYPE_CODE=#{assetTypeCode}
+	  	</if>
+	  	<if test="fromDate != null and fromDate != ''">
+	  	and b.DATE_STORAGE &gt;= #{fromDate}
+	  	</if>
+	  	<if test="toDate != null and toDate != ''">
+	  	and b.DATE_STORAGE &lt;= #{toDate}
+	  	</if>
+	  	<if test="bill != null and bill != ''">
+	  	and b.BILL = #{bill}
+	  	</if>
+	  	order by b.DATE_STORAGE desc
+	</select>
+	
+	<!-- 耗材入库管理 -->
+	<select id="materialStorage" parameterType="map" resultType="map">
+		select b.MATERIAL_NAME assetName,ifnull(b.BILL,'') bill,e.ASSET_CHARACTER_NAME assetCharacterName,c.ASSET_TYPE_NAME assetTypeName,
+		ifnull(b.BRAND,'') brand,ifnull(b.MODEL_NO,'') modelNo,c.MEASURE_UNIT measureUnit,c.ASSET_TYPE_SHORTNAME assetTypeShortName,
+		b.PRICE1 price1,b.PRICE2 price2,IFNULL(DATE_FORMAT(b.DATE_STORAGE,'%Y-%m-%d'),'') dateStorage,ifnull(b.REMARKS,'') remarks
+		from gm_material_base b
+		join GM_ASSET_TYPE c on b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+		join GM_ASSET_CLASS d on c.ASSET_CLASS_CODE=d.ASSET_CLASS_CODE
+		join FM_ASSET_CHARACTER e on d.ASSET_CHARACTER_CODE=e.ASSET_CHARACTER_CODE
+		where b.SYS_PROCESS_FLAG='1'
+		<if test="assetClassCode != null and assetClassCode !=''">
+	  	and d.ASSET_CLASS_CODE=#{assetClassCode}
+	  	</if>
+	  	<if test="assetTypeCode != null and assetTypeCode !=''">
+	  	and c.ASSET_TYPE_CODE=#{assetTypeCode}
+	  	</if>
+	  	<if test="fromDate != null and fromDate != ''">
+	  	and b.DATE_STORAGE &gt;= #{fromDate}
+	  	</if>
+	  	<if test="toDate != null and toDate != ''">
+	  	and b.DATE_STORAGE &lt;= #{toDate}
+	  	</if>
+	  	<if test="bill != null and bill != ''">
+	  	and b.BILL = #{bill}
+	  	</if>
+	  	order by b.DATE_STORAGE desc
+	</select>
+	
+	<select id="selectAssetRent" parameterType="map" resultType="map">
+		select a.ASSET_CODE assetCode,b.ASSET_NAME assetName,e.ASSET_CHARACTER_NAME assetCharacterName,c.ASSET_TYPE_NAME assetTypeName,
+		ifnull(b.BRAND,'') brand,ifnull(b.MODEL_NO,'') modelNo,c.MEASURE_UNIT measureUnit,c.ASSET_TYPE_SHORTNAME assetTypeShortName,
+		case when a.LOAN_PRO_NO is not null then a.LOAN_PRO_NAME else a.LOAN_UNIT_NAME end unitName,
+		DATE_FORMAT(a.RENT_DATE,'%Y-%m-%d') rentDate,ifnull(DATE_FORMAT(a.RETURN_DATE,'%Y-%m-%d'),'') returnDate,
+		b.PRICE1 price1,b.PRICE2 price2,ifnull(a.REMARKS,'') remarks,left(a.REMARKS,25) remarks1
+		from GM_ASSET_RENT a
+		join GM_ASSET_BASE b on a.ASSET_CODE=b.ASSET_CODE
+		join GM_ASSET_TYPE c on b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+		join GM_ASSET_CLASS d on c.ASSET_CLASS_CODE=d.ASSET_CLASS_CODE
+		join FM_ASSET_CHARACTER e on d.ASSET_CHARACTER_CODE=e.ASSET_CHARACTER_CODE
+		where a.FLOW_STATUS=4 
+		<if test="assetClassCode != null and assetClassCode !=''">
+	  	and d.ASSET_CLASS_CODE=#{assetClassCode}
+	  	</if>
+	  	<if test="assetTypeCode != null and assetTypeCode !=''">
+	  	and c.ASSET_TYPE_CODE=#{assetTypeCode}
+	  	</if>
+	  	<if test="fromDate != null and fromDate != ''">
+	  	and a.RENT_DATE &gt;= #{fromDate}
+	  	</if>
+	  	<if test="toDate != null and toDate != ''">
+	  	and a.RENT_DATE &lt;= #{toDate}
+	  	</if>
+	  	<if test="proNo != null and proNo != ''">
+	  	and a.LOAN_PRO_NO=#{proNo}
+	  	</if>
+	  	<if test="assetCodes != null and assetCodes != ''">
+	  	and find_in_set (a.ASSET_CODE,#{assetCodes})>0
+	  	</if>
+	  	
+	  	order by a.RENT_DATE desc
+	</select>
+	
+	<select id="selectAssetRentReturn" parameterType="map" resultType="map">
+		select a.ASSET_CODE assetCode,e.ASSET_CHARACTER_NAME assetCharacterName,c.ASSET_TYPE_NAME assetTypeName,
+		ifnull(b.BRAND,'') brand,ifnull(b.MODEL_NO,'') modelNo,c.MEASURE_UNIT measureUnit,c.ASSET_TYPE_SHORTNAME assetTypeShortName,
+		case when a.LOAN_PRO_NO is not null then a.LOAN_PRO_NAME else a.LOAN_UNIT_NAME end unitName,
+		DATE_FORMAT(a.RENT_DATE,'%Y-%m-%d') rentDate,ifnull(DATE_FORMAT(a.RETURN_DATE,'%Y-%m-%d'),'') returnDate,
+		b.PRICE1 price1,b.PRICE2 price2,ifnull(a.REMARKS,'') remarks,
+		FORMAT(b.PRICE1-period_diff(DATE_FORMAT(a.RETURN_DATE,'%Y%m'),DATE_FORMAT(DATE_STORAGE,'%Y%m'))*((b.PRICE1*(1-d.RESIDUAL_RATE/100))/d.EUP_MONTH),2) nav
+		from GM_ASSET_RENT a
+		join GM_ASSET_BASE b on a.ASSET_CODE=b.ASSET_CODE
+		join GM_ASSET_TYPE c on b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+		join GM_ASSET_CLASS d on c.ASSET_CLASS_CODE=d.ASSET_CLASS_CODE
+		join FM_ASSET_CHARACTER e on d.ASSET_CHARACTER_CODE=e.ASSET_CHARACTER_CODE
+		where a.RETURN_DATE is not null
+		<if test="assetClassCode != null and assetClassCode !=''">
+	  	and d.ASSET_CLASS_CODE=#{assetClassCode}
+	  	</if>
+	  	<if test="assetTypeCode != null and assetTypeCode !=''">
+	  	and c.ASSET_TYPE_CODE=#{assetTypeCode}
+	  	</if>
+	  	<if test="fromDate != null and fromDate != ''">
+	  	and a.RETURN_DATE &gt;= #{fromDate}
+	  	</if>
+	  	<if test="toDate != null and toDate != ''">
+	  	and a.RETURN_DATE &lt;= #{toDate}
+	  	</if>
+	  	order by a.RETURN_DATE desc
+	</select>
+	
+	
+	
+	
+	
+	<select id="selectAssetScrap" parameterType="map" resultType="map">
+		select b.ASSET_CODE assetCode, e.ASSET_CHARACTER_NAME assetCharacterName,c.ASSET_TYPE_NAME assetTypeName,
+		ifnull(b.BRAND,'') brand,ifnull(b.MODEL_NO,'') modelNo,c.MEASURE_UNIT measureUnit,c.ASSET_TYPE_SHORTNAME assetTypeShortName,
+		b.PRICE1 price1,b.PRICE2 price2,IFNULL(DATE_FORMAT(b.DATE_STORAGE,'%Y-%m-%d'),'') dateStorage,
+		ifnull(b.LOAN_EMPLOYEENAME,'') loanEmployeeName,ifnull(b.LOAN_UNIT_NAME,'') loanUnitName,
+		ifnull(b.LOAN_PRO_NAME,'') loanProName,DATE_FORMAT(b.DATE_DUMP,'%Y-%m-%d') dateDump,DUMP_AMOUNT dumpAmount,
+		FORMAT(b.PRICE1-period_diff(DATE_FORMAT(b.DATE_DUMP,'%Y%m'),DATE_FORMAT(DATE_STORAGE,'%Y%m'))*((b.PRICE1*(1-d.RESIDUAL_RATE/100))/d.EUP_MONTH),2) nav
+		from GM_ASSET_BASE b
+		join GM_ASSET_TYPE c on b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+		join GM_ASSET_CLASS d on c.ASSET_CLASS_CODE=d.ASSET_CLASS_CODE
+		join FM_ASSET_CHARACTER e on d.ASSET_CHARACTER_CODE=e.ASSET_CHARACTER_CODE
+		where b.STATUS=7
+		<if test="assetClassCode != null and assetClassCode !=''">
+	  	and d.ASSET_CLASS_CODE=#{assetClassCode}
+	  	</if>
+	  	<if test="assetTypeCode != null and assetTypeCode !=''">
+	  	and c.ASSET_TYPE_CODE=#{assetTypeCode}
+	  	</if>
+	  	<if test="fromDate != null and fromDate != ''">
+	  	and b.DATE_DUMP &gt;= #{fromDate}
+	  	</if>
+	  	<if test="toDate != null and toDate != ''">
+	  	and b.DATE_DUMP &lt;= #{toDate}
+	  	</if>
+	  	order by b.DATE_DUMP desc
+	</select>
+	
+	<select id="queryForCount" parameterType="map" resultType="int">
+	  	select count(*)
+		from GM_ASSET_RENT a
+		join GM_ASSET_BASE b on a.ASSET_CODE=b.ASSET_CODE
+		join GM_ASSET_TYPE c on b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+		join GM_ASSET_CLASS d on c.ASSET_CLASS_CODE=d.ASSET_CLASS_CODE
+		join FM_ASSET_CHARACTER e on d.ASSET_CHARACTER_CODE=e.ASSET_CHARACTER_CODE
+		where a.FLOW_STATUS=4 
+		<if test="assetClassCode != null and assetClassCode !=''">
+	  	and d.ASSET_CLASS_CODE=#{assetClassCode}
+	  	</if>
+	  	<if test="assetTypeCode != null and assetTypeCode !=''">
+	  	and c.ASSET_TYPE_CODE=#{assetTypeCode}
+	  	</if>
+	  	<if test="fromDate != null and fromDate != ''">
+	  	and (a.RETURN_DATE is null or a.RETURN_DATE &gt; #{fromDate})
+	  	</if>
+	  	<if test="toDate != null and toDate != ''">
+	  	and a.RENT_DATE &lt;= #{toDate}
+	  	</if>
+	  	
+	  	<if test="assetProno != null and assetProno != ''">
+	  	and a.LOAN_PRO_NO=#{assetProno}
+	  	</if>
+	  	<if test="loanUnitCode != null and loanUnitCode != ''">
+	  	and a.LOAN_UNIT_CODE=#{loanUnitCode}
+	  	</if>
+	  	
+	   
+	  	order by a.RENT_DATE desc
+	</select>
+	
+	
+	
+	<select id="selectAssetRentalCost" parameterType="map" resultType="map">
+	  	select a.ASSET_CODE assetCode,e.ASSET_CHARACTER_NAME assetCharacterName,c.ASSET_TYPE_NAME assetTypeName,
+		ifnull(b.BRAND,'') brand,ifnull(b.MODEL_NO,'') modelNo,c.MEASURE_UNIT measureUnit,c.ASSET_TYPE_SHORTNAME assetTypeShortName,
+		case when a.LOAN_PRO_NO is not null then a.LOAN_PRO_NAME else a.LOAN_UNIT_NAME end unitName,
+		DATE_FORMAT(a.RENT_DATE,'%Y-%m-%d') rentDate,ifnull(DATE_FORMAT(a.RETURN_DATE,'%Y-%m-%d'),'') returnDate,
+		b.PRICE1 price1,b.PRICE2 price2,ifnull(a.REMARKS,'') remarks,c.DAILY_RENT dailyRent,
+		case when RETURN_DATE is not null and RETURN_DATE&lt;#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(a.RETURN_DATE,a.RENT_DATE)+1) * c.DAILY_RENT 
+		when RETURN_DATE is not null and RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE)+1) * c.DAILY_RENT 
+		when RETURN_DATE is null and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE)+1) * c.DAILY_RENT 
+		when RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(a.RETURN_DATE,#{fromDate})+1) * c.DAILY_RENT
+		when RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate})+1) * c.DAILY_RENT
+		when RETURN_DATE is null and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate})+1) * c.DAILY_RENT end rentalCost
+		from GM_ASSET_RENT a
+		join GM_ASSET_BASE b on a.ASSET_CODE=b.ASSET_CODE
+		join GM_ASSET_TYPE c on b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+		join GM_ASSET_CLASS d on c.ASSET_CLASS_CODE=d.ASSET_CLASS_CODE
+		join FM_ASSET_CHARACTER e on d.ASSET_CHARACTER_CODE=e.ASSET_CHARACTER_CODE
+		where a.FLOW_STATUS=4 
+		<if test="assetClassCode != null and assetClassCode !=''">
+	  	and d.ASSET_CLASS_CODE=#{assetClassCode}
+	  	</if>
+	  	<if test="assetTypeCode != null and assetTypeCode !=''">
+	  	and c.ASSET_TYPE_CODE=#{assetTypeCode}
+	  	</if>
+	  	<if test="fromDate != null and fromDate != ''">
+	  	and (a.RETURN_DATE is null or a.RETURN_DATE &gt; #{fromDate})
+	  	</if>
+	  	<if test="toDate != null and toDate != ''">
+	  	and a.RENT_DATE &lt;= #{toDate}
+	  	</if>
+	  	
+	  	<if test="assetProno != null and assetProno != ''">
+	  	and a.LOAN_PRO_NO=#{assetProno}
+	  	</if>
+	  	<if test="loanUnitCode != null and loanUnitCode != ''">
+	  	and a.LOAN_UNIT_CODE=#{loanUnitCode}
+	  	</if>
+	   
+	  	order by a.RENT_DATE desc
+	  	
+	  	limit #{firstResult},#{maxResult}
+  </select>
+  
+  <select id="exportAssetRentalCost" parameterType="map" resultType="map">
+	  	select a.ASSET_CODE assetCode,e.ASSET_CHARACTER_NAME assetCharacterName,c.ASSET_TYPE_NAME assetTypeName,
+		ifnull(b.BRAND,'') brand,ifnull(b.MODEL_NO,'') modelNo,c.MEASURE_UNIT measureUnit,c.ASSET_TYPE_SHORTNAME assetTypeShortName,
+		case when a.LOAN_PRO_NO is not null then a.LOAN_PRO_NAME else a.LOAN_UNIT_NAME end unitName,
+		
+		case when a.LOAN_PRO_NO is not null then p.PRO_CODE else a.LOAN_UNIT_CODE end unitCode,
+		DATE_FORMAT(a.RENT_DATE,'%Y-%m-%d') rentDate,ifnull(DATE_FORMAT(a.RETURN_DATE,'%Y-%m-%d'),'') returnDate,
+		b.PRICE1 price1,b.PRICE2 price2,ifnull(a.REMARKS,'') remarks,c.DAILY_RENT dailyRent,
+		case when RETURN_DATE is not null and RETURN_DATE&lt;#{toDate} and a.RENT_DATE&gt;=#{fromDate} then datediff(a.RETURN_DATE,a.RENT_DATE) * c.DAILY_RENT 
+		when RETURN_DATE is not null and RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&gt;=#{fromDate} then datediff(#{toDate},a.RENT_DATE) * c.DAILY_RENT 
+		when RETURN_DATE is null and a.RENT_DATE&gt;=#{fromDate} then datediff(#{toDate},a.RENT_DATE) * c.DAILY_RENT 
+		when RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&lt;#{fromDate} then datediff(a.RETURN_DATE,#{fromDate}) * c.DAILY_RENT
+		when RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&lt;#{fromDate} then datediff(#{toDate},#{fromDate}) * c.DAILY_RENT
+		when RETURN_DATE is null and a.RENT_DATE&lt;#{fromDate} then datediff(#{toDate},#{fromDate}) * c.DAILY_RENT end rentalCost,
+		u.UNIT_NAME
+		
+		from GM_ASSET_RENT a
+		join GM_ASSET_BASE b on a.ASSET_CODE=b.ASSET_CODE
+		join GM_ASSET_TYPE c on b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+		join GM_ASSET_CLASS d on c.ASSET_CLASS_CODE=d.ASSET_CLASS_CODE
+		join FM_ASSET_CHARACTER e on d.ASSET_CHARACTER_CODE=e.ASSET_CHARACTER_CODE
+		left join pm_base p on p.PRO_NO=a.LOAN_PRO_NO
+		left join md_org_unit u on p.MANAGE_DEPT=u.UNIT_CODE
+		where a.FLOW_STATUS=4 
+		<if test="assetClassCode != null and assetClassCode !=''">
+	  	and d.ASSET_CLASS_CODE=#{assetClassCode}
+	  	</if>
+	  	<if test="assetTypeCode != null and assetTypeCode !=''">
+	  	and c.ASSET_TYPE_CODE=#{assetTypeCode}
+	  	</if>
+	  	<if test="fromDate != null and fromDate != ''">
+	  	and (a.RETURN_DATE is null or a.RETURN_DATE &gt; #{fromDate})
+	  	</if>
+	  	<if test="toDate != null and toDate != ''">
+	  	and a.RENT_DATE &lt;= #{toDate}
+	  	</if>
+	  	
+	  	<if test="assetProno != null and assetProno != ''">
+	  	and a.LOAN_PRO_NO=#{assetProno}
+	  	</if>
+	  	<if test="loanUnitCode != null and loanUnitCode != ''">
+	  	and a.LOAN_UNIT_CODE=#{loanUnitCode}
+	  	</if>
+	   
+	  	order by a.RENT_DATE desc
+	  	
+	  	
+  </select>
+  
+  <select id="selectRentDorm" parameterType="map" resultType="map">
+  	select DORM_CODE dormCode,DORM_NAME dormName,PROVINCE province,CITY city,DISTRICT district,DATE_FORMAT(S_RENT_DATE,'%Y-%m-%d') srentDate,
+	DATE_FORMAT(E_RENT_DATE,'%Y-%m-%d') erentDate,MONTHRENT monthrent,MAX_BEDS maxBeds,DAYRENT dayRent
+	from GM_BM_DORM 
+	where SYS_PROCESS_FLAG='1' and E_RENT_DATE &gt;#{fromDate} and S_RENT_DATE&lt;#{toDate}
+	<if test="areaName != null and areaName != ''">
+    	and (CITY=#{areaName} or PROVINCE=#{areaName} or DISTRICT=#{areaName})
+    </if>
+    <if test="searchName != null and searchName != ''">
+    	and (CITY like "%"#{searchName}"%" or PROVINCE like "%"#{searchName}"%" or DISTRICT like "%"#{searchName}"%") or DORM_NAME like "%"#{searchName}"%"
+    </if>
+    
+  </select>
+  
+  <select id="selectRentDormBed" parameterType="map" resultType="map">
+  	select a.DORM_CODE dormCode,a.PRO_NO proNo,a.EMPLOYEENAME employeeName,a.EMPLOYEECODE employeeCode,DATE_FORMAT(a.RENT_DATE,'%Y-%m-%d') rentDate,
+	IFNULL(DATE_FORMAT(a.RETURN_DATE,'%Y-%m-%d'),'') returnDate,c.PRO_NAME proName,
+	case when a.RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&gt;=#{fromDate} then datediff(a.RETURN_DATE,a.RENT_DATE) * b.DAYRENT 
+	when a.RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&gt;=#{fromDate} then datediff(#{toDate},a.RENT_DATE) * b.DAYRENT 
+	when a.RETURN_DATE is null and a.RENT_DATE&gt;=#{fromDate} then datediff(#{toDate},a.RENT_DATE) * b.DAYRENT 
+	when a.RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&lt;#{fromDate} then datediff(a.RETURN_DATE,#{fromDate}) * b.DAYRENT
+	when a.RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&lt;#{fromDate} then datediff(#{toDate},#{fromDate}) * b.DAYRENT
+	when a.RETURN_DATE is null and a.RENT_DATE&lt;#{fromDate} then datediff(#{toDate},#{fromDate}) * b.DAYRENT end rentalCost,b.DAYRENT dayRent
+	from GM_BM_BEDRENT a
+	join GM_BM_DORM b on a.DORM_CODE=b.DORM_CODE
+	join PM_BASE c on a.PRO_NO=c.PRO_NO
+	where a.FLOW_STATUS=4
+	<if test="bedroomProno != null and bedroomProno != ''">
+    	and a.PRO_NO=#{bedroomProno}
+    </if>
+	and (a.RETURN_DATE is null or a.RETURN_DATE&gt;#{fromDate})
+	and a.RENT_DATE&lt;#{toDate}  
+  </select>
+  
+  <select id="queryAssetDistributing" parameterType="map" resultType="map">
+  	
+  	select * from (
+  	SELECT b.city,COUNT(*) icount, '1' assetFlag FROM gm_asset_base a
+	JOIN pm_base b ON a.LOAN_PRO_NO=b.pro_no
+	JOIN GM_ASSET_TYPE c on a.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+	WHERE 1=1 and (a.STATUS=3 OR a.STATUS=4)
+	<if test="assetTypeCode != null and assetTypeCode != ''">
+	and c.ASSET_TYPE_CODE=#{assetTypeCode}
+	</if>
+	<if test="assetClassCode != null and assetClassCode != ''">
+	and c.ASSET_CLASS_CODE=#{assetClassCode}
+	</if>
+	GROUP BY b.city
+	UNION
+	SELECT '总部' city,COUNT(*) icount,'2' assetFlag FROM gm_asset_base a
+	JOIN GM_ASSET_TYPE c on a.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+	WHERE 1=1 and (STATUS=2 OR STATUS=5)
+	<if test="assetTypeCode != null and assetTypeCode != ''">
+	and c.ASSET_TYPE_CODE=#{assetTypeCode}
+	</if>
+	<if test="assetClassCode != null and assetClassCode != ''">
+	and c.ASSET_CLASS_CODE=#{assetClassCode}
+	</if>
+	UNION
+	SELECT '中心仓库' city,COUNT(*) icount,'3' assetFlag FROM gm_asset_base a
+	JOIN GM_ASSET_TYPE c on a.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+	WHERE STATUS=1
+	<if test="assetTypeCode != null and assetTypeCode != ''">
+	and c.ASSET_TYPE_CODE=#{assetTypeCode}
+	</if>
+	<if test="assetClassCode != null and assetClassCode != ''">
+	and c.ASSET_CLASS_CODE=#{assetClassCode}
+	</if>
+	) t order by icount desc
+  </select>
+  
+  <select id="selectDistributeAsset" parameterType="map" resultType="map">
+  	SELECT count(*) icount, 
+	<if test="assetFlag != null and assetFlag == 1">
+	a.LOAN_PRO_NO proNo, a.LOAN_PRO_NAME proName
+	</if>
+	<if test="assetFlag != null and assetFlag == 2">
+	a.LOAN_UNIT_CODE proNo, a.LOAN_UNIT_NAME proName
+	</if>
+	FROM gm_asset_base a 
+	JOIN GM_ASSET_TYPE b ON a.ASSET_TYPE_CODE=b.ASSET_TYPE_CODE 
+	JOIN GM_ASSET_CLASS c ON b.ASSET_CLASS_CODE=c.ASSET_CLASS_CODE
+	<if test="assetFlag != null and assetFlag == 1">
+	JOIN PM_BASE d ON a.LOAN_PRO_NO=d.PRO_NO AND d.CITY=#{areaName}
+	</if>
+	WHERE a.SYS_PROCESS_FLAG='1' 
+	<if test="assetTypeCode != null and assetTypeCode != ''">
+	and b.ASSET_TYPE_CODE=#{assetTypeCode}
+	</if>
+	<if test="assetClassCode != null and assetClassCode != ''">
+	and c.ASSET_CLASS_CODE=#{assetClassCode}
+	</if>
+	<if test="assetFlag != null and assetFlag == 1">
+	and (a.STATUS=3 OR a.STATUS=4)
+	</if>
+	<if test="assetFlag != null and assetFlag == 2">
+	and (a.STATUS=2 OR a.STATUS=5)
+	</if>
+	<if test="assetFlag != null and assetFlag == 1">
+	group by a.LOAN_PRO_NO
+	</if>
+	<if test="assetFlag != null and assetFlag == 2">
+	group by a.LOAN_UNIT_CODE
+	</if>
+
+  </select>
+  
+  <select id="selectProAssetCostForCount" parameterType="map" resultType="int">
+  	
+  	SELECT count(*) FROM (
+    SELECT f.CITY city,f.DISTRICT district,f.pro_no proNo,f.pro_name proName,f.PRO_MANAGER proManager,
+    SUM(case when RETURN_DATE is not null and RETURN_DATE&lt;#{toDate} and a.RENT_DATE&gt;=#{fromDate} then datediff(a.RETURN_DATE,a.RENT_DATE) * c.DAILY_RENT 
+	when RETURN_DATE is not null and RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&gt;=#{fromDate} then datediff(#{toDate},a.RENT_DATE) * c.DAILY_RENT 
+	when RETURN_DATE is null and a.RENT_DATE&gt;=#{fromDate} then datediff(#{toDate},a.RENT_DATE) * c.DAILY_RENT 
+	when RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&lt;#{fromDate} then datediff(a.RETURN_DATE,#{fromDate}) * c.DAILY_RENT
+	when RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&lt;#{fromDate} then datediff(#{toDate},#{fromDate}) * c.DAILY_RENT
+	when RETURN_DATE is null and a.RENT_DATE&lt;#{fromDate} then datediff(#{toDate},#{fromDate}) * c.DAILY_RENT END) proRentCost
+    FROM pm_base f
+    JOIN GM_ASSET_RENT a ON f.pro_no = a.LOAN_PRO_NO
+	JOIN GM_ASSET_BASE b ON a.ASSET_CODE=b.ASSET_CODE
+	JOIN GM_ASSET_TYPE c ON b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE  
+    WHERE a.FLOW_STATUS=4
+    <if test="assetMark != null and assetMark == 2">
+    and b.ASSET_MARK!=1
+    </if>
+    <if test="assetMark != null and assetMark == 1">
+    and b.ASSET_MARK=1
+    </if>
+    <if test="fromDate != null and fromDate != ''">
+  	and (a.RETURN_DATE is null or a.RETURN_DATE &gt; #{fromDate})
+  	</if>
+  	<if test="toDate != null and toDate != ''">
+  	and a.RENT_DATE &lt;= #{toDate}
+  	</if>
+  	<if test="areaName != null and areaName != ''">
+    and (f.CITY=#{areaName} or f.PROVINCE=#{areaName} or f.DISTRICT=#{areaName})
+    </if>
+    <if test="categoryCode != null and categoryCode != ''">
+    and f.CATEGORY_CODE=#{categoryCode}
+    </if>
+    <if test="proNo != null and proNo != ''">
+    and f.PRO_NO = #{proNo}
+    </if>
+    <if test="deptCode != null and deptCode != ''">
+    and f.MANAGE_DEPT=#{deptCode}
+    </if>
+    <if test="districtManager != null and districtManager != ''">
+	and f.DISTRICT_MANAGER=#{districtManager}
+	</if>
+	<if test="proManager != null and proManager != ''">
+	and f.EMPLOYEECODE=#{proManager}
+	</if>
+    AND c.DAILY_RENT IS NOT NULL
+    GROUP BY f.pro_no) t
+  	
+  </select>
+  
+  <select id="selectProAssetCostForPage" parameterType="map" resultType="map">
+  	
+  	SELECT * FROM (
+    SELECT f.CITY city,f.DISTRICT district,f.pro_no proNo,f.pro_name proName,f.PRO_MANAGER proManager,ifnull(d.UNIT_NAME,'') unitName,
+    SUM(case when RETURN_DATE is not null and RETURN_DATE&lt;#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(a.RETURN_DATE,a.RENT_DATE) + 1) * c.DAILY_RENT 
+	when RETURN_DATE is not null and RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE) + 1) * c.DAILY_RENT 
+	when RETURN_DATE is null and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE) + 1) * c.DAILY_RENT 
+	when RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(a.RETURN_DATE,#{fromDate}) + 1) * c.DAILY_RENT
+	when RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate}) + 1) * c.DAILY_RENT
+	when RETURN_DATE is null and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate}) + 1) * c.DAILY_RENT END) proRentCost
+    FROM pm_base f
+    JOIN GM_ASSET_RENT a ON f.pro_no = a.LOAN_PRO_NO
+	JOIN GM_ASSET_BASE b ON a.ASSET_CODE=b.ASSET_CODE
+	JOIN GM_ASSET_TYPE c ON b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE 
+    LEFT JOIN MD_ORG_UNIT d on f.MANAGE_DEPT=d.UNIT_CODE
+    WHERE a.FLOW_STATUS=4 
+    <if test="assetMark != null and assetMark == 2">
+    and b.ASSET_MARK!=1
+    </if>
+    <if test="assetMark != null and assetMark == 1">
+    and b.ASSET_MARK=1
+    </if>
+    <if test="fromDate != null and fromDate != ''">
+  	and (a.RETURN_DATE is null or a.RETURN_DATE &gt; #{fromDate})
+  	</if>
+  	<if test="toDate != null and toDate != ''">
+  	and a.RENT_DATE &lt;= #{toDate}
+  	</if>
+  	<if test="areaName != null and areaName != ''">
+    and (f.CITY=#{areaName} or f.PROVINCE=#{areaName} or f.DISTRICT=#{areaName})
+    </if>
+    <if test="categoryCode != null and categoryCode != ''">
+    and f.CATEGORY_CODE=#{categoryCode}
+    </if>
+    <if test="proNo != null and proNo != ''">
+    and f.PRO_NO = #{proNo}
+    </if>
+    <if test="deptCode != null and deptCode != ''">
+    and f.MANAGE_DEPT=#{deptCode}
+    </if>
+    <if test="districtManager != null and districtManager != ''">
+	and f.DISTRICT_MANAGER=#{districtManager}
+	</if>
+	<if test="proManager != null and proManager != ''">
+	and f.EMPLOYEECODE=#{proManager}
+	</if>
+    AND c.DAILY_RENT IS NOT NULL
+    GROUP BY f.pro_no) t
+    ORDER BY proNo
+    limit #{firstResult},#{maxResult}
+  </select>
+  
+  <select id="selectProAssetCostForList" parameterType="map" resultType="map">
+  	
+  	SELECT * FROM (
+    SELECT f.CITY city,f.DISTRICT district,f.pro_no proNo,f.pro_name proName,f.PRO_MANAGER proManager,ifnull(d.UNIT_NAME,'') unitName,
+    SUM(case when RETURN_DATE is not null and RETURN_DATE&lt;#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(a.RETURN_DATE,a.RENT_DATE) + 1) * c.DAILY_RENT 
+	when RETURN_DATE is not null and RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE) + 1) * c.DAILY_RENT 
+	when RETURN_DATE is null and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE) + 1) * c.DAILY_RENT 
+	when RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(a.RETURN_DATE,#{fromDate}) + 1) * c.DAILY_RENT
+	when RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate}) + 1) * c.DAILY_RENT
+	when RETURN_DATE is null and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate}) + 1) * c.DAILY_RENT END) proRentCost
+    FROM pm_base f
+    JOIN GM_ASSET_RENT a ON f.pro_no = a.LOAN_PRO_NO
+	JOIN GM_ASSET_BASE b ON a.ASSET_CODE=b.ASSET_CODE
+	JOIN GM_ASSET_TYPE c ON b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE 
+    LEFT JOIN MD_ORG_UNIT d on f.MANAGE_DEPT=d.UNIT_CODE
+    WHERE a.FLOW_STATUS=4 
+    <if test="assetMark != null and assetMark == 2">
+    and b.ASSET_MARK!=1
+    </if>
+    <if test="assetMark != null and assetMark == 1">
+    and b.ASSET_MARK=1
+    </if>
+    <if test="fromDate != null and fromDate != ''">
+  	and (a.RETURN_DATE is null or a.RETURN_DATE &gt; #{fromDate})
+  	</if>
+  	<if test="toDate != null and toDate != ''">
+  	and a.RENT_DATE &lt;= #{toDate}
+  	</if>
+  	<if test="areaName != null and areaName != ''">
+    and (f.CITY=#{areaName} or f.PROVINCE=#{areaName} or f.DISTRICT=#{areaName})
+    </if>
+    <if test="categoryCode != null and categoryCode != ''">
+    and f.CATEGORY_CODE=#{categoryCode}
+    </if>
+    <if test="proNo != null and proNo != ''">
+    and f.PRO_NO = #{proNo}
+    </if>
+    <if test="deptCode != null and deptCode != ''">
+    and f.MANAGE_DEPT=#{deptCode}
+    </if>
+    <if test="districtManager != null and districtManager != ''">
+	and f.DISTRICT_MANAGER=#{districtManager}
+	</if>
+	<if test="proManager != null and proManager != ''">
+	and f.EMPLOYEECODE=#{proManager}
+	</if>
+    AND c.DAILY_RENT IS NOT NULL
+    GROUP BY f.pro_no) t
+    ORDER BY proNo
+   
+  </select>
+  
+  <select id="selectProAssetList" parameterType="map" resultType="map">
+  	select *,rentalDate * dailyRent rentalCost FROM (
+  	select a.ASSET_CODE assetCode,e.ASSET_CHARACTER_NAME assetCharacterName,c.ASSET_TYPE_NAME assetTypeName,
+	ifnull(b.BRAND,'') brand,ifnull(b.MODEL_NO,'') modelNo,c.MEASURE_UNIT measureUnit,c.ASSET_TYPE_SHORTNAME assetTypeShortName,
+	case when a.LOAN_PRO_NO is not null then a.LOAN_PRO_NAME else a.LOAN_UNIT_NAME end unitName,
+	DATE_FORMAT(a.RENT_DATE,'%Y-%m-%d') rentDate,ifnull(DATE_FORMAT(a.RETURN_DATE,'%Y-%m-%d'),'') returnDate,
+	b.PRICE1 price1,b.PRICE2 price2,ifnull(a.REMARKS,'') remarks,c.DAILY_RENT dailyRent,
+	case when RETURN_DATE is not null and RETURN_DATE&lt;#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(a.RETURN_DATE,a.RENT_DATE) + 1)
+	when RETURN_DATE is not null and RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE) + 1)
+	when RETURN_DATE is null and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE) + 1) 
+	when RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(a.RETURN_DATE,#{fromDate}) + 1)
+	when RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate}) + 1)
+	when RETURN_DATE is null and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate}) + 1) END rentalDate,
+	ifnull(b.VA_NO,'') vaNo,ifnull(b.ASSET_NAME,'') assetName
+	from GM_ASSET_RENT a
+	join GM_ASSET_BASE b on a.ASSET_CODE=b.ASSET_CODE
+	join GM_ASSET_TYPE c on b.ASSET_TYPE_CODE=c.ASSET_TYPE_CODE
+	join GM_ASSET_CLASS d on c.ASSET_CLASS_CODE=d.ASSET_CLASS_CODE
+	join FM_ASSET_CHARACTER e on d.ASSET_CHARACTER_CODE=e.ASSET_CHARACTER_CODE
+	where a.FLOW_STATUS=4 and a.LOAN_PRO_NO=#{proNo}
+	<if test="assetMark != null and assetMark == 2">
+    and b.ASSET_MARK!=1
+    </if>
+    <if test="assetMark != null and assetMark == 1">
+    and b.ASSET_MARK=1
+    </if>
+  	<if test="fromDate != null and fromDate != ''">
+  	and (a.RETURN_DATE is null or a.RETURN_DATE &gt; #{fromDate})
+  	</if>
+  	<if test="toDate != null and toDate != ''">
+  	and a.RENT_DATE &lt;= #{toDate}
+  	</if>
+  	) t
+  </select>
+  
+  <select id="selectProDormCostForCount" parameterType="map" resultType="int">
+  	SELECT count(*) FROM (
+  	SELECT c.CITY city,c.DISTRICT district,c.pro_no proNo,c.pro_name proName,c.PRO_MANAGER proManager,
+  	ROUND(ifnull(case when a.RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&gt;=#{fromDate} then datediff(a.RETURN_DATE,a.RENT_DATE) * b.DAYRENT 
+	when a.RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&gt;=#{fromDate} then datediff(#{toDate},a.RENT_DATE) * b.DAYRENT 
+	when a.RETURN_DATE is null and a.RENT_DATE&gt;=#{fromDate} then datediff(#{toDate},a.RENT_DATE) * b.DAYRENT 
+	when a.RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&lt;#{fromDate} then datediff(a.RETURN_DATE,#{fromDate}) * b.DAYRENT
+	when a.RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&lt;#{fromDate} then datediff(#{toDate},#{fromDate}) * b.DAYRENT
+	when a.RETURN_DATE is null and a.RENT_DATE&lt;#{fromDate} then datediff(#{toDate},#{fromDate}) * b.DAYRENT end,0),2) rentalCost
+	FROM PM_BASE c
+	JOIN GM_BM_BEDRENT a ON c.pro_no=a.pro_no
+	JOIN GM_BM_DORM b ON a.DORM_CODE=b.DORM_CODE
+	LEFT JOIN MD_ORG_UNIT d on c.MANAGE_DEPT=d.UNIT_CODE
+	WHERE a.FLOW_STATUS=4
+	and (a.RETURN_DATE is null or a.RETURN_DATE&gt;#{fromDate})
+	and a.RENT_DATE&lt;#{toDate}
+	<if test="areaName != null and areaName != ''">
+    and (c.CITY=#{areaName} or c.PROVINCE=#{areaName} or c.DISTRICT=#{areaName})
+    </if>
+    <if test="categoryCode != null and categoryCode != ''">
+    and c.CATEGORY_CODE=#{categoryCode}
+    </if>
+    <if test="proNo != null and proNo != ''">
+    and c.PRO_NO = #{proNo}
+    </if>
+    <if test="deptCode != null and deptCode != ''">
+    and c.MANAGE_DEPT=#{deptCode}
+    </if>
+    <if test="districtManager != null and districtManager != ''">
+	and c.DISTRICT_MANAGER=#{districtManager}
+	</if>
+	<if test="proManager != null and proManager != ''">
+	and c.EMPLOYEECODE=#{proManager}
+	</if>
+	GROUP BY c.pro_no) t
+  </select>
+  
+  <select id="selectProDormCostForPage" parameterType="map" resultType="map">
+  	SELECT * FROM (
+  	SELECT c.CITY city,c.DISTRICT district,c.pro_no proNo,c.pro_name proName,c.PRO_MANAGER proManager,ifnull(d.UNIT_NAME,'') unitName,
+  	ROUND(ifnull(SUM(case when a.RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(a.RETURN_DATE,a.RENT_DATE) + 1) * b.DAYRENT 
+	when a.RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE) + 1) * b.DAYRENT 
+	when a.RETURN_DATE is null and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE) + 1) * b.DAYRENT 
+	when a.RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(a.RETURN_DATE,#{fromDate}) + 1) * b.DAYRENT
+	when a.RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate}) + 1) * b.DAYRENT
+	when a.RETURN_DATE is null and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate}) + 1) * b.DAYRENT end),0),2) rentalCost
+	FROM PM_BASE c
+	JOIN GM_BM_BEDRENT a ON c.pro_no=a.pro_no
+	JOIN GM_BM_DORM b ON a.DORM_CODE=b.DORM_CODE
+	LEFT JOIN MD_ORG_UNIT d on c.MANAGE_DEPT=d.UNIT_CODE
+	WHERE a.FLOW_STATUS=4
+	and (a.RETURN_DATE is null or a.RETURN_DATE&gt;#{fromDate})
+	and a.RENT_DATE&lt;#{toDate}
+	<if test="areaName != null and areaName != ''">
+    and (c.CITY=#{areaName} or c.PROVINCE=#{areaName} or c.DISTRICT=#{areaName})
+    </if>
+    <if test="categoryCode != null and categoryCode != ''">
+    and c.CATEGORY_CODE=#{categoryCode}
+    </if>
+    <if test="proNo != null and proNo != ''">
+    and c.PRO_NO = #{proNo}
+    </if>
+    <if test="deptCode != null and deptCode != ''">
+    and c.MANAGE_DEPT=#{deptCode}
+    </if>
+    <if test="districtManager != null and districtManager != ''">
+	and c.DISTRICT_MANAGER=#{districtManager}
+	</if>
+	<if test="proManager != null and proManager != ''">
+	and c.EMPLOYEECODE=#{proManager}
+	</if>
+	GROUP BY c.pro_no) t
+	ORDER BY proNo
+	limit #{firstResult},#{maxResult}
+  </select>
+  
+  <select id="selectProDormList" parameterType="map" resultType="map">
+  	SELECT b.DORM_CODE dormCode,b.DORM_NAME dormName,COUNT(*) icount,b.DAYRENT dayRent,
+  	ROUND(ifnull(SUM(case when a.RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(a.RETURN_DATE,a.RENT_DATE) + 1) * b.DAYRENT 
+	when a.RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE) + 1) * b.DAYRENT 
+	when a.RETURN_DATE is null and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE) + 1) * b.DAYRENT 
+	when a.RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(a.RETURN_DATE,#{fromDate}) + 1) * b.DAYRENT
+	when a.RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate}) + 1) * b.DAYRENT
+	when a.RETURN_DATE is null and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate}) + 1) * b.DAYRENT end),0),2) rentalCost
+	FROM GM_BM_DORM b
+	JOIN GM_BM_BEDRENT a ON a.DORM_CODE=b.DORM_CODE
+	WHERE a.FLOW_STATUS=4 and a.pro_no=#{proNo}
+	and (a.RETURN_DATE is null or a.RETURN_DATE&gt;#{fromDate})
+	and a.RENT_DATE&lt;#{toDate}
+  </select>
+  
+  <select id="selectProDormCostForList" parameterType="map" resultType="map">
+  	SELECT (@rowNO := @rowNo+1) AS rowno,city,district,proNo,proName,proManager,unitName,rentalCost FROM (
+  	SELECT c.CITY city,c.DISTRICT district,c.pro_no proNo,c.pro_name proName,c.PRO_MANAGER proManager,ifnull(d.UNIT_NAME,'') unitName,
+  	ROUND(ifnull(SUM(case when a.RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(a.RETURN_DATE,a.RENT_DATE) + 1) * b.DAYRENT 
+	when a.RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE) + 1) * b.DAYRENT 
+	when a.RETURN_DATE is null and a.RENT_DATE&gt;=#{fromDate} then (datediff(#{toDate},a.RENT_DATE) + 1) * b.DAYRENT 
+	when a.RETURN_DATE is not null and a.RETURN_DATE&lt;#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(a.RETURN_DATE,#{fromDate}) + 1) * b.DAYRENT
+	when a.RETURN_DATE is not null and a.RETURN_DATE&gt;=#{toDate} and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate}) + 1) * b.DAYRENT
+	when a.RETURN_DATE is null and a.RENT_DATE&lt;#{fromDate} then (datediff(#{toDate},#{fromDate}) + 1) * b.DAYRENT end),0),2) rentalCost
+	FROM PM_BASE c
+	JOIN GM_BM_BEDRENT a ON c.pro_no=a.pro_no
+	JOIN GM_BM_DORM b ON a.DORM_CODE=b.DORM_CODE
+	LEFT JOIN MD_ORG_UNIT d on c.MANAGE_DEPT=d.UNIT_CODE
+	WHERE a.FLOW_STATUS=4
+	and (a.RETURN_DATE is null or a.RETURN_DATE&gt;#{fromDate})
+	and a.RENT_DATE&lt;#{toDate}
+	<if test="areaName != null and areaName != ''">
+    and (c.CITY=#{areaName} or c.PROVINCE=#{areaName} or c.DISTRICT=#{areaName})
+    </if>
+    <if test="categoryCode != null and categoryCode != ''">
+    and c.CATEGORY_CODE=#{categoryCode}
+    </if>
+    <if test="proNo != null and proNo != ''">
+    and c.PRO_NO = #{proNo}
+    </if>
+    <if test="deptCode != null and deptCode != ''">
+    and c.MANAGE_DEPT=#{deptCode}
+    </if>
+    <if test="districtManager != null and districtManager != ''">
+	and c.DISTRICT_MANAGER=#{districtManager}
+	</if>
+	<if test="proManager != null and proManager != ''">
+	and c.EMPLOYEECODE=#{proManager}
+	</if>
+	GROUP BY c.pro_no) t,(SELECT @rowNO :=0) l
+	ORDER BY proNo
+  </select>
+	
+</mapper>

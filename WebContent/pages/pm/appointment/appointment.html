@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 人员调动</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+*{font-family: '微软雅黑'}
+	.all{width:100%;height:100%;}
+	.title{width:100%;color:red;font-size:32px;text-align: center;height:60px;padding-top:10px;}
+	.title1{width:100%;font-size:22px;text-align: center;height:30px;padding-top:20px;font-weight: 700}
+	.fileNo{width:100%;color:red;font-size:16px;text-align: center;height:50px;padding-top:10px;}
+	.content1{height:30px;padding-top:10px;width:80%;margin: 0 auto;text-indent: 2em;line-height: 33px;font-size:16px}
+	.content2{height:30px;padding-top:20px;width:80%;margin: 0 auto;text-indent: 2em;line-height: 25px;font-size:16px}
+	.content3{height:100px;padding-top:10px;width:80%;margin: 0 auto;line-height: 33px;font-size:16px}
+	.content4{height:20px;padding-top:10px;width:80%;margin: 0 auto;text-align: right;font-size:16px}
+	.content5{height:20px;padding-top:10px;width:80%;margin: 0 auto;border-bottom:1px #333 solid;font-size:16px}
+	.companyImg{position: absolute; width:151px;height:113px;margin-left:-150px;margin-top:-30px;font-size:16px}
+	.content6{height:30px;padding-top:20px;width:70%;margin: 0 auto;text-align: right;}
+	.content6 input{border:0px; background:#0078D7;color:#fff;font-family: '微软雅黑';cursor: pointer;width:60px;padding:5px;border-radius:8px;}
+</style>
+
+</head>
+
+<body ng-app="projectType" ng-controller="userMgrCtrl">
+<form id="form">
+<div class="all">
+	<div class="title">江苏量为石科技股份有限公司文件</div>
+	<div class="fileNo">{{fileNo}}</div>
+	<hr style="height:3px;border:none;border-top:3px solid red;width:92%;margin:0 auto" />
+	<div class="title1">关于{{dataObj.employeename}}职务任命的通知</div>
+	<div class="content1">
+		根据公司的发展需要，经公司各方面的考核决定，现任命  
+	</div>
+	<div class="content2">
+		{{dataObj.employeename}}为江苏量为石科技股份有限公司{{dataObj.proName}}项目项目负责人,岗级为D1级。
+	</div>
+	<div class="content2" style="margin-top:10px;">
+		该决定自{{vdate}}开始生效，任期至项目结束。
+	</div>
+	<div class="content4" style="margin-top:100px;">
+		江苏量为石科技股份有限公司<img src="../../../img/company1.png" class="companyImg" />
+	</div>
+	<div class="content4">
+		<span style="font: right;margin-right:50px;">人力资源部</span>
+	</div>
+	
+<div class="content5">
+		主题词：    工作  调整   通知  <span style="float:right">{{mvda}}</span>
+	</div>
+	<div class="content5">
+		发：公司各部门、各项目
+	</div>
+	
+	<div class="content6">
+		<input type="button" value=" 打 印 " id="btnprint" onclick="MakeWord()" />
+	</div>
+</div>
+</form>
+
+<script type="text/javascript">
+
+function MakeWord()
+ {
+	$("#btnprint").hide();
+  window.print();
+  $("#btnprint").show();
+ }
+
+	var ngScope;
+	var app = angular.module("projectType", []);
+	app.controller("userMgrCtrl", function($scope, $http){
+		/* init */
+		ngScope = $scope;
+		
+		$scope.dataObj={}; 
+		$scope.mvda={};
+		$scope.vdate={};
+		$scope.fileNo={};
+		var mydate = new Date();
+		$(".currentYear").html(mydate.getFullYear());
+		
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		$scope.userData = jQuery.parseJSON(userDataStr);
+		var ticket = $.cookie("pmsWeb_ticket");
+		
+		var params = getUrlParams();
+		$scope.required = params.required;
+		
+		
+		
+		$scope.fileNo=params.fileNo;
+		
+		$scope.dataObj=params;
+		var movedate=$scope.dataObj.movedate;
+		var md= new Date(movedate) ;
+		$scope.mvda=md.getFullYear()+"年"+(md.getMonth()+1)+"月"+md.getDate()+"日";
+		
+		var validdate=$scope.dataObj.validDate;
+		var md1= new Date(validdate) ;
+		$scope.vdate=md1.getFullYear()+"年"+(md1.getMonth()+1)+"月"+md1.getDate()+"日";
+		
+		
+		var moveType=params.moveType;
+		
+		if(moveType==1){
+			$scope.pname1="项目";
+			$scope.pname2="项目";
+		}else if(moveType==2){
+			$scope.pname1="项目";
+			$scope.pname2="";
+		}else if(moveType==3){
+			$scope.pname1="";
+			$scope.pname2="项目";
+		}else{
+			$scope.pname1="";
+			$scope.pname2="";
+		}
+	
+		
+	});
+	</script>
+</body>
+</html>
+

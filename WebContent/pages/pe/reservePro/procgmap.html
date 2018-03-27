@@ -1,0 +1,227 @@
+<!DOCTYPE HTML>
+<html ng-app="hisPosition">
+<head>
+<title> 轨迹回放之地图视图 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script src="../../../js/jquery.js"></script>
+<script src="../../../js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=PL4wfqVofjrMVz7FMaPs8Dts"></script>
+
+
+<script type="text/javascript" src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+
+<link rel="stylesheet" href="../../../css/jquery-ui.min.css">
+
+<style type="text/css">
+	ul,li{list-style:none;padding:0;margin:0}
+	body{
+		margin:0px;
+		padding:0px;
+		font-size:12px;
+		font-family:"微软雅黑";
+	}
+	a{color:#4D4D4D;text-decoration: none;}
+
+	.list{position: absolute;left:13px;right:13px;top:13px;bottom:10px;border:solid 0px;}
+	.list .list_left{position: absolute;left:10px;top:0px;bottom:0px;width:390px;}
+	.list .list_left .left_title{font-size:18px;width:100%;height:40px;background:#297BE6;line-height:40px;color:#fff;text-indent:20px}
+	.list .list_left .left_title > input{width:200px;height:38px;border:solid 0px;margin-left:20px;margin-top:20px;float:left;color:#1A1A1A;padding-left:4px;font-family:"微软雅黑";}
+	.list .list_left .left_title .search_div{width:60px;height:40px;background:#1A4F93;color:#fff;line-height:40px;text-align:center;float:left;margin-left:10px;margin-top:20px;font-size:14px;font-weight: bold;}
+	.list .list_left .left_content{position: absolute;left:0px;right:0px;top:50px;bottom:0px;border-bottom:solid 1px #B2D1FF;}
+	.list .list_left .left_content .content_table{width:100%;top:0px;bottom:45px;}
+	.list .map_div{position: absolute;left:410px;top:0px;bottom:0px;right:0px;border:solid 1px #cccccc;}
+
+	.table,.table td,.table th{border:1px solid #EDEDED;border-collapse:collapse;}
+	.tr1{height:40px;background:#D9E9FF;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;font-weight:normal;}
+	.tr2{height:40px;background:#fff;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.tr2:hover{background:#F5F5F5;}
+	.tr3{height:40px;background:#FFCE7F;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.tr3:hover{background:#F5F5F5;}
+	.tr4{height:40px;background:#EFD397;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.operationImg{cursor: pointer;}
+
+	.paging_div{bottom:10px;width:390px;height:22px;;margin:0 auto;border:solid 0px;color:#4D4D4D;text-align:center;margin-top:10px;}
+	.dropDownList{background-image:url(../../../img/drop_down_list.png);background-repeat: no-repeat;background-position:right;cursor:pointer;}
+	.dateComponent{height:30px;background-image:url(../../../img/icon-calendar.png);background-repeat: no-repeat;background-position:right;cursor:pointer;border:solid 1px #ccc;}
+
+	#page_bar .page_btn_prev{display:inline-black;border:solid 1px #3385FF;background:#3385FF;color:#fff;margin:0 4px;padding:2px 5px 2px 5px;}
+	#page_bar .page_btn_next{display:inline-black;border:solid 1px #3385FF;background:#3385FF;color:#fff;margin:0 4px;padding:2px 5px 2px 5px;}
+	#page_bar .page_btn{display:inline-black;border:solid 1px #3385FF;margin:0 4px;padding:2px 5px 2px 5px;}
+	#page_bar .selected{font-weight:bold;border:solid 1px #666;background:#666;color:#fff;}
+
+
+
+.userinfo{width:300px;}
+.userinfo .title{background:#fff;border:solid 1px #ccc;border-left:solid 3px #3385FF;vertical-align:middle;}
+.userinfo .title label{display:inline-block;width:250px;line-height:30px;margin-left:10px;color:#3385FF;font-family:微软雅黑;}
+.userinfo .title a{display:inline-block;}
+.userinfo .title img{vertical-align:middle;}
+.userinfo .table{background:rgba(256,256,256,0.9);border:solid 0px #ccc;margin-top:-1px;}
+.userinfo .table table{border-collapse:collapse;border:solid 1px #ccc;width:100%;}
+.userinfo .table table td{border:solid 1px #ccc;text-align:center;padding:10px;}
+.userinfo .table table td span{display:block;color:#3385FF;font-size:14px;font-weight:bold;font-family:微软雅黑;}
+.userinfo .table table td span font.unit{color:#888;font-size:10px;font-weight:normal;font-family:微软雅黑;}
+.userinfo .table table td label{display:block;color:#888;font-family:微软雅黑;}
+
+.message{width:100%;height:50px;z-index:999;background:rgba(256,256,256,0.9);border-top:solid 1px #297BE6;position: absolute;top:0px;border-bottom:solid 1px #ccc;padding-bottom:3px;left:410px;right:20px;}
+.time{height:100%;width:160px;text-align: center;border-right:1px #eee solid;position: absolute;left:0px;}
+.time input{font-family: '微软雅黑';margin-top:5px;}
+.employeename{height:100%;width:80px;font-family: '微软雅黑';float:left;text-align: center;border-right:1px #eee solid;position: absolute;left:160px;}
+.content1{height:100%;width:400px;text-align: center;border-right:1px #eee solid;float:left;position: absolute;left:240px;}
+.slider{height:100%;width:230px;text-align: center;border-right:1px #eee solid;float:left;text-align: center;position: absolute;left:640px;}
+.hot{text-align: center;width:150px;position: absolute;left:870px;}
+</style>
+</head>
+
+<body ng-controller="hisPositionCtrl">
+	
+	<div class="list">
+		<div class="list_left">
+			<div class="left_title">
+				项目列表	
+			</div>
+			<div class="left_content">
+					<ul>
+						<li>
+							<div class="left_contentitle">富阳<span>详情</span></div>
+							<div class="detils">
+								<div>
+									<span>表箱数:530</span>
+									<span>户数:530</span>
+								</div>
+								<div>
+									<span>已审核:130</span>
+									<span>已审核户数:130</span>
+								</div>
+								<div>
+									<span>未审核:130<span>
+									<span>未审核户数:130<span>
+								</div>
+								<div>
+									<span>驳回:30</span>
+									<span>驳回户数:30</span>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div class="left_contentitle">富阳<span>详情</span></div>
+							<div class="detils">
+								<div>
+									<span>表箱数:530</span>
+									<span>户数:530</span>
+								</div>
+								<div>
+									<span>已审核:130</span>
+									<span>已审核户数:130</span>
+								</div>
+								<div>
+									<span>未审核:130</span>
+									<span>未审核户数:130</span>
+								</div>
+								<div>
+									<span>驳回:30</span>
+									<span>驳回户数:30</span>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div class="left_contentitle">富阳<span>详情</span></div>
+							<div class="detils">
+								<div>
+									<span>表箱数:530</span>
+									<span>户数:530</span>
+								</div>
+								<div>
+									<span>已审核:130</span>
+									<span>已审核户数:130</span>
+								</div>
+								<div>
+									<span>未审核:130</span>
+									<span>未审核户数:130</span>
+								</div>
+								<div>
+									<span>驳回:30</span>
+									<span>驳回户数:30</span>
+								</div>
+							</div>
+						</li>
+					</ul>	
+					<div class="detils_hz">
+						<span>表箱总数:530</span>
+						<span>已审核:130</span>
+						<span>未审核:130</span><br/><br/>
+						<span>驳回:30</span>
+						<span>户数:530</span>
+						<span>已审核户数:130</span><br/><br/>
+						<span>未审核户数:130</span>
+						<span>驳回户数:30</span>
+					</div>
+				</div>
+		</div>
+		<style>
+			.left_content .left_contentitle{font-size:18px;}
+			.left_content .left_contentitle span{float:right;font-size:14px;color:#297be6;}
+			.left_content ul{width:90%;margin:0 auto 20px;}
+			.left_content ul li{border-bottom:1px solid #ccc;}
+			.left_content ul .detils{overflow:hidden}
+			.left_content ul .detils div{float:left;margin:0 10px 10px 0;color:#666}
+			.left_content ul .detils div span{display:block;margin-top:10px;}
+			.left_content .detils_hz{padding:30px 0;background:#ccc;width:90%;margin:0 auto;text-align:center}
+			.left_content .detils_hz span{border-right:1px solid #666;padding:0 5px;margin-top:5px;}
+			.map_head{width:98%;margin:0 auto}
+			.map_head *{line-height:50px;}
+			.map_head input{width:20%;height:30px;line-height:30px;border-radius:3px;}
+			.map_head .csx{cursor:pointer;margin-left:10px;border-radius:3px;vertical-align: middle;display: inline-block;width: 30px;height: 35px;background: #fff;border:1px solid #ccc }
+			.map_head .csx img{margin-left:5px;}
+			.map_head .map_search{margin-left:10px;cursor:pointer;height:35px;line-height:35px;border-radius:3px;display: inline-block;background:#297be6;width:60px;color:#fff;text-align:center}
+			.map_head .map_search:hover{background:#579af3}
+			.map_head span.states{margin:0 20px 0;font-weight:bold}
+			.map_head span.mo1{color:#6ed522}
+			.map_head span.mo2{color:#ff6200}
+			.map_head span.mo3{color:#145dc4}
+			.map_head span.mo4{color:#b3b3b1}
+			.map_head .return{margin-left:10px;cursor:pointer;border:1px solid #82b4e7;color:#82b4e7;height:35px;line-height:35px;border-radius:20px;display: inline-block;width:80px;text-align:center}
+			.map_head .return:hover{background:#f2f3f3}
+		</style>
+		<div class="message">
+			<div class="map_head">
+				<input type="text" placeholder="请输入搜索关键字"/>
+				<span class="csx"><img src="../../../img/filter.png"></span>
+				<a class="map_search">搜索</a>
+				<span class="states mo1">已审核</span>
+				<span class="states mo2">未审核</span>
+				<span class="states mo3">未在储备方案</span>
+				<span class="states mo4">驳回</span>
+				<a class="return">返回</a>
+			</div>
+		</div>
+		<div class="map_div" id="allmap" >
+				
+		</div>
+	</div>
+ <script type="text/javascript">
+	var map = new BMap.Map("allmap");    
+	$(document).ready(function(){
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		userData = jQuery.parseJSON(userDataStr);
+		ticket = $.cookie("pmsWeb_ticket");
+		map.centerAndZoom(new BMap.Point(userData.x, userData.y), 11);  // 初始化地图,设置中心点坐标和地图级别
+	});
+
+</script>
+</body>
+</html>

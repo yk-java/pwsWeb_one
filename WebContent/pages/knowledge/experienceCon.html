@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html ng-app="orgMgr">
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		
+		<link rel="stylesheet" type="text/css" href="../../bootstrap-3.3.5-dist/css/bootstrap.min.css"/>
+		
+		<link rel="stylesheet" href="../../css/zTreeStyle/zTreeStyle.css" type="text/css">
+		<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+		<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+		<script type="text/javascript" src="../../js/jquery.ztree.core-3.5.js"></script>
+		<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+		<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+		<script type="text/javascript" src="../../js/PageBar.js"></script>
+		<script type="text/javascript" src="../../js/config.js"></script>
+		<script type="text/javascript" src="../../js/util.js"></script>
+		<script type="text/javascript" src="../../js/ng-base.js"></script>
+		
+		<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+		
+		<link rel="stylesheet" type="text/css" href="../../css/list.css"/>
+		<link rel="stylesheet" type="text/css" href="../../css/knowledge/knowledge.css"/>
+		<style>
+			.ask_warp{width:90%;margin:30px auto}
+			.ask_warp .ask_title{font-size:24px;color:#7b7a79}
+			.ask_warp .knowcon_word{margin:0 0 20px 0;color:#7c7c7c}
+			.ask_warp .message{color:#81a0cf}
+			.fengeLine{width:95%;margin:0 auto 10px;background:#e5e5e5;height:7px}
+			.return{width:80px;height:30px;line-height:30px;border-radius:5px;text-align:center;color:#7c7c7c;background:#e5e5e5;cursor:pointer}
+			.anwser_warp{width:90%;margin:10px auto}
+			.anwser_warp .anwser_header{height:60px; background:#f3f3f3}
+			.anwser_warp .anwser_header img{margin:10px 0 0 10px;}
+			
+			
+		</style>
+	</head>
+	<body ng-controller="orgMgr">
+		<div class="ask_warp">
+			<p class="ask_title">{{kmbaseData.QUESTION_TITLE}} <span class="fr return">返回</span></p>
+			<div id="btext1" class="knowcon_word"></div>
+			<div class="message">
+				发布人：{{kmbaseData.COLLATOR}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				问题责任人：{{kmbaseData.employeename}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				问题分类：{{kmbaseData.TYPE_NAME}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				发布日期：{{kmbaseData.SYS_CREATE_TIME}}
+			</div>
+		</div>
+		<div class="fengeLine"></div>
+		
+		<div class="anwser_warp">
+			<div class="anwser_header">
+				<img src="../../img/touxiang.png" class="fl"/>
+				<div class="fl" style="line-height:60px;margin-left:10px;">
+					{{kmbaseData.employeename}}
+				</div>
+				<div class="fr" style="line-height:60px;margin-right:50px">
+					回复时间：{{kmbaseData.SOVLE_DATE}}
+				</div>
+			</div>
+			<div id="btext2" class="knowcon_word" style="margin:20px auto 0;width:98%"></div>
+			
+			<div style="margin:20px 0" ng-if="kmbaseData.CHECKOPTION && kmbaseData.CHECKOPTION!=''">
+				<div style="line-height:30px">审核意见：</div>
+				<p style="width:100%;height:80px;text-indent:20px">{{kmbaseData.CHECKOPTION}}</p>
+			</div>
+			
+		</div>
+	</body>
+	<script>
+		var app = simpleController({
+			moduleName:"orgMgr",
+			controllerName:"orgMgr",
+			init:function($scope, $http){
+				
+				$scope.kmbaseData={};
+				
+				var params = getUrlParams();
+				console.log(params);
+				$scope.httpGet({
+					url:"eap/pmsServices/km/question/getQuestionByCode",
+					data:{"questionCode":params.questionCode},
+					success:function(res){
+						$scope.kmbaseData=res.data;
+					 	$("#btext1").append($scope.kmbaseData.QUESTION_CONTENT);
+					 	$("#btext2").append($scope.kmbaseData.ANSWER);
+					}
+				});
+				
+				$(".return").click(function(){
+					hrefTo({
+						url:"experienceMgr.html",
+						data:{
+							_currentPage:params._currentPage
+						}
+					});
+				});
+				
+			}
+		});
+	
+	</script>
+</html>

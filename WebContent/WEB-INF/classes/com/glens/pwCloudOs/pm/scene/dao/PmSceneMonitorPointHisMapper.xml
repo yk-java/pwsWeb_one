@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.pm.scene.dao.PmSceneMonitorPointHisMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.pm.scene.vo.PmSceneMonitorPointHis" >
+  
+    <id column="ROWID" property="rowid" jdbcType="BIGINT" />
+    <result column="MONITOR_POINT_CODE" property="monitorPointCode" jdbcType="VARCHAR" />
+    <result column="MONITOR_VALUE" property="monitorValue" jdbcType="VARCHAR" />
+    <result column="SUBMIT_TIME" property="submitTime" jdbcType="TIMESTAMP" />
+    
+  </resultMap>
+  
+  <select id="queryForList" resultType="map" parameterType="map" >
+	select 
+    	t1.ROWID, t1.MONITOR_POINT_CODE, t1.MONITOR_VALUE, t1.SUBMIT_TIME
+    from pm_scene_monitor_point_his t1
+    where 1=1
+    <if test="monitorPointCode != null and monitorPointCode != ''">
+    and t1.MONITOR_POINT_CODE = #{monitorPointCode,jdbcType=VARCHAR}
+    </if>
+    <if test="startTime != null and startTime != ''">
+    and t1.SUBMIT_TIME &gt;= #{startTime, jdbcType=TIMESTAMP}
+    </if>
+    <if test="endTime != null and endTime != ''">
+    and t1.SUBMIT_TIME &lt;= #{endTime, jdbcType=TIMESTAMP}
+    </if>
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from pm_scene_monitor_point_his
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </delete>
+  
+  <insert id="insert" parameterType="com.glens.pwCloudOs.pm.scene.vo.PmSceneMonitorPointHis" >
+    insert into pm_scene_monitor_point_his (MONITOR_POINT_CODE, MONITOR_VALUE, 
+    	SUBMIT_TIME)
+    values (#{monitorPointCode,jdbcType=VARCHAR}, #{monitorValue,jdbcType=VARCHAR}, 
+      now())
+  </insert>
+  
+</mapper>

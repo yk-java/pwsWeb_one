@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.questionnire.dao.QaOptionMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.questionnire.vo.QaOption" >
+    <id column="ROWID" property="rowid" jdbcType="BIGINT" />
+    <result column="OPTION_CODE" property="optionCode" jdbcType="VARCHAR" />
+    <result column="QUESTIONNIRE_CODE" property="questionnireCode" jdbcType="VARCHAR" />
+    <result column="QUESTION_CODE" property="questionCode" jdbcType="VARCHAR" />
+    <result column="OPTION_LABEL" property="optionLabel" jdbcType="VARCHAR" />
+    <result column="NUM" property="num" jdbcType="VARCHAR" />
+    <result column="IS_SUPPLEMENT" property="isSupplement" jdbcType="INTEGER" />
+    <result column="OPTION_SCORE" property="optionScore" jdbcType="REAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ROWID, OPTION_CODE, QUESTIONNIRE_CODE, QUESTION_CODE, OPTION_LABEL, NUM, IS_SUPPLEMENT, 
+    OPTION_SCORE
+  </sql>
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from qa_option
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </select>
+  <select id="findByCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from qa_option
+    where OPTION_CODE = #{optionCode,jdbcType=VARCHAR}
+  </select>
+  <select id="findByQuestionnireCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from qa_option
+    where QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+  </select>
+  <delete id="delete" parameterType="java.lang.String" >
+    delete from qa_option
+    where OPTION_CODE = #{optionCode,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByQuestionnireCode" parameterType="java.lang.String" >
+    delete from qa_option
+    where QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.glens.pwCloudOs.questionnire.vo.QaOption" >
+    insert into qa_option (OPTION_CODE, QUESTIONNIRE_CODE, 
+      QUESTION_CODE, OPTION_LABEL, NUM, 
+      IS_SUPPLEMENT, OPTION_SCORE)
+    values (#{optionCode,jdbcType=VARCHAR}, #{questionnireCode,jdbcType=VARCHAR}, 
+      #{questionCode,jdbcType=VARCHAR}, #{optionLabel,jdbcType=VARCHAR}, #{num,jdbcType=VARCHAR}, 
+      #{isSupplement,jdbcType=INTEGER}, #{optionScore,jdbcType=REAL})
+  </insert>
+  <insert id="batchInsert" parameterType="list" >
+    insert into qa_option (OPTION_CODE, QUESTIONNIRE_CODE, 
+      QUESTION_CODE, OPTION_LABEL, NUM, 
+      IS_SUPPLEMENT, OPTION_SCORE)
+    values 
+    <foreach collection="list" item="item" separator=",">
+    (#{item.optionCode,jdbcType=VARCHAR}, #{item.questionnireCode,jdbcType=VARCHAR}, 
+      #{item.questionCode,jdbcType=VARCHAR}, #{item.optionLabel,jdbcType=VARCHAR}, #{item.num,jdbcType=VARCHAR}, 
+      #{item.isSupplement,jdbcType=INTEGER}, #{item.optionScore,jdbcType=REAL})
+    </foreach>
+  </insert>
+</mapper>

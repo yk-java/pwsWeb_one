@@ -1,0 +1,298 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 人员管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css"/>
+
+<link rel="stylesheet" href="ckeditor/samples/css/samples.css">
+<link rel="stylesheet" href="ckeditor/samples/toolbarconfigurator/lib/codemirror/neo.css">
+<script type="text/javascript" src="../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+
+<script type="text/javascript" src="../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/edit.css"/>
+
+<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+<script type="text/javascript" src="../../js/jquery.form.js"></script>
+
+
+	<link rel="stylesheet" href="../../js/kindedit/plugins/code/prettify.css" />
+	<script charset="utf-8" src="../../js/kindedit/kindeditor.js"></script>
+	<script charset="utf-8" src="../../js/kindedit/zh_CN.js"></script>
+	<script charset="utf-8" src="../../js/kindedit/plugins/code/prettify.js"></script>
+
+<style type="text/css">
+	.chooseUser{width:1000px;height:530px;}
+	.sgreen{background:#EDF4FF;border:dashed 1px #72BBFF;}
+	.sred{background:#FFFF99;border:dashed 1px #FF9900;}
+	
+	.cke_contents{height:500px !important}
+	
+	.dialogs-keywords{width:480px;height:350px;}
+	.title_save_continus{margin:5px 0 0 32px;float:left;padding: 4px 10px;background: #e86b00;color: #fff;border-radius: 17px;cursor: pointer;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">新建词条</label>
+			</div>
+			<img src="../../img/list_Header2-.png">
+		</div>
+		<div class="tabs">
+			<a class="tab selected">词条属性</a>
+		</div>
+		<form id="saveForm" class="required-validate" >
+		<div class="form_div" id="lay1">
+			<table>
+				<tr>
+					<th>词条名称</th>
+					<td width="300">
+						<input type="text" name="fileTitle" class="required" maxlength="16"/></td>
+					<th>知识目录</th>
+					<td width="300">
+						<input type="text" name="catalogName" id="catalogName" class="required dropDownList"/>
+						<input type="hidden" name="catalogCode"/>
+					</td>
+					<th>词条关键字</th>
+					<td width="300" style="position:relative">
+						<input type="text" name="keywords" readonly="readonly"/>
+						<a href="#" ng-click="add()" style="float: right;margin: 1px 60px 0 10px;">
+							<img src="../../img/addKey.png">
+						</a>
+						<span style="position:absolute;right: -47px;top: 7px;color: #ffb692;">关键字以逗号相隔</span>
+					</td>
+				</tr>
+				<tr>
+					<th>内容</th>
+					<td colspan="5">
+						<textarea id="content" name="content" cols="120" rows="8" style="width:1000px;height:300px;visibility:hidden;margin-left:50px;"></textarea>	
+						<input name="employeeCode" type="hidden" />
+						<input name="employeeName" type="hidden" />
+						<input name="btext" type="hidden" />
+						<input name="btextContent" type="hidden" />
+						<input name="companyCode" type="hidden" />
+					</td>
+				</tr>
+				<tr>
+					<th>适用范围</th>
+					<td colspan="5">
+						<textarea placeholder="请输入适用范围" name="publishRange" style="width:1000px;height:80px"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<th>搜索页预览</th>
+					<td colspan="5">
+						<textarea placeholder="请输入搜索页预览" name="remarks" style="width:1000px;height:80px"></textarea>
+					</td>
+				</tr>
+				
+			</table>
+			
+		</div>
+		
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave(0)" class="title_save" style="margin-left:65px;">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+			<a href="javascript:" ng-click="onSave(1)" class="title_save_continus">
+				保存并继续
+			</a>
+		</div>
+		 
+		   
+		   
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+var editor1;
+KindEditor.ready(function(K){
+    editor1 = K.create("textarea[id='content']",{
+        resizeType : 1,
+        allowPreviewEmoticons: false,
+        allowImageUpload:true,//允许上传图片
+        allowFileManager:true, //允许对上传图片进行管理
+        uploadJson:'../../js/kindedit/upload_json.jsp', //上传图片的java代码，只不过放在jsp中
+        fileManagerJson:'../../js/kindedit/file_manager_json.jsp',
+        afterUpload: function(){this.sync();}, //图片上传后，将上传内容同步到textarea中
+        afterBlur: function(){this.sync();},   ////失去焦点时，将上传内容同步到textarea中
+        items : [
+            'fontname','fontsize', '|','forecolor', 'hilitecolor','bold', 'italic','underline',
+            'removeformat','|', 'justifyleft','justifycenter', 'justifyright','insertorderedlist',
+            'insertunorderedlist','|', 'emoticons','link','media','|','image']   
+    });
+});    
+
+
+
+function validateValue$(){
+	if($.formValidator.pageIsValid()){
+		return true;
+	}
+	return false;
+	
+}
+
+
+
+
+
+
+
+var validator;
+var ngScope;
+var userData;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	
+	
+	$("input[name=employeeName]").val(userData.employeeName);
+	$("input[name=employeeCode]").val(userData.employeeCode);
+	$("input[name=companyCode]").val(userData.companyCode);
+	
+	ticket = $.cookie("pmsWeb_ticket");
+
+	
+	$scope.add=function(){
+		
+		   new ShowDlog().showFrame("keywords.html?keywords="+$("input[name=keywords]").val(),"添加关键词",
+				function(data){
+					if(data){
+						 console.log(data)
+						$("input[name=keywords]").val(data);
+					}
+				},
+				"dialogs-keywords"
+			);
+
+		
+	};
+	
+	
+	
+	/* 文档分类 */
+		new DropDownList().init({
+			renderTo:"#catalogName",
+			url:"../component/koneorgTree.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=catalogName]").val(result.name);
+				$("input[name=catalogCode]").val(result.id);
+				$("input[name=catalogName]").focus();
+			}
+		});
+
+		/* 表单验证 */
+		validator = $("#saveForm").validate({
+			onsubmit: false,
+			focusInvalid: false,
+			focusCleanup: true,
+			errorElement: "span",
+			ignore:".ignore",
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {
+					
+				} 
+			}
+		});
+		
+	/* 发布状态 */
+	new DropDownList().init({
+		renderTo:"input[name=publishStatus]",
+		data:[{code:1, name:'创建'},{code:2, name:'发布'},{code:3, name:'收回'}],
+		textField:"name",
+		onSelected:function(result){
+			$("input[name=publishStatus]").val(result.name);
+			$("input[name=publishStatus]").focus();
+		}
+	});
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		
+		 history.go(-1); 
+		//location.href="knowledgeMan.html";
+	};
+	
+	/* var data = CKEDITOR.instances.editor.getData(); */
+	/* 保存 */
+	$scope.onSave = function(flage){
+		//var formData = $("#saveForm").serialize();
+		if($("#saveForm").valid()){
+			var data = editor1.html();
+			//var stemTxt=CKEDITOR.instances.editor.document.getBody().getText();
+			
+			
+			
+			$("input[name=btext]").val(data);
+			$("input[name=btextContent]").val(data);
+			
+			var options = {
+					success: function(responseText, statusText) {
+						new ShowDlog().prompt({msg:"保存成功！",
+							done:function(){
+								if(flage==0){
+									location.href="knowledgeMan.html";
+								}else{
+									window.location.reload(); 
+								}
+							},
+							t:1500
+						});
+
+						
+						
+					},      //提交后的回调函数   
+					type: "post",               //默认是form的method（get or post），如果申明，则会覆盖  
+					dataType: "json",           //html(默认), xml, script, json...接受服务端返回的类型  
+					clearForm: false,          //成功提交后，清除所有表单元素的值
+					url:serviceBasePath+"eap/pmsServices/km/kmbase/kmbase/add",
+					error: function(xhr, status, error) {
+						console.log(error);
+					}
+				};
+				$("#saveForm").ajaxSubmit(options);
+
+		}
+		
+	};
+});
+
+
+
+</script>
+</body>
+</html>

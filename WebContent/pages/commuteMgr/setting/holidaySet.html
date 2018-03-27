@@ -1,0 +1,367 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <title>My JSP 'holidayset.jsp' starting page</title>
+    
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">
+	<link rel="stylesheet" type="text/css" href="../../../bootstrap-3.3.5-dist/css/bootstrap.min.css"/>
+	<link rel="StyleSheet" type="text/css" href="css/admin_xz_ppx.css" />
+	<link rel="StyleSheet" type="text/css" href="css/common.css" />
+	
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+	
+	<script type="text/javascript">
+	var G=function(objId){return document.getElementById(objId);};
+	var Gn=function(objName){return document.getElementsByName(objName);};
+	var year='2016';//'${year}';
+	var datesStr='';//'${dates}';
+	var selectedDates=new Array();
+	window.onload=function(){
+		if(datesStr.length>0){
+			var datesArr = datesStr.split(",");
+			for(var i=0; i<datesArr.length; i++){
+				var item = datesArr[i];
+				var ymd = item.split("-");
+				var dayItem = new Object();
+				dayItem.year=ymd[0];
+				dayItem.month=ymd[1];
+				dayItem.day=ymd[2];
+				selectedDates.push(dayItem);
+			}
+		}
+		
+		/**/
+		var i=0;
+		for(i=-2;i<3;i++){
+			var myoption = document.createElement("option");
+			$(myoption).val(parseInt(year)+i);
+			$(myoption).text((parseInt(year)+i)+"");
+			if(myoption.value==year){
+				myoption.selected=true;
+			}
+			$("select[name=year]").append(myoption);
+		}
+		$("select[name=year]").change(function(){yearChange();});
+		createYearCalendar(year);
+	};
+	
+	function dayInSelected(month, day){
+		var i;
+		for(i=0; i<selectedDates.length; i++){
+			var dayItem = selectedDates[i];
+			if(month==dayItem.month && day==dayItem.day){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	function yearChange(){
+		var y = $("select[name=year]").val();
+		location.href="toHolidaySet.action?year="+y;
+	}
+	
+	function createYearCalendar(year){
+		var i=0;
+		for(i=1;i<13;i++){
+			var panel = document.createElement("div");
+			panel.id="calendar_panel"+i;
+			panel.className="calendar_panel";
+			
+			var monthTitle=document.createElement("div");
+			monthTitle.className="month_title";
+			monthTitle.innerHTML=i+"月";
+			
+			panel.appendChild(monthTitle);
+			
+			G("calendar_list").appendChild(panel);
+			new SmpCalendar().createCalendar({year:year, month:i, appendTo:("calendar_panel"+i), dayClick:function(month,day,selected){
+					//alert(month+"-"+day+","+selected);
+				}});
+		}
+	}
+	
+	
+	function getSelectedDays(){
+		var y = $("select[name=year]").val();
+		var dates="";
+		$("li>a.selected").each(function(){
+			var month=$(this).attr("month");
+			var day=$(this).html();
+			if(dates.length!=0){
+				dates+=",";
+			}
+
+			dates+=(y+"-"+month+"-"+day);
+		});	
+		//alert(dates);
+		//return;
+		var url="doHolidaySet.action";
+		/*$.post(url, {"dates":dates}, function(res){
+			if(res.indexOf("success")!=-1){
+				alert("保存成功！");
+			}else{
+				alert("保存失败！");
+			}
+		});*/
+	}
+	
+	
+	/* 上月 
+	function toPrevMonth(){
+		month--;
+		if(month==0){
+			month=12;
+			year--;
+		}
+		G("year_month").innerHTML=year+"-"+month;
+		G("calendar_panel").innerHTML="";
+		createCalendar({year:year, month:month, appendTo:"calendar_panel"});
+	}*/
+	/* 下月
+	function toNextMonth(){
+		month++;
+		if(month==13){
+			month=1;
+			year++;
+		}
+		G("year_month").innerHTML=year+"-"+month;
+		G("calendar_panel").innerHTML="";
+		createCalendar({year:year, month:month, appendTo:"calendar_panel"});
+	}
+ */
+/**
+* ===================
+* new SmpCalendar().createCalendar({year:year, month:month, appendTo:("calendar_panel_1"), dayClick:function(month,day,selected){
+* 	alert(month+"-"+day+","+selected);
+* }});
+* ===================
+*/
+SmpCalendar = function(){
+	/**
+	* --------------------------------------
+	* ul
+	* ______________________________________
+	* 		li.calendar_week_head
+	* --------------------------------------
+	*				a(日、一、二、三、四、五、六)
+	* --------------------------------------
+	*		li
+	* --------------------------------------
+	*				a (dayClick)
+	* --------------------------------------
+	*
+	*/
+	this.week = ["日","一","二","三","四","五","六"];
+		
+	/* 根据日历数据创建日历控件 */
+	this.createCalendar = function(config){
+		var calendarData = this.getCalendarData(new Date(config.year, config.month-1, 1));
+		var calendar_el = document.createElement("ul");
+		calendar_el.className="calendar_style";
+		var weekHead_el = document.createElement("li");
+		weekHead_el.className="calendar_week_head";
+		for(var i=0; i<7; i++){
+			var headItem_el = document.createElement("a");
+			headItem_el.innerHTML=this.week[i];
+			weekHead_el.appendChild(headItem_el);
+		}
+		calendar_el.appendChild(weekHead_el);
+		var weekItem_el={};
+		for(var i=0; i<calendarData.length; i++){
+			var dayItem = calendarData[i];
+			if(dayItem.dayOfWeek == 0){
+				weekItem_el = document.createElement("li");
+			}
+			var dayItem_el = document.createElement("a");
+			dayItem_el.innerHTML=dayItem.date+"";
+			dayItem_el.setAttribute("month", config.month);
+			
+			if(dayItem.date!="&nbsp;"&&(dayItem.dayOfWeek == 0 ||dayItem.dayOfWeek == 6)){
+					if(selectedDates.length>0){
+						if(dayInSelected(config.month, dayItem.date)){
+							dayItem_el.className="selected";
+						}
+					}else{
+						dayItem_el.className="selected";
+					}
+			}
+			
+			if(dayItem.date!="&nbsp;"&&(dayItem.dayOfWeek != 0 && dayItem.dayOfWeek != 6)){
+				if(dayInSelected(config.month, dayItem.date)){
+					dayItem_el.className="selected";
+				}
+			}
+			
+			if(dayItem.date!="&nbsp;"){
+					//var day = dayItem.date;
+					dayItem_el.onclick=function(dayItem_el){
+						if(this.className=="selected"){
+							this.className="";
+						}else{
+							this.className="selected";
+						}
+						config.dayClick(this.getAttribute("month"), this.innerHTML, this.className=="selected");
+					};
+			}
+			
+			
+			//
+			if(dayItem.color){
+				dayItem_el.style.color=dayItem.color;
+			}
+			//
+			if(dayItem.fontWeight){
+				dayItem_el.style.fontWeight="bold";
+			}
+			if(dayItem.border){
+				dayItem_el.style.borderWidth=1;
+				dayItem_el.style.borderStyle="solid";
+				dayItem_el.style.borderColor="#ccc";
+			}
+			//if(dayItem.bg){
+			//	dayItem_el.style.backgroundColor=dayItem.bg;
+			//}
+
+			//
+			weekItem_el.appendChild(dayItem_el);
+			if(dayItem.dayOfWeek == 6){
+				calendar_el.appendChild(weekItem_el);
+			}
+		}
+		if(typeof(config.appendTo)=="string"){
+			var appendTo = document.getElementById(config.appendTo);
+			appendTo.appendChild(calendar_el);
+		}
+	};
+	/* 获取日历数据（带样式信息） */
+	this.getCalendarData=function(firstOfMonth){
+		var calendarData=new Array();
+		var year=firstOfMonth.getYear();
+		var month=firstOfMonth.getMonth()+1;
+		//var todayDate=firstOfMonth.getDate();
+		var monthDays=this.getMonthDays(year, month);
+		
+		var firstDayOfWeek = firstOfMonth.getDay();
+
+		for(var i=0; i<firstDayOfWeek; i++){
+			var dayItem = new Object();
+			dayItem.dayOfWeek=i;
+			dayItem.date="&nbsp;";
+			dayItem.color="black";
+			dayItem.bg="#fff";
+			calendarData.push(dayItem);
+		}
+		var dayOfWeek_temp = firstDayOfWeek;
+		for(var i=0; i<monthDays; i++){
+			var dayItem = new Object();
+			dayItem.dayOfWeek=dayOfWeek_temp;
+			dayItem.date=i+1;
+			if(this.isToday(new Date(year, month-1, i+1))){
+				dayItem.color="#ff0000";
+				dayItem.fontWeight="bold";
+				//dayItem.bg="#fff";
+				//dayItem.border="1";
+			}else{
+				dayItem.color="black";
+				//dayItem.bg="#fff";
+			}
+			calendarData.push(dayItem);
+			dayOfWeek_temp++;
+			if(dayOfWeek_temp==7){
+				dayOfWeek_temp=0;
+			}
+		}
+
+		for(var i=0; i<7-dayOfWeek_temp; i++){
+			var dayItem = new Object();
+			dayItem.dayOfWeek=dayOfWeek_temp+i;
+			dayItem.date="&nbsp;";
+			dayItem.color="black";
+			dayItem.bg="#fff";
+			calendarData.push(dayItem);
+		}
+		return calendarData;
+	};
+	/* 日期是否是今天 */
+	this.isToday=function(date){ 
+		var now = new Date();
+		var year=now.getYear();
+		var month=now.getMonth();
+		var todayDate=now.getDate();
+		if(date.getYear()==year && date.getMonth()==month &&date.getDate()==todayDate){
+			return true;
+		}
+		return false;
+	};
+	/* 获取指定月的天数 */
+	this.getMonthDays = function(year, month){
+		if(month==1||month==3||month==5||month==7||month==8||month==10||month==12){
+			return 31;
+		}else if(month==4||month==6||month==9||month==11){
+			return 30;
+		}else{
+			if(this.isLeapYear(year)){
+				return 29;
+			}else{
+				return 28;
+			}
+		}
+	};
+	/* 是否闰年 */
+	this.isLeapYear = function(year) {
+		if (year % 4 == 0 && year % 100 != 0) {
+			return true;
+		} else {
+			if (year % 400 == 0) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	};
+};
+</script>
+<style type="text/css">
+	body{margin:14px;}
+	ul,li{list-style-type:none;}
+	#calendar_list{border:solid 0px;width:900px;}
+	#calendar_list .calendar_panel{float:left;width:220px;height:210px;border:solid 0px;}
+	#calendar_list .calendar_panel .month_title{text-align:center;font-weight:bold;font-size:14px;color:#06f;}
+	
+	ul.calendar_style{margin:0;padding:0;width:214px;height:180px;border:solid 1px #f4f4f4;background-color:#fff;}
+	ul.calendar_style li{border:solid 0px;}
+	ul.calendar_style li a{display:inline-block;width:30px;height:24px;line-height:24px;text-align:center;font-size:12px;}
+	ul.calendar_style li a.selected{background-color:#b5e0FF;color:#666;}
+	
+	.calendar_style li.calendar_week_head{color:#666;font-weight:bold;background:#e6e6e6;}
+	
+	
+	.page_title_bar{color:#fff;background:#4CA9FF;border-radius:0px;padding:10px;}
+	.page_title_bar .navbar-header a{color:#fff;font-size:18px;}
+</style>
+</HEAD>
+
+<BODY>
+    <nav class="navbar navbar-default page_title_bar" role="navigation">
+	   <div class="navbar-header">
+	      <a class="navbar-brand" href="#">假期设置</a>
+	   </div>
+	   <div>
+	      <form class="navbar-form navbar-left" >
+	         <label>指定年：</label>
+		    <select name="year" class="form-control">
+		    </select>
+		    <input type="button" value="  保存设置  " onclick="getSelectedDays()" class="btn btn-default btn-small btnSubmit"/>
+	      </form>    
+	   </div>
+	</nav>
+	<center>
+    <div id="calendar_list">
+    </div>
+    </center>
+</BODY>
+</HTML>

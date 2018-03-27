@@ -1,0 +1,460 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 资产分布查询</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../../css/list.css" />
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+
+
+<script type="text/javascript" src="../../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../css/validate.css"/>
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript" src="../../../../js/echarts-all.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<style type="text/css">
+	.dropDownArea{background-image:url(../../../../img/flag.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+	.ck{border:1px #fff solid;background:#fff;margin-top:5px}
+	.cks{float:left;height:20px;}
+	.cks .ck{float:left;margin-top:15px;margin-left:10px;}
+	.cks span{float:left;margin-top:5px;}
+    .dialog-viewcode{width:500px;height:400px;}
+    .dialog-viewcyle{width:900px;height:500px;}
+    .dialog-scrap{width:480px;height:320px;}
+    .dialog-scrap1{width:480px;height:300px;}
+    .dialog-asset{height:600px;width:500px;}
+    
+    
+    .title_div2{border:solid 0px red;background:#4CA9FF;padding:8px 6px 8px 6px;}
+.title_div2 .condLayer1{display:block;border:solid 0px;margin:6px;}
+.title_div2 .condLayer2{border:solid 0px green;margin:6px;}
+.title_div2 .condLayer1 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:0 4px;padding:0 4px;font-family:微软雅黑;}
+.title_div2 .condLayer2 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:0 4px;padding:0 4px;background-color:#DAEDFF;font-family:微软雅黑;}
+.title_div2 .btn{display:inline-block;height:30px;line-height:30px;margin:0 4px;padding:0 15px 0 15px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; border-radius:4px;}
+.title_div2 .blue{background:#3385FF;color:#fff;}
+.title_div2 .blue:hover{background:#186CE7;}
+.title_div2 .pink{background:#ED7798;color:#fff;}
+.title_div2 .pink:hover{background:#E54673;}
+    .qiehuan {
+    line-height: 25px;
+    border-radius: 20px;
+    border: 1px solid white;
+    margin-top: 16px;
+    overflow: hidden;
+    margin-left: 16px;
+    margin-right: 16px;
+    width:150px;
+    height:25px;
+    float:right;
+    margin-top:0px;
+    margin-right:-2px;
+   
+}
+
+.qiehuan .tong_zhi, .qiehuan .fang_an, .qiehuan .zhi_nan {
+    float: left;
+    width: 32.7%;
+    text-align: center;
+}
+.tong_zhi {
+    font-size:12px;
+    color: #288df5;
+    background-color: white;
+     border-right: 1px solid white;
+}
+.fang_an {
+    font-size:12px;
+    color: white;
+    border-right: 1px solid white;
+    
+}
+.zhi_nan {
+   font-size:12px;
+    color: white;
+}
+a{
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.proType{
+	display: none
+}
+.proNameD{
+	display: none
+}
+.unitcode{
+display: none
+}
+
+.more{position:absolute; margin-top:8px;}
+.operates{
+	position: absolute;
+	z-index: 9999;
+	height:165px;
+	width:95px;
+	background-image: url(../../../../img/asset/round.png);
+	text-align: left;
+	padding-top:12px;
+	margin-left:45px;
+	display: none
+}
+.operates p{margin:0px;padding-left:8px;height:23px;padding-top:3px;cursor: pointer;}
+.operates p:HOVER{background:#d3dff1;}
+.operates p img{float:left;margin-top:1px;}
+.bor{border-bottom:1px solid #eee}
+.btnmore{position: absolute;margin-top:2px;}
+
+.t_c{width:100%;height:500px}
+	
+#chart1{width:100%;height:98%;overflow:hidden;margin-left:10px;margin-top:10px;}
+.tableList{width:100%;height:auto;}
+
+table,table td, table th {   
+	 border: 1px solid #ccc;
+    border-collapse: collapse;
+   
+    }
+    .hd{display:none}
+    .tr1{background:#D9E9FF}
+    
+    .tr2{background:#D9E9FF;display: none}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+<form id="saveForm" class="required-validate">
+<div class="list">
+	<div class="list_content">
+		
+		
+		<div class="title_div">
+			<div class="title_left">
+				
+				<input type="text" style="width:110px" id="dropDownProjectType" class="dropDownList" placeholder="请选择资产分类"/>
+				<input type="text" style="width:110px" id="dropDownProjectType1" class="dropDownList" placeholder="请选择资产类型"/>
+				<input type="text" style="width:110px" class="proType dropDownList" placeholder="请选择项目类别"/>
+				&nbsp;&nbsp;
+				
+					<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				
+
+				
+				
+				&nbsp;&nbsp;
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+			
+		</div>
+		
+		
+		
+		<div class="table_div">
+			
+				
+				
+				<div class="t_c">
+					<div id="chart1" class="spanmo"></div>
+				</div>
+				<div id="areaTitle" style="height:30px;width:100%;text-align:center;font-size:16px;color: blue ">
+					 XXX地区资产分布数量
+				</div>
+				<div class="tableList">
+					<table style="width: 100%;text-align: center;">
+						 <tr class="tr1">
+						 	<td>序号</td>
+						 	<td>项目名称</td>
+						 	<td>项目编码</td>
+						 	<td>数量</td>
+						 </tr>
+						  <tr class="tr2">
+						 	<td>序号</td>
+						 	<td>部门名称</td>
+						 	<td>部门编码</td>
+						 	<td>数量</td>
+						 </tr>
+						  <tr ng-repeat="item in areaList" style="height:30px;">
+						 	<td>{{$index+1}}</td>
+						 	<td>{{item.proName}}</td>
+						 	<td>{{item.proNo}}</td>
+						 	<td>{{item.icount}}</td>
+						 </tr>
+					</table>
+				</div>
+		</div>
+
+		
+	</div>
+</div>
+</form>
+<script type="text/javascript">
+
+
+
+
+
+
+
+
+var searchName="";
+var assetTypeCode="";
+var assetTypeName="";
+var assetClassCode="";
+var assetClassName="";
+var status="1,2,3,4,5,6,7,8";
+var proNo="";
+var proName="";
+var _currentPage=1;
+var category_Code="";
+var category_Name="";
+var proTypes;
+var ngScope;
+var droptype;
+var price1="";
+var price2="";
+var fromDate="";
+var toDate="";
+var validator;
+
+var loanUnitCode="";
+var loanUnitName="";
+
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.projectList=[];
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	var params = getUrlParams();
+	
+
+	
+	
+
+
+	
+	/* 表单验证 */
+	validator = $("#saveForm").validate({
+		onsubmit: false,
+		focusInvalid: false,
+		focusCleanup: true,
+		errorElement: "span",
+		ignore:".ignore",
+		invalidHandler: function(form, validator) {
+			var errors = validator.numberOfInvalids();
+			if (errors) {
+				
+			} 
+		}
+	});
+	
+	
+	/* 资产分类*/
+	new DropDownList().init({
+		renderTo:"#dropDownProjectType",
+		url:"../../../component/assetType.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			//assetClassName
+			$("#dropDownProjectType").val(result.assetClassName);
+			assetClassCode = result.assetClassCode;
+			assetClassName = result.assetClassName;
+			ngScope.loadProjects(assetTypeCode, assetClassCode);
+		
+		
+			var url="../../../component/assetLeixing.html?&assetClassCode="+assetClassCode;
+			droptype.setConfig("url", url);
+		}
+	});
+	
+	droptype=new DropDownList();
+	//资产类型
+	droptype.init({
+		renderTo:"#dropDownProjectType1",
+		url:"../../../component/assetLeixing.html?ticket="+ticket+"&assetClassCode="+assetClassCode,
+		height:"200px",
+		onSelected:function(result){
+			$("#dropDownProjectType1").val(result.assetTypeName);
+			assetTypeCode = result.assetTypeCode;  
+			assetTypeName = result.assetTypeName;
+			ngScope.loadProjects(assetTypeCode, assetClassCode);
+		}
+	});
+	
+	
+	$scope.loadAreaList=function(flag,name){
+		
+		
+		
+		$http.get(serviceBasePath+"eap/pmsServices/materielMg/comprehensiveQuery/distributeAssetList?assetClassCode="+assetClassCode+"&assetTypeCode="+assetTypeCode+"&areaName="+name+"&assetFlag="+flag).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../login.html";
+				return;
+			}
+			$scope.areaList=response.list;
+		});
+		
+		
+	};
+	
+	
+
+	
+	/* 加载数据 */
+	$scope.loadProjects=function(assetTypeCode, assetClassCode){//alert(unitCode);
+
+			$http.get(serviceBasePath+"eap/pmsServices/materielMg/comprehensiveQuery/assetDistribute?assetClassCode="+assetClassCode+"&assetTypeCode="+assetTypeCode).success(function(response){
+				if(response.statusCode==401){
+					alert("用户凭据过期！请重新登录！");
+					window.top.location.href="../../login.html";
+					return;
+				}
+				$scope.datalist=response.list;
+				
+				var num=[];
+				var area=[];
+				var flags=[];
+				for(var i=0;i<response.list.length;i++){
+					area.push(response.list[i].city);
+					num.push(response.list[i].icount);
+					flags.push(response.list[i].assetFlag);
+				}
+
+			
+				
+				var option1 = {
+						
+						title:{
+							text: '单位(个)',
+							textStyle:{
+								fontSize:12
+							}
+						},
+		   
+					    tooltip : {
+					        trigger: 'axis'
+					    },
+					    calculable : true,
+					  	 grid: { // 控制图的大小，调整下面这些值就可以，
+				           
+				             x: 35,
+				             y:30,
+				             x2: 30,
+				             y2: 100,// y2可以控制 X轴跟Zoom控件之间的间隔，避免以为倾斜后造成 label重叠到zoom上
+				             
+				             borderColor:"#eee"
+		        		 },
+					    xAxis : [
+					        {
+					            type : 'category',
+					             axisLabel: {
+						            rotate: 40
+						        },
+						        
+					            data : area,
+					            splitLine:{
+					            	show:false
+					            	
+					            }
+					        }
+					    ],
+					    yAxis : [
+					        {
+					            type : 'value',
+					            
+					        }
+					    ],
+					    series : [
+					        {
+					            name:'数量',
+					            type:'bar',
+					            data:num,
+					            barWidth : 15,
+					        }
+					    ]
+					};
+
+					var chart = echarts.init(document.getElementById('chart1'));
+					chart.setOption(option1);
+					
+					
+					function eConsole(param) {
+						
+						
+						
+						if(flags[param.dataIndex]==1){
+							$("#areaTitle").html(param.name+"各项目资产分布数量");
+							$(".tr1").show();
+							$(".tr2").hide();
+							$scope.loadAreaList(flags[param.dataIndex],param.name);
+						}else if(flags[param.dataIndex]==2){
+							$("#areaTitle").html(param.name+"各部门资产分布数量");
+							$(".tr1").hide();
+							$(".tr2").show();
+							$scope.loadAreaList(flags[param.dataIndex],param.name);
+						}
+							
+						
+						
+					}
+					chart.on("click", eConsole);
+				
+			});
+			
+			
+			//alert($scope.dataList.length);
+			
+
+
+	};
+	/* 查询 */
+	$scope.doQuery=function(){
+		
+		
+		   
+		    $scope.loadProjects(assetTypeCode, assetClassCode);
+	
+		
+	};
+	
+
+	
+	/* 初始查询 */
+	ngScope.loadProjects(assetTypeCode, assetClassCode);
+});
+</script>
+</body>
+</html>

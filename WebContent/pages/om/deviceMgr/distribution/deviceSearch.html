@@ -1,0 +1,990 @@
+<!DOCTYPE HTML>
+<html ng-app="realPosition">
+<head>
+<title> 设备搜索 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=PL4wfqVofjrMVz7FMaPs8Dts"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/echarts-all.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<style type="text/css">
+	body{
+		margin:0px;
+		padding:0px;
+		font-size:12px;
+		font-family:"微软雅黑";
+	}
+	a{color:#4D4D4D;text-decoration: none;}
+
+	.list{position: absolute;left:4px;right:4px;top:100px;bottom:10px;border:solid 0px;}
+	.list .list_left{position: absolute;left:0px;top:0px;bottom:0px;width:400px;}
+	.list .list_left .left_content{position: absolute;left:0px;right:0px;top:50px;bottom:0px;border:solid 1px #B2D1FF;z-index:1;overflow-x:hidden;overflow-y:auto;}
+	.list .list_left .left_content .content_table{width:100%;top:0px;bottom:45px;}
+	.list .map_div{position: absolute;left:410px;top:0px;bottom:0px;right:0px;border:solid 1px #cccccc;}
+
+	.table,.table td,.table th{border:1px solid #EDEDED;border-collapse:collapse;}
+	.tr1{height:40px;background:#D9E9FF;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;font-weight:normal;}
+	.tr2{height:40px;background:#fff;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.tr2:hover{background:#F5F5F5;}
+	.tr3{height:40px;background:#F5F5F5;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.tr3:hover{background:#F5F5F5;}
+	.tr4{height:40px;background:#EFD397;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.operationImg{cursor: pointer;}
+
+	.paging_div{bottom:10px;width:390px;height:22px;;margin:0 auto;border:solid 0px;color:#4D4D4D;text-align:center;margin-top:10px;}
+	.dropDownList{background-image:url(../../../../img/drop_down_list.png);background-repeat: no-repeat;background-position:right;cursor:pointer;}
+
+	#page_bar .page_btn_prev{display:inline-black;border:solid 1px #3385FF;background:#3385FF;color:#fff;margin:0 4px;padding:2px 5px 2px 5px;}
+	#page_bar .page_btn_next{display:inline-black;border:solid 1px #3385FF;background:#3385FF;color:#fff;margin:0 4px;padding:2px 5px 2px 5px;}
+	#page_bar .page_btn{display:inline-black;border:solid 1px #3385FF;margin:0 4px;padding:2px 5px 2px 5px;}
+	#page_bar .selected{font-weight:bold;border:solid 1px #666;background:#666;color:#fff;}
+	
+	
+	.table td{cursor:pointer;}
+	
+	.marker{display:inline-block;width:22px;height:25px;background:url(../../../../img/markers.png) -22px -275px no-repeat;padding:0;margin:0;}
+	.mkr_s{background:url(../../../../img/markers.png) 0px -275px no-repeat;}
+	.mkr1{background:url(../../../../img/markers.png) -22px 0px no-repeat;}
+	.mkr_s1{background:url(../../../../img/markers.png) 0px 0px no-repeat;}
+	.mkr2{background:url(../../../../img/markers.png) -22px -25px no-repeat;}
+	.mkr_s2{background:url(../../../../img/markers.png) 0px -25px no-repeat;}
+	.mkr3{background:url(../../../../img/markers.png) -22px -50px no-repeat;}
+	.mkr_s3{background:url(../../../../img/markers.png) 0px -50px no-repeat;}
+	.mkr4{background:url(../../../../img/markers.png) -22px -75px no-repeat;}
+	.mkr_s4{background:url(../../../../img/markers.png) 0px -75px no-repeat;}
+	.mkr5{background:url(../../../../img/markers.png) -22px -100px no-repeat;}
+	.mkr_s5{background:url(../../../../img/markers.png) 0px -100px no-repeat;}
+	.mkr6{background:url(../../../../img/markers.png) -22px -125px no-repeat;}
+	.mkr_s6{background:url(../../../../img/markers.png) 0px -125px no-repeat;}
+	.mkr7{background:url(../../../../img/markers.png) -22px -150px no-repeat;}
+	.mkr_s7{background:url(../../../../img/markers.png) 0px -150px no-repeat;}
+	.mkr8{background:url(../../../../img/markers.png) -22px -175px no-repeat;}
+	.mkr_s8{background:url(../../../../img/markers.png) 0px -175px no-repeat;}
+	.mkr9{background:url(../../../../img/markers.png) -22px -200px no-repeat;}
+	.mkr_s9{background:url(../../../../img/markers.png) 0px -200px no-repeat;}
+	.mkr10{background:url(../../../../img/markers.png) -22px -225px no-repeat;}
+	.mkr_s10{background:url(../../../../img/markers.png) 0px -225px no-repeat;}
+	.marker:hover{cursor:pointer;}
+	
+	.cmkr1{background:url(../../../../img/markers1.png) no-repeat;}
+	.cmkr2{background:url(../../../../img/markers2.png) no-repeat;}
+	.cmkr3{background:url(../../../../img/markers3.png) no-repeat;}
+	.cmkr4{background:url(../../../../img/markers4.png) no-repeat;}
+	.cmkr5{background:url(../../../../img/markers5.png) no-repeat;}
+	.cmkr6{background:url(../../../../img/markers6.png) no-repeat;}
+	.cmkr7{background:url(../../../../img/markers7.png) no-repeat;}
+	.cmkr8{background:url(../../../../img/markers8.png) no-repeat;}
+	.cmkr9{background:url(../../../../img/markers9.png) no-repeat;}
+	.cmkr10{background:url(../../../../img/markers10.png) no-repeat;}
+	
+	.title{font-size:14px;color:#0066FF;}
+	.table_item{border:0;margin-top:10px;margin-bottom:10px;}
+	.table_item td{border:0;}	
+	
+
+	.info_win{width:380px;}
+	.info_win table td{font-size:12px;padding:6px;}
+	
+	.info_win .tiBar{height:30px;}
+	.info_win .title{float:left;font-size:14px;color:#0066ff;font-weight:bold;}
+	.info_win .dev_status{float:right;display:inline-block;padding:2px 4px 2px 4px;background:#ff7700;color:#fff;border-radius:5px;}
+	.info_win .foBar{border-top:solid 1px #ccc;padding:10px 10px 10px 10px;}
+	.info_win .foBar a{font-size:12px;color:#0066ff;}
+	
+	.device_detail{width:1000px;height:500px;}
+	.cond_layer{position:absolute;display:none;width:388px;border:solid 1px #297BE6;border-radius:4px;margin:10px 0 0 0;z-index:99;background:rgba(41,123,230,0.9);}
+	.cond_layer ul, cond_layer li{margin:0;padding:0;list-style-type:none;}
+	.cond_layer ul{margin:20px 0 20px 0;}
+	.cond_layer li{margin:4px 4px 4px 4px;}
+	.cond_layer li>input{height:32px;border:solid 1px #ccc;margin-left:10px;color:#888;border-radius:3px;padding-left:2px;font-family:"微软雅黑";}
+	.cond_layer .close_btn{position:absolute;bottom:4px;right:4px;font-size:18px;color:#fff;padding:4px;}
+	
+	.form_group .form_item{display:inline-block;width:175px;margin:6px;}
+	.form_group .form_item label{color:#fff;display:block;font-size:14px;line-height:18px;}
+	.form_group .form_item input{height:36px;border:solid 0px;color:#888;border-radius:3px;padding-left:2px;font-family:"微软雅黑";}
+	
+	.left_title .line{margin:10px auto;border-bottom:solid 1px #66A8FF;}
+	
+	.left_title .btn{display:inline-block;height:36px;vertical-align:middle;line-height:36px;margin:0 4px;padding:0 10px 0 10px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; border-radius:4px;}
+	.left_title .blue{background:#3385FF;color:#fff;}
+	.left_title .blue:hover{background:#186CE7;}
+	
+	.sw_btn{display:inline-block;width:26px;height:14px;background:url(../../../../img/blue.png) no-repeat;}
+	.sw_btn.close{background:url(../../../../img/gray.png) no-repeat;}
+	
+	.title_div2{border:solid 0px red;background:#4CA9FF;padding:8px 6px 8px 6px;}
+	.title_div2 .condLayer1{display:block;border:solid 0px;margin:6px;}
+	.title_div2 .condLayer2{border:solid 0px green;margin:6px;}
+	.title_div2 .condLayer1 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:0 4px;padding:0 4px;font-family:微软雅黑;}
+	.title_div2 .condLayer2 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:0 4px;padding:0 4px;background-color:#DAEDFF;font-family:微软雅黑;}
+	.title_div2 .btn{display:inline-block;height:30px;line-height:30px;margin:0 4px;padding:0 15px 0 15px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; border-radius:4px;}
+	.title_div2 .blue{background:#3385FF;color:#fff;}
+	.title_div2 .blue:hover{background:#186CE7;}
+	.title_div2 .pink{background:#ED7798;color:#fff;}
+	.title_div2 .pink:hover{background:#E54673;}
+
+
+	.tab_ct{width:100%;margin-top:20px;}
+	.tab_ct .tab_com{width:100px;margin:0 auto;}
+	.tab_ct .tab_com span{padding:10px 10px;border-bottom:2px solid #ccc;color:#ccc;cursor:pointer}
+	.curt{border-bottom:2px solid #2f93ff !important;color:#2f93ff !important;}
+	.tc_con .table_list *{text-align:center;line-height:30px;}
+	.tc_con .table_list td,.tc_con .table_list th{border-bottom:1px solid #CCC	}
+	.tc_con .table_list td .tablelist_color{width:10px;height:10px;margin:0 auto}
+	.tc_con .table_list td img{vertical-align: middle;}
+	
+	.BMapLib_Drawing_panel a[drawingtype=marker], a[drawingtype=polyline]{
+		display:none;
+	}
+	.BMapLib_Drawing .BMapLib_clear:hover{
+		background-position: 0 -52px;
+	}
+	.BMapLib_Drawing .BMapLib_clear {
+	    background-position: 0 0;
+	}
+	.BMapLib_Drawing .BMapLib_box2 {
+	    border-right: 1px solid #d2d2d2;
+	    float: left;
+	    height: 100%;
+	    width: 64px;
+	    height: 100%;
+	    background-image: url(../../../../img/bg_drawing_tool_del.png);
+	    cursor: pointer;
+	}
+	.resultInfo{position:absolute;top:0px;left:0px;right:0;z-index:999;background:rgba(51,133,255,1);color:#fff;border-radius:3px;padding:10px 20px 10px 20px;}
+	.resultInfo label{font-size:14px;line-height:30px;}
+	.resultInfo label span{}
+	.more a{width:200px;text-align:center;display:block;margin:10px auto;border:solid 1px #ccc;color:blue;font-size:14px;line-height:30px;font-weight:bold;}
+</style>
+</head>
+
+<body ng-controller="realPositionCtrl">
+	<div class="title_div2">
+		<div class="condLayer1">
+			<input type="text" id="category" class="dropDownList" style="width:100px;" placeholder="请选择项目分类"/>
+			<input type="text" id="proName" class="dropDownList" style="width:100px;" placeholder="请选择项目"/>
+			<input type="text" id="mct" class="dropDownList" style="width:100px;" placeholder="请选择总控表"/>
+			<input type="text" name="searchName" style="width:100px;" placeholder="搜索"/>
+			
+			<div class="btn blue" ng-click="toQuery()">
+				查询
+			</div>
+			<div class="btn blue" ng-click="doExport()">
+				导出
+			</div>
+<!-- 			<div class="btn pink" ng-click="toAdd()"> -->
+<!-- 				矩形 -->
+<!-- 			</div> -->
+<!-- 			<div class="btn pink" ng-click="batchUpdate()"> -->
+<!-- 				多边形 -->
+<!-- 			</div> -->
+<!-- 			<div class="btn pink" ng-click="batchUpdate()"> -->
+<!-- 				圆形 -->
+<!-- 			</div> -->
+		</div>
+		
+		<div class="condLayer2">
+			<!-- 动态条件 -->
+			<span ng-repeat="item in theadData.searchFields">
+			<input ng-if="item.dtype==4" type="text" group="cond" id="{{item.ename}}" style="width:100px;" class="dropDownList" placeholder="{{item.cname}}"/>
+			</span>
+			<!-- 动态条件 -->
+		</div>
+	</div>
+	
+	
+	<div class="list">
+		<!-- List -->
+		<div class="list_left">
+			<div class="resultInfo">
+				<label>搜索结果共<span>{{dataList.length}}</span>条</label>
+			</div>
+			<div class="left_content">
+				<div class="content_table">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+					  <tr class="tr2" ng-repeat="item in dataListPage" >
+						<td>
+							<table width="100%" class="table_item">
+								<tr>
+									<td width="40" align="center">
+										<span class="marker mkr"></span>
+									</td>
+									<td>
+										<div class="title">{{item.deviceObjName}}</div>
+<!-- 										<div>设备编号：{{item.deviceObjCode}}</div> -->
+										<div ng-if="featureField && featureField.ename">{{featureField.cname}}：{{item[featureField.ename]}}</div>
+										<div>{{item.addressDesc}}</div>
+									</td>
+									<td>
+										<div ng-if="item.x && item.x!=0"><a href="javascript:" style="color:#0066ff;" ng-click="locationTo(item)" >定位</a></div>
+										<div><a href="javascript:" style="color:#0066ff;" ng-click="openDetail(item)" >台帐</a></div>
+									</td>
+								</tr>
+							</table>
+						</td>
+					  </tr>
+				 	</table>
+				 	<div class="more"><a ng-if="dataListPage.length < dataList.length" href="javascript:" ng-click="pushToPageList()">加载更多</a></div>
+				</div>
+				<div id="page_bar" class="paging_div">
+				</div>
+			</div>
+		</div>
+		<!-- Map -->
+		<div class="map_div" id="allmap">
+		</div>
+	</div>
+	
+	<script>
+		var n= 0;
+		var imgflag = true;
+		$(".tab_com span").click(function(index){
+			$(this).addClass("curt").siblings("span").removeClass("curt");
+			n=$(this).index();
+			$(".tc_con .abc").eq(n).css("display","block").siblings().css("display","none"); 
+		});
+		$(".table_list img").each(function(){
+			$(this).click(function(){
+				if(imgflag == true){
+					$(this).attr("src","../../../../img/gray.png");
+					imgflag = false;
+				}else{
+					$(this).attr("src","../../../../img/blue.png");
+					imgflag = true;
+				}
+			})
+		})
+	</script>
+<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("allmap", {enableMapClick:false});    // 创建Map实例
+	map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
+	map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+	var markergg = null;
+    
+	
+    var userData, ticket;
+    $(document).ready(function(){
+    	var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		userData = jQuery.parseJSON(userDataStr);
+		ticket = $.cookie("pmsWeb_ticket");
+    });
+ 
+    var __mode="",__r="",__x="",__y="",__xs="",__ys="";
+    var viewPortPoints=[];
+    var overlays = [];
+	var overlaycomplete = function(e){
+		// 清除
+		for(var i = 0; i < overlays.length; i++){
+            map.removeOverlay(overlays[i]);
+        }
+        overlays.length = 0;
+        // 增加
+		var overlay = e.overlay;
+        overlays.push(e.overlay);
+        __mode=e.drawingMode;
+        if(e.drawingMode=="circle"){
+        	__r = overlay.getRadius();
+        	var center = overlay.getCenter();
+        	__x =center.lng;
+        	__y =center.lat;
+        	
+        	var bounds = overlay.getBounds();
+        	var minPoint = bounds.getSouthWest();
+        	var maxPoint = bounds.getNorthEast();
+        	viewPortPoints=[];
+        	viewPortPoints.push(minPoint);
+        	viewPortPoints.push(maxPoint);
+        	__xs=minPoint.lng+","+maxPoint.lng;
+        	__ys=minPoint.lat+","+maxPoint.lat;
+        	// 查询
+        	ngScope.toQuery();
+        }else if(e.drawingMode=="polygon" || e.drawingMode=="rectangle"){
+        	var points = overlay.getPath();
+        	viewPortPoints=points;
+        	__xs="",__ys="";
+        	for(var i=0; i<points.length; i++){
+        		var p = points[i];
+        		if(__xs.length>0){
+        			__xs+=",";
+        		}
+        		if(__ys.length>0){
+        			__ys+=",";
+        		}
+        		__xs+=p.lng;
+        		__ys+=p.lat;
+        	}
+        	// 查询
+        	ngScope.toQuery();
+        }else{
+        	
+        }
+        //$("a[drawingtype=hander]").click();
+        drawingManager.setDrawingMode("hander");
+    };
+    var styleOptions = {
+        strokeColor:"red",    //边线颜色。
+        fillColor:"red",      //填充颜色。当参数为空时，圆形将没有填充效果。
+        strokeWeight: 3,       //边线的宽度，以像素为单位。
+        strokeOpacity: 0.2,	   //边线透明度，取值范围0 - 1。
+        fillOpacity: 0.1,      //填充的透明度，取值范围0 - 1。
+        strokeStyle: 'solid' //边线的样式，solid或dashed。
+    }
+    //实例化鼠标绘制工具
+    var drawingManager = new BMapLib.DrawingManager(map, {
+        isOpen: false, //是否开启绘制模式
+        enableDrawingTool: true, //是否显示工具栏
+        drawingToolOptions: {
+            anchor: BMAP_ANCHOR_TOP_LEFT, //位置
+            offset: new BMap.Size(5, 5), //偏离值
+        },
+        circleOptions: styleOptions, //圆的样式
+        polylineOptions: styleOptions, //线的样式
+        polygonOptions: styleOptions, //多边形的样式
+        rectangleOptions: styleOptions //矩形的样式
+    });  
+	 //添加鼠标绘制工具监听事件，用于获取绘制结果
+    drawingManager.addEventListener('overlaycomplete', overlaycomplete);
+	$(".BMapLib_Drawing_panel").prepend("<label class=\"BMapLib_box2 BMapLib_clear\" drawingtype=\"clear\" href=\"javascript:void(0)\" title=\"清除\" onfocus=\"this.blur()\"></label>");
+	$("label[drawingtype=clear]").click(function(){
+		for(var i = 0; i < overlays.length; i++){
+            map.removeOverlay(overlays[i]);
+        }
+        overlays.length = 0;
+        __mode="";__r="";__x="";__y="";__xs="";__ys="";
+	}); 
+	
+	
+    function setViewPort(points){
+		var minLng=999,minLat=999,maxLng=0,maxLat=0;
+		for (var i = 0; i < points.length; i++) {
+			var p = points[i];
+			var lng = p.lng;
+			var lat = p.lat;
+			if(lng<minLng){
+				minLng=lng;
+			}
+			if(lat<minLat){
+				minLat=lat;
+			}
+			if(lng>maxLng){
+				maxLng=lng;
+			}
+			if(lat>maxLat){
+				maxLat=lat;
+			}
+		}
+		var pts = [new BMap.Point(minLng,minLat),new BMap.Point(maxLng,minLat),new BMap.Point(maxLng,maxLat),new BMap.Point(minLng,maxLat)];
+		map.setViewport(pts);
+	}
+    
+    /* 自定义图标 */
+	function CustomMarker(point, markerIdx){
+    	this._div;
+		this._point = point;
+    	this.markerIndex=1;
+    	this.clickListener;
+		if(markerIdx)
+			this.markerIndex=markerIdx;
+	};
+    CustomMarker.prototype = new BMap.Overlay();
+    CustomMarker.prototype.initialize = function(map){
+        this._map = map;
+        var _self = this;
+        var div = this._div = document.createElement("div");
+        div.style.position = "absolute";
+        div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
+        var span = this._span = document.createElement("span");
+        span.className="marker cmkr"+this.markerIndex;
+        div.appendChild(span);
+        var that = this;
+
+        div.onmouseover = function(){
+        };
+
+        div.onmouseout = function(){
+        };
+		span.onclick=function() {
+			
+			if (_self.clickListener) {
+				
+				_self.clickListener(_self._point);
+			}
+		};
+        map.getPanes().labelPane.appendChild(div);
+        return div;
+      };
+    CustomMarker.prototype.addClickListener=function(fn){
+    	this.clickListener=fn;
+    };  
+    CustomMarker.prototype.draw = function(){
+      var map = this._map;
+      var pixel = map.pointToOverlayPixel(this._point);
+      this._div.style.left = pixel.x - 12 + "px";
+      this._div.style.top  = pixel.y - 25 + "px";
+    }
+   
+    // ================================================================================== //
+    
+var cond_categoryCode="", cond_proNo="",cond_searchName="", cond_statisticsType="";
+var cond_mct="", cond_condStr="";
+var colors=['#E5360C','#5BBAF8','#E8DF26','#53C353','#5589EC','#FF4BA4','#BC5BD3','#CE6261','#E2A432','#4FDACB'];
+// var ngScope;
+var timer2=null;
+var ngScope;
+simpleController({
+	moduleName:"realPosition",
+	controllerName:"realPositionCtrl",
+	init:function($scope, $http){
+		ngScope=$scope;
+		$scope.theadData={};
+		$scope.dataList=[];
+		$scope.dataListPage=[];
+		$scope.statisticsTypeData=[];
+		$scope.legendData=[];
+		$scope.theadData.searchFields=[];
+		$scope.featureField={};
+		map.centerAndZoom(new BMap.Point($scope.userData.x, $scope.userData.y), 12);  // 初始化地图,设置中心点坐标和地图级别
+		
+		/* 项目分类 */
+		new DropDownList().init({
+			mode:"page",
+			renderTo:"#category",
+			url:"../../../component/projectType.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				cond_categoryCode=result.categoryCode;
+				$("#category").val(result.categoryName);
+				//$scope.cond_categoryName=result.categoryName;
+				proNameList.setConfig("url", "../../../component/projectList.html?categoryCode="+result.categoryCode+"&ticket="+$scope.ticket);
+			}
+		});
+		
+		/* 项目列表 */
+		var proNameList = new DropDownList();
+		proNameList.init({
+			mode:"page",
+			renderTo:"#proName",
+			url:"../../../component/projectList.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				cond_proNo=result.proNo;
+				$("#proName").val(result.proName);
+				mctList.setConfig("url", "../../../component/mctType.html?proNo="+cond_proNo);
+			}
+		});
+		
+		/* 项目总控表*/
+		var mctList = new DropDownList();
+		mctList.init({
+			renderTo:"#mct",
+			url:"../../../component/mctType.html?proNo="+cond_proNo,
+			onSelected:function(item){
+				cond_mct=item.mctCode;
+				$("#mct").val(item.mctName);
+				//if(cond_mct!=null && cond_mct.length>0)
+					$scope.loadTheader(cond_mct);
+			}
+		});
+		
+		/* 数据导出 */
+		$scope.exportData=function(mctCode, condStr, searchName){
+			/* 确定图例数据 */
+			//$scope.getLegendData();
+			var paramsData={"companyCode":$scope.userData.companyCode, 
+					"searchName":searchName, 
+					"attrJson":condStr,
+					"proNo":cond_proNo,
+					"r":__r,"x":__x,"y":__y,"xs":__xs,"ys":__ys};
+			if(mctCode && mctCode.length>0){
+				paramsData["mctCode"]=mctCode;
+			}else{
+				paramsData["deviceTypeCode"]="01";
+			}
+			
+			var url="eap/pmsServices/om/deviceMgr/device/spatialQueryMctDeviceExport";
+			if(__mode=="circle"){
+				url="eap/pmsServices/om/deviceMgr/device/spatialCircleQueryMctDeviceExport";
+			}else if(__mode=="polygon" || __mode=="rectangle"){
+				url="eap/pmsServices/om/deviceMgr/device/spatialQueryMctDeviceExport";
+	        }
+			var form = createForm({
+				method:"post",
+				action:serviceBasePath+url,
+				data:paramsData});
+			document.body.appendChild(form);
+			form.submit();
+		};
+
+		
+		/* 数据加载 */
+		$scope.loadData=function(mctCode, condStr, searchName){
+			var dlog = new ShowDlog();
+			dlog.prompt({
+				icon:"waitting",
+				msg:"正在加载中...",
+				done:function(){},
+				t:120000
+			});
+			/* 确定图例数据 */
+			//$scope.getLegendData();
+			var paramsData={"companyCode":$scope.userData.companyCode, 
+					"searchName":searchName, 
+					"attrJson":condStr,
+					"proNo":cond_proNo,
+					"r":__r,"x":__x,"y":__y,"xs":__xs,"ys":__ys};
+			if(mctCode && mctCode.length>0){
+				paramsData["mctCode"]=mctCode;
+			}else{
+				paramsData["deviceTypeCode"]="01";
+			}
+			
+			var url="eap/pmsServices/om/deviceMgr/device/spatialQueryMctDevice";
+			if(__mode=="circle"){
+				url="eap/pmsServices/om/deviceMgr/device/spatialCircleQueryMctDevice";
+			}else if(__mode=="polygon" || __mode=="rectangle"){
+				url="eap/pmsServices/om/deviceMgr/device/spatialQueryMctDevice";
+	        }
+			$scope.httpExecute({
+				method:"post",
+				url:url,
+				data:paramsData,
+				success:function(response){
+					if(!response.list){
+						$dlog.close();
+						new ShowDlog().prompt({
+							icon:"error",
+							msg:"未查到数据",
+							done:function(){},
+							t:1500
+						});
+						return;
+					}
+					$scope.dataList = response.list;
+					$scope.dataListPage=[];
+					$scope.pushToPageList();
+					$scope.showAll($scope.dataList);
+					$dlog.close();
+				}
+			});
+		};
+		/* 加载属性信息 */
+		$scope.loadAttrs=function(paramsData){
+			$scope.httpGet({
+				url:"eap/pmsServices/om/deviceMgr/device/mctAttr?companyCode="+$scope.userData.companyCode,
+				data:paramsData,
+				success:function(response){
+					var i=0;
+					for(; i<response.list.length; i++){
+						var attr = response.list[i];
+						if(attr.isFeature=="1"){
+							$scope.featureField = attr;
+							return;
+						}
+					};
+				}
+			});
+		};
+
+		/* 加载条件和表头信息 */
+		$scope.loadTheader=function(mctCode){
+			var paramsData={};
+			if(mctCode && mctCode.length>0){
+				paramsData["mctCode"]=mctCode;
+			}else{
+				paramsData["deviceTypeCode"]="01";
+			}
+			$scope.loadAttrs(paramsData);
+			$scope.httpGet({
+				url:"eap/pmsServices/om/deviceMgr/device/mctListAttr?companyCode="+$scope.userData.companyCode,
+				data:paramsData,
+				success:function(response){
+					$scope.theadData = response.data;
+					/* 统计项 */
+					$scope.statisticsTypeData=[];
+					if(!$scope.theadData || !$scope.theadData.searchFields){
+						return;
+					}
+					for(var i=0; i<$scope.theadData.searchFields.length; i++){
+						(function(){
+							var searchField = $scope.theadData.searchFields[i];
+							if(searchField.dtype==4){
+								$scope.statisticsTypeData.push(searchField);
+							}
+						})();
+					}
+					
+					/* 初始化搜索条件 */
+					lazyCall('t1',function(){
+						for(var i=0; i<$scope.theadData.searchFields.length; i++){
+							(function(){
+								var searchField = $scope.theadData.searchFields[i];
+								if(searchField.dtype==4){
+									/* 搜索条件*/ 
+									searchField.enumValue.unshift("(清空)");
+									new DropDownList().init({
+										renderTo:"#"+searchField.ename,
+										data:searchField.enumValue,
+										onSelected:function(result){
+											if(result=="(清空)"){
+												$("#"+searchField.ename).val("");
+											}else{
+												$("#"+searchField.ename).val(result);
+											}
+										}
+									});
+								}
+							})();
+						}
+						
+						/* 初始化统计项选框 */
+						new DropDownList().init({
+							renderTo:"#statisticsType",
+							data:$scope.statisticsTypeData,
+							textField:"cname",
+							onSelected:function(item){
+								$("#statisticsType").val(item.cname);
+								$scope.clearCond();
+								cond_statisticsType=item.ename;
+								callNgFn({ctrlEl:$("body")[0], ngFn:function(scope){
+									for(var i=0; i<scope.theadData.searchFields.length; i++){
+										var searchField = $scope.theadData.searchFields[i];
+										if(item.ename == searchField.ename){
+											searchField.isStatistic=true;//alert(searchField.ename);
+										}else{
+											searchField.isStatistic=false;
+										}
+									}
+								}});
+							}
+						});
+					}, 100);
+					
+					//$scope.loadData(cond_mct, cond_searchName);
+				}
+			});
+		};
+		
+		$scope.clearCond=function(){
+			for(var i=0; i<$scope.theadData.searchFields.length; i++){
+				(function(){
+					var searchField = $scope.theadData.searchFields[i];
+					if(searchField.dtype==4){
+						/* 搜索条件*/ 
+						$("#"+searchField.ename).val("");
+					}
+				})();
+			}
+		};
+		
+		
+		$scope.toQuery=function(){
+			var cond={};
+			$("input[group=cond]").each(function(){
+				var $cond = $(this);
+				var key = $cond.attr("id");
+				var val = $cond.val();
+				cond[key]=val;
+			});
+			cond_condStr=JSON.stringify(cond);
+			cond_searchName=$("input[name=searchName]").val();
+			if($scope.theadData && $scope.theadData.searchFields){
+				var vars="";
+				for(var i=0; i<$scope.theadData.searchFields.length; i++){
+					var searchField = $scope.theadData.searchFields[i];
+					if(searchField.dtype==1){
+						if(vars && vars.length>0){
+							vars+=",";
+						}
+						vars+=searchField.ename;
+					}
+				}
+				cond_searchName=vars+";"+cond_searchName;
+			}
+			$scope.loadData(cond_mct, cond_condStr, cond_searchName);
+		};
+		$scope.doExport=function(){
+			var cond={};
+			$("input[group=cond]").each(function(){
+				var $cond = $(this);
+				var key = $cond.attr("id");
+				var val = $cond.val();
+				cond[key]=val;
+			});
+			cond_condStr=JSON.stringify(cond);
+			cond_searchName=$("input[name=searchName]").val();
+			if($scope.theadData.searchFields){
+				var vars="";
+				for(var i=0; i<$scope.theadData.searchFields.length; i++){
+					var searchField = $scope.theadData.searchFields[i];
+					if(searchField.dtype==1){
+						if(vars && vars.length>0){
+							vars+=",";
+						}
+						vars+=searchField.ename;
+					}
+				}
+				cond_searchName=vars+";"+cond_searchName;
+			}
+			$scope.exportData(cond_mct, cond_condStr, cond_searchName);
+		};
+		$scope.pushToPageList=function(){
+			var size=0;
+			for(var i=$scope.dataListPage.length; i<$scope.dataList.length; i++){
+				var item = $scope.dataList[i];
+				$scope.dataListPage.push(item);
+				size++;
+				if(size>=20){
+					break;
+				}
+			}
+		}
+		
+		window.onkeyup=function(e){
+			if(e.keyCode==13){
+				$scope.toQuery(cond_mct, cond_searchName, cond_condStr);
+			}
+		};
+		
+		$scope.strCut=function(str, len){
+			if(str.length>len){
+				str = str.substring(0, len);
+				str+="...";
+			}
+			return str;
+		};
+		
+		$scope.selectedUser=function(item){
+			if(item.x && item.y){
+				map.setCenter(new BMap.Point(item.x, item.y));  // 初始化地图,设置中心点坐标和地图级别
+				if(markergg != null){
+					map.removeOverlay(markergg);
+				}
+				markergg = new BMap.Marker(new BMap.Point(item.x, item.y));
+			    map.addOverlay(markergg);
+			}
+		};
+		var __pointCollOverLay;
+		$scope.showAll=function(users){
+			map.removeOverlay(__pointCollOverLay);
+			var groupPts={};
+			for(var i=0;i<users.length;i++){
+				var item=users[i];
+				if(item.x && item.y){
+					(function(){
+						var pts = groupPts[item[cond_statisticsType]];
+						if(!pts){
+							groupPts[item[cond_statisticsType]]=[];
+							pts = groupPts[item[cond_statisticsType]]
+						}
+						
+						var p=new BMap.Point(item.x, item.y);
+						p.data=item;
+						pts.push(p);
+					})();
+				}
+			}
+			for(var k in groupPts){
+				if(groupPts[k].length>0 && viewPortPoints && viewPortPoints.length>0){
+					setViewPort(viewPortPoints);
+				}
+				break;
+			}
+			
+			for(var key in groupPts){
+				var pts = groupPts[key];
+				var options = {
+		            color: colors[$scope.getValIndex(key)]
+		        }
+		        var pointCollection = new BMap.PointCollection(pts, options);  // 初始化PointCollection
+		        pointCollection.addEventListener('click', function (e) {
+		        	//var pros="";
+		        	//for(pro in e){
+		        	//	pros+=","+pro;
+		        	//}
+		        	//alert(pros);
+		            var devInfo = e.point.data;
+		            /* infoWindow */
+				    var infoWinContent = "<div class=\"info_win\">"
+						+"	<table width=\"100%\">"
+						+"		<tr>"
+						+"			<td align=\"center\" width=\"100\">"
+						+"				<img id=\"infoimg_"+item.deviceObjCode+"\" src=\"../../../../img/img_danaut.png\" style='width:100px;height:80px'/>"
+						+"			</td>"
+						+"			<td>"
+						+"				<div class=\"tiBar\">"
+						+"					<label class=\"title\">"+devInfo.deviceObjName+"</label>"
+						+"					<span class=\"dev_status\">"+devInfo.healthName+"</span>"
+						+"				</div>"
+						+"				<div>"
+// 						+"					设备编号："+devInfo.deviceObjCode
+						+($scope.featureField && $scope.featureField.ename?"					"+$scope.featureField.cname+"："+devInfo[$scope.featureField.ename]:"")
+						+"				</div>"
+						//+"				<div>"
+						//+"					"+(devInfo.addressDesc?devInfo.addressDesc:'')
+						//+"				</div>"
+						+"			</td>"
+						+"		</tr>"
+						+"	</table>"
+						+"	<div class=\"foBar\">"
+						+"		<a href=\"javascript:openDetail('"+devInfo.deviceObjCode+"')\">台帐&gt;&gt;</a>"
+// 						+"		<a href=\"javascript:\">移入&gt;&gt;</a>"
+// 						+"		<a href=\"javascript:\">移出&gt;&gt;</a>"
+						+"	</div>"
+						+"</div>";
+					var infoWindow = new BMap.InfoWindow(infoWinContent);  // 创建信息窗口对象
+					
+					var mctCode=devInfo.mctCode;
+					var companyCode=devInfo.companyCode;
+					var proNo=devInfo.proNo;
+					var deviceObjCode=devInfo.deviceObjCode;
+					
+					//mctCode,companyCode,proNo,deviceObjCode
+					 var imgUrl="";
+					$http.get(serviceBasePath+"eap/pmsServices/om/deviceMgr/images/getList?mctCode="
+						+mctCode+"&deviceObjCode="+deviceObjCode+"&proNo="+proNo+"&companyCode="+companyCode).success(function(response){
+						if(response.statusCode==401){
+							alert("用户凭据过期！请重新登录！");
+							window.top.location.href="../../../login.html";
+							return;
+						}
+						
+						for(var i=0;i<response.list.length;i++){
+							var st=filePath+"?fileCode="+response.list[i].picVisitid+"&attachment=0"
+									
+						    response.list[i].url=st;			
+						} 
+						
+						if(response.list.length>0){
+							imgUrl = response.list[0].url;
+							//alert(imgUrl)
+							$("#infoimg_"+deviceObjCode).attr("src",imgUrl);
+							
+						}
+						
+					}); 
+					map.openInfoWindow(infoWindow, e.point);
+		          });
+		        map.addOverlay(pointCollection);
+		        __pointCollOverLay=pointCollection;
+			}
+	       
+		};
+		$scope.locationTo=function(item){
+			var p=new BMap.Point(item.x, item.y);
+			setViewPort([p]);
+		};
+		$scope.showCond=function(){
+			$(".cond_layer").show();
+		};
+		$scope.closeCond=function(){
+			$(".cond_layer").hide();
+		};
+		$scope.openDetail=function(item){
+			new ShowDlog().showFrame("../device/deviceDetail.html?deviceObjCode="+item.deviceObjCode, "设备详情", function(){
+				
+			}, "device_detail");
+			
+		};
+		
+		/* 1、查出图例数据 */
+		$scope.getLegendData=function(){
+			var arrN=[];
+			for(var i=0; i<$scope.theadData.searchFields.length; i++){
+				var searchField = $scope.theadData.searchFields[i];
+				if(searchField.dtype==4 && searchField.ename == cond_statisticsType){
+					for(j=0; j<searchField.enumValue.length; j++){
+						var enumVal = searchField.enumValue[j];
+						if(enumVal!="(清空)"){
+							arrN.push(enumVal);
+						}
+					}
+					$scope.legendData=arrN;
+					return arrN;
+					
+				}
+			}
+		};
+		/* 2、获取值索引，用于决定颜色 */
+		$scope.getValIndex=function(val){
+			for(var j=0; j<$scope.legendData.length; j++){
+				var v = $scope.legendData[j];
+				if(v==val){
+					return j;
+				}
+			}
+		};
+		/* 3、组织图表数据与每项颜色 */
+		$scope.sumgc=0;
+		$scope.getSeriesData=function(data){
+			$scope.sumgc=0;
+			for(var i=0; i<data.length; i++){
+				var item= data[i];
+				item.name=item[cond_statisticsType];
+				item.value=item.groupCount;
+				$scope.sumgc+=item.groupCount;
+				item.itemStyle={normal:{color:colors[$scope.getValIndex(item.name)]}};
+			}
+		};
+		$scope.decim=function(num, len){
+			return decim(num, len);
+		};
+		$scope.isHidden=function(item){
+			for(var i=0; i<$scope.dataList.groupList.length; i++){
+				var grpItem = $scope.dataList.groupList[i];
+				if(grpItem.name==item[cond_statisticsType]){
+					if(grpItem.isClose){
+						return true;
+					}else{
+						return false;
+					}
+				}
+			}
+			return false;
+		};
+		$scope.onSwitch=function(item, index){
+			if(!item.isClose){
+				item.isClose=true;
+				// 地图不显示
+			}else{
+				item.isClose=false;
+				// 地图上显示
+			}
+			$scope.showAll($scope.dataList.mctDeviceList);
+		};
+		
+		//if(cond_mct!=""){
+			$scope.loadTheader(cond_mct);
+			//$scope.toQuery();
+		//}
+			//$scope.loadData();
+	}
+});
+
+function openDetail(deviceObjCode){
+	new ShowDlog().showFrame("../device/deviceDetail.html?deviceObjCode="+deviceObjCode, "设备详情", function(){
+		
+	}, "device_detail");
+	
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.questionnire.dao.QaQuestionnireSendMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.questionnire.vo.QaQuestionnireSend" >
+    <id column="ROWID" property="rowid" jdbcType="BIGINT" />
+    <result column="QUESTIONNIRE_CODE" property="questionnireCode" jdbcType="VARCHAR" />
+    <result column="EMPLOYEE_CODE" property="employeeCode" jdbcType="VARCHAR" />
+    <result column="EMPLOYEE_NAME" property="employeeName" jdbcType="VARCHAR" />
+    <result column="JOB_NO" property="jobNo" jdbcType="VARCHAR" />
+    <result column="UNIT_NAME" property="unitName" jdbcType="VARCHAR" />
+    <result column="PRO_NAME" property="proName" jdbcType="VARCHAR" />
+    <result column="SEND_TIME" property="sendTime" jdbcType="TIMESTAMP" />
+    <result column="SUBMIT_TIME" property="submitTime" jdbcType="TIMESTAMP" />
+    <result column="STATUS" property="status" jdbcType="INTEGER" />
+    
+    <result column="SCORE" property="score" jdbcType="FLOAT" />
+  </resultMap>
+
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    	ROWID, QUESTIONNIRE_CODE, EMPLOYEE_CODE, SEND_TIME
+    from qa_questionnire_send
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </select>
+  <select id="findByQuestionnireCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    	ROWID, QUESTIONNIRE_CODE, EMPLOYEE_CODE, SEND_TIME
+    from qa_questionnire_send
+    where QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+  </select>
+  <delete id="delete" parameterType="map" >
+    delete from qa_questionnire_send
+    where QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+    	and EMPLOYEE_CODE = #{employeeCode,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByQuestionnireCode" parameterType="java.lang.String" >
+    delete from qa_questionnire_send
+    where QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+  </delete>
+  <delete id="batchDelete" parameterType="map">
+  	DELETE FROM qa_questionnire_send 
+  	WHERE questionnire_code = #{questionnireCode,jdbcType=VARCHAR} 
+  		AND employee_code IN ('-1',
+  		<foreach collection="employeecodes" item="employeecode" separator=",">
+  			#{employeecode,jdbcType=VARCHAR}
+  		</foreach>
+  		)
+  </delete>
+  <insert id="insert" parameterType="com.glens.pwCloudOs.questionnire.vo.QaQuestionnireSend" >
+    insert into qa_questionnire_send (QUESTIONNIRE_CODE, EMPLOYEE_CODE, SEND_TIME)
+    values (#{questionnireCode,jdbcType=VARCHAR}, #{employeeCode,jdbcType=VARCHAR}, now())
+  </insert>
+  <insert id="batchInsert" parameterType="list" >
+    insert into qa_questionnire_send (QUESTIONNIRE_CODE, EMPLOYEE_CODE, SEND_TIME)
+    values 
+    <foreach collection="list" item="item" separator=",">
+    (#{item.questionnireCode,jdbcType=VARCHAR}, #{item.employeeCode,jdbcType=VARCHAR}, now())
+    </foreach>
+  </insert>
+  <select id="queryForCount" resultType="int" parameterType="map">
+  	select count(*)	from
+	(SELECT 
+		t1.*, 
+		t2.SUBMIT_TIME,
+		(CASE WHEN t2.SUBMIT_USER IS NOT NULL THEN 1 ELSE 0 END) AS STATUS,
+		t3.EMPLOYEENAME as EMPLOYEE_NAME, t3.JOB_NO,
+		t4.UNIT_NAME,
+		(CASE WHEN GROUP_CONCAT(DISTINCT t5.PRO_NAME) IS NOT NULL THEN GROUP_CONCAT(DISTINCT t5.PRO_NAME) 
+			ELSE GROUP_CONCAT(DISTINCT t7.PRO_NAME) END) AS PRO_NAME
+	FROM qa_questionnire_send t1 
+	LEFT JOIN qa_answer_sheet t2 ON t1.QUESTIONNIRE_CODE = t2.QUESTIONNIRE_CODE 
+		AND t1.EMPLOYEE_CODE=t2.SUBMIT_USER
+	LEFT JOIN md_employee t3 ON t1.EMPLOYEE_CODE=t3.EMPLOYEECODE
+	LEFT JOIN md_org_unit t4 ON t3.UNIT_CODE = t4.UNIT_CODE
+	LEFT JOIN pm_base t5 ON t1.EMPLOYEE_CODE=t5.EMPLOYEECODE AND t5.pro_status&lt;&gt;3
+	LEFT JOIN pm_member t6 ON t1.EMPLOYEE_CODE=t6.EMPLOYEECODE AND t6.WORK_STATUE=1	
+	LEFT JOIN pm_base t7 ON t6.PRO_NO=t7.PRO_NO AND t7.pro_status&lt;&gt;3
+	WHERE t1.QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+	GROUP BY employee_code) t
+	where 1=1
+	<if test="searchName != null">
+    	and (EMPLOYEE_NAME like "%"#{searchName}"%" or
+    		UNIT_NAME like "%"#{searchName}"%" or
+    		PRO_NAME like "%"#{searchName}"%")
+    </if>
+    <if test="status != null">
+    	and STATUS = #{status, jdbcType=INTEGER}
+    </if>
+  </select>
+  <select id="queryForPage" resultMap="BaseResultMap" parameterType="map">
+	select * from
+	(SELECT 
+		t1.ROWID, 
+		t2.SUBMIT_TIME,
+		t1.QUESTIONNIRE_CODE, t1.EMPLOYEE_CODE, t1.SEND_TIME,
+		(CASE WHEN t2.SUBMIT_USER IS NOT NULL THEN 1 ELSE 0 END) AS STATUS,
+		t2.SCORE,
+		t3.EMPLOYEENAME as EMPLOYEE_NAME, t3.JOB_NO,
+		t4.UNIT_NAME,
+		(CASE WHEN GROUP_CONCAT(DISTINCT t5.PRO_NAME) IS NOT NULL THEN GROUP_CONCAT(DISTINCT t5.PRO_NAME) 
+			ELSE GROUP_CONCAT(DISTINCT t7.PRO_NAME) END) AS PRO_NAME
+	FROM qa_questionnire_send t1 
+	LEFT JOIN qa_answer_sheet t2 ON t1.QUESTIONNIRE_CODE = t2.QUESTIONNIRE_CODE 
+		AND t1.EMPLOYEE_CODE=t2.SUBMIT_USER
+	LEFT JOIN md_employee t3 ON t1.EMPLOYEE_CODE=t3.EMPLOYEECODE
+	LEFT JOIN md_org_unit t4 ON t3.UNIT_CODE = t4.UNIT_CODE
+	LEFT JOIN pm_base t5 ON t1.EMPLOYEE_CODE=t5.EMPLOYEECODE AND t5.pro_status&lt;&gt;3
+	LEFT JOIN pm_member t6 ON t1.EMPLOYEE_CODE=t6.EMPLOYEECODE AND t6.WORK_STATUE=1	
+	LEFT JOIN pm_base t7 ON t6.PRO_NO=t7.PRO_NO AND t7.pro_status&lt;&gt;3
+	WHERE t1.QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+	GROUP BY employee_code) t
+	where 1=1
+	<if test="searchName != null">
+    	and (EMPLOYEE_NAME like "%"#{searchName}"%" or
+    		UNIT_NAME like "%"#{searchName}"%" or
+    		PRO_NAME like "%"#{searchName}"%")
+    </if>
+    <if test="status != null">
+    	and STATUS = #{status, jdbcType=INTEGER}
+    </if>
+    ORDER BY t.SEND_TIME DESC, t.ROWID
+    limit #{firstResult},#{maxResult}
+  </select>
+  <select id="queryForList" resultMap="BaseResultMap" parameterType="map">
+	select * from
+	(SELECT 
+		t1.ROWID, 
+		t2.SUBMIT_TIME,
+		t1.QUESTIONNIRE_CODE, t1.EMPLOYEE_CODE, t1.SEND_TIME,
+		(CASE WHEN t2.SUBMIT_USER IS NOT NULL THEN 1 ELSE 0 END) AS STATUS,
+		t2.SCORE,
+		t3.EMPLOYEENAME as EMPLOYEE_NAME, t3.JOB_NO,
+		t4.UNIT_NAME,
+		(CASE WHEN GROUP_CONCAT(DISTINCT t5.PRO_NAME) IS NOT NULL THEN GROUP_CONCAT(DISTINCT t5.PRO_NAME) 
+			ELSE GROUP_CONCAT(DISTINCT t7.PRO_NAME) END) AS PRO_NAME
+	FROM qa_questionnire_send t1 
+	LEFT JOIN qa_answer_sheet t2 ON t1.QUESTIONNIRE_CODE = t2.QUESTIONNIRE_CODE 
+		AND t1.EMPLOYEE_CODE=t2.SUBMIT_USER
+	LEFT JOIN md_employee t3 ON t1.EMPLOYEE_CODE=t3.EMPLOYEECODE
+	LEFT JOIN md_org_unit t4 ON t3.UNIT_CODE = t4.UNIT_CODE
+	LEFT JOIN pm_base t5 ON t1.EMPLOYEE_CODE=t5.EMPLOYEECODE AND t5.pro_status&lt;&gt;3
+	LEFT JOIN pm_member t6 ON t1.EMPLOYEE_CODE=t6.EMPLOYEECODE AND t6.WORK_STATUE=1	
+	LEFT JOIN pm_base t7 ON t6.PRO_NO=t7.PRO_NO AND t7.pro_status&lt;&gt;3
+	WHERE t1.QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+	GROUP BY employee_code) t
+	where 1=1
+	<if test="searchName != null">
+    	and (EMPLOYEE_NAME like "%"#{searchName}"%" or
+    		UNIT_NAME like "%"#{searchName}"%" or
+    		PRO_NAME like "%"#{searchName}"%")
+    </if>
+    <if test="status != null">
+    	and STATUS = #{status, jdbcType=INTEGER}
+    </if>
+    ORDER BY t.SEND_TIME DESC, t.ROWID
+  </select>
+  <select id="selectMyQuestionnire" resultType="map" parameterType="string">
+  	SELECT 
+  		t1.questionnire_code as questionnireCode, 
+  		t2.title,
+  		DATE_FORMAT(t2.ENABLED_BEGIN_TIME, '%Y-%m-%d %H:%i:%s') as enabledBeginTime,
+  		DATE_FORMAT(t2.ENABLED_END_TIME, '%Y-%m-%d %H:%i:%s') as enabledEndTime,
+  		t1.SEND_TIME as sendTime,
+  		t2.TYPE as type, 
+  		t1.employee_code as employeeCode, 
+  		CASE WHEN t3.submit_user IS NULL THEN 0 ELSE 1 END AS status
+	FROM `qa_questionnire_send` t1 
+	LEFT JOIN `qa_questionnire` t2 ON t1.questionnire_code = t2.questionnire_code
+	LEFT JOIN qa_answer_sheet t3 ON t1.questionnire_code = t3.questionnire_code AND t1.employee_code = t3.submit_user
+	WHERE t1.employee_code = #{employeeCode, jdbcType=VARCHAR}
+		AND t2.enabled_begin_time &lt;= DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AND t2.enabled_end_time &gt;= DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
+	ORDER BY t1.SEND_TIME DESC
+  </select>
+</mapper>

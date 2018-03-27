@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.gm.vm.filling.dao.GmVmSinopecBillMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.gm.vm.filling.vo.GmVmSinopecBill" >
+    <id column="ROWID" property="rowid" jdbcType="BIGINT" />
+    <result column="CARD_NO" property="cardNo" jdbcType="VARCHAR" />
+    <result column="REC_TIME" property="recTime" jdbcType="TIMESTAMP" />
+    <result column="OIL_CATEGORY" property="oilCategory" jdbcType="VARCHAR" />
+    <result column="COUNT" property="count" jdbcType="REAL" />
+    <result column="PRICE" property="price" jdbcType="REAL" />
+    <result column="AMOUNT" property="amount" jdbcType="REAL" />
+    <result column="SCORE" property="score" jdbcType="REAL" />
+    <result column="BALANCE" property="balance" jdbcType="REAL" />
+    <result column="ADDRESS" property="address" jdbcType="VARCHAR" />
+    <result column="CHECK_TIME" property="checkTime" jdbcType="TIMESTAMP" />
+    <result column="CHECK_RESULT" property="checkResult" jdbcType="INTEGER" />
+    <result column="REL_ID" property="relId" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ROWID, CARD_NO, date_format(REC_TIME, '%Y-%m-%d %H:%i:%S') as REC_TIME, OIL_CATEGORY, COUNT, PRICE, AMOUNT, SCORE, BALANCE, ADDRESS, 
+    date_format(CHECK_TIME, '%Y-%m-%d') as CHECK_TIME, CHECK_RESULT, REL_ID
+  </sql>
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from gm_vm_sinopec_bill
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </select>
+  <select id="selectByCardNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from gm_vm_sinopec_bill
+    where CARD_NO = #{cardNo,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByCardNoTimeAddr" resultMap="BaseResultMap" parameterType="com.glens.pwCloudOs.gm.vm.filling.vo.GmVmSinopecBill" >
+    select 
+    <include refid="Base_Column_List" />
+    from gm_vm_sinopec_bill
+    where CARD_NO = #{cardNo,jdbcType=VARCHAR}
+    and REC_TIME = #{recTime,jdbcType=VARCHAR}
+    and ADDRESS = #{address,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByCardNoDate" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    <include refid="Base_Column_List" />
+    from gm_vm_sinopec_bill
+    where CARD_NO = #{cardNo,jdbcType=VARCHAR}
+    and date_format(REC_TIME, '%Y-%m-%d') = #{recTime,jdbcType=VARCHAR}
+  </select>
+  <select id="queryForCount" resultType="int" parameterType="map" >
+    select 
+    	count(*)
+    from gm_vm_sinopec_bill
+    where 1=1
+    <if test="cardNo != null and cardNo != ''">
+    	and CARD_NO = #{cardNo,jdbcType=VARCHAR}
+    </if>
+    <if test="startTime != null and startTime != ''">
+    	and REC_TIME &gt;= #{startTime,jdbcType=VARCHAR}
+    </if>
+    <if test="endTime != null and endTime != ''">
+    	and REC_TIME &lt;= #{endTime,jdbcType=VARCHAR}
+    </if>
+    <if test="checkResult != null">
+    	and CHECK_RESULT = #{checkResult, jdbcType=INTEGER}
+    </if>
+  </select>
+  <select id="queryForPage" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    <include refid="Base_Column_List" />
+    from gm_vm_sinopec_bill
+    where 1=1
+    <if test="cardNo != null and cardNo != ''">
+    	and CARD_NO = #{cardNo,jdbcType=VARCHAR}
+    </if>
+    <if test="startTime != null and startTime != ''">
+    	and REC_TIME &gt;= #{startTime,jdbcType=VARCHAR}
+    </if>
+    <if test="endTime != null and endTime != ''">
+    	and REC_TIME &lt;= #{endTime,jdbcType=VARCHAR}
+    </if>
+    <if test="checkResult != null">
+    	and CHECK_RESULT = #{checkResult, jdbcType=INTEGER}
+    </if>
+    order by rec_time desc
+    limit #{firstResult},#{maxResult}
+  </select>
+  <insert id="insert" parameterType="com.glens.pwCloudOs.gm.vm.filling.vo.GmVmSinopecBill" >
+    insert into gm_vm_sinopec_bill (ROWID, CARD_NO, REC_TIME, 
+      OIL_CATEGORY, COUNT, PRICE, 
+      AMOUNT, SCORE, BALANCE, ADDRESS 
+      )
+    values (#{rowid,jdbcType=BIGINT}, #{cardNo,jdbcType=VARCHAR}, #{recTime,jdbcType=TIMESTAMP}, 
+      #{oilCategory,jdbcType=VARCHAR}, #{count,jdbcType=REAL}, #{price,jdbcType=REAL}, 
+      #{amount,jdbcType=REAL}, #{score,jdbcType=REAL}, #{balance,jdbcType=REAL}, #{address,jdbcType=VARCHAR} 
+      )
+  </insert>
+  <insert id="batchInsert" parameterType="list" >
+    insert into gm_vm_sinopec_bill (ROWID, CARD_NO, REC_TIME, 
+      OIL_CATEGORY, COUNT, PRICE, 
+      AMOUNT, SCORE, BALANCE, ADDRESS
+      )
+    values 
+    <foreach collection="list" item="item" separator=",">
+    (#{item.rowid,jdbcType=BIGINT}, #{item.cardNo,jdbcType=VARCHAR}, #{item.recTime,jdbcType=TIMESTAMP}, 
+      #{item.oilCategory,jdbcType=VARCHAR}, #{item.count,jdbcType=REAL}, #{item.price,jdbcType=REAL}, 
+      #{item.amount,jdbcType=REAL}, #{item.score,jdbcType=REAL}, #{item.balance,jdbcType=REAL}, #{item.address,jdbcType=VARCHAR} 
+      )
+      </foreach>
+  </insert>
+  <update id="update" parameterType="com.glens.pwCloudOs.gm.vm.filling.vo.GmVmSinopecBill" >
+    update gm_vm_sinopec_bill
+    <set >
+      CHECK_TIME = now(),
+      <if test="checkResult != null and checkResult != 0" >
+        CHECK_RESULT = #{checkResult,jdbcType=INTEGER},
+      </if>
+      <if test="relId != null" >
+        REL_ID = #{relId,jdbcType=BIGINT},
+      </if>
+    </set>
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </update>
+</mapper>

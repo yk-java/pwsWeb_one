@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.questionnire.dao.QuestionnireStatisticMapper" >
+  
+  <select id="queryForCount" resultType="int" parameterType="map">
+  	select count(*) from qa_questionnire
+  	where 1=1
+  	<if test="searchName != null">
+    	and (title like "%"#{searchName}"%" or
+    		descr like "%"#{searchName}"%")
+    </if>
+    <if test="status != null">
+    	and status = #{status, jdbcType=INTEGER}
+    </if>
+    <if test="type != null">
+    	and type = #{type, jdbcType=INTEGER}
+    </if>
+  </select>
+  <select id="queryForPage" resultType="map" parameterType="map">
+    SELECT 
+    	t1.ROWID as rowid,
+  		t1.QUESTIONNIRE_CODE as questionnireCode,
+  		t1.TITLE as title,
+  		t1.DESCR as descr,
+  		DATE_FORMAT(t1.ENABLED_BEGIN_TIME, '%Y-%m-%d %H:%i:%s') as enabledBeginTime,
+  		DATE_FORMAT(t1.ENABLED_END_TIME, '%Y-%m-%d %H:%i:%s') as enabledEndTime,
+  		t1.STATUS as status,
+  		t1.SYS_CREATE_TIME as sysCreateTime,
+  		t1.CREATER as creater,
+  		t3.EMPLOYEENAME as employeeName,
+  		t1.TYPE as type,
+  		t1.sendedCnt,
+    	COUNT(t2.submit_user) AS answerSheetCnt 
+	FROM (SELECT tt1.*, COUNT(tt2.employee_code) AS sendedCnt FROM qa_questionnire tt1 
+		LEFT JOIN qa_questionnire_send tt2 ON tt1.questionnire_code = tt2.questionnire_code
+		GROUP BY tt1.questionnire_code
+		) t1
+	LEFT JOIN qa_answer_sheet t2 ON t1.questionnire_code = t2.questionnire_code
+	LEFT JOIN md_employee t3 ON t1.creater = t3.employeecode
+	where 1=1
+	<if test="searchName != null">
+		and (t1.title like "%"#{searchName}"%" or
+			t1.descr like "%"#{searchName}"%")
+	</if>
+	<if test="status != null">
+		and t1.status = #{status, jdbcType=INTEGER}
+	</if>
+	<if test="type != null">
+		and t1.type = #{type, jdbcType=INTEGER}
+	</if>
+	GROUP BY t1.questionnire_code
+    limit #{firstResult},#{maxResult}
+  </select>
+  <select id="selectAnswerByQuestionnireCodeAndUser" resultType="map" parameterType="map">
+  	SELECT 
+  		t1.question_code as questionCode, 
+  		t1.answer, 
+  		t1.supplement, 
+  		t2.submit_time as submitTime 
+  	FROM qa_answer t1
+	LEFT JOIN qa_answer_sheet t2 ON t1.answer_sheet_code = t2.answer_sheet_code
+	WHERE t2.questionnire_code=#{questionnireCode} AND t2.submit_user=#{submitUser}
+  </select>
+  <select id="statisticRadioAnswerByQuestionCode" resultType="map" parameterType="map">
+  	SELECT 
+  		t1.answer, 
+  		COUNT(t1.answer) AS cnt 
+  	FROM qa_answer t1
+	WHERE t1.question_code=#{questionCode}
+		AND t1.answer IS NOT NULL AND t1.answer &lt;&gt; ''
+	GROUP BY t1.answer
+  </select>
+  <select id="selectSupplementByQuestionCodeAndOptCode" resultType="map" parameterType="map">
+  	SELECT 
+  		t2.submit_user as submitUser,
+  		t3.employeename, 
+  		t1.supplement 
+  	FROM qa_answer t1
+	LEFT JOIN qa_answer_sheet t2 ON t1.answer_sheet_code = t2.answer_sheet_code
+	LEFT JOIN md_employee t3 ON t2.submit_user = t3.employeecode
+	WHERE t1.question_code=#{questionCode} AND t1.ANSWER=#{optNum}
+  </select>
+  <select id="selectTextAnswerByQuestionCode" resultType="map" parameterType="map">
+  	SELECT 
+  		t2.submit_user as submitUser,
+  		t3.employeename, 
+  		t1.answer 
+  	FROM qa_answer t1
+	LEFT JOIN qa_answer_sheet t2 ON t1.answer_sheet_code = t2.answer_sheet_code
+	LEFT JOIN md_employee t3 ON t2.submit_user = t3.employeecode
+	WHERE t1.question_code=#{questionCode}
+  </select>
+  <select id="selectAnswerData" resultType="map" parameterType="map">
+  	SELECT 
+  		t4.num as num, t4.title, t4.sub_type as subType, 
+  		t1.answer, t5.option_label as optionLabel, t1.supplement, t3.employeename as employeeName  
+	FROM qa_answer t1
+	LEFT JOIN qa_question t4 ON t1.question_code = t4.question_code
+	LEFT JOIN qa_option t5 ON t1.answer = t5.num AND t5.question_code = t4.question_code
+	LEFT JOIN qa_answer_sheet t2 ON t1.answer_sheet_code = t2.answer_sheet_code
+	LEFT JOIN md_employee t3 ON t2.submit_user = t3.employeecode
+	WHERE t1.questionnire_code=#{questionnireCode}
+	<if test="subType != null and subType != ''"> 
+	AND t4.sub_type=#{subType}
+	</if>
+	<if test="questionCode != null and questionCode != ''">
+	AND t1.question_code=#{questionCode}
+	</if>
+	<if test="submitUser != null and submitUser != ''">
+	AND t2.submit_user=#{submitUser}
+	</if>
+  </select>
+</mapper>

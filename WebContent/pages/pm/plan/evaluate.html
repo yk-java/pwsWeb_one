@@ -1,0 +1,346 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 填报项目计划 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css"/>
+<style type="text/css">
+	.kpiTable{border:solid 1px #ccc;}
+	.kpiTable th, .kpiTable td{border:solid 1px #ccc;}
+	.sgreen{background:#EDF4FF;border:dashed 1px #72BBFF;}
+	.sred{background:#FFFF99;border:dashed 1px #FF9900;}
+	.kpiTable tr{background:#EDF4FF;}
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+<!-- 		<div class="title_div"> -->
+<!-- 			<div class="title_left"> -->
+<!-- 				<label class="title">评价</label> -->
+<!-- 			</div> -->
+<!-- 			<img src="../../../img/list_Header2-.png"> -->
+<!-- 		</div> -->
+<!-- 		<div class="tabs"> -->
+<!-- 			<a href="#lay1" class="tab selected"></a> -->
+<!-- 		</div> -->
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1" style="padding-top:4px;">
+			<table>
+				<tr>
+					<th>计划编号</th>
+					<td>
+						<input type="hidden" name="rowid" value="{{rowid}}"/>
+						<input type="text" name="planNo" value="{{planNo}}" class="readonly" readonly="readonly" style="width:360px;"/>
+					</td>
+					<th>项目</th>
+					<td>
+						<input type="hidden" name="proNo" value="{{planVo.proNo}}"/>
+						<input type="text" name="proName" value="{{planVo.proName}}" class="required readonly" readonly="readonly" placeholder="项目" style="width:360px;"/>
+					</td>
+				</tr>
+				<tr>
+					<th>开始时间</th>
+					<td>
+						<input type="text" name="sdate" value="{{planVo.sdate}}" class="readonly" readonly="readonly" style="width:360px;"/>
+					</td>
+					<th>结束时间</th>
+					<td>
+						<input type="text" name="edate" value="{{planVo.edate}}" class="readonly" readonly="readonly" style="width:360px;"/>
+					</td>
+				</tr>
+<!-- 				<tr> -->
+<!-- 					<th>计划工作量</th> -->
+<!-- 					<td colspan="3"> -->
+<!-- 						<ul style="background:#e6e6e6;border:solid 1px #c3c3c3;list-style-type:none;padding:5px;"> -->
+<!-- 							<li ng-repeat="item in kpiList"><label style="display:inline-block;padding-right:8px;">{{item.kpiName}}:</label>{{item.kpiValue}} ({{item.kpiUnit}})</li> -->
+<!-- 						</ul> -->
+<!-- 					</td> -->
+<!-- 				</tr> -->
+				<tr>
+					<td></td>
+					<td colspan="3">
+						<table style="width:100%" class="kpiTable">
+							<tr style="background:#EDF4FF;font-weight:bold;">
+								<td colspan="3" align="center">计划工作量：<span style="font-size:14px;font-weight:bold;color:#ff6600;">{{planVo.planWordload}}</span></td>
+								<td colspan="3" align="center">实际工作量：<span style="font-size:14px;font-weight:bold;color:#ff6600;">{{planVo.sumWordload}}</span></td>
+							</tr>
+							<tr ng-repeat="item in planVo.kpiLibList"><!-- ng-class="{'sgreen':item.kpiType==1, 'sred':item.kpiType==2}" -->
+								<th width="60" style="text-align:center;font-weight:bold;" ng-if="item.kpiType_rowspan" rowspan="{{item.kpiType_rowspan?item.kpiType_rowspan:1}}">
+									<span ng-if="item.kpiType==1">外业</span>
+									<span ng-if="item.kpiType==2">内业</span>
+									<span ng-if="item.kpiType==3">非标项</span>
+								</th>
+								<th width="100" style="text-align:center;">{{item.kpiName}}</th>
+								<td><span style="font-size:14px;font-weight:bold;color:#ff6600;">{{item.kpiValue?item.kpiValue:0}}</span> {{item.kpiUnit}}</td>
+								<th width="60" style="text-align:center;font-weight:bold;" ng-if="item.kpiType_rowspan" rowspan="{{item.kpiType_rowspan?item.kpiType_rowspan:1}}">
+									<span ng-if="item.kpiType==1">外业</span>
+									<span ng-if="item.kpiType==2">内业</span>
+									<span ng-if="item.kpiType==3">非标项</span>
+								</th>
+								<th width="100" style="text-align:center;">{{item.kpiName}}</th>
+								<td><span style="font-size:14px;font-weight:bold;color:#ff6600;">{{item.realKpiValue?item.realKpiValue:0}}</span> {{item.kpiUnit}}</td>
+							</tr>
+							<tr>
+								<td colspan="6" style="font-weight:bold;">计划执行率：<span style="font-size:14px;font-weight:bold;color:#ff6600;">{{decim(planVo.planComplatePer, 1)}}%</span></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<th>计划说明 </th>
+					<td>
+						<textarea cols="57" rows="5" name="" class="readonly" readonly="readonly" placeholder="本月计划投入外业**人，计划外出作业**日；计划投入内业**人，计划作业**日">{{planVo.planDesc}}</textarea>
+					</td>
+					<th>计划评定 </th>
+					<td>
+						<textarea cols="57" rows="5" name="evaluate" class="required">{{planVo.evaluate}}</textarea>
+					</td>
+				</tr>
+				<tr>
+					<th>反馈内容 </th>
+					<td>
+						<textarea cols="57" rows="5" name="" class="readonly" readonly="readonly">{{planVo.feedback}}</textarea>
+					</td>
+					<th>反馈评定 </th>
+					<td>
+						<textarea cols="57" rows="5" name="feedbackEval">{{planVo.feedbackEval}}</textarea>
+					</td>
+				</tr>
+				<tr>
+					<th>计划考核分值 </th>
+					<td>
+						<input name="planCheckScore" class="" value="{{planVo.planCheckScore}}" style="width:360px;"/>
+					</td>
+					<th>反馈考核分值 </th>
+					<td>
+						<input name="feedbackCheckScore" class="" value="{{planVo.feedbackCheckScore}}" style="width:360px;"/>
+						
+						<input type="hidden" name="docTypelibName" />
+						<input type="hidden" name="status" />
+						<input type="hidden" name="employeeCode" />
+						<input type="hidden" name="companyCode" />
+						<input type="hidden" name="proNo" />
+						<input type="hidden" name="planWordload" value="{{planVo.planWordload}}" />
+						<input type="hidden" name="allPlanWordload" value="{{planVo.allPlanWordload}}" />
+						<input type="hidden" name="opType" value="evaluate" />
+					</td>
+				</tr>
+			</table>
+		</div>
+		
+
+		<div class="form_bottom" style="padding-top:6px;">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;提交
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		<br/><br/><br/>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+var isSave=false;
+simpleController({
+	init:function($scope, $http){
+		// 定义
+		$scope.planVo={};
+		$scope.dataList=[];
+		$scope.kpiList=[];
+		$scope.planType=1;
+		var ticket = $scope.ticket;
+		// 参数
+		var urlParams = getUrlParams();
+		$scope.rowid=urlParams.rowid;
+		$scope.planNo=urlParams.planNo;
+		$scope.planType=urlParams.planType;
+		
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		var userData = jQuery.parseJSON(userDataStr);
+		//alert(userData.employeeCode)
+		
+		$("input[name=employeeCode]").val(userData.employeeCode);
+		$("input[name=companyCode]").val(userData.companyCode);
+		$("input[name=proNo]").val(urlParams.proNo);
+		
+		$scope.httpGet({
+			url:"eap/pmsServices/pm/plan/get",
+			data:{"rowid":urlParams.rowid},
+			success:function(res){
+				$scope.planVo = res.data;
+				
+				rowspanFormat({
+					data:$scope.planVo.kpiLibList,
+					params:[{name:"kpiType_rowspan", fields:["kpiType"]}]
+				});
+				
+// 				$scope.loadKpiList($scope.planVo.pmBase.categoryCode, true);
+				
+				if($scope.planVo.planCheckScore){
+					$scope.planStatus=1;
+				}else{
+					$scope.planStatus=0;
+				}
+				
+				if($scope.planVo.feedbackCheckScore){
+					$scope.feedStatus=1;
+				}else{
+					$scope.feedStatus=0;
+				}
+				
+			}
+		});
+		
+		
+		
+		/* 指标列表 */
+// 		$scope.loadKpiList=function(categoryCode, isLoad){
+// 			$scope.httpGet({
+// 				url:"eap/pmsServices/pm/kpiLib/listAll",
+// 				data:{"categoryCode":categoryCode},
+// 				success:function(res){
+// 					$scope.kpiList = res.list;
+// 					if(isLoad){
+// 						for(var i=0; i<res.list.length; i++){
+// 							var item = res.list[i];
+// 							item.kpiValue = $scope.getKpiVal(item.kpiCode);
+// 						}
+// 					}
+// 				}
+// 			});
+// 		};
+		
+		$scope.getKpiVal=function(kpiCode){
+			for(var i=0; i<$scope.planVo.pmPlanKpiList.length; i++){
+				var item = $scope.planVo.pmPlanKpiList[i];
+				if(item.kpiCode==kpiCode){
+					return item.kpiValue;
+				}
+			}
+		};
+		/* 验证 */
+		var validator = $("#saveForm").validate({
+			onsubmit: false,
+			focusInvalid: false,
+			focusCleanup: true,
+			errorElement: "span",
+			ignore:".ignore",
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {
+					
+				} 
+			}
+		});
+		
+		/* 保存 */
+		$scope.onSave = function(){
+			
+			var docTypelibName="";
+			var status=3;
+			if($scope.planType==1){
+				if($scope.planStatus==0){//计划评定未填
+					docTypelibName="周计划评定";
+					status=1;
+				}else if($scope.planStatus==1){//计划评定已填
+					if($scope.feedStatus==0){//反馈考核未填
+						docTypelibName="周计划反馈评定";
+						status=2;
+					}
+				}
+			}else if($scope.planType==2){
+				if($scope.planStatus==0){//计划评定未填
+					docTypelibName="月计划评定";
+					status=1;
+				}else if($scope.planStatus==1){//计划评定已填
+					if($scope.feedStatus==0){//反馈考核未填
+						docTypelibName="月计划反馈评定";
+						status=2;
+					}
+				}
+			}
+			var feedbackEval = $("input[name=feedbackEval]").val();
+			if(feedbackEval && feedbackEval.length>0){
+				status=2;
+			}
+			$("input[name=status]").val(status);
+			$("input[name=docTypelibName]").val(docTypelibName);
+			
+			//return false;
+			var formData = $("#saveForm").serialize();
+			if($("#saveForm").valid()){
+				new ShowDlog().confirm({
+					msg:"确定提交吗？",
+					ok:function(){
+						if(!isSave){
+							isSave=true;
+							$.ajax({
+								url:serviceBasePath+"eap/pmsServices/pm/plan/update",
+								cache:false,
+								method:"POST",
+								data:formData,
+								success:function(res){
+									if(res.statusCode==200){
+										new ShowDlog().prompt({msg:"提交成功！",
+												done:function(){
+													parent.$dlog.data="SUCCESS";
+													parent.$dlog.close();
+												},
+												t:1500
+											});
+										
+									}
+								},
+								error:function(){
+									
+								}
+							});
+						}
+					}
+				});
+			}
+		};
+		
+		// 返回
+		$scope.onCancel = function(){
+			parent.$dlog.close();
+		};
+		
+		$scope.decim=function(num, len){
+			return decim(num, len);
+		}
+	}
+});
+
+</script>
+</body>
+</html>

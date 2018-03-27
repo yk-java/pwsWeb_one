@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  
+ <context-param>
+	    <param-name>contextConfigLocation</param-name>
+	    <param-value>
+			/WEB-INF/classes/spring/applicationContext*.xml
+		</param-value>
+    </context-param>
+	
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    
+    <listener>
+    	<listener-class>com.glens.eap.platform.framework.listener.EAPContextListener</listener-class>
+    </listener>
+    
+    <filter>
+    	<filter-name>encodingFilter</filter-name>
+    	<filter-class>
+    		org.springframework.web.filter.CharacterEncodingFilter
+    	</filter-class>
+    	<init-param>
+    		<param-name>encoding</param-name>
+    		<param-value>utf-8</param-value>
+    	</init-param>
+    </filter>
+    <filter-mapping>
+    	<filter-name>encodingFilter</filter-name>
+    	<url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <filter>
+    	<filter-name>eapAuthClientFilter</filter-name>
+    	<filter-class>com.glens.eap.platform.framework.auth.web.RestUrlInterceptFilter</filter-class>
+    	<init-param>
+    		<param-name>eapsoClientAppId</param-name>
+    		<param-value>01</param-value>
+    	</init-param>
+    	<init-param>
+    		<param-name>appClientLoginHandlerClass</param-name>
+    		<param-value>com.glens.eap.platform.framework.auth.handler.DBAppClientLoginHandler</param-value>
+    	</init-param>
+    	<init-param>
+			<param-name>allowUrl</param-name>
+			<param-value>{"filter":["/pages/main.html","*.jsp", "/eap/pmsServices/*"],
+			"allow":["/eap/pmsServices/loginService","/eap/pmsServices/loginService/wxlogin","/eap/pmsServices/weixin/*","/eap/pmsServices/commuteMgr/app/myCommute/myCommuteStatus", 
+			"/pages/login.html", "/eap/pmsServices/pwBaoAppService/*", "/eap/pmsServices/opsAppService/*",
+			"/eap/pmsServices/loginService/psw","/eap/pmsServices/pm/taskMgr/carDispach/*","/eap/pmsServices/pm/taskMgr/task/*",
+			"/eap/pmsServices/pe/baseMgr/remouldBatch/*","/eap/pmsServices/pwsCommon/*",
+			"/eap/pmsServices/pe/proReserve/*","/eap/pmsServices/pm/sceneMonitoring/*","/eap/pmsServices/pm/sceneEnv/*","/eap/pmsServices/opsAppService/*","/eap/pmsServices/dailylog/*","/eap/websocket","/eap/pmsServices/kmCatalogService/*","/eap/pmsServices/kmbaseService/*","/eap/pmsServices/appNotice/*","/eap/pmsServices/fileServerClientService","/eap/pmsServices/pm/baseMgr/pmBase/proMember"]}</param-value>
+		</init-param>
+    </filter>
+
+    <servlet>
+        <servlet-name>springMvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+	      <param-name>contextConfigLocation</param-name>
+	      <param-value>classpath:spring/application-mvc.xml</param-value>
+	    </init-param>
+	     <load-on-startup>1</load-on-startup>
+    </servlet>
+      
+    <filter-mapping>
+    	<filter-name>eapAuthClientFilter</filter-name>
+    	<url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <servlet-mapping>
+        <servlet-name>springMvc</servlet-name>
+        <url-pattern>/eap/*</url-pattern>
+    </servlet-mapping>
+
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>	 
+  
+  <welcome-file-list>
+    <welcome-file>/index.html</welcome-file>
+  </welcome-file-list>
+</web-app>

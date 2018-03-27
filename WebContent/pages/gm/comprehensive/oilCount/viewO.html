@@ -1,0 +1,234 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 加油记录</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../../../css/validate.css"/>
+
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../../css/list.css" />
+<style type="text/css">
+	
+	
+	
+</style>
+
+</head>
+
+<body ng-app="projectType" ng-controller="userMgrCtrl">
+<div class="list">
+	<div class="list_content">
+		<div style="width:100%;height:35px;text-align: center;font-size:20px;font-weight:700;font-family: '微软雅黑'">
+			{{dataObj.vehicleNo}} ({{dataObj.tempfromDate}}~{{dataObj.temptoDate}})汽车油耗统计表
+		</div>
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr2" style="background:#92D050">
+				<th width="10%"><div align="center">总里程(公里)</div></th>
+				<th width="15%" colspan="2"><div align="center">{{dataObj.totalMileage}}</div></th>
+				<th width="12%"><div align="center">统计天数(天)</div></th>
+				<th width="20%" colspan="2"><div align="center">{{dataObj.totalDay}}</div></th>
+				<th width="15%"><div align="center">平均耗油(升/百公里)</div></th>
+				<th width="28%" colspan="3"><div align="center">{{dataObj.avgMiles}}</div></th>
+			  </tr>
+			  <tr class="tr2" style="background:#ccc">
+				<th><div align="center">总耗油量(升)</div></th>
+				<th colspan="2"><div align="center">{{dataObj.totalVolume}}</div></th>
+				<th><div align="center">日均里程(公里)</div></th>
+				<th colspan="2"><div align="center">{{dataObj.avgMileage}}</div></th>
+				<th><div align="center">平均耗油(元/公里)</div></th>
+				<th colspan="3"><div align="center">{{dataObj.avgFuel}}</div></th>
+			  </tr>
+			  
+			  <tr class="tr2" style="background:#92D050">
+				<th ><div align="center">总油费(元)</div></th>
+				<th  colspan="2"><div align="center">{{dataObj.totalAmount}}</div></th>
+				<th ><div align="center">平均油价(元/升)</div></th>
+				<th colspan="2"><div align="center">{{dataObj.avgPrice}}</div></th>
+				<th ><div align="center"></div></th>
+				<th  colspan="3"><div align="center"></div></th>
+			  </tr>
+			 
+			   <tr class="tr1" style="background:#FFFF00">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">日期</div></th>
+				<th><div align="center">行驶天数</div></th>
+				<th><div align="center">里程表(公里)</div></th>
+				<th><div align="center">行驶里程(公里)</div></th>
+				<th><div align="center">加油金额(元)</div></th>
+				<th><div align="center">单价(元)</div></th>
+				<th><div align="center">加油量(升)</div></th>
+				<th><div align="center">每公里油费(元)</div></th>	
+				<th><div align="center">百公里耗油(升)</div></th>
+				
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in Oillist">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.fcDate}}</div></td>
+				<td><div align="center">{{item.driverDays}}</div></td>
+				<td><div align="center">{{item.curMileage}}</div></td>
+				<td><div align="center">{{item.driverMileage}}</div></td>
+				<td><div align="center">{{item.fcAmount}}</div></td>
+				<td><div align="center">{{item.curPrice}}</div></td>
+				<td><div align="center">{{item.fcVolume}}</div></td>
+				<td><div align="center">{{item.avgFuel}}</div></td>
+				<td><div align="center">{{item.avgMiles}}</div></td>
+				
+			  </tr>
+			</table>
+		</div>
+
+		
+
+	</div>
+</div>
+
+<script language="javascript">
+	  	$(function(){
+	  		$(".timeline").animate({
+	  			height:'480px'
+	  		},1500);
+	  	});
+  	</script>
+
+<script type="text/javascript">
+	var ngScope;
+	var app = angular.module("projectType", []);
+	app.controller("userMgrCtrl", function($scope, $http){
+		/* init */
+		ngScope = $scope;
+		
+		$scope.Oillist=[];//保养记录
+		$scope.dataObj={}; //左侧数据
+		
+		var mydate = new Date();
+		$(".currentYear").html(mydate.getFullYear());
+		
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		$scope.userData = jQuery.parseJSON(userDataStr);
+		var ticket = $.cookie("pmsWeb_ticket");
+		
+		var params = getUrlParams();
+		$scope.required = params.required;
+		
+		
+		var assetCode = "";
+		/* var totalMileage = "";//总里程
+		var totalDay = "";//统计天数
+		var totalVolume = "";//总耗油 （升）
+		var totalAmount = "";//总油费
+		
+		var avgMiles = "";//平均耗油（升/百公里）
+		var avgMileage = "";//日均里程
+		var avgPrice = "";//平均单价
+		var avgFuel = "";//平均耗油(元/公里)
+		 */
+		 
+		var tempfromDate="";
+		var temptoDate="";
+		
+		if(params.assetCode){
+				assetCode=params.assetCode;
+				
+		}
+		if(params.totalMileage){
+				//totalMileage=params.totalMileage;
+				$scope.dataObj.totalMileage=params.totalMileage;
+		}
+		if(params.totalDay){
+				///totalDay=params.totalDay;
+				$scope.dataObj.totalDay=params.totalDay;
+		}
+		if(params.totalVolume){
+				//totalVolume=params.totalVolume;
+				$scope.dataObj.totalVolume=params.totalVolume;
+		}
+		if(params.totalAmount){
+				//totalAmount=params.totalAmount;
+				$scope.dataObj.totalAmount=params.totalAmount;
+		}
+		if(params.avgMiles){
+				//avgMiles=params.avgMiles;
+				$scope.dataObj.avgMiles=params.avgMiles;
+		}
+		if(params.avgMileage){
+				//avgMileage=params.avgMileage;
+				$scope.dataObj.avgMileage=params.avgMileage;
+		}
+		if(params.avgPrice){
+				//avgPrice=params.avgPrice;
+				$scope.dataObj.avgPrice=params.avgPrice;
+		}
+		if(params.avgFuel){
+				//avgFuel=params.avgFuel;
+				$scope.dataObj.avgFuel=params.avgFuel;
+		}
+		var tempfromDate="";
+		var temptoDate="";
+		if(params.tempfromDate){
+				//avgFuel=params.avgFuel;
+				tempfromDate=params.tempfromDate;
+				$scope.dataObj.tempfromDate=params.tempfromDate;
+		}
+		
+		if(params.temptoDate){
+				//avgFuel=params.avgFuel;
+				temptoDate=params.temptoDate;
+				$scope.dataObj.temptoDate=params.temptoDate;
+		}
+		
+		if(params.vehicleNo){
+				//avgFuel=params.avgFuel;
+				
+				$scope.dataObj.vehicleNo=params.vehicleNo;
+		}
+		
+		
+		
+		
+		/* 加载数据 */
+		$http.get(serviceBasePath+"eap/pmsServices/materielMg/comprehensiveQuery/vehicleFuelCharge?ticket="+ticket+"&assetCode="+assetCode+"&fromDate="+tempfromDate+"&toDate="+temptoDate).success(function(response){
+			if(response.statusCode==200){
+				$scope.Oillist = response.list;
+			}else if(response.statusCode==401){
+				window.parent.location.href="../login.html";
+			}else{
+				alert("服务器访问出错！");
+			}
+		});
+		
+		/* 加载数据 */
+		$scope.loadProjects=function(fromDate, toDate){//alert(unitCode);
+			//alert(fromDate+","+toDate+","+companyCode)
+			$http.get(serviceBasePath+"eap/pmsServices/materielMg/comprehensiveQuery/ vehicleFuelCharge?fromDate="
+				+fromDate+"&toDate="+toDate+"&companyCode="+companyCode+"&ticket="+ticket).success(function(response){
+				if(response.statusCode==401){
+					alert("用户凭据过期！请重新登录！");
+					window.top.location.href="../../../login.html";
+					return;
+				}
+				$scope.projectList = response.list;
+				createPageBar(response.totalPage, response.currentPage);
+			});
+		};
+		
+		
+		
+	});
+	</script>
+</body>
+</html>

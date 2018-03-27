@@ -1,0 +1,265 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 人员管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css"/>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.owWordLoad{text-decoration:underline;color:#0099ff;}
+	.owWordload-detail{border:solid 1px #666;background:#ffee99;color:#666;padding:4px 6px 4px 6px;position:absolute;display:none;}
+	.stutes_span{display:inline-block;width:20px;height:20px;border-radius:50%;position: relative; top: 5px;}
+	.hstu{background:#76b102}
+	.nostu{background:red}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<!-- <input type="text" id="category" class="dropDownList" placeholder="请选择项目分类"/> -->
+				<input type="text" name="searchName"  maxlength="32" style="width:220px" placeholder="请输入查询条件"/>
+				<input type="text" name="reserveStatus" class="dropDownList" style="width:100px;" placeholder="是否改造"/>
+				
+				<!--<input type="text" id="searchName" placeholder="请输入姓名"> 
+				<input type="text" id="starttime" name="fromDate" class="date dateComponent" placeholder="请选择开始时间" onclick="new Calendar().show(this)" />
+				<input type="text" id="endtime"   name="toDate" class="date dateComponent" placeholder="请选择结束时间" onclick="new Calendar().show(this)" />
+				-->
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				
+				
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">设备编码</div></th>
+				<th><div align="center">设备名称</div></th>
+				<th><div align="center">项目编码</div></th>
+				<th><div align="center">项目名称</div></th>
+				<th><div align="center">方案名称</div></th>
+				<th><div align="center">改造单位</div></th>
+				<th><div align="center">改造状态</div></th>
+				<th><div align="center">操作</div></th>
+			  </tr>
+			   <tr class="tr2" ng-repeat="item in userList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.deviceObjCode}}</div></td>
+				<td><div align="center">{{item.deviceObjName}}</div></td>
+				<td><div align="center">{{item.proNo}}</div></td>
+				<td><div align="center">{{item.proName}}</div></td>
+				<td><div align="center">{{item.REFORM_PROGRAM}}</div></td>
+				<td><div align="center">{{item.reseverOrgname}}</div></td>
+				<td>
+					<div align="center" ng-if="item.reserveStatus==0">未改造</div>
+					<div style="color:red" align="center" ng-if="item.reserveStatus==2">已改造被驳回</div>
+				</td>
+				<td>
+					 <div align="center">
+						<img  class="operationImg" ng-click="toDetail(item)" src="../../../img/list_see-icon.png" title="查看 ">
+						
+					</div>
+				</td>
+				</tr>
+			</table>
+		</div>
+		
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+function createPageBar(totalPage, curPage,totalRecord){
+	new PageBar().init({
+		renderTo:"#page_bar",
+		totalPage:totalPage,
+		curPage:curPage,
+		totalRecord: totalRecord,
+		showPageInfo:true,
+		prevPageText:"上一页",
+		nextPageText:"下一页",
+		onPage:function(pageNum){
+			_currentPage=pageNum;
+			//ngScope.loadProjects(areaName, dormName, pageNum,dormType);
+			ngScope.loadUsers(companyCode,fromDate,toDate,proNo,_currentPage);
+		}
+	});
+}
+
+var _currentPage=1;
+
+
+var selectedUnitCode="", cond_employeename="";
+var ngScope;
+var companyCode="";
+var unitCode="";
+var employeeName="";
+var employeeCode="";
+var fromDate="";
+var toDate="";
+var logFromTime="";
+var logToTime="";
+var unitCode="";
+var searchName="";
+	
+var proNo="";
+
+var reserveStatus="";
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.userList=[];
+	fromDate=getMonthStartDate();
+	$("input[name=fromDate]").val(fromDate);
+	toDate=getMonthEndDate();
+	$("input[name=toDate]").val(toDate);
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	
+	companyCode=userData.companyCode;
+	employeeCode=userData.employeeCode;
+	unitCode=userData.unitCode;
+	
+	/* 项目分类 */
+	new DropDownList().init({
+		mode:"page",
+		renderTo:"#category",
+		url:"../../component/projectType.html?ticket="+$scope.ticket,
+		height:"200px",
+		onSelected:function(result){
+			$scope.cond_category=result.categoryCode;
+			console.log(result.categoryCode)
+			$("#category").val(result.categoryName);
+			proNameList.setConfig("url", "../../component/projectList.html?categoryCode="+result.categoryCode+"&ticket="+$scope.ticket);
+		}
+	});
+
+	
+	/* 项目名称 */
+	var proNameList = new DropDownList();
+	proNameList.init({
+		mode:"page",
+		renderTo:"input[name=proName]",
+		url:"../../component/projectList.html?required=true",
+		height:"200px",
+		onSelected:function(result){
+			//$("input[name=wiPro]").val(result.proName);
+			$("input[name=proName]").val(result.proName);
+			//$("input[name=proName]").focus();
+			proNo=result.proNo;
+			$scope.loadUsers(companyCode,fromDate,toDate,proNo,1);
+
+		}
+	});
+	
+	new DropDownList().init({
+		renderTo:"input[name=reserveStatus]",
+		mode:"list",
+		data:[{id:"", name:"（全部）"},{id:0, name:"未改造"},{id:2, name:"已改造被驳回"}],
+		textField:"name",
+		onSelected:function(item){
+			$scope.reserveStatus=item.id;
+			reserveStatus=item.id;
+			$("input[name=reserveStatus]").val(item.name);
+			$scope.loadUsers(searchName);
+		}
+	});
+
+	
+	$scope.loadUsers=function(searchName){//alert(unitCode);
+		//eap/pmsServices/pe/baseMgr/remouldBatch/queryBatchDevice1?companyCode="+companyCode+"&reseverOrgcode="+reseverOrgcode+"&searchName="+searchName
+				
+				
+		
+				
+		$http.post(serviceBasePath+"eap/pmsServices/pe/baseMgr/remouldBatch/queryBatchDevice1?companyCode="+companyCode+"&reseverOrgcode="+unitCode+"&searchName="+searchName+"&mctCode=''&reserveStatus="+reserveStatus).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$scope.userList=response.list;
+			//createPageBar(response.totalPage, response.currentPage,response.totalRecord);
+		});
+		
+		
+	};
+	
+	$scope.doQuery=function(){
+		
+		
+		searchName=$("input[name=searchName]").val();
+		
+		
+		$scope.loadUsers(searchName);
+	};	
+	$scope.doAdd=function(){
+		
+		location.href="addBilling.html";
+	};
+	
+	$scope.toDetail=function(item){
+		location.href="deviceDetail.html?deviceObjCode="+item.deviceObjCode+"&reserveProNo="+item.reserveProNo+"&proNo="+item.proNo+"&mctCode="+item.mctCode+"&deviceObjName="+item.deviceObjName;
+	};
+	
+	/* 项目删除 */
+	$scope.doDelete=function(item){
+		
+		
+		
+		new ShowDlog().confirm({
+			msg:"确定删除该条开票记录吗？",
+			ok:function(){
+				$http.post(serviceBasePath+"eap/pmsServices/pm/ticket/delete?rowid="+item.rowid+"&ticket="+ticket).success(function(response){
+					$scope.loadUsers(companyCode,fromDate,toDate,proNo,1);
+				});
+			},
+			cancel:function(){}
+		});
+	};
+	
+	
+	$scope.loadUsers(searchName);
+	
+	
+	
+	 
+	
+});
+</script>
+</body>
+</html>

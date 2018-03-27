@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/util 
+	http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+	
+	<!-- 组合凭据解析器对象。 -->
+	<bean id="credentialResolver" class="com.glens.eap.eapAuth.web.CompositeCredentialResolver">
+		<property name="encryCredentialResolver">
+			<bean class="com.glens.eap.eapAuth.web.EncryCredentialResolver"></bean>
+		</property>
+		<property name="usernamePasswordCredentialResolver">
+			<bean class="com.glens.eap.eapAuth.web.UsernamePasswordCredentialResolver"></bean>
+		</property>
+	</bean>
+	
+	<!-- 密码加密器 -->
+	<bean id="passwordEncoder" class="com.glens.eap.eapAuth.core.authentication.handlers.DefaultPasswordEncoder">
+		<constructor-arg value="MD5"></constructor-arg>
+		<property name="characterEncoding" value="UTF-8"></property>
+	</bean>
+	
+	<bean id="keyService" class="com.glens.eap.platform.framework.auth.key.SimpleEapSoKeyService">
+	</bean>
+	<bean id="appService" class="com.glens.eap.platform.framework.auth.app.SimpleEapSoAppService">
+	</bean>
+	
+	<bean id="encryCredentialManager" class="com.glens.eap.eapAuth.core.authentication.impl.EncryCredentialManagerImpl">
+		<property name="keyService" ref="keyService"></property>
+	</bean>
+	<!-- 默认的用户登录状态存储器服务。 -->
+	<bean id="userLoggedStatusStore" class="com.glens.eap.eapAuth.core.authentication.status.DefaultUserLoggedStatusStore"></bean>
+	<!-- 认证管理器对象。 -->
+	<bean id="authenticationManager" class="com.glens.eap.eapAuth.core.authentication.impl.AuthenticationManagerImpl">
+		
+		<property name="authenticationHandlers">
+			<list>
+				<bean class="com.glens.pwCloudOs.login.handler.DBUsernamePasswordAuthenticationHandler">
+					<property name="passwordEncoder" ref="passwordEncoder"></property>
+				</bean>
+				<bean class="com.glens.eap.eapAuth.core.authentication.handlers.EncryCredentialAuthenticationHandler"></bean>
+			</list>
+		</property>
+		
+		<property name="credentialToPrincipalResolvers">
+			<list>
+				<bean class="com.glens.eap.eapAuth.core.authentication.resolvers.UsernamePasswordCredentialToPrincipalResolver"></bean>
+				<bean class="com.glens.eap.eapAuth.core.authentication.resolvers.EncryCredentialToPrincipalResolver"></bean>
+			</list>
+		</property>
+		<property name="authenticationPostHandler">
+			<bean class="com.glens.eap.eapAuth.core.authentication.impl.DefaultAuthenticationPostHandler">
+				<property name="encryCredentialManager" ref="encryCredentialManager"></property>
+				<property name="keyService" ref="keyService"></property>
+				<property name="appService" ref="appService"></property>
+				<property name="userLoggedStatusStore" ref="userLoggedStatusStore"></property>
+			</bean>
+		</property>
+	</bean>
+	
+	<!-- eapso 中心服务 -->
+	<bean id="eapsoService" class="com.glens.eap.eapAuth.core.service.EapsoServiceImpl">
+		<property name="appService" ref="appService"></property>
+		<property name="authenticationManager" ref="authenticationManager"></property>
+		<property name="userLoggedStatusStore" ref="userLoggedStatusStore"></property>
+	</bean>
+	
+</beans>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html ng-app="orgMgr">
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		
+		<link rel="stylesheet" type="text/css" href="../../bootstrap-3.3.5-dist/css/bootstrap.min.css"/>
+		
+		<link rel="stylesheet" href="../../css/zTreeStyle/zTreeStyle.css" type="text/css">
+		<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+		<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+		<script type="text/javascript" src="../../js/jquery.ztree.core-3.5.js"></script>
+		<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+		<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+		<script type="text/javascript" src="../../js/PageBar.js"></script>
+		<script type="text/javascript" src="../../js/config.js"></script>
+		<script type="text/javascript" src="../../js/util.js"></script>
+		<script type="text/javascript" src="../../js/ng-base.js"></script>
+		
+		<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+		
+		<link rel="stylesheet" type="text/css" href="../../css/list.css"/>
+		<link rel="stylesheet" type="text/css" href="../../css/knowledge/knowledge.css"/>
+	</head>
+	<body ng-controller="orgMgr">
+		<div class="knowcon">
+			<div class="knowcon_title">{{dataList.fileTitle}}<span class="fr return">返回</span><span class="fr" style="margin-right:20px">下载</span></div>
+			<div class="knowcon_tip">
+				<ul>
+					<li>文档编号：{{dataList.fileCode}}</li>
+					<li>发布人：{{dataList.employeeName}}</li>
+					<li>目录：{{dataList.catalogName}}</li>
+					<li>发布日期：{{dataList.sysCreateTime}}</li>
+				</ul>
+				<div class="knowcontip_udline"></div>
+				<div class="knowcon_word">
+					<div class="knowword_title">电力系统基础知识 </div>
+					<p>5月数据系列分析之三 </p>
+					<div class="wordwarp_title">
+						<p>来源：中国信息报</p>
+						<p>发布时间：2015-06-19 09:25</p>
+					</div>
+					<div class="word_warp">
+						<p>一、电力系统的构成</p>
+						<p>一个完整的电力系统由分布各地的各种类型的发电厂、升压和降压变电所、输电线路及电力用户组成，它们分别完成电能的生产、电压变换、电能的输配及使用。</p>
+						<p>二．电力网、电力系统和动力系统的划分</p>
+						<p>电力网：由输电设备、变电设备和配电设备组成的网络。</p>
+						<p>电力系统：在电力网的基础上加上发电设备。</p>
+						<p>动力系统：在电力系统的基础上，把发电厂的动力部分（例如火力发电厂的锅炉、汽轮机和水力发电厂的水库、水轮机以及核动力发电厂的反应堆等）包含在内的系统。</p>
+						<p>三．电力系统运行的特点</p>
+						<p>一是经济总量大。目前，我国电力行业的资产规模已超过2万多亿，占整个国有资产总量的四分之一，电力生产直接影响着国民经济的健康发展。</p>
+						<p> 二是同时性，电能不能大量存储，各环节组成的统一整体不可分割，过渡过程非常迅速，瞬间生产的电力必须等于瞬间取用的电力，所以电力生产的的发电、输电、配电到用户的每一环节都非常重要。</p>
+						<p>三是集中性，电力生产是高度集中、统一的，无论多少个发电厂、供电公司，电网必须统一调度、统一管理标准，统一管理办法;安全生产，组织纪律，职业品德等都有严格的要求。</p>
+						<p>四是适用性，电力行业的服务对象是全方位的，涉及到全社会所有人群，电能质量、电价水平与广大电力用户的利益密切相关。</p>
+						<p>五是先行性，国民经济发展电力必须先行。</p>
+						<p>四、电力系统的额定电压</p>
+						<p>电网电压是有等级的，电网的额定电压等级是根据国民经济发展的需要、技术经济的合理性以及电气设备的制造水平等因素，经全面分析论证，由国家统一制定和颁布的。</p>
+						<p>我们国家电力系统的电压等级有220/380V、3 kV、6 kV、10 kV、20 kV、35 kV、66 kV、110 kV、220 kV、330 kV、500 kV。随着标准化的要求越来越高，3 kV、6 kV、20 kV、66 kV也很少使用。供电系统以10 kV、35 kV、为主。输配电系统以110 kV以上为主。发电机过去有6 kV与10 kV两种，现在以10 kV为主，低压用户均是220/380V。</p>
+						<p>用电设备的额定电压和电网的额定电压一致。实际上，由于电网中有电压损失，致使各点实际电压偏离额定值，为了保证用电设备的良好运行，显然，用电设备应具有比电网电压允许偏差更宽的正常工作电压范围。发电机的额定电压一般比同级电网额定电压要高出5%，用于补偿电网上的电压损失。</p>
+						<p>变压器的额定电压分为一次和二次绕组。对于一次绕组，当变压器接于电网末端时，性质上等同于电网上的一个负荷(如工厂降压变压器)，故其额定电压与电网一致，当变压器接于发电机引出端时(如发电厂升压变压器)，则其额定电压应与发电机额定电压相同。对于二次绕组，考虑到变压器承载时自身电压损失(按5%计)，变压器二次绕组额定电压应比电网额定电压高5%，当二次侧输电距离较长时，还应考虑到线路电压损失(按5%计)，此时，二次绕组额定电压应比电网额定电压高10%。</p>
+						<p>五、电力系统的中性点运行方式</p>
+						<p>在电力系统中，中性点直接接地或中性点经小阻抗（小电阻）接地的系统称为大电流接地系统，中性点不接地或中性点经消弧线圈接地的系统称为小电流接地系统。中性点的运行方式主要取决于单相接地时电气设备绝缘要求及供电可靠性。</p>
+						<p>各种运行方式优缺点比较</p>
+						<p>中性点直接接地方式：当发生一相对地绝缘破坏时，即构成单相短路，供电中断，可靠性降低。但是，该方式下非故障相对地电压不变，电气设备绝缘水平可按相电压考虑。我们国家的220V/380V和110KV以上级系统，都采用中性点直接接地，以大电流接地方式运行。</p>
+						<p>中性点不接地或经消弧线圈接地方式：当发生单相接地故障时，线电压不变，而非故障相对地电压升高到原来相电压的√3倍，供电不中断，可靠性高。我们国家的10KV和35KV系统，都采用中性点不接地或经消弧线圈接地，以小电流接地方式运行。</p>
+						<p>六、供电质量</p>
+						<p>决定用户供电质量的指标为电压、频率和可靠性。</p>
+						<p>1．电压</p>
+						<p>理想的供电电压应该是幅值恒为额定值的三相对称正弦电压。由于供电系统存在阻抗、用电负荷的变化和用电负荷的性质等因素，实际供电电压无论是在幅值上、波形上还是三相对称性上都与理想电压之间存在着偏差。</p>
+						<p>1）电压偏差：电压偏差是指电网实际电压与额定电压之差，实际电压偏高或偏低对用电设备的良好运行都有影响。</p>
+						<p>国家标准规定电压偏差允许值为：</p>
+						<p>a、35千伏及以上电压供电的，电压正负偏差的绝对值之和不超过额定电压的±10%；</p>
+						<p>b、10千伏及以下三相供电的，电压允许偏差为额定电压的±7%。</p>
+						<p>c、220伏单相供电的，电压允许偏差为额定电压的+7%、-10%。</p>
+						<p>（2）电压波动和闪变：在某一时段内，电压急剧变化偏离额定值的现象称为电压波动。当电弧炉等大容量冲击性负荷运行时，剧烈变化的负荷电流将引起线路压降的变化，从而导致电网发生电压波动。由电压波动引起的灯光闪烁，光通量急剧波动，对人眼脑的刺激现象称为电压闪变。
+    国家标准规定对电压波动的允许值为：</p>
+						<p>（3）高次谐波：高次谐波的产生，是非线性电气设备接到电网中投入运行，使电网电压、电流波形发生不同程度畸变，偏离了正弦波. 高次谐波除电力系统自身背景谐波外，主要是用户方面的大功率变流设备、电弧炉等非线性用电设备所引起。高次谐波的存在降导致供电系统能耗增大、电气设备绝缘老化加快，并且干扰自动化装置和通信设施的正常工作。</p>
+						<p>（4）三相不对称：三相电压不对称指三个相电压的幅值和相位关系上存在偏差。三相不对称主要由系统运行参数不对称、三相用电负荷不对称等因素引起。供电系统的不对称运行，对用电设备及供配电系统都有危害，低压系统的不对称运行还会导致中性点偏移，从而危及人身和设备安全。</p>
+						<p>电力系统公共连接点正常运行方式下不平衡度国家规定的允许值为2％，短时不得超过4％，单个用户不得超过1．3％</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		var app = simpleController({
+			moduleName:"orgMgr",
+			controllerName:"orgMgr",
+			init:function($scope, $http){
+				
+				
+				$scope.httpGet({
+					url:"eap/pmsServices/km/kmbase/kmbase/get",
+					data:{"companyCode":$scope.userData.companyCode,"fileCode":fileCode,},
+					success:function(res){
+						$scope.dataList=res.list;
+						
+					}
+				});
+				
+				
+			}
+		});
+
+	
+	
+	
+		$(".return").click(function(){
+			window.history.back();
+		})
+	</script>
+</html>

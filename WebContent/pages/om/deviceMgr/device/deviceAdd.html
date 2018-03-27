@@ -1,0 +1,517 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 设备管理 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css"/>
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/ng-base.js"></script>
+
+<script type="text/javascript" src="../../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.chooseUser{width:1000px;height:500px;}
+	.dlog-subObject{width:1000px;height:500px;}
+	#lay1 .pdd_ta{width:800px;padding:1% 0;background:#f5f5f5;border-radius:5px;margin-bottom:20px;border:1px solid #ccc}
+	#lay1 .pdd_ta table{width:100%;}
+	#lay1 .pdd_ta table th{color:#77acf9;font-weight:bold;padding:0 20px 0;}
+	#lay1 .pdd_ta table input{padding-left:10px;border:1px solid #ccc;height:30px;border-radius:3px;}
+	.form_bottom{border-top:none;padding-top:0;}
+	.obj{min-width:80px !important;width:80px !important;}
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">新增设备信息</label>
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<div class="pdd_ta">
+				<table>
+					<tr>
+						<th width="120">项目分类</th>
+						<td>
+							<input type="hidden" name="companyCode"/>
+							<input type="hidden" name="categoryCode"/>
+							<input type="hidden" name="attrJson"/>
+							<input type="text" name="categoryName" class="required dropDownList" maxlength="32" placeholder="选择项目分类"/>
+						</td>
+						<th width="120">项目</th>
+						<td>
+							<input type="hidden" name="proNo"/>
+							<input type="text" name="proName" class="required dropDownList"  placeholder="选择项目"/>
+						</td>
+					</tr>
+					<tr>
+						<th>总控表</th>
+						<td>
+							<input type="hidden" name="mctCode"/>
+							<input type="hidden" name="deviceTypeCode"/>
+							<input type="text" name="mctName" class="required dropDownList"  placeholder="选择总控表"/>
+						</td>
+						<th></th>
+						<td></td>
+					</tr>
+					<tr>
+						<th>设备名称</th>
+						<td>
+							<input type="text" name="deviceObjName" class="required" />
+						</td>
+						<th></th>
+						<td>
+	<!-- 						<input type="text" name="deviceObjCode" class="required" maxlength="32"/> -->
+						</td>
+					</tr>
+<!-- 					<tr> -->
+<!-- 						<th>健康状况</th> -->
+<!-- 						<td> -->
+<!-- 							<input type="hidden" name="healthCode"/> -->
+<!-- 							<input type="text" name="healthName" class="dropDownList"  placeholder="选择健康状况"/> -->
+<!-- 						</td> -->
+<!-- 						<th>故障问题分类</th> -->
+<!-- 						<td> -->
+<!-- 							<input type="hidden" name="problemCode"/> -->
+<!-- 							<input type="text" name="problemName" class="dropDownList"  placeholder="选择故障问题"/> -->
+<!-- 						</td> -->
+<!-- 					</tr> -->
+				</table>
+			</div>
+			<div class="pdd_ta">
+				<table width="700">
+					
+					<tr ng-repeat="tr in deviceAttrTrs track by $index">
+						<th ng-repeat-start="item in tr track by $index"  width="120">{{item.cname}}</th>
+						<td ng-repeat-end>
+						<div ng-if="item.dtype==1">
+						<input ng-if="item" type="text" class="{{item.isNotNull?'required ':''}}" group="cond" name="{{item.ename}}" />
+						</div>
+						<div ng-if="item.dtype==2">
+						<input ng-if="item" type="text" class="{{item.isNotNull?'required ':''}}number" group="cond" name="{{item.ename}}" />
+						</div>
+						<div ng-if="item.dtype==3">
+						<input ng-if="item" type="text" class="{{item.isNotNull?'required ':''}}date dateComponent" group="cond" name="{{item.ename}}" placeholder="请选择" onclick="new Calendar().show(this, null, null, dateSelected)"/>
+						</div>
+<!-- 						<div ng-if="item.dtype==4 && (item.cname=='台区类型' || item.cname=='作业类型')"> -->
+<!-- 							<input readonly="readonly" ng-if="item" type="text" class="{{item.isNotNull?'required ':''}}dropDownList" group="cond" name="{{item.ename}}" placeholder="请选择{{item.cname}}"/> -->
+<!-- 						</div> -->
+						<div ng-if="item.dtype==4">
+							<input  ng-if="item" type="text" class="{{item.isNotNull?'required ':''}}dropDownList" group="cond" name="{{item.ename}}" placeholder="请选择{{item.cname}}"/>
+						</div>
+						<div ng-if="item.dtype==6">
+							<input ng-if="item" type="text" class="{{item.isNotNull?'required ':''}} readonly obj" readonly="readonly" value="{{objValues[item.ename]?'已录入':''}}"/>
+							<input ng-if="item" type="button" class="btn" value="编辑..." ng-click="addSubObject(item)"/>
+						</div>
+						<div ng-if="item.dtype==8">
+							<input ng-if="item" type="text" class="{{item.isNotNull?'required ':''}} readonly obj" readonly="readonly" value="{{objValues[item.ename]?'已录入':''}}"/>
+							<input ng-if="item" type="button" class="btn" value="编辑..." ng-click="addSubArr(item)"/>
+						</div>
+						</td>
+					</tr>
+				</table>
+				<div ng-repeat="item in dependencyAttrs track by $index">
+				<div ng-if="item.dtype==9">
+					<input ng-if="item" type="hidden" group="cond" name="{{item.ename}}" />
+				</div>
+				</div>
+			</div>	
+		</div>
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onSave('continue')" class="title_save2">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存并继续
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		$scope.deviceAttrList=[];
+		$scope.deviceAttrTrs=[];
+		$scope.dependencyAttrs=[];
+		$scope.objValues=[];
+		$scope.calcFields = [];
+		
+		/* 加载属性信息 */
+		$scope.loadAttrs=function(mctCode){
+			$scope.httpGet({
+				url:"eap/pmsServices/om/deviceMgr/device/mctAttr?companyCode="+$scope.userData.companyCode,
+				data:{"mctCode":mctCode},
+				success:function(response){
+					$scope.deviceAttrList = response.list;
+					if($scope.deviceAttrList){
+						// 取出字段类型是5的（计算类型），并且从字段集中删除
+						$scope.calcFields = $scope.filterCalcFields($scope.deviceAttrList);
+						$scope.deviceAttrTrs=$scope.splitToTr($scope.deviceAttrList);// 不包含5的
+						/* 初始化搜索条件 */
+						lazyCall('t1',function(){
+							for(var i=0; i<$scope.deviceAttrList.length; i++){
+								(function(){
+									var searchField = $scope.deviceAttrList[i];
+									if(searchField.dtype==4 && searchField.enumSource==1){
+										/* 搜索条件*/ 
+										new DropDownList().init({
+											renderTo:"input[name="+searchField.ename+"]",
+											height:"200px",
+											data:searchField.enumValue,
+											onSelected:function(result){
+												$("input[name="+searchField.ename+"]").val(result);
+												$("input[name="+searchField.ename+"]").change();
+											}
+										});
+									}else if(searchField.dtype==4 && searchField.enumSource==2){
+										var depAttrs = [];/* 收集依赖于些字段的其它属性 */
+										for(var j=0;j<$scope.dependencyAttrs.length;j++){
+											if($scope.dependencyAttrs[j].enumValue==searchField.ename){
+												depAttrs.push($scope.dependencyAttrs[j]);
+											}
+										}
+										/* 搜索条件*/ 
+										var proNo = $("input[name=proNo]").val();
+										var serviceUrl=searchField.enumValue;
+										if(serviceUrl.indexOf("?")>-1){
+											serviceUrl+="&proNo="+proNo;
+										}else{
+											serviceUrl+="?proNo="+proNo;
+										}
+										var dlist = new DropDownList();
+										dlist.init({
+											renderTo:"input[name="+searchField.ename+"]",
+											height:"200px",
+											url:"../../../component/listByUrl.html?url="+encodeURIComponent(serviceUrl)+"&textField="+searchField.ename+"&ticket="+$scope.ticket+"&companyCode="+$scope.userData.companyCode,
+											onSelected:function(result){
+												$("input[name="+searchField.ename+"]").val(result[searchField.ename]);
+												$("input[name="+searchField.ename+"]").change();
+												for(var k=0; k<depAttrs.length; k++){/* 给依赖属性赋值 */
+													$("input[name="+depAttrs[k].ename+"]").val(result[depAttrs[k].ename]);
+												}
+											}
+										});
+									}
+								})();
+							}
+							
+							if(deviceTypeCode=="P04"){// PMS2.0低压（名称组合：时间_台区名称_作业类型）
+								$("input[name=WORK_DATE]").keyup(function(){
+									var workDate = $("input[name=WORK_DATE]").val();
+									var dmrdName = $("input[name=DMRD_NAME]").val();
+									var workType = $("input[name=WORK_TYPE]").val();
+									$("input[name=deviceObjName]").val(workDate+"_"+dmrdName+"_"+workType);
+								}).change(function(){
+									var workDate = $("input[name=WORK_DATE]").val();
+									var dmrdName = $("input[name=DMRD_NAME]").val();
+									var workType = $("input[name=WORK_TYPE]").val();
+									$("input[name=deviceObjName]").val(workDate+"_"+dmrdName+"_"+workType);
+								});
+								$("input[name=DMRD_NAME]").keyup(function(){
+									var workDate = $("input[name=WORK_DATE]").val();
+									var dmrdName = $("input[name=DMRD_NAME]").val();
+									var workType = $("input[name=WORK_TYPE]").val();
+									$("input[name=deviceObjName]").val(workDate+"_"+dmrdName+"_"+workType);
+								}).change(function(){
+									var workDate = $("input[name=WORK_DATE]").val();
+									var dmrdName = $("input[name=DMRD_NAME]").val();
+									var workType = $("input[name=WORK_TYPE]").val();
+									$("input[name=deviceObjName]").val(workDate+"_"+dmrdName+"_"+workType);
+								});
+								$("input[name=WORK_TYPE]").keyup(function(){
+									var workDate = $("input[name=WORK_DATE]").val();
+									var dmrdName = $("input[name=DMRD_NAME]").val();
+									var workType = $("input[name=WORK_TYPE]").val();
+									$("input[name=deviceObjName]").val(workDate+"_"+dmrdName+"_"+workType);
+								}).change(function(){
+									var workDate = $("input[name=WORK_DATE]").val();
+									var dmrdName = $("input[name=DMRD_NAME]").val();
+									var workType = $("input[name=WORK_TYPE]").val();
+									$("input[name=deviceObjName]").val(workDate+"_"+dmrdName+"_"+workType);
+								});
+							}
+						}, 100);
+					}
+				}
+			});
+		};
+		
+		$scope.filterCalcFields=function(attrList){
+			var newList=[];
+			for(var i=0; i<$scope.deviceAttrList.length; i++){
+				var searchField = $scope.deviceAttrList[i];
+				if(searchField.dtype==5){
+					removeAt($scope.deviceAttrList, i);
+					i--;
+					newList.push(searchField);
+				}
+			}
+			return newList;
+		};
+		/* 组织tr数据 */
+		$scope.splitToTr=function(arr){
+			var trs=[];
+			for(var i=0; i<arr.length; i++){
+				var attr = arr[i];
+				if(attr.dtype==9){
+					$scope.dependencyAttrs.push(attr);
+					continue;
+				}
+				if(i!=0 && i%2==0){
+					trs.push([]);
+				}
+				if(trs.length==0){
+					trs.push([]);
+				}
+				var tr=trs[trs.length-1];
+				tr.push(attr);
+			}
+			var lastTr=trs[trs.length-1];
+			if(lastTr.length<2){
+				lastTr.push({});
+			}
+			return trs;
+		};
+		
+		var urlParams = getUrlParams();
+		/* 项目分类 */
+		new DropDownList().init({
+			mode:"page",
+			renderTo:"input[name=categoryName]",
+			url:"../../../component/projectType.html?required=true",
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=categoryCode]").val(result.categoryCode);
+				$("input[name=categoryName]").val(result.categoryName);
+				$("input[name=categoryName]").focus();
+				proNameList.setConfig("url", "../../../component/projectList.html?required=true&categoryCode="+result.categoryCode);
+			}
+		});
+		/* 项目名称 */
+		var proNameList = new DropDownList();
+		proNameList.init({
+			mode:"page",
+			renderTo:"input[name=proName]",
+			url:"../../../component/projectList.html?required=true",
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=proNo]").val(result.proNo);
+				$("input[name=proName]").val(result.proName);
+				$("input[name=proName]").focus();
+// 				healthList.setConfig("url", "../../../component/chooseDeviceHealth.html?proNo="+result.proNo+"&required=true");
+// 				problemList.setConfig("url", "../../../component/chooseDeviceProblem.html?proNo="+result.proNo+"&required=true");
+				mctList.setConfig("url", "../../../component/mctType.html?proNo="+result.proNo+"&required=true");
+			}
+		});
+		var deviceTypeCode = "";
+		/* 项目总控表*/
+		var mctList = new DropDownList();
+		mctList.init({
+			renderTo:"input[name=mctName]",
+			url:"../../../component/mctType.html?required=true",
+			onSelected:function(item){
+				$("input[name=mctName]").val(item.mctName);
+				$("input[name=mctCode]").val(item.mctCode);
+				$("input[name=deviceTypeCode]").val(item.deviceTypeCode);
+				deviceTypeCode = item.deviceTypeCode;
+				$("input[name=mctName]").focus();
+				$scope.loadAttrs(item.mctCode);
+			}
+		});
+		
+// 		/* 设备健康状况 */
+// 		var healthList = new DropDownList();
+// 		healthList.init({
+// 			mode:"page",
+// 			renderTo:"input[name=healthName]",
+// 			url:"../../../component/chooseDeviceHealth.html?required=true",
+// 			onSelected:function(result){
+// 				$("input[name=healthCode]").val(result.healthCode);
+// 				$("input[name=healthName]").val(result.healthName);
+// 				$("input[name=healthName]").focus();
+// 			}
+// 		});
+		
+// 		/* 设备故障问题 */
+// 		var problemList = new DropDownList();
+// 		problemList.init({
+// 			mode:"page",
+// 			renderTo:"input[name=problemName]",
+// 			url:"../../../component/chooseDeviceProblem.html?required=true",
+// 			onSelected:function(result){
+// 				$("input[name=problemCode]").val(result.problemCode);
+// 				$("input[name=problemName]").val(result.problemName);
+// 				$("input[name=problemName]").focus();
+// 			}
+// 		});
+		
+		$scope.addSubObject=function(item){
+			var obj =  $scope.objValues[item.ename];
+			var objStr = JSON.stringify(obj);
+			new ShowDlog().showFrame("subObjectAdd.html?fieldCname="+encodeURIComponent(item.cname)+"&deviceTypeCode="+item.enumValue+"&objStr="+objStr, item.cname, function(data){
+				if(data!=null && data!='' && data!='CANCEL'){
+					callNgFn({ctrlEl:$("body")[0],ngFn:function(scope){
+						scope.objValues[item.ename]=data;
+					}});
+				}
+			}, "dlog-subObject");
+		};
+		$scope.addSubArr=function(item){
+			var arr =  $scope.objValues[item.ename];
+			var arrStr = JSON.stringify(arr);
+			new ShowDlog().showFrame("subArrayAdd.html?fieldCname="+encodeURIComponent(item.cname)+"&deviceTypeCode="+item.enumValue+"&arrStr="+arrStr, item.cname, function(data){
+				if(data!=null && data!='' && data!='CANCEL'){
+					callNgFn({ctrlEl:$("body")[0],ngFn:function(scope){
+						scope.objValues[item.ename]=data;
+					}});
+				}
+			}, "dlog-subObject");
+		};
+		
+		/* 表单验证 */
+		validator = $("#saveForm").validate({
+			onsubmit: false,
+			focusInvalid: false,
+			focusCleanup: true,
+			errorElement: "span",
+			ignore:".ignore",
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {
+					
+				} 
+			}
+		});
+		
+		/* 保存 */
+		$scope.onSave=function(isContinue){
+			$("input[name=companyCode]").val($scope.userData.companyCode);
+			var cond={};
+			$("input[group=cond]").each(function(){
+				var $cond = $(this);
+				var key = $cond.attr("name");
+				var val = $cond.val();
+				if(val && val.length>0 && $cond.attr("class").indexOf("number")>-1){
+					val=Number(val);
+				}
+				cond[key]=val;
+			});
+			$scope.callCalc(cond);// 计算类型（计算）
+			// 收集子对象的值
+			for(var key in $scope.objValues){
+				var obj = $scope.objValues[key];
+				cond[key]=obj;
+			}
+			$("input[name=attrJson]").val(angular.toJson(cond));
+			var params = serializeArrayToMap($("#saveForm").serializeArray());
+			// 处理字段类型为5（计算类型）
+			if($("#saveForm").valid()){
+				new ShowDlog().prompt({
+					icon:"waitting",
+					msg:"正在保存...",
+					done:function(){},
+					t:1000*60*20
+				});
+				this.httpPost({
+					url:"eap/pmsServices/om/deviceMgr/device/insertMctDevice",
+					data:params,
+					success:function(response){
+						if("continue"==isContinue){
+							$dlog.close();
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"保存成功！",
+								done:function(){
+									new ShowDlog().confirm({
+										msg:"您可以此页面上修改后继续添加！",
+										ok:function(){
+											$("input[group=cond]").val("");
+											$("input[name=deviceObjName]").val("");
+											callNgFn({ctrlEl:$("body")[0], ngFn:function(scope){
+												scope.objValues=[];
+											}});
+										},
+										cancel:function(){
+											hrefTo({
+												url:"deviceMgr.html",
+												data:urlParams
+											});
+										}
+									});
+								},
+								t:1500
+							});
+						}else{
+							$dlog.close();
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"保存成功！",
+								done:function(){
+									hrefTo({
+										url:"deviceMgr.html",
+										data:urlParams
+									});
+								},
+								t:1500
+							});
+						}
+					},
+					error:function(data, status, headers, config){
+						$dlog.close();
+						new ShowDlog().prompt({
+							icon:"error",
+							msg:"网络异常！",
+							done:function(){},
+							t:1500
+						});
+					}
+				});
+			}
+		};
+		$scope.callCalc=function(item){// item必要！
+			for(var i=0; i<$scope.calcFields.length; i++){
+				var field = $scope.calcFields[i];
+				eval(field.enumValue);
+			}
+		}
+		/* 取消 */
+		$scope.onCancel=function(){
+			hrefTo({
+				url:"deviceMgr.html",
+				data:urlParams
+			});
+		};
+	
+	}
+});
+function dateSelected(hostEl){
+	$(hostEl).change();
+}
+</script>
+</body>
+</html>

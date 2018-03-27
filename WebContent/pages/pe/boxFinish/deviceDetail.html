@@ -1,0 +1,758 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 宿舍管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<script type="text/javascript" src="../../../js/jquery.form.js"></script>
+
+
+<script src="../../../js/jquery-photo-gallery/jquery.photo.gallery.js"></script>
+
+
+
+
+<style type="text/css">
+	.dialog-contract{height:270px; width:480px;}
+	.dialog-map{height:500px;width:900px;}
+	
+	.imgitem {
+	height: 170px;
+	width: 135px;
+	border: 1px #ccc solid;
+	float: left;
+	margin-right: 1px;
+	margin-left: 5px;
+	margin-top: 5px;
+	}
+	
+.imgs {
+	width: 100%;
+	height: 100%;
+	z-index: -1
+}
+
+.eidtdiv {
+	margin-left: 100px;
+	text-align: center;
+	padding-top: 8px;
+	position: absolute;
+	font-family: '微软雅黑';
+	font-size: 12px;
+	height: 27px;
+	width: 80px;
+	filter: alpha(Opacity = 80);
+	-moz-opacity: 0.5;
+	opacity: 0.5;
+	
+	background-color: black;
+}
+.titlemess{
+	width:180px;
+	height:75px;
+	background:red;
+	position: absolute;
+	margin-top:-78px;
+	filter: alpha(Opacity = 90);
+	-moz-opacity: 0.9;
+	opacity: 0.9;
+	background-color: #E6E6E6;
+	text-align: center;
+	color:#999
+}
+.eidtdiv a {
+	color: #fff;
+	cursor: pointer;
+}
+
+.eidtdiv a:HOVER {
+	color: #3385FF;
+}
+
+.imgitem:HOVER {
+	border: 1px red solid;
+	cursor: pointer;
+}
+
+.it{height: 200px;
+	width:100%}
+.bxys_wma1{height:50px;}
+.bxys_wma1 input{height:21px;width:200px;}
+.title_save{float:left;width:70px;height:28px;background: url(../../../img/btn_save.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;}
+.title_save:hover{background: url(../../../img/btn_save.png) no-repeat 0 -29px;}
+
+.title_cancel{float:left;width:70px;height:28px;background: url(../../../img/btn_cancel.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#666;cursor: pointer;}
+.title_cancel:hover{background: url(../../../img/btn_cancel.png) no-repeat 0 -29px;}
+</style>
+</head>
+
+<body ng-app="mdu" ng-controller="ctrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">表箱报竣工</label>
+				
+				
+				
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+				</a>
+				<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+				</a>
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">表箱属性</a>
+			<a href="#lay2" class="tab">改造材料</a>
+			<a href="#lay3" class="tab">图片资料</a>
+			<a href="#lay4" class="tab">营配信息</a>
+			
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+		 
+
+			<table>
+				<tr>
+					<th style="width:120px;">设备编号</th>
+					<td>
+						<input type="text" name="deviceObjCode"  class="readonly" readonly="readonly"   value="{{data.deviceObjCode}}"/>
+					</td>
+					
+				
+					<th style="width:120px;">健康状况</th>
+					<td>
+						<input type="text" name="healthName"  class="readonly"  readonly="readonly"    value="{{data.healthName}}"/>
+					</td>
+				</tr>
+			</table>
+			
+			
+			
+		
+				<table>
+					<tr ng-repeat="tr in deviceAttrTrs track by $index">
+							<th ng-repeat-start="item in tr track by $index" width="120">{{item.cname}}</th>
+							<td ng-repeat-end>
+							<div ng-if="item.dtype==1">
+							<input ng-if="item" type="text" name="{{item.ename}}" group="cond"  value="{{data[item.ename]}}"  placeholder="请输入内容" />
+							</div>
+							<div ng-if="item.dtype==2">
+							<input ng-if="item" type="text" class="number"  name="{{item.ename}}" group="cond"  value="{{data[item.ename]}}" placeholder="请输入内容"  />
+							</div>
+							<div ng-if="item.dtype==3">
+							<input ng-if="item" type="text" class="date dateComponent" name="{{item.ename}}" group="cond"   value="{{data[item.ename]}}"  placeholder="请选择" onclick="new Calendar().show(this)"  />
+							</div>
+							<div ng-if="item.dtype==4">
+							<input  type="text" class="dropDownList" name="{{item.ename}}" group="cond"   value="{{data[item.ename]}}"  placeholder="请选择{{item.cname}}" />
+							</div>
+							</td>
+					</tr>
+						
+				</table>
+			
+			  
+			
+			
+		</div>
+		
+		<!-- 改造材料 -->
+		<div class="form_div" id="lay2" style="height:300px;">
+		   
+			<table style="line-height: 40px;">
+				<tr ng-repeat="item in deviceAttrList" ng-if="item.dimPeBsMaterial==1">
+					
+					<th>{{item.cname}}：</th>
+					<td>
+						<input type="text" name="{{item.ename}}"  class="required" placeholder="请输入内容"  group="cond"   />
+						<!-- <input name="price1" type="hidden" value="{{item.amount/item.needCount}}"  /> -->
+					</td>
+					
+				</tr>
+			</table>
+			
+			
+			
+		</div>
+		<!-- 图片 -->
+		<div class="form_div" id="lay3">
+			<div >
+				<div class="it">
+					<div style="padding-left:10px;color:#3385FF">改造前照片:</div>
+					<div class="imgitem" ng-click="addImg1('reserveB1Img')">
+						<img src="../../../img/adding.png" style="width: 100%;height:100%" id="reserveB1Img" onclick="addImg1('reserveB1Img')" />
+						<input type="hidden" name="reserveB1Img" value="" />
+					</div>
+					<div class="imgitem" ng-click="addImg1('reserveB2Img')">
+						<img src="../../../img/adding.png" style="width: 100%;height:100%" id="reserveB2Img" onclick="addImg1('reserveB2Img')" />
+						<input type="hidden" name="reserveB2Img" value="" />
+					</div>
+				</div>
+				<div class="it">
+					<div style="padding-left:10px;color:#3385FF">改造后照片:</div>
+					<div class="imgitem" ng-click="addImg1('reserveA1Img')">
+						<img src="../../../img/adding.png" style="width: 100%;height:100%" id="reserveA1Img"  onclick="addImg1('reserveA1Img')" />
+						<input type="hidden" name="reserveA1Img" value="" />
+					</div>
+					<div class="imgitem" ng-click="addImg1('reserveA2Img')">
+						<img src="../../../img/adding.png" style="width: 100%;height:100%" id="reserveA2Img" onclick="addImg1('reserveA2Img')" />
+						<input type="hidden" name="reserveA2Img" value="" />
+					</div>
+				</div>
+				<div class="it">
+					<div style="padding-left:10px;color:#3385FF">工作票:</div>
+					<div class="imgitem" ng-click="addImg1('reserveOpImg')">
+						<img src="../../../img/adding.png" style="width: 100%;height:100%" id="reserveOpImg" onclick="addImg1('reserveOpImg')"  />
+						<input type="hidden" name="reserveOpImg" value="" />
+					</div>
+					
+				</div>
+				<div class="it">
+					<div style="padding-left:10px;color:#3385FF">户表关系核查:</div>
+					<div class="imgitem" ng-click="addImg1('reserveSignImg')">
+						<img src="../../../img/adding.png" style="width: 100%;height:100%" id="reserveSignImg" onclick="addImg1('reserveSignImg')" />
+						<input type="hidden" name="reserveSignImg" value="" />
+					</div>
+					
+				</div>
+				<div class="it">
+					<div style="padding-left:10px;color:#3385FF">停电通知书:</div>
+					<div class="imgitem" ng-click="addImg1('reservePcutImg')">
+						<img src="../../../img/adding.png" style="width: 100%;height:100%" id="reservePcutImg" onclick="addImg1('reservePcutImg')"  />
+						<input type="hidden" name="reservePcutImg" value="" />
+					</div>
+					
+				</div>
+			</div>
+			
+		</div>
+		<!-- 营配信息 -->
+		<div class="form_div" id="lay4">
+			
+			
+			<div class="bxys_wma1"><span class="mesadd">台区名称：</span><input type="text"  name="deviceByqName" placeholder="请输入内容"  /></div>
+			<div class="bxys_wma1"><span class="mesadd">线路名称：</span><input type="text"  name="deviceLineName" placeholder="请输入内容"  /></div>
+			<div class="bxys_wma1"><span class="mesadd">表箱编号：</span><input type="text" class="required" name="deviceBxId" placeholder="请输入内容"    /></div>
+			
+			<div class="uder_line"></div>			
+			<div id="bnum">
+				<div class="bxys_wma1">
+					<span class="mesadd">&nbsp;&nbsp;表&nbsp;&nbsp;号 &nbsp;：&nbsp; </span>
+					<input type="text" name="bxid"  placeholder="请输入内容" flag=false style="margin-left:-4px;" class="required"  />
+					<input  type="hidden" name="deviceBhIds" />
+					<input  type="hidden" name="attrJson" />
+					<input  type="hidden" name="proNo" />
+					<input  type="hidden" name="mctCode" />
+					<input  type="hidden" name="deviceObjCode" />
+					<input  type="hidden" name="reserveProNo" />
+					<input  type="hidden" name="companyCode" />
+					
+					<input type="hidden" name="price"  />
+					
+					<img src="../../../img/deviceAdd/addimg.png" title="添加表号" onclick="add()" class="add" style="cursor:pointer;margin-left:5px;margin-top:px;position: absolute;" />
+					<img src="../../../img/deviceAdd/addmore.png" title="批量添加" onclick="add1()" class="add" style="cursor:pointer;margin-left:35px;margin-top:px;position: absolute;" />
+				</div>
+			</div>
+			
+		</div>
+
+		
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+function add(){
+	var bminp = $("<div class='bxys_wma1'><span class='mesadd'>&nbsp;&nbsp;表&nbsp;&nbsp;号 &nbsp;：&nbsp;</span><input name='bxid' type='text' class='required' placeholder='请输入内容' flag=false /> <img src='../../../img/deviceAdd/del.png' onclick='del(this)' style='margin-left:5px;margin-top:px;position: absolute;' class='del'/></div>");
+	bminp.appendTo($("#bnum"));
+}
+
+function add1(){
+	
+	new ShowDlog().showFrame("bx.html","表号", function(data){
+		// 
+		
+		if(data){
+			for(var i=0;i<data.length;i++){
+				if(data[i]!=""){
+					var bminp = $("<div class='bxys_wma1'><span class='mesadd'>&nbsp;&nbsp;表&nbsp;&nbsp;号 &nbsp;：&nbsp;</span><input name='bxid' value='"+data[i]+"' type='text' class='required' placeholder='请输入内容' flag=false /> <img src='../../../img/deviceAdd/del.png' onclick='del(this)' style='margin-left:5px;margin-top:px;position: absolute;' class='del'/></div>");
+					bminp.appendTo($("#bnum"));
+				}
+			}
+		}
+		//$scope.loadProjects(areaName, dormName, _currentPage,dormType);
+		//$scope.loadInvoice($scope.dormCode);
+		
+	},"dialog-contract");
+	
+	
+	
+	
+}
+
+function del(obj){
+	$(obj).parent(".bxys_wma1").remove();
+}
+
+function getUrlParams(){
+	var params={};
+	var url = location.href;
+	var start = url.indexOf("?", 0)+1;
+	var paramsStr = url.substring(start, url.length);
+	var paramsArr = paramsStr.split("&");
+	for(var i=0;i<paramsArr.length;i++){
+		var kv = paramsArr[i].split("=");
+		var k = kv[0];
+		var v = kv[1];
+		params[k]=v;
+	}
+	return params;
+}
+var selectedUnitCode="";
+var validator;
+var userData;
+var dormCode="";
+var companyCode="";
+var ngScope;
+var app = angular.module("mdu", []);
+app.controller("ctrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	
+	$scope.deviceInfo=[];
+	$scope.materialListTrs=[];
+	$scope.isshow=0;
+
+	$scope.deviceObjName=deviceObjName;
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	
+	var params=getUrlParams();
+	
+	companyCode=userData.companyCode;
+	
+	var proNo=params.proNo;
+	var mctCode=params.mctCode;
+	var deviceObjCode=params.deviceObjCode;
+	var reserveProNo=params.reserveProNo;
+	
+	var deviceObjName=params.deviceObjName;
+	
+	$("input[name=proNo]").val(proNo);
+	$("input[name=mctCode]").val(mctCode);
+	$("input[name=deviceObjCode]").val(deviceObjCode);
+	$("input[name=reserveProNo]").val(reserveProNo);
+	
+	
+	
+	/* 视图渲染 */
+	$(".tabs>a").each(function(){
+		var layId = $(this).attr("href");
+		var idx = $(".tabs>a").index($(this));
+		if(idx!=0){
+			$(layId).hide();
+			$(layId).attr("data-show", "0");
+		}else{
+			$(layId).attr("data-show", "1");
+		}
+		$(this).click(function(){
+			validator.reset();
+			$(".tabs>.selected").removeClass("selected");
+			$(this).addClass("selected");
+			var layId = $(this).attr("href");
+			$("div[data-show=1]").hide();
+			$("div[data-show=1]").attr("data-show", "0");
+			$(layId).show();
+			$(layId).attr("data-show", "1");
+			
+		});
+	});
+	
+	/* Validate */
+	validator = $("#saveForm").validate({
+		onsubmit: false,
+		focusInvalid: false,
+		focusCleanup: true,
+		errorElement: "span",
+		ignore:".ignore",
+		invalidHandler: function(form, validator) {
+			var errors = validator.numberOfInvalids();
+			if (errors) {
+				
+			} 
+		}
+	});
+	
+	
+	
+	
+	
+	
+	
+	/* 数据加载 */
+	$scope.loadProject=function(){
+		
+		
+		$http.get(serviceBasePath+"eap/pmsServices/pe/baseMgr/remouldBatch/getProDevice1?companyCode="+companyCode+"&reserveProNo="+params.reserveProNo+"&deviceObjCode="+params.deviceObjCode).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$scope.data=response.data;
+			
+			$scope.loadAttrs($scope.data.mctCode);
+			//createPageBar(response.totalPage, response.currentPage,response.totalRecord);
+		});
+		
+	};
+	
+	$scope.deviceAttrList=[];
+	$scope.deviceAttrTrs=[];
+	/* 加载属性信息 */
+	$scope.loadAttrs=function(mctCode){
+		
+		
+		$http.get(serviceBasePath+"eap/pmsServices/om/deviceMgr/device/mctAttr?companyCode="+companyCode+"&mctCode="+mctCode).success(function(response){
+			
+			if(response.statusCode==200){
+				$scope.deviceAttrList = response.list;
+				
+				$scope.deviceAttrTrs=$scope.splitToTr($scope.deviceAttrList);
+				
+				lazyCall('t1',function(){
+					for(var i=0; i<$scope.deviceAttrList.length; i++){
+						(function(){
+							var searchField = $scope.deviceAttrList[i];
+							if(searchField.dtype==4){
+								/* 搜索条件*/ 
+								//alert(searchField.ename)
+								/* var tempstr=searchField.enumValue+"";
+								var arry=tempstr.split(","); */
+								
+								new DropDownList().init({
+									renderTo:"input[name="+searchField.ename+"]",
+									data:searchField.enumValue,
+									onSelected:function(result){
+										$("input[name="+searchField.ename+"]").val(result);
+									}
+								});
+							}
+						})();
+					}
+				}, 100);
+
+				
+				
+			}else if(response.statusCode==404){
+				$scope.deviceAttrList=[];
+				$scope.deviceAttrTrs=[];
+			}
+			
+			//createPageBar(response.totalPage, response.currentPage,response.totalRecord);
+		});
+	};
+	
+	/* 组织tr数据 */
+	$scope.splitToTr=function(arr){
+		var trs=[];
+		for(var i=0; i<arr.length; i++){
+			
+			if(arr[i].dimPeBsMaterial==1){
+				continue;
+			}
+			
+			var attr = arr[i];
+			if(i!=0 && i%2==0){
+				trs.push([]);
+			}
+			if(trs.length==0){
+				trs.push([]);
+			}
+			var tr=trs[trs.length-1];
+			tr.push(attr);
+		}
+		var lastTr=trs[trs.length-1];
+		if(lastTr.length<2){
+			lastTr.push({});
+		}
+		return trs;
+	};
+	
+	
+	/* 初始加载 */
+	$scope.loadProject();
+	
+	
+	
+	
+	
+	$scope.showdiv=function(index,title){
+		//alert(title);
+		
+		var img1=$("#pic_"+index);
+		
+		$.openPhotoGallery(img1,"../../../js/jquery-photo-gallery/gallery.html?picTitle="+title);
+
+	
+	};
+	$scope.showdiv1=function(index,title){
+		//alert(title);
+		
+		var img1=$("#pic1_"+index);
+		
+		$.openPhotoGallery(img1,"../../../js/jquery-photo-gallery/gallery.html?picTitle="+title);
+
+	
+	};
+	//添加合同
+	$scope.addImg=function(){
+		
+		//alert($scope.dormCode)
+		new ShowDlog().showFrame("contract.html?dormCode="+$scope.dormCode,"添加合同", function(){
+			// 
+			//$scope.loadProjects(areaName, dormName, _currentPage,dormType);
+			$scope.loadContract($scope.dormCode);
+			
+		},"dialog-contract");
+		
+	};
+	
+	//添加图片
+	$scope.addImg1=function(str){
+		
+		
+		//alert($scope.dormCode)
+		new ShowDlog().showFrame("invoice.html?dormCode="+$scope.dormCode,"选择照片", function(data){
+			// 
+			
+			if(data!=null && data!=""){
+				$("input[name="+str+"]").val(data);
+				
+				var st=filePath+"?fileCode="+data+"&attachment=0"
+	
+				$("#"+str).attr("src",st);
+		    }
+			//$scope.loadProjects(areaName, dormName, _currentPage,dormType);
+			//$scope.loadInvoice($scope.dormCode);
+			
+		},"dialog-contract");
+		
+	};
+
+
+	
+	/* 保存 */
+	$scope.onSave = function(){
+		//$("input[name=companyCode]").val(userData.companyCode);
+		
+		 				var cond={};
+						$("input[group=cond]").each(function(){
+							var $cond = $(this);
+							var key = $cond.attr("name");
+							var val = $cond.val();
+							cond[key]=val;
+						});
+						
+						var condStr=JSON.stringify(cond);
+						
+						$("input[name=attrJson]").val(condStr);
+						var deviceBhIds="";
+						$("input[name=bxid]").each(function(){
+							var $cond = $(this);
+							
+							var val = $cond.val();
+							deviceBhIds+=val+",";
+						});
+						deviceBhIds=deviceBhIds.substring(0,deviceBhIds.length-1);
+						
+						//alert(deviceBhIds)
+						$("input[name=deviceBhIds]").val(deviceBhIds);
+						
+						
+						var price="";
+						$("input[name=price1]").each(function(){
+							var $cond = $(this);
+							
+							var val = $cond.val();
+							price+=val+",";
+						});
+						price=price.substring(0,price.length-1);
+						$("input[name=price]").val(price);
+						
+						$("input[name=companyCode]").val(companyCode);
+						
+						
+						var formData = $("#saveForm").serialize();
+						
+						if($("#saveForm").valid()){
+							$.ajax({
+								url:serviceBasePath+"eap/pmsServices/pe/baseMgr/remouldBatch/webUpdateDevice",
+								cache:false,
+								method:"POST",
+								data:formData,
+								success:function(res){
+									if(res.statusCode==200){
+										//
+										new ShowDlog().prompt({msg:"新增成功！",
+											done:function(){
+												location.href="deviceList.html";
+											},
+											t:1500
+										});
+									}else{
+										//
+										
+									}
+								},
+								error:function(){
+									
+								}
+							});
+							
+						}else{
+							new ShowDlog().prompt({
+								icon:"warning",
+								msg:"表单还有未填项！",
+								done:function(){
+									
+								},
+								t:2000
+							});
+						}
+						
+						
+	};
+	
+	$scope.deleteItem=function(picVisitid){
+		 
+		 new ShowDlog().confirm({
+			msg:"确定删除该图片吗？",
+			ok:function(){
+				
+				
+				var dialog=new ShowDlog();
+				dialog.prompt({
+					icon:"waitting",
+					msg:"文件正在删除...",
+					done:function(){},
+					t:20000
+				});
+				$http.post(serviceBasePath+"eap/pmsServices/materielMg/dormMg/dorm/deleteContract?contractScanimg="+picVisitid).success(function(response){
+					dialog.close();
+					if(response.statusCode=="200"){
+						//var dialog1=;
+						new ShowDlog().prompt({
+							icon:"success",
+							msg:"文件删除成功！",
+							done:function(){
+								
+								$scope.loadContract($scope.dormCode);
+							},
+							t:1500
+						});
+					}else{
+						new ShowDlog().prompt({
+							icon:"error",
+							msg:"文件删除失败！",
+							done:function(){
+								//location.href="projectFile.html?docClass="+docClass;
+							},
+							t:1500
+						});
+					}
+					
+					
+				});
+			},
+			cancel:function(){}
+		});
+		
+	};
+	
+	$scope.deleteItem1=function(picVisitid){
+		 
+		 new ShowDlog().confirm({
+			msg:"确定删除该图片吗？",
+			ok:function(){
+				
+				
+				var dialog=new ShowDlog();
+				dialog.prompt({
+					icon:"waitting",
+					msg:"文件正在删除...",
+					done:function(){},
+					t:20000
+				});
+				$http.post(serviceBasePath+"eap/pmsServices/materielMg/dormMg/dorm/deleteInvoice?invoiceScanimg="+picVisitid).success(function(response){
+					dialog.close();
+					if(response.statusCode=="200"){
+						//var dialog1=;
+						new ShowDlog().prompt({
+							icon:"success",
+							msg:"文件删除成功！",
+							done:function(){
+								
+								$scope.loadInvoice($scope.dormCode);
+							},
+							t:1500
+						});
+					}else{
+						new ShowDlog().prompt({
+							icon:"error",
+							msg:"文件删除失败！",
+							done:function(){
+								//location.href="projectFile.html?docClass="+docClass;
+							},
+							t:1500
+						});
+					}
+					
+					
+				});
+			},
+			cancel:function(){}
+		});
+		
+	};
+
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		location.href="deviceList.html";
+	};
+	
+});
+</script>
+</body>
+</html>

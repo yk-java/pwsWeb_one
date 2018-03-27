@@ -1,0 +1,353 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 人员管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css"/>
+<script type="text/javascript" src="../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/ng-base.js"></script>
+
+<script type="text/javascript" src="../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/edit.css"/>
+
+<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.chooseUser{width:1000px;height:500px;}
+	
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">新增人员</label>
+			</div>
+			<img src="../../img/list_Header2-.png">
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+				<tr>
+					<th>档案号</th>
+					<td width="220">
+						<input type="text" name="recordno" class="required" maxlength="32"/>
+					</td>
+					<th>微信号</th>
+					<td><input type="text" name="weixinid"  maxlength="50"/></td>
+					<th>&nbsp;</th>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<th>部门</th>
+					<td width="220">
+						<input type="hidden" name="unitCode"/>
+						<input type="text" name="unitName" class="required dropDownList" maxlength="16" placeholder="请选择"/>
+					</td>
+					<th>工号</th>
+					<td width="220"><input type="text" name="jobNo" class="required" maxlength="25"/></td>
+					<th>姓名</th>
+					<td width="220"><input type="text" name="employeename" class="required" maxlength="25"/></td>
+				</tr>
+				<tr>
+					<th>性别</th>
+					<td>
+						<label><input type="radio" name="sex" value="0" checked="checked"/>男</label>
+						<label><input type="radio" name="sex" value="1"/>女</label>
+					</td>
+					<th>身份证号</th>
+					<td><input type="text" name="idcard" class="required customvalid" maxlength="18"
+					customvalid="onCustomvalid" customMessage="{customvalid:'请输入正确身份证号'}"/></td>
+					<th>出生日期</th>
+					<td><input type="text" name="birthday" class="datev dateComponent" placeholder="请选择" onclick="new Calendar().show(this)"/></td>
+				</tr>
+				<tr>
+					<th>婚姻状况</th>
+					<td>
+						<label><input type="radio" name="marital" value="3" checked="checked"/>未知</label>&nbsp;
+						<label><input type="radio" name="marital" value="1"/>未婚</label>&nbsp;
+						<label><input type="radio" name="marital" value="2"/>已婚</label>&nbsp;
+					</td>
+					<th>籍贯</th>
+					<td><input type="text" name="nativePlace"/></td>
+					<th>家庭住址</th>
+					<td><input type="text" name="addr"/></td>
+				</tr>
+				<tr>	
+					<th>毕业学校</th>
+					<td><input type="text" name="graduateSchool"/></td>
+					<th>学历</th>
+					<td><input type="text" name="degree"/></td>
+					<th>所学专业</th>
+					<td><input type="text" name="majorDegree"/></td>
+				</tr>
+				<tr>
+					<th>毕业时间</th>
+					<td><input type="text" name="graduateTime" class="datev dateComponent" placeholder="请选择" onclick="new Calendar().show(this)"/></td>
+					<th>办公室电话</th>
+					<td><input type="text" name="officeTel" class="phone"/></td>
+					<th>家庭电话</th>
+					<td><input type="text" name="tel" class="phone"/></td>
+				</tr>
+				<tr>
+					<th>手机1</th>
+					<td><input type="text" name="mobilephone1" class="phone"/></td>
+					<th>手机2 </th>
+					<td><input type="text" name="mobilephone2" class="phone"/></td>
+					<th>邮箱</th>
+					<td><input type="text" name="mail" class="email"/></td>
+				</tr>
+				<tr>
+					<th>紧急联系人姓名</th>
+					<td><input type="text" name="emergencyContactorName"/></td>
+					<th>紧急联系人号码</th>
+					<td><input type="text" name="emergencyContactorPhone" class="phone"/></td>
+					<th>紧急联系人关系</th>
+					<td><input type="text" name="emergencyContactorRelation"/></td>
+				</tr>
+<tr>
+	<th>职务岗位</th>
+	<td>
+		<input type="hidden" name="jobCode"/>
+		<input type="text" name="jobName" class="dropDownList" placeholder="请选择"/>
+	</td>
+	<th>工作性质</th>
+	<td>
+		<input type="hidden" name="jobPropertyCode"/>
+		<input type="text" name="jobPropertyName" class="dropDownList" placeholder="请选择"/>
+	</td>
+	<th>直接上级领导</th>
+	<td >
+	  <input type="hidden" name="leaderCode"/>
+	  <input type="text" name="leaderName" class="required dropDownList" ng-click="chooseUser()" />
+	</td>
+</tr>
+<tr>
+	<th>类别</th>
+	<td>
+		<input type="hidden" name="jobClass1"/>
+		<input type="text" name="jobClass1Name" class="dropDownList" placeholder="请选择"/>
+	</td>
+	<th>计算数据</th>
+	<td colspan="3">
+		<input type="hidden" name="jobClass2"/>
+		<input type="text" name="jobClass2Name" class="dropDownList" placeholder="请选择"/>
+	</td>
+</tr>
+<tr>
+	<th>招聘地点</th>
+	<td><input type="text" name="recruitPlace"/></td>
+	<th>到职日期</th>
+	<td><input type="text" name="officeDate" class="dateComponent" placeholder="请选择" onclick="new Calendar().show(this)"/></td>
+	<th>转正日期</th>
+	<td><input type="text" name="workDate" class="dateComponent" placeholder="请选择" onclick="new Calendar().show(this)"/></td>
+</tr>
+<tr>
+	<th>合同性质</th>
+	<td>
+		<input type="hidden" name="contractPropertyCode"/>
+		<input type="text" name="contractPropertyName" class="dropDownList" placeholder="请选择"/>
+	</td>
+	<th>合同签订日期</th>
+	<td><input type="text" name="contractDateS" class="dateComponent" placeholder="请选择" onclick="new Calendar().show(this)"/></td>
+	<th>合同到期日期</th>
+	<td><input type="text" name="contractDateE" class="dateComponent" placeholder="请选择" onclick="new Calendar().show(this)"/></td>
+</tr>
+<tr>
+	<th>银行账号</th>
+	<td><input type="text" name="bankAccount"/></td>
+	<th>银行名称</th>
+	<td colspan="3"><input type="text" name="bankName"/></td>
+</tr>
+<tr>
+	<th>公积金</th>
+	<td><input type="text" name="weal1Status"/></td>
+	<th>社保卡</th>
+	<td><input type="text" name="weal2Status"/></td>
+	<th>意外险</th>
+	<td><input type="text" name="weal3Status"/></td>
+</tr>
+			
+			</table>
+		</div>
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		/* 初始化视图 */
+		new DropDownList().init({
+			mode:"page",
+			renderTo:"input[name=unitName]",
+			url:"../component/orgTree.html?required=true&ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=unitName]").val(result.unitName);
+				$("input[name=unitCode]").val(result.unitCode);
+				$("input[name=unitName]").focus();
+			}
+		});
+		/* 工作岗位 */
+		new DropDownList().init({
+			mode:"page",
+			renderTo:"input[name=jobName]",
+			url:"../component/job.html?required=true&ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=jobName]").val(result.jobName);
+				$("input[name=jobCode]").val(result.jobCode);
+				$("input[name=jobName]").focus();
+			}
+		});
+		/* 工作性质 */
+		new DropDownList().init({
+			mode:"page",
+			renderTo:"input[name=jobPropertyName]",
+			url:"../component/jobProperty.html?required=true&ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=jobPropertyName]").val(result.jobPropertyName);
+				$("input[name=jobPropertyCode]").val(result.jobPropertyCode);
+				$("input[name=jobPropertyName]").focus();
+			}
+		});
+		/* 类型 */
+		new DropDownList().init({
+			mode:"list",
+			renderTo:"input[name=jobClass1Name]",
+			data:[{code:1,name:"总部"},{code:2,name:"项目"}],
+			textField:"name",
+// 			height:"200px",
+			onSelected:function(result){
+				$("input[name=jobClass1Name]").val(result.name);
+				$("input[name=jobClass1]").val(result.code);
+				$("input[name=jobClass1Name]").focus();
+			}
+		});
+		/* 计算数据 */
+		new DropDownList().init({
+			mode:"list",
+			renderTo:"input[name=jobClass2Name]",
+			data:[{code:1,name:"内业"},{code:2,name:"外业"}],
+			textField:"name",
+// 			height:"200px",
+			onSelected:function(result){
+				$("input[name=jobClass2Name]").val(result.name);
+				$("input[name=jobClass2]").val(result.code);
+				$("input[name=jobClass2Name]").focus();
+			}
+		});
+		
+		/* 合同性质 */
+		new DropDownList().init({
+			mode:"page",
+			renderTo:"input[name=contractPropertyName]",
+			url:"../component/contractProperty.html?required=true&ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=contractPropertyName]").val(result.contractPropertyName);
+				$("input[name=contractPropertyCode]").val(result.contractPropertyCode);
+				$("input[name=contractPropertyName]").focus();
+			}
+		});
+		/* 表单验证 */
+		validator = $("#saveForm").validate({
+			onsubmit: false,
+			focusInvalid: false,
+			focusCleanup: true,
+			errorElement: "span",
+			ignore:".ignore",
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {
+					
+				} 
+			}
+		});
+		
+		
+		
+		$scope.chooseUser = function(){
+			/* 选择员工 */
+			var unitCode = $("input[name=unitCode]").val();
+			var unitName = $("input[name=unitName]").val();
+			new ShowDlog().showFrame("../component/chooseUser.html?unitCode="+unitCode+"&unitName="+encodeURIComponent(unitName), "选择员工", function(data){
+				if(data && data.length>0){
+					$("input[name=leaderName]").val(data[0].employeename);
+					$("input[name=leaderCode]").val(data[0].employeecode);
+				}
+			}, "chooseUser");
+		};
+
+		
+		/* 保存 */
+		$scope.onSave=function(){
+			var params = serializeArrayToMap($("#saveForm").serializeArray());
+			if($("#saveForm").valid()){
+				this.httpPost({
+					url:"eap/pmsServices/sys/orgEmployee/employee/add",
+					data:params,
+					success:function(response){
+						if(response.statusCode=="200"){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"保存成功！",
+								done:function(){
+									location.href = "employeeMgr.html";
+								},
+								t:1500
+							});
+						}else{
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:response.resultMsg,
+								done:function(){
+									//
+								},
+								t:1500
+							});
+						}
+					}
+				});
+			}
+		};
+		
+		/* 取消 */
+		$scope.onCancel=function(){
+			history.go(-1);
+		};
+	}
+});
+
+function onCustomvalid(value) {
+	return /^(\d{15}$|^\d{17}(\d|X|x))$/.test(value);
+}
+
+</script>
+</body>
+</html>

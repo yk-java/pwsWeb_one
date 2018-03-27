@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 类型管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css"/>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.all{width:100%;height:100%}
+	.top{height:18%;width:100%;background:#328BFF;color:#fff;font-family: '微软雅黑'}
+	.tj{width:40%;float:left;height:20px;margin-top:12px;margin-left:30px;}
+	.tj b{color:yellow}
+	
+	
+	 .cnt
+        {
+            border-collapse: collapse;
+            border: none;
+           width:100%;
+           line-height:35px;
+           text-align: center;
+        }
+      .cnt  td
+        {
+            border: solid #ccc 1px;
+        }
+        .tr1{color:#999}
+        tr.tab_header td{background:#328BFF;color:#fff;font-family: '微软雅黑';border:solid 1px #52ABFF;}
+        
+        .title_left .btn{display:inline-block;height:30px;line-height:30px;margin:0 4px;padding:0 15px 0 15px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; border-radius:4px;}
+.title_left .blue{background:#3385FF;color:#fff;}
+.title_left .blue:hover{background:#186CE7;}
+.title_left .pink{background:#ED7798;color:#fff;}
+.title_left .pink:hover{background:#E54673;}
+</style>
+
+</head>
+
+<body ng-app="projectType" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				&nbsp;&nbsp;
+				<input type="text" name="auditName" class="dropDownList" placeholder="审核状态"/>
+				<input type="hidden" name="auditCode"/>
+				<div class="btn blue" ng-click="doQuery()">
+					过滤
+				</div>
+				<div class="btn pink" ng-click="doExport()">
+					导出
+				</div>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<div class="all">
+<!-- 	<div class="top"> -->
+<!-- 		<div class="tj">表箱数量 : <b>1500</b></div> -->
+<!-- 		<div class="tj">户&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数 : <b>1500</b></div> -->
+<!-- 		<div class="tj">小&nbsp;区&nbsp;数&nbsp; : <b>1500</b></div> -->
+<!-- 		<div class="tj">审核状态 : <b>已审核</b></div> -->
+<!-- 	</div> -->
+<!-- 	<table class="cnt"> -->
+<!-- 		<tr style="height:50px;"> -->
+<!-- 			<td>材料</td> -->
+<!-- 			<td>勘测数量</td> -->
+<!-- 			<td>审核数量</td> -->
+<!-- 			<td>小区数</td> -->
+<!-- 		</tr> -->
+		
+<!-- 		<tr class="tr1"  ng-repeat="item in huizongList"> -->
+<!-- 			<td>{{item.name}}</td> -->
+<!-- 			<td>{{item.num}}</td> -->
+<!-- 			<td>{{item.num1}}</td> -->
+<!-- 			<td>{{item.num2}}</td>	 -->
+<!-- 		</tr> -->
+<!-- 		<tr style="height:40px;"> -->
+<!-- 			<td colspan="2">预算费用 : <b style="color:#328BFF">1500</b></td> -->
+<!-- 			<td colspan="2">实际费用 : <b style="color:#328BFF">1500</b></td> -->
+			
+<!-- 		</tr> -->
+<!-- 	</table> -->
+	
+	<table class="cnt" id="datTab">
+		<tr class="tab_header">
+			<td rowspan="2">项目</td>
+<!-- 			<td colspan="3">表箱数量</td> -->
+			<td rowspan="2">户数</td>
+<!-- 			<td rowspan="2">小区数</td> -->
+<!-- 			<td rowspan="2">单元数</td> -->
+			<td rowspan="2" ng-repeat="item in dataList[0].materialList">{{item.name}}</td>
+			
+		</tr>
+		<tr class="tab_header">
+<!-- 			<td>未审核</td> -->
+<!-- 			<td>驳回</td> -->
+<!-- 			<td>已审核</td> -->
+			
+		</tr>
+		<tr ng-repeat="item in dataList">
+			<td>{{item.REFORM_PROGRAM}}</td>
+			
+<!-- 			<td>{{item.unAuditMeterBoxCount}}</td> -->
+<!-- 			<td>{{item.returnMeterBoxCount}}</td> -->
+<!-- 			<td>{{item.auditMeterBoxCount}}</td> -->
+			
+			<td>{{item.houseHold}}</td>
+<!-- 			<td>{{item.estateCount}}</td> -->
+<!-- 			<td>{{item.unitCount}}</td> -->
+			
+			<td ng-repeat="item2 in item.materialList">{{decim(item2.v1, 2)}}</td>
+			
+		</tr>
+	</table>
+	
+</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+simpleController({			
+	moduleName:"projectType",			
+	controllerName:"userMgrCtrl",		
+	init:function($scope, $http){
+		/* init */
+		$scope.dataList=[];
+		
+		var urlParams = getUrlParams();
+		new DropDownList().init({
+			renderTo:"input[name=auditName]",
+			data:[{code:"",name:"全部"},{code:"1",name:"已审核"},{code:"0",name:"未审核"}],
+			textField:"name",
+			onSelected:function(item){
+				$("input[name=auditName]").val(item.name);
+				$("input[name=auditCode]").val(item.code);
+			}
+		});
+		$scope.loadData=function(audit){
+			var waittingDlog = new ShowDlog();
+			waittingDlog.prompt({
+				icon:"waitting",
+				msg:"正在查询...",
+				done:function(){},
+				t:60*1000
+			});
+			/* 加载数据 */
+			$scope.httpGet({
+				url:"eap/pmsServices/pe/baseMgr/reservePro/reserveStatistics?companyCode="+$scope.userData.companyCode+"&reserveProNo="+
+						urlParams.reserveProNo+"&mctViewCode="+urlParams.mctViewCode+"&rpAuditStateCode="+audit,
+				success:function(response){
+					waittingDlog.close();
+					$scope.dataList=response.list;
+				}
+			});
+		}
+		$scope.doQuery=function(){
+			var auditCode = $("input[name=auditCode]").val();
+			$scope.loadData(auditCode);
+		};
+		
+		$scope.doQuery();
+		
+		$scope.decim=function(num, len){
+			return decim(num, len);
+		};
+		
+		$scope.doExport=function(){
+			excelExport("datTab");
+		};
+	}
+});
+	</script>
+</body>
+</html>

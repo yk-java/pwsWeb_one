@@ -1,0 +1,282 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 人员管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<link rel="stylesheet" type="text/css" href="../../css/list.css"/>
+<script type="text/javascript" src="../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../js/time.js"></script>
+<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript" src="../../js/ExportExcel.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.owWordLoad{text-decoration:underline;color:#0099ff;}
+	.owWordload-detail{border:solid 1px #666;background:#ffee99;color:#666;padding:4px 6px 4px 6px;position:absolute;display:none;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" class="dropDownTree dropDownList" style="width:280px;" placeholder="请选择部门"/>
+				<input type="text" id="searchName" placeholder="请输入姓名">
+				<input type="text" id="starttime" name="fromDate" class="date dateComponent" placeholder="请选择开始时间" onclick="new Calendar().show(this)" />
+				<input type="text" id="endtime"   name="toDate" class="date dateComponent" placeholder="请选择结束时间" onclick="new Calendar().show(this)" />
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				<div class="query_div" ng-click="doExport()">
+					导出
+				</div>
+				
+			</div>
+			<img src="../../img/list_Header2-.png">
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+			   <tr class="tr1">
+				<th width="10%"><div align="center">日志时间</div></th>
+				<th width="4%"><div align="center">姓名</div></th>
+				<th width="10%"><div align="center">所属项目</div></th>
+				<th width="30%"><div align="center">工作记录</div></th>
+				<th width="5%"><div align="center">计划执行情况</div></th>
+				<th  width="30%"><div align="center">工作成果</div></th>
+				<th width="10%"><div align="center">提交时间</div></th>
+				<!-- <th width="10%"><div align="center">备注</div></th> -->
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in userList">
+				<td ng-if="item.date_rowspan" rowspan="{{item.date_rowspan?item.date_rowspan:1}}"><div align="center">{{item.logDate }}{{toWeek(item.logDate)}} </div></th>
+				<td ng-if="item.name_rowspan" rowspan="{{item.name_rowspan?item.name_rowspan:1}}"><div align="center">{{item.employeename}}</div></td>
+				<td><div align="center">{{item.wiPro}}</div></td>
+				<td>
+					<div align="center" >{{item.wiRecord}}</div>
+					
+				</td>
+				<td><div align="center">{{item.wiPlan}}</div></td>
+				<td>
+					<div align="center" style="display:inline-block;">{{item.wiResult}}</div>
+					
+				</td>
+				<td><div align="center">{{item.createtime}}</div></td>
+				<!-- <td><div align="center">{{item.remarks}}</div></td> -->
+			  </tr>
+			  
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+
+window.onkeyup=function(e){
+	if(e.keyCode==13){
+		ngScope.doQuery();
+	}
+};
+var selectedUnitCode="", cond_employeename="";
+var ngScope;
+var companyCode="";
+var unitCode="";
+var employeeName="";
+var fromDate="";
+var toDate="";
+var logFromTime="";
+var logToTime="";
+	
+
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.userList=[];
+	fromDate=getWeekStartDate();
+	$("input[name=fromDate]").val(fromDate);
+	toDate=getWeekEndDate();
+	$("input[name=toDate]").val(toDate);
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	
+	companyCode=userData.companyCode;
+	
+	
+	new DropDownList().init({
+		renderTo:".dropDownTree",
+		url:"../component/orgTree.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			selectedUnitCode=result.unitCode;
+			$(".dropDownTree").val(result.unitName);
+			currentPage=1;
+			unitCode=result.unitCode;
+			ngScope.loadUsers(companyCode,unitCode,employeeName,fromDate,toDate);
+		}
+	});
+	
+	$scope.loadUsers=function(companyCode,unitCode,employeeName,fromDate,toDate){//alert(unitCode);
+		$http.get(serviceBasePath+"eap/pmsServices/dailylog/getLoglist?companyCode="
+			+companyCode+"&unitCode="+unitCode+"&employeeName="+employeeName+"&fromDate="+fromDate+"&toDate="+toDate).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$scope.userList=response.list;
+			//$scope.getweek();
+			if(response.list.length>0){
+				$scope.format();
+			}
+			});
+	};
+	
+	$scope.doQuery=function(){
+		employeeName = $("#searchName").val();
+		fromDate=$("input[name=fromDate]").val();
+		toDate=$("input[name=toDate]").val();
+		var fromDate1=fromDate.split("-");
+	    var toDate1=toDate.split("-");
+		
+		if(fromDate1>toDate1){
+			alert("开始日期不能大于结束日期");
+			return false;
+		}
+		
+		$scope.loadUsers(companyCode,unitCode,employeeName,fromDate,toDate);
+	};	
+	
+	/* 根据日期获取星期 */
+	$scope.toWeek=function(logDate){
+	 
+		
+		 var oDate1 = new Date(logDate);
+		 var week=oDate1.getDay();
+		 var str="";
+		 //alert(week)
+		 if(week==1){
+			 str="一";
+		 }else if(week==2){
+			 str="二";
+		 }else if(week==3){
+			 str="三";
+		 }
+		 else if(week==4){
+			 str="四";
+		 }
+		 else if(week==5){
+			 str="五";
+		 }
+		 else if(week==6){
+			 str="六";
+		 }
+		 else if(week==0){
+			 str="日";
+		 }
+		 
+		 return "(星期"+str+")";
+		
+	};
+	/* 下载 */
+	$scope.doExport=function(){
+		excelExport("dataTable");
+	};
+	
+	
+	
+	/* 合并  */
+	$scope.count=function(params){
+		var count=0;
+		for(var i=0; i<$scope.userList.length; i++){
+			var item=$scope.userList[i];
+			var flag=false;
+			for(var k in params){
+				if(item[k]!=params[k]){
+					flag=true;
+					break;
+				}
+			}
+			if(!flag){
+				count++;
+			}
+		}
+		return count;
+	};
+
+	$scope.isFirst=function(params, key){
+		var isNotFirst=false;
+		for(var i=0; i<$scope.userList.length; i++){
+			var item=$scope.userList[i];
+			var flag=false;
+			for(var k in params){
+				if(item[k]!=params[k]){
+					flag=true;
+					break;
+				}
+			}
+			if(!flag){
+				if(item[key]){
+					isNotFirst=true;
+				}
+			}
+		}
+		if(!isNotFirst){
+			return true;
+		}
+	};
+
+
+	$scope.format=function(){
+		for(var i=0; i<$scope.userList.length; i++){
+			var item=$scope.userList[i];
+			if($scope.isFirst({logDate:item.logDate}, 'date_rowspan')){
+				item.date_rowspan=$scope.count({logDate:item.logDate});
+			}
+			if($scope.isFirst({logDate:item.logDate, employeename:item.employeename}, 'name_rowspan')){
+				item.name_rowspan=$scope.count({logDate:item.logDate, employeename:item.employeename});
+			}
+		}
+	};
+	
+	$scope.loadUsers(companyCode,unitCode,employeeName,fromDate,toDate);
+	
+	
+	$scope.sub=function(content){
+		
+		//	alert(content)
+		    
+		    if(content.length>20){
+		    	var str=content.substring(0,20);
+		    	return str;
+		    }else{
+		    	return content;
+		    }
+			
+		};
+
+	
+
+	
+	
+});
+</script>
+</body>
+</html>

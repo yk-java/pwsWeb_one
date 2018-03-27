@@ -1,0 +1,223 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 车辆管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	
+</style>
+</head>
+
+<body ng-app="mdu" ng-controller="ctrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">查看项目材料种类</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">项目材料种类属性</a>
+			
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+				<tr>
+					<th>总控视图名称</th>
+					<td width="300">
+						
+						<input type="text" name="mctViewName" class="readonly" readonly="readonly" value="{{projectInfo.mctViewName}}" />
+						<input type="hidden" name="companyCode" value="{{projectInfo.companyCode}}"   />
+						<input type="hidden" name="mctViewCode" value="{{projectInfo.mctViewCode}}"   />
+					</td>
+				    <th>视图关联项目</th>
+					<td>
+						<input type="text" name="proNames" style="width:400px;" class="readonly" value="{{projectInfo.proNames}}"   class="readonly" placeholder="请选择"/>
+						<input type="hidden" name="proNos" value="{{projectInfo.proNos}}" />
+					</td>
+					
+				
+					
+				</tr>
+				<tr>
+					
+					
+					
+					<th>备注 </th>
+					<td><input type="text" name="remarks" readonly="readonly" class="readonly" value="{{projectInfo.remarks}}" /></td>
+				</tr>
+			</table>
+			
+		</div>
+		
+		
+
+		<div class="form_bottom">
+			
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+function getUrlParams(){
+	var params={};
+	var url = location.href;
+	var start = url.indexOf("?", 0)+1;
+	var paramsStr = url.substring(start, url.length);
+	var paramsArr = paramsStr.split("&");
+	for(var i=0;i<paramsArr.length;i++){
+		var kv = paramsArr[i].split("=");
+		var k = kv[0];
+		var v = kv[1];
+		params[k]=v;
+	}
+	return params;
+}
+var selectedUnitCode="";
+var validator;
+var userData;
+
+var ngScope;
+var app = angular.module("mdu", []);
+app.controller("ctrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	
+	$scope.projectInfo={};
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	var params = getUrlParams();
+	
+	/* 视图渲染 */
+	$(".tabs>a").each(function(){
+		var layId = $(this).attr("href");
+		var idx = $(".tabs>a").index($(this));
+		if(idx!=0){
+			$(layId).hide();
+			$(layId).attr("data-show", "0");
+		}else{
+			$(layId).attr("data-show", "1");
+		}
+		$(this).click(function(){
+			$(".tabs>.selected").removeClass("selected");
+			$(this).addClass("selected");
+			var layId = $(this).attr("href");
+			$("div[data-show=1]").hide();
+			$("div[data-show=1]").attr("data-show", "0");
+			$(layId).show();
+			$(layId).attr("data-show", "1");
+			
+		});
+	});
+	
+	/* Validate */
+	validator = $("#saveForm").validate({
+		onsubmit: false,
+		focusInvalid: false,
+		focusCleanup: true,
+		errorElement: "span",
+		ignore:".ignore",
+		invalidHandler: function(form, validator) {
+			var errors = validator.numberOfInvalids();
+			if (errors) {
+				
+			} 
+		}
+	});
+	
+	
+	/* 数据加载 */
+	$scope.loadProject=function(mctViewCode,companyCode){
+		
+		$http.get(serviceBasePath+"eap/pmsServices/pe/baseMgr/projectInit/get?mctViewCode="
+			+mctViewCode+"&ticket="+ticket+"&companyCode="+companyCode).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../../login.html";
+				return;
+			}
+			$scope.projectInfo = response.data;
+		});
+	};
+	/* 初始加载 */
+	$scope.loadProject(params.mctViewCode,params.companyCode);
+	
+	/* 保存 */
+	$scope.onSave = function(){
+		//$("input[name=companyCode]").val(userData.companyCode);
+		var formData = $("#saveForm").serialize();
+		
+		if($("#saveForm").valid()){
+			$.ajax({
+				url:serviceBasePath+"eap/pmsServices/pe/baseMgr/projectInit/update",
+				cache:false,
+				method:"POST",
+				data:formData,
+				success:function(res){
+					if(res.statusCode==200){
+						//
+						new ShowDlog().prompt({msg:"修改成功！",
+							done:function(){
+								location.href="projectInitMgr.html";
+							},
+							t:1500
+						});
+					}else{
+						//
+						
+					}
+				},
+				error:function(){
+					
+				}
+			});
+			
+		}else{
+			
+		}
+	};
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		location.href="projectInitMgr.html";
+	};
+	
+});
+</script>
+</body>
+</html>

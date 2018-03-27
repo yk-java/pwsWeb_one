@@ -1,0 +1,551 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>保养管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+
+<script src="../../../js/jquery-photo-gallery/jquery.photo.gallery.js"></script>
+
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=PL4wfqVofjrMVz7FMaPs8Dts"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+
+<style type="text/css">
+	
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+	.dialog-viewOil{height:500px;width:900px}
+</style>
+<style type="text/css">
+	.title_tabs{list-style-type:none;padding:0;margin:0;height:39px;margin-left:-1px;}
+	.title_tabs li{position:relative;padding:0;margin:0;border-left:1px #fff solid;float:left;height:39px;background:#E1E1E1;}
+	.title_tabs li>a{display:block;line-height:39px;border:solid 0px;padding:0 70px 0 50px;margin-right:-14px;
+		background:url(../../../img/list_Header2-gray.png) right no-repeat;color:#666;font-size:14px;font-weight:bold;}
+	.title_tabs li.selected{background:#4CA9FF;z-index:9;}
+	.title_tabs li.selected>a{background:url(../../../img/list_Header2-.png) right no-repeat;color:#fff;font-size:14px;font-weight:bold;}
+	
+	.owWordLoad{text-decoration:underline;color:#0099ff;}
+	.owWordload-detail{border:solid 1px #666;background:#ffee99;color:#666;padding:4px 6px 4px 6px;position:absolute;display:none;margin-left:-120px;width:170px;}
+	.owWordLoad1{text-decoration:underline;color:#0099ff;}
+	.owWordload-detail1{width:50px; border:solid 1px #666;background:#ffee99;color:#666;padding:4px 6px 4px 6px;position:absolute;display:none;}
+	
+	   .qiehuan {
+    line-height: 25px;
+    border-radius: 20px;
+    border: 1px solid white;
+    margin-top: 16px;
+    overflow: hidden;
+    margin-left: 16px;
+    margin-right: 16px;
+    width:150px;
+    height:25px;
+    float:right;
+    margin-top:7px;
+    margin-right:-2px;
+   
+}
+
+.qiehuan .tong_zhi, .qiehuan .fang_an, .qiehuan .zhi_nan {
+    float: left;
+    width: 32.7%;
+    text-align: center;
+}
+.tong_zhi {
+    font-size:12px;
+    color: #288df5;
+    background-color: white;
+     border-right: 1px solid white;
+}
+.fang_an {
+    font-size:12px;
+    color: white;
+    border-right: 1px solid white;
+    
+}
+.zhi_nan {
+   font-size:12px;
+    color: white;
+}
+a{
+    text-decoration: none;
+    cursor: pointer;
+}
+.proType{
+	display: none
+}
+.proNameD{
+	display: none
+}
+.unitcode{
+	display: none
+}
+
+.ltitle{color:#3385FF;font-size:15px; border-bottom:1px #e0e0e0 solid;height:25px;margin-top: 10px;}
+	table input{padding-left:3px; border:1px solid #ccc;border-radius:4px;height:26px;}
+	.title_cancel{float:left;width:70px;height:28px;background: url(../../../img/btn_cancel.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#666;cursor: pointer;}
+	.title_cancel:hover{background: url(../../../img/btn_cancel.png) no-repeat 0 -29px;}
+	.map_div{border:solid 1px #cccccc;position: absolute;bottom: 0;left: 0;right: 0;top: 40px;}
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+	
+		<ul class="title_tabs">
+			<li class="selected">
+				<a href="javascript:" ui-id="#lay1">派单详情</a>
+			</li>
+			<li>
+				<a href="javascript:" ui-id="#lay2">照片</a>
+			</li>
+				<li>
+				<a href="javascript:" ui-id="#lay3">轨迹</a>
+			</li>
+			
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;返回
+			</a>
+			
+		</ul>
+		<div id="lay1">
+			<div class="ltitle">
+		    	[{{projectInfo.PRO_NAME}}]&nbsp;派单基本信息
+		    </div>
+			<table style="line-height: 40px;margin-top:10px;">
+				<tr>
+					
+					<th>任务对象</th>
+					<td><input type="text" name="proName" id="proName" value="{{projectInfo.PTJ_DRIVERNAME}}"  readonly="readonly"      />
+					<th>车牌号</th>
+					
+					<td  style="width:250px;">
+						<input type="text" name="proType" id="proType" value="{{projectInfo.VEHICLE_NO}}"   readonly="readonly" />
+					</td>
+					
+					<th>乘车人员</th>
+					<td  style="width:250px;">
+					<input type="text" name="proName" id="proName" value="{{projectInfo.RIDOR}}"  readonly="readonly"      />
+				</td>
+				</tr>
+				<tr>
+					<th>任务描述</th>
+					<td colspan="5">
+						<textarea rows="3" style="width: 90%;font-family: 微软雅黑" name="proName" id="proName"  readonly="readonly" >{{projectInfo.TASK_DESC}}</textarea>
+					</td>
+					
+					
+				</tr>
+				<tr>
+					<th>备注</th>
+					<td colspan="5">
+						<textarea rows="3" style="width: 90%;font-family: 微软雅黑" name="proName" id="proName"  readonly="readonly" >{{projectInfo.REMARKS}}</textarea>
+					</td>
+					
+					
+				</tr>
+			</table>
+			 <div class="ltitle" style="margin-top:25px;">
+		    	&nbsp;派单前
+		    </div>
+			<table style="line-height: 40px;margin-top:15px;">	
+				<tr>
+					<th>出发地点</th>
+					<td  style="width:250px;">
+					<input type="text" name="proName" id="proName" value="{{projectInfo.S_PLACE}}"  readonly="readonly"      />
+					
+					
+					<th>出发时间</th>
+					
+					<td  style="width:250px;">
+						<input type="text" name="proType" id="proType" value="{{projectInfo.S_DATE}}"   readonly="readonly" />
+					</td>
+					
+					<th>起始里程</th>
+					<td><input type="text" name="proName" id="proName" value="{{projectInfo.S_MILEAGE}}"  readonly="readonly"      />
+					
+				</tr>
+			</table>
+			 <div class="ltitle" style="margin-top:20px;">
+		    	&nbsp;派单后
+		    </div>
+			<table style="line-height: 40px;margin-top:20px;">
+				<tr>
+					
+					<th>目的地点</th>
+					<td  style="width:250px;">
+					<input type="text" name="proName" id="proName" value="{{projectInfo.D_PLACE}}"  readonly="readonly"      />
+				
+					<th>目的时间</th>
+					
+					<td  style="width:250px;">
+						<input type="text" name="proType" id="proType" value="{{projectInfo.E_DATE}}"   readonly="readonly" />
+					</td>	
+				
+					<th>结束里程</th>
+					
+					<td>
+						<input type="text" name="proType" id="proType" value="{{projectInfo.D_MILEAGE}}"   readonly="readonly" />
+					</td>
+				</tr>
+			</table>
+		</div>
+		
+		<div id="lay2">
+			<div style="width:600px;height:200px;margin-bottom:5px;margin-top:20px; clear: both" class="gallerys">
+				<div style="height:200px;width:200px; float:left;margin-left:10px;">
+					
+					
+					<img id="sMileageImg" onerror="this.src='../../../img/defaultImg.png'" title="点击放大" src="../../../img/testimg/1.png" style="height:200px;width:200px;cursor:url(../../../img/big.png), pointer" class="gallery-pic" onclick="$.openPhotoGallery(this,'../../../js/jquery-photo-gallery/gallery.html?picTitle=上车前')" />
+				</div>
+				<div style="height:200px;width:200px; float:left;margin-left:80px;">
+					
+					
+					<img id="dMileageImg" onerror="this.src='../../../img/defaultImg.png'" title="点击放大" src="../../../img/testimg/1.png" style="height:200px;width:200px;cursor:url(../../../img/big.png), pointer" class="gallery-pic" onclick="$.openPhotoGallery(this,'../../../js/jquery-photo-gallery/gallery.html?picTitle=上车后')" />
+				</div>
+			</div>
+			
+		</div>
+
+		<div id="lay3">
+			<div class="map_div" id="allmap" >
+	     	</div>
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+var map = new BMap.Map("allmap");    
+
+
+var myIcon = new BMap.Icon("../../../img/map/position.png", new BMap.Size(19,25));
+var marker = new BMap.Marker(new BMap.Point(0,0),{icon:myIcon});  
+
+map.enableScrollWheelZoom(true);
+//添加缩略图控件
+            map.addControl(new BMap.OverviewMapControl({isOpen:false,anchor:BMAP_ANCHOR_BOTTOM_RIGHT}));
+            //添加缩放平移控件
+            map.addControl(new BMap.NavigationControl());
+            //添加比例尺控件
+            map.addControl(new BMap.ScaleControl());
+            //添加地图类型控件
+            map.addControl(new BMap.MapTypeControl());
+function setViewPort(points){
+	var minLng=999,minLat=999,maxLng=0,maxLat=0;
+	for (var i = 0; i < points.length; i++) {
+		var p = points[i];
+		var lng = p.lng;
+		var lat = p.lat;
+		if(lng<minLng){
+			minLng=lng;
+		}
+		if(lat<minLat){
+			minLat=lat;
+		}
+		if(lng>maxLng){
+			maxLng=lng;
+		}
+		if(lat>maxLat){
+			maxLat=lat;
+		}
+	}
+	var pts = [new BMap.Point(minLng,minLat),new BMap.Point(maxLng,minLat),new BMap.Point(maxLng,maxLat),new BMap.Point(minLng,maxLat)];
+	map.setViewport(pts);
+}
+
+
+function searchAll(){
+	$("#allbar").css("background","#fff");
+	$("#allbar").css("color","#3385ff");
+	
+	$("#probar").css("background","#4CA9FF");
+	$("#probar").css("color","#fff");
+	
+	$("#unitbar").css("background","#4CA9FF");
+	$("#unitbar").css("color","#fff");
+	
+	
+	
+	proNo="";
+	proName="";
+	loanUnitCode = "";
+	category_Code="";
+	
+	$(".proType").hide();
+	$(".proNameD").hide();
+	$(".unitcode").hide();
+	
+	$(".proType").val("");
+	$(".proNameD").val("");
+	$(".unitcode").val("");
+	
+	//ngScope.loadProjects(searchName,assetTypeCode, assetClassCode,status,1,proNo,fromDate,toDate,price1,price2,loanUnitCode);
+	
+	//ngScope.loadProjects(assetTypeCode, assetClassCode,fromDate, toDate,proNo,_currentPage,loanUnitCode);
+	ngScope.loadProjects(assetTypeCode, assetClassCode,fromDate, toDate,proNo,_currentPage,loanUnitCode);
+	
+}
+function searchPro(){
+	
+	$("#allbar").css("background","#4CA9FF");
+	$("#allbar").css("color","#fff");
+	$("#probar").css("background","#fff");
+	$("#probar").css("color","#3385ff");
+	$("#unitbar").css("background","#4CA9FF");
+	$("#unitbar").css("color","#fff");
+	
+	//proNo="";
+	//proName="";
+	loanUnitCode = "";
+	//category_Code="";
+	//proNo="";
+	//proName="";
+	//category_Code = "";
+	//category_Name="";
+	
+	$(".proType").show();
+	$(".proNameD").show();
+	$(".unitcode").hide();
+	
+	$(".unitcode").val("");
+	
+	ngScope.loadProjects(assetTypeCode, assetClassCode,fromDate, toDate,proNo,_currentPage,loanUnitCode);
+	
+}
+function searchUnit(){
+	
+	$("#allbar").css("background","#4CA9FF");
+	$("#allbar").css("color","#fff");
+	
+	$("#probar").css("background","#4CA9FF");
+	$("#probar").css("color","#fff");
+	
+	$("#unitbar").css("background","#fff");
+	$("#unitbar").css("color","#3385ff");
+	
+	
+	//loanUnitCode="";
+	//loanUnitName="";
+	proNo="";
+	proName="";
+	//loanUnitCode = "";
+	category_Code="";
+	
+	$(".proType").hide();
+	$(".proNameD").hide();
+	$(".unitcode").show();
+	$(".proType").val("");
+	$(".proNameD").val("");
+	ngScope.loadProjects(assetTypeCode, assetClassCode,fromDate, toDate,proNo,_currentPage,loanUnitCode);
+	
+}
+
+
+function createPageBar(totalPage,curPage,totalRecord){
+	new PageBar().init({
+		renderTo:"#page_bar",
+		totalPage:totalPage,
+		curPage:curPage,
+		totalRecord:totalRecord,
+		prevPageText:"上一页",
+		nextPageText:"下一页",
+		showPageInfo:true,
+		onPage:function(pageNum){
+			_currentPage=pageNum;
+			//ngScope.loadProjects(searchName,assetTypeCode, assetClassCode,status,pageNum,proNo,fromDate,toDate,price1,price2,loanUnitCode);
+			ngScope.loadProjects(assetTypeCode, assetClassCode,fromDate, toDate,proNo,_currentPage,loanUnitCode);
+		}
+	});
+}
+
+
+
+
+function getFirstAndLastMonthDay( year, month){    
+               var   firstdate = year + '-' + month + '-01';  
+               var  day = new Date(year,month,0);   
+               var lastdate = year + '-' + month + '-' + day.getDate();//获取当月最后一天日期    
+  //给文本控件赋值。同下  
+               return lastdate;  
+}
+            
+            
+            
+var validator;
+var ngScope;
+var userData;
+var category_Code="";
+var proNo="";
+var proName="";
+var proTypes;
+var taskType=1;
+var kpitype;
+var app = angular.module("userMgr", []);
+var line=null;
+
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	
+	$scope.userList=[];
+	$scope.projectInfo={};
+	var params = getUrlParams();
+	
+	var mydate = new Date();
+	//alert(mydate.getFullYear()+"-"+(mydate.getMonth()+1)+"-"+mydate.getDate());
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	map.centerAndZoom(new BMap.Point(userData.x, userData.y), 20);  // 初始化地图,设置中心点坐标和地图级别
+	
+	/* 初始化视图 */
+	$(".title_tabs>li>a").each(function(){
+		var layId = $(this).attr("ui-id");
+		var $li = $(this).parent();
+		var idx = $(".title_tabs>li").index($li);
+		if(idx!=0){
+			$(layId).hide();
+			$(layId).attr("data-show", "0");
+		}else{
+			$(layId).attr("data-show", "1");
+		}
+		$(this).click(function(){
+			$(".title_tabs>.selected").removeClass("selected");
+			$(this).parent("li").addClass("selected");
+			var layId = $(this).attr("ui-id");
+			$("div[data-show=1]").hide();
+			$("div[data-show=1]").attr("data-show", "0");
+			$(layId).show();
+			$(layId).attr("data-show", "1");
+		});
+	});
+	
+
+	$scope.onCancel=function(){
+		
+		location.href="dispachList.html";
+	};
+	
+	
+	/* 数据加载 */
+	$scope.loadProject=function(rowid){
+		$http.get(serviceBasePath+"eap/pmsServices/pm/taskMgr/carDispach/getByRowid?rowid="
+			+rowid).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../../login.html";
+				return;
+			}
+			$scope.projectInfo = response.data;
+			
+			var  sMileageImg=$scope.projectInfo.S_MILEAGE_IMG;
+			var  dMileageImg=$scope.projectInfo.D_MILEAGE_IMG;
+			var url=filePath+"?fileCode="+sMileageImg+"&attachment=0";
+			var url1=filePath+"?fileCode="+dMileageImg+"&attachment=0";
+			//alert(url)
+			$("#sMileageImg").attr("src",url);
+			$("#dMileageImg").attr("src",url1);
+			
+			var xs=$scope.projectInfo.TRACK_XS;
+			var ys=$scope.projectInfo.TRACK_YS;
+			var arryxs=[];
+			var arryys=[];
+			if(xs){
+				
+				xs=xs.substring(0,xs.length-1);
+				ys=ys.substring(0,ys.length-1);
+				
+				arryxs=xs.split(",");
+				arryys=ys.split(",");
+			}else{
+				
+			}
+			
+			//alert("xs:"+xs+"==ys:"+ys);
+			
+			var fx="";
+			var fy="";
+			var lx="";
+			var ly="";
+			
+			var ftext=$scope.projectInfo.S_PLACE;
+			var ltext=$scope.projectInfo.D_PLACE;
+			
+			
+			
+			
+			var pts=[];
+			for(var i=0; i<arryxs.length; i++){
+				var tempx = arryxs[i];
+				var tempy = arryys[i];
+				if(i==0){
+					fx=tempx;
+					fy=tempy;
+				}
+				if(i==arryxs.length-1){
+					lx=tempx;
+					ly=tempy;
+				}
+				
+				//if(p.x=='4.9E-324' || p.y=='4.9E-324')continue;
+				pts.push(new BMap.Point(tempx, tempy));
+				//lineShow.push(new BMap.Point(p.x, p.y));
+			}
+			
+			line = new BMap.Polyline(pts);
+			line.setStrokeColor("red");
+			map.addOverlay(line);
+			
+			//map.setCenter(lastPoint);
+			setViewPort(pts); 
+			
+			
+			if(fx!=""){
+				var point = new BMap.Point(fx,fy);
+				var myIcon = new BMap.Icon("../../../img/starting.png", new BMap.Size(20,34));
+				var marker = new BMap.Marker(point,{icon:myIcon});  // 创建标注
+				map.addOverlay(marker);              // 将标注添加到地图中
+				var point1 = new BMap.Point(lx,ly);
+				var myIcon1 = new BMap.Icon("../../../img/ending.png", new BMap.Size(20,34));
+				var marker1 = new BMap.Marker(point1,{icon:myIcon1});  // 创建标注
+				map.addOverlay(marker1);
+			}
+			
+			             
+			
+			
+			
+		});
+	};
+	/* 初始加载 */
+	$scope.loadProject(params.rowid);
+});
+</script>
+</body>
+</html>

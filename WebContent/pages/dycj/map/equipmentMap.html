@@ -1,0 +1,84 @@
+<!DOCTYPE HTML>
+<html  ng-app="mapPosition">
+<head>
+    <title> 定位 </title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=PL4wfqVofjrMVz7FMaPs8Dts"></script>
+    <script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+    <script type="text/javascript" src="../../../js/PageBar.js"></script>
+    <script type="text/javascript" src="../../../js/util.js"></script>
+    <script type="text/javascript" src="../../../js/config.js"></script>
+    <script type="text/javascript" src="../../../js/ng-base.js"></script>
+    <script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+    <script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+    <script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+    <script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../../../js/dycj/commonMap.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/common.css"/>
+    <script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+    <style type="text/css">
+        body{
+            margin:0;
+            padding:0;
+            font-size:12px;
+            font-family:"微软雅黑",serif;
+        }
+        .list .map_div{height:100%;border:solid 1px #cccccc;}
+    </style>
+</head>
+
+<body  ng-controller="mapPositionCtrl" >
+<div class="list">
+    <div class="list_content">
+        <div class="title_div">
+            <div class="title_left">
+                <label class="title">低压设备定位</label>
+            </div>
+            <img src="../../../img/list_Header2-.png">
+            <a href="javascript:" ng-click="onCancel()" class="title_cancel">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;返回
+            </a>
+        </div>
+        <div class="map_div" id="allmap">
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    simpleController({
+        moduleName:"mapPosition",
+        controllerName:"mapPositionCtrl",
+        init:function($scope, $http){
+            //var params = localStorage.setItem('item', JSON.stringify(equipmentInfo));
+            let params = JSON.parse(localStorage.getItem('item'));
+            console.log(params);
+            let map = createBMap("allmap");//初始化地图
+            let ggPoint = new BMap.Point(params.jd, params.wd);
+            translateCallback = function (data){
+                if(data.status === 0) {
+                    let new_point=data.points[0];
+                    //设置标注的图标
+                    let icon = new BMap.Icon("img/icon.jpg",new BMap.Size(100,100));
+                    let marker = new BMap.Marker(new_point,{icon:icon});
+                    equipmentInfoWin(map,marker,params); //弹出设备详细信息窗口
+                }
+            };
+
+            let convertor = new BMap.Convertor();
+            let pointArr = [];
+            pointArr.push(ggPoint);
+            convertor.translate(pointArr, 1, 5, translateCallback);
+            $scope.onCancel=function(){
+                history.go(-1);
+            };
+        }
+    });
+</script>
+</body>
+</html>

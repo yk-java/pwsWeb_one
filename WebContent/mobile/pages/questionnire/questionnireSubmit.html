@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html ng-app="moduleName">
+<head>
+<meta charset="UTF-8">
+<title> 问卷编辑 </title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css"/>
+<script type="text/javascript" src="../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/ng-base.js"></script>
+
+<script type="text/javascript" src="../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/edit.css"/>
+
+<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+<style type="text/css">
+	ul,li{margin:0;padding:0;}
+	.list{padding: 0;margin: 0;top: 0;right: 0;bottom: 0;left: 0;overflow-y: auto;}
+	.list .list_content .title_div{height: 60px;}
+	.list .list_content .title_div .title_left{line-height: 65px;height: 60px;font-size: 20px;font-weight: normal;background:#02a2ff;}
+	.title_save{display:inline-block;width:70px;height:28px;background: url(../../img/btn_save.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:10px;margin-top:5px;color:#fff;cursor: pointer;}
+	.title_save:hover{background: url(../../img/btn_save.png) no-repeat 0 -29px;}
+	.title_cancel{display:inline-block;width:70px;height:28px;background: url(../../img/btn_cancel.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:10px;margin-top:5px;color:#666;cursor: pointer;}
+	.title_cancel:hover{background: url(../../img/btn_cancel.png) no-repeat 0 -29px;}
+	.title_left .return img{width: 13px;}
+	.bottom_space{float:left;width:100%;height:80px; }
+	.preview_box{width:90%;padding:10px 10px;position:relative;margin:0 auto}
+	.preview_box.selected{background:#FFF8CB;border:solid 1px #ff9900;margin:0 -1px;}
+	
+	.questionnire{float:left;}
+	.questionnire_title>h2{text-align:center;}
+	.questionnire_descr>p{text-indent:24px;line-height:22px;color:#666;}
+	.enabled_time{text-align:center;color:#888;}
+	.title_divtop{position: fixed;z-index: 100;top: 0;}
+	.form_div{padding-top:80px}
+	.group{float:left;}
+	.title_left .return{position: absolute;left: 10px;top: 3px;width: 23px;height: 41px;}
+	.question{float:left;}
+/* 	.question .num{width:30px;float:left;} */
+	.question .question_body{width:100%;float:left;}
+	.question .question_body .question_title{}
+	.question .question_body .question_options{}
+	.question .question_body .question_options ul li{float:left;list-style-type:none;margin:4px 4px 4px 0;}
+	.edit_box.question .question_body .question_options ul li{float:left;width:100%;list-style-type:none;margin:4px 10px 4px 0;}
+	.question .question_body .question_options textarea{width:100%;height: 60px;}
+	.question .question_body .question_options .supplement{border:0;border-bottom:solid 1px;width:220px;}
+	.radio{}
+	.checkbox{}
+	.text{}
+	.Submit_btn{line-height: 40px;text-align: center;background: #4ca9ff;width: 90%;margin: 0 auto;color: #fff;font-size: 18px;}
+</style>
+</head>
+<body ng-controller="controllerName" storagekey="questionnire.questionnireMgr.questionnireEdit">
+<div class="list">
+	<div class="list_content">
+		<div class="title_div title_divtop">
+			<div class="title_left" style="float:none;text-align:center;">
+				<a class="return"><img src="../../img/return.png"></a>
+				调查问卷
+			</div>
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div questionnire" id="lay1">
+			<div partner="questionnire_title" class="preview_box questionnire_title">
+				<h2>{{questionnire.title}}</h2>
+			</div>
+			<div partner="questionnire_descr" class="preview_box questionnire_descr">
+				<p>{{questionnire.descr}}</p>
+			</div>
+			<div ng-repeat="question in questionnire.questions track by $index" partner="item_{{question.idx}}" id="item_{{question.idx}}" class="preview_box {{question.type}} {{question.subType?question.subType:''}}">
+				<!-- group/title -->
+				<div ng-if="question.type=='group'" class="title"><h2>{{question.num}}、{{question.title}}</h2></div>
+				<!-- question -->
+				<div ng-if="question.type=='question'" class="question_body">
+					<div class="question_title"><h3>{{question.num}}. {{question.title}}</h3></div>
+					<div ng-if="question.subType=='radio'" class="question_options">
+						<ul>
+							<li ng-repeat="option in question.options">
+								<label><input type="radio" name="q{{question.num}}" value="{{option.num}}" ng-model="question.answer"/>{{option.num}}. {{option.optionLabel}}</label>
+								<input ng-if="option.isSupplement" name="q{{question.num}}_supplement" class="supplement" ng-model="option.supplement"/>
+							</li>
+						</ul>
+					</div>
+					<div ng-if="question.subType=='checkbox'" class="question_options">
+						<ul>
+							<li ng-repeat="option in question.options">
+								<label><input type="checkbox" name="q{{question.num}}" ng-model="option.isAnswer"/>{{option.num}}. {{option.optionLabel}}</label>
+								<input ng-if="option.isSupplement" name="q{{question.num}}_supplement" class="supplement" ng-model="option.supplement"/>
+							</li>
+						</ul>
+					</div>
+					<div ng-if="question.subType=='text'" class="question_options">
+						<textarea name="q{{question.num}}" ng-model="question.answer"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="bottom_space">
+			<div class="Submit_btn" ng-click="onSubmit()">提&nbsp;&nbsp;交</div>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		$scope.questionnire={};
+		$scope.answerSheet={};
+		$scope.answerSheet.answers=[];
+		
+		var urlParams = getUrlParams();
+		$scope.answerChange=function(a){alert(a);};
+		/* 初始化（查询） */
+		$scope.loadQuestionnire=function(){
+			new ShowDlog().prompt({
+				icon:"waitting",
+				msg:"正在查询...",
+				done:function(){},
+				t:20*60*1000
+			});
+			$scope.httpExecute({
+				url:"eap/pmsServices/myQuestionnire/get",
+				method:"GET",
+				data:{questionnireCode:urlParams.questionnireCode},
+				success:function(res){
+					$dlog.close();
+					if(res.statusCode==200){
+						$scope.questionnire=res.data;
+						$scope.answerSheet.questionnireCode=$scope.questionnire.questionnireCode;
+						$scope.answerSheet.submitUser=$scope.userData.employeeCode;
+						lazyCall('t1', function(){
+							questionnire_init();
+						}, 20);
+					}
+				},
+				error:function(){
+					$dlog.close();
+					new ShowDlog().prompt({
+						msg:"网络异常",
+						done:function(){},
+						t:1500
+					});
+				}
+			});
+		};
+		/* 提交 */
+		$scope.onSubmit=function(){
+			$scope.answerSheet.answers=[];
+			$(".preview_box").removeClass("selected");
+			var questions = $scope.questionnire.questions;
+			for(var i=0; i<questions.length; i++){
+				var question = questions[i];
+				if("question"==question.type){
+					if("radio"==question.subType){
+						var options = question.options;
+						var supplement="";
+						for(var j=0; j<options.length; j++){
+							var option = options[j];
+							if(option.num==question.answer && option.isSupplement==1){
+								// check
+								if(!option.supplement || option.supplement==""){
+									new ShowDlog().confirm({
+										msg:"题目未作答完整！",
+										ok:function(){
+											$("#item_"+question.idx).addClass("selected");
+											location.href="#item_"+question.idx;
+										},
+										cancel:function(){
+											$("#item_"+question.idx).addClass("selected");
+											location.href="#item_"+question.idx;
+										}
+									});
+									return;
+								}
+								supplement=option.supplement;
+								break;
+							}
+						}
+						// check
+						if((question.relyQuestionNum==null || question.relyQuestionNum=="")  && (!question.answer || question.answer=="")){
+							new ShowDlog().confirm({
+								msg:"还有未作答的题目！",
+								ok:function(){
+									$("#item_"+question.idx).addClass("selected");
+									location.href="#item_"+question.idx;
+								},
+								cancel:function(){
+									$("#item_"+question.idx).addClass("selected");
+									location.href="#item_"+question.idx;
+								}
+							});
+							return;
+						}
+						// collect
+						var answerObj={};
+						answerObj.questionnireCode=$scope.questionnire.questionnireCode;
+						answerObj.questionCode=question.questionCode;
+						answerObj.answer=question.answer;
+						answerObj.supplement=supplement;
+						$scope.answerSheet.answers.push(answerObj);
+					}else if("checkbox"==question.subType){
+						var options = question.options;
+						var hasAnswer=false;
+						for(var j=0; j<options.length; j++){
+							var option = options[j];
+							if(option.isAnswer){
+								hasAnswer=true;
+								// check
+								if(option.isSuplement==1 && (!option.supplement || option.supplement=="")){
+									new ShowDlog().confirm({
+										msg:"题目未作答完整！",
+										ok:function(){
+											$("#item_"+question.idx).addClass("selected");
+											location.href="#item_"+question.idx;
+										},
+										cancel:function(){
+											$("#item_"+question.idx).addClass("selected");
+											location.href="#item_"+question.idx;
+										}
+									});
+									return;
+								}
+								var answerObj={};
+								answerObj.questionnireCode=$scope.questionnire.questionnireCode;
+								answerObj.questionCode=question.questionCode;
+								answerObj.answer=option.num;
+								answerObj.supplement=option.supplement;
+								$scope.answerSheet.answers.push(answerObj);
+							}
+						}
+						if((question.relyQuestionNum==null || question.relyQuestionNum=="")  && !hasAnswer){// check
+							new ShowDlog().confirm({
+								msg:"还有未作答的题目！",
+								ok:function(){
+									$("#item_"+question.idx).addClass("selected");
+									location.href="#item_"+question.idx;
+								},
+								cancel:function(){
+									$("#item_"+question.idx).addClass("selected");
+									location.href="#item_"+question.idx;
+								}
+							});
+							return;
+						}
+					}else if("text"==question.subType){
+						if((question.relyQuestionNum==null || question.relyQuestionNum=="")  && (!question.answer || question.answer=="")){// check
+							new ShowDlog().confirm({
+								msg:"还有未作答的题目！",
+								ok:function(){
+									$("#item_"+question.idx).addClass("selected");
+									location.href="#item_"+question.idx;
+								},
+								cancel:function(){
+									$("#item_"+question.idx).addClass("selected");
+									location.href="#item_"+question.idx;
+								}
+							});
+							return;
+						}
+						var answerObj={};
+						answerObj.questionnireCode=$scope.questionnire.questionnireCode;
+						answerObj.questionCode=question.questionCode;
+						answerObj.answer=question.answer;
+						$scope.answerSheet.answers.push(answerObj);
+					}
+				}
+			}
+			new ShowDlog().confirm({
+				msg:"确定提交问卷吗？",
+				ok:function(){
+					$scope.doSubmit();
+				},
+				cancel:function(){}
+			});
+		};
+		$scope.doSubmit=function(){
+			new ShowDlog().prompt({
+				icon:"waitting",
+				msg:"正在提交...",
+				done:function(){},
+				t:20*60*1000
+			});
+			var dataStr = JSON.stringify($scope.answerSheet);
+			$scope.httpExecute({
+				url:"eap/pmsServices/myQuestionnire/submitAnswer",
+				method:"POST",
+				data:{"answerSheet":dataStr},
+				success:function(res){
+					$dlog.close();
+					if(res.statusCode==200){
+						new ShowDlog().prompt({
+							icon:"success",
+							msg:"提交成功！",
+							done:function(){
+								hrefTo({url:"questionnireList.html"});
+							},
+							t:1500
+						});
+					}else{
+						new ShowDlog().prompt({
+							msg:res.resultMsg,
+							done:function(){
+								hrefTo({url:"questionnireList.html"});
+							},
+							t:1500
+						});
+					}
+				},
+				error:function(){
+					$dlog.close();
+					new ShowDlog().prompt({
+						msg:"网络异常",
+						done:function(){},
+						t:1500
+					});
+				}
+			});
+		};
+		/* 取消 */
+		$scope.onCancel=function(){
+			//hrefTo({url:"questionnireList.html"});
+			top.viewBack();
+		};
+		$scope.loadQuestionnire();
+	}
+});
+/*
+ * 初始化
+ */
+function questionnire_init(){
+	$(".edit_box").not(":has('.operate_layer')").each(function(){
+		var $editBox = $(this);
+		var partner = $editBox.attr("partner");
+		var idx = parseInt(partner.split("_")[1]);
+		if(isNaN(idx) || idx<=0)
+			return;
+		
+	});
+}
+
+$(".return").click(function(){
+	top.viewBack();
+});	
+</script>
+</body>
+</html>

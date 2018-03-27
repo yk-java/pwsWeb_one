@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.questionnire.dao.QaQuestionGroupMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.questionnire.vo.QaQuestionGroup" >
+    <id column="ROWID" property="rowid" jdbcType="BIGINT" />
+    <result column="QUESTIONNIRE_CODE" property="questionnireCode" jdbcType="VARCHAR" />
+    <result column="GROUP_CODE" property="groupCode" jdbcType="VARCHAR" />
+    <result column="GROUP_NAME" property="groupName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ROWID, QUESTIONNIRE_CODE, GROUP_CODE, GROUP_NAME
+  </sql>
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from qa_question_group
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </select>
+  <select id="findByCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from qa_question_group
+    where GROUP_CODE = #{groupCode,jdbcType=VARCHAR}
+  </select>
+  <select id="findByQuestionnireCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from qa_question_group
+    where QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+  </select>
+  <delete id="delete" parameterType="java.lang.String" >
+    delete from qa_question_group
+    where GROUP_CODE = #{groupCode,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByQuestionnireCode" parameterType="java.lang.String" >
+    delete from qa_question_group
+    where QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.glens.pwCloudOs.questionnire.vo.QaQuestionGroup" >
+    insert into qa_question_group (QUESTIONNIRE_CODE, GROUP_CODE, 
+      GROUP_NAME)
+    values (#{questionnireCode,jdbcType=VARCHAR}, #{groupCode,jdbcType=VARCHAR}, 
+      #{groupName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="batchInsert" parameterType="list" >
+    insert into qa_question_group (QUESTIONNIRE_CODE, GROUP_CODE, 
+      GROUP_NAME)
+      values
+      <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.questionnireCode,jdbcType=VARCHAR}, #{item.groupCode,jdbcType=VARCHAR}, 
+      #{item.groupName,jdbcType=VARCHAR})
+      </foreach>
+  </insert>
+</mapper>

@@ -1,0 +1,293 @@
+<!DOCTYPE HTML>
+<html ng-app="realPosition">
+<head>
+<title> 实时监控 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=PL4wfqVofjrMVz7FMaPs8Dts"></script>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/ng-base.js"></script>
+<script src="../../../../js/echarts-all.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<link rel="stylesheet" type="text/css" href="../../../../css/common.css"/>
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../../css/list.css" />
+
+<style type="text/css">
+	body{
+		margin:0px;
+		padding:0px;
+		font-size:12px;
+		font-family:"微软雅黑";
+	}
+	ul,li{margin:0;padding:0;list-style:none;outline:none}
+	a{color:#4D4D4D;text-decoration: none;}
+	.list{position: absolute;left:13px;right:13px;top:13px;bottom:10px;border:solid 0px;}
+	.list .list_left{position: absolute;left:10px;top:0px;bottom:0px;width:350px;}
+	.list .list_left .left_title{width:100%;height:160px;background:#297BE6;}
+	.list .list_left .left_title div> input{height:36px;border:solid 0px;margin-left:10px;color:#888;border-radius:3px;padding-left:2px;font-family:"微软雅黑";}
+	.list .map_div{position: absolute;left:370px;top:0px;bottom:0px;right:0px;border:solid 1px #cccccc;}
+	.left_title .line{padding:10px auto;border-bottom:solid 0px #66A8FF;}
+	.dlog-edit{width:500px;height:300px;}
+
+</style>
+</head>
+
+<body ng-controller="realPositionCtrl">
+	
+	<div class="list">
+		<div class="list_left">
+			<div class="left_title">
+				<div style="border:solid 0px;padding:30px 0 0 0;margin:6px 0 0 0;">
+					<input type="text" style="height:30px;width:90%;padding-left: 5%;" id="proName" class="dropDownList" placeholder="请选择项目"/>
+				</div>
+				<div style="border:solid 0px;padding:30px 0 0 0;margin:6px 0 0 0;">
+					<input type="text" name="status" class="dropDownList" style="height:30px;width:90%;padding-left: 5%;" placeholder="选择监控类型"/>
+				</div>
+				<div class="line"></div>
+			</div>
+			<div class="abc" id="table1" style="width: 100%;overflow:auto;position:absolute;top:180px;bottom:0;left:0;right:0;border: 1px solid #ccc;">
+				<ul style="margin-left:20px;padding-bottom:10px">
+					<li style="margin-top:20px" ng-repeat="item in temperatureArr">
+						<span style="color:#ff7f50">温度</span> 监测点{{$index+1}}
+						<span style="float:right;margin-right:20px;cursor:pointer;color:#297be6" ng-click="showHistory($index,item)">查看历史</span>
+						<span style="float:right;margin-right:20px;cursor:pointer;color:#297be6" ng-if="item.length!=2" ng-click="offOn(item,$index)">开</span>
+						<span style="float:right;margin-right:20px;cursor:pointer;color:#297be6" ng-if="!item.length||item.length==2" ng-click="onOff(item,$index)">关</span>
+					</li>
+					<!-- <li style="margin-top:20px" ng-repeat="item in humidityArr">
+						<span style="color:#87cefa">湿度</span> 监测点{{$index+1}}
+						<span style="float:right;margin-right:20px;cursor:pointer;color:#297be6">查看历史</span>
+						<span style="float:right;margin-right:20px;cursor:pointer;color:#297be6" ng-if="!item.offFlag || item.offFlag==1" ng-click="offOn(item,$index)">开</span>
+						<span style="float:right;margin-right:20px;cursor:pointer;color:#297be6" ng-if="item.offFlag==2" ng-click="onOff(item,$index)">关</span>
+					</li>
+					<li style="margin-top:20px" ng-repeat="item in noiseArr">
+						<span style="color:#da70d6">噪音</span> 监测点{{$index+1}}
+						<span style="float:right;margin-right:20px;cursor:pointer;color:#297be6">查看历史</span>
+						<span style="float:right;margin-right:20px;cursor:pointer;color:#297be6" ng-if="!item.offFlag || item.offFlag==1" ng-click="offOn(item,$index)">开</span>
+						<span style="float:right;margin-right:20px;cursor:pointer;color:#297be6" ng-if="item.offFlag==2" ng-click="onOff(item,$index)">关</span>
+					</li>
+					<li style="margin-top:20px" ng-repeat="item in DustArr">
+						<span style="color:#32cd32">扬尘</span> 监测点{{$index+1}}
+						<span style="float:right;margin-right:20px;cursor:pointer;color:#297be6">查看历史</span>
+						<span style="float:right;margin-right:20px;cursor:pointer;color:#297be6" ng-if="!item.offFlag || item.offFlag==1" ng-click="offOn(item,$index)">开</span>
+						<span style="float:right;margin-right:20px;cursor:pointer;color:#297be6" ng-if="item.offFlag==2" ng-click="onOff(item,$index)">关</span>
+					</li> -->
+				</ul>
+			</div>
+		</div>
+		<div class="map_div" id="allmap" style="background:url('../../../lightApp/img/timg.jpg') no-repeat top center;background-size:cover">
+			
+		</div>
+	</div>
+<script type="text/javascript">
+	// 百度地图API功能
+	/* var map = new BMap.Map("allmap",{enableMapClick:false});    // 创建Map实例
+	map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
+	map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+	var markergg = null; */
+   
+    var userData, ticket;
+    $(document).ready(function(){
+    	var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		userData = jQuery.parseJSON(userDataStr);
+		ticket = $.cookie("pmsWeb_ticket");
+    });
+ 
+    
+    
+    
+var cond_categoryCode="", cond_proNo="",cond_searchName="";
+var cond_mct="", cond_condStr="";
+var temperatureArr2=[];
+// var ngScope;
+simpleController({
+	moduleName:"realPosition",
+	controllerName:"realPositionCtrl",
+	init:function($scope, $http){
+
+		$scope.theadData=[];
+		$scope.dataList=[];
+		$scope.featureField={};
+		//map.centerAndZoom(new BMap.Point($scope.userData.x, $scope.userData.y), 12);  // 初始化地图,设置中心点坐标和地图级别
+		
+		/* 项目列表 */
+		var proNameList = new DropDownList();
+		proNameList.init({
+			mode:"page",
+			renderTo:"#proName",
+			url:"../../../component/projectList.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				cond_proNo=result.proNo;
+				$("#proName").val(result.proName);
+				//mctList.setConfig("url", "../../../component/mctType.html?proNo="+cond_proNo);
+			}
+		});
+		
+		new DropDownList().init({
+			renderTo:"input[name=status]",
+			mode:"list",
+			data:[{id:"", name:"（全部）"},{id:0, name:"温度"},{id:1, name:"湿度"},{id:1, name:"噪音"},{id:1, name:"扬尘"}],
+			textField:"name",
+			onSelected:function(item){
+				status=item.id;
+				$("input[name=status]").val(item.name);
+			}
+		});
+		
+		$scope.temperatureArr=[
+		                    [167.5, 59.0], [159.5, 49.2], [157.0, 63.0], [155.8, 53.6],
+			            ];
+		
+		
+			for(var i =0;i<$scope.temperatureArr.length;i++){
+				temperatureArr2.push($scope.temperatureArr[i])		
+			}
+	/* 	$scope.humidityArr=[[174.0, 65.6], [175.3, 71.8], [193.5, 80.7], [186.5, 72.6], [187.2, 78.8],
+			                [181.5, 74.8], [184.0, 86.4], [184.5, 78.4], [175.0, 62.0], [184.0, 81.6],
+			                [180.3, 83.2], [180.3, 83.2]
+			            ];
+		$scope.noiseArr= [[174.0, 65.6], [175.3, 71.8], [193.5, 80.7], [186.5, 72.6], [187.2, 78.8],
+		                [181.5, 74.8], [184.0, 86.4], [184.5, 78.4], [175.0, 62.0], [184.0, 81.6],
+		                [180.0, 76.6], [177.8, 83.6], [192.0, 90.0], [176.0, 74.6], [174.0, 71.0],
+		            ];
+		$scope.DustArr=[[174.0, 65.6], [175.3, 71.8], [193.5, 80.7], [186.5, 72.6], [187.2, 78.8],
+		                [181.5, 74.8], [184.0, 86.4], [184.5, 78.4], [175.0, 62.0], [184.0, 81.6],
+		                [180.0, 76.6], [177.8, 83.6], [192.0, 90.0], [176.0, 74.6], [174.0, 71.0],
+		                [188.0, 83.6], [198.1, 85.5], [175.3, 90.9], [166.4, 85.9], [190.5, 89.1],
+		                [180.3, 83.2], [180.3, 83.2]
+		            ];
+		 */
+		var flagArr=[];
+		$scope.onOff=function(item,index){
+			$scope.temperatureArr[index].push("0");
+			 flagArr=temperatureArr2[index];
+			temperatureArr2.splice(index,1);
+			  $scope.echarts();
+			 
+		};
+		$scope.offOn=function(item,index){
+			 if(flagArr!=""){
+				 temperatureArr2.push(flagArr);
+			 }
+			 $scope.temperatureArr[index].splice(2,1);
+			 $scope.echarts();
+		};
+		
+	    $scope.echarts=function(){
+	    	var myChart = echarts.init(document.getElementById('allmap'));
+			
+			option = {
+				    title : {
+				        text: '',
+				        /* subtext: '' *//* 小标题  */
+				    },
+				    grid:{
+	                    x:0,
+	                    y:0,
+	                    x2:0,
+	                    y2:0,
+	                    borderWidth:0
+	                },
+				    tooltip : {
+				        trigger: 'axis',
+				        showDelay : 0,
+				        formatter : function (params) {
+				            if (params.value.length > 1) {
+				                return params.seriesName + ' :<br/>'
+				                   + params.value[0] + ' ' 
+				                   + params.value[1] + ' ';
+				            }
+				            else {
+				                return params.seriesName + ' :<br/>'
+				                   + params.name + ' : '
+				                   + params.value + ' ';
+				            }
+				        },  
+				        axisPointer:{
+				            show: true,
+				            type : 'cross',
+				            lineStyle: {
+				                type : 'dashed',
+				                width : 1
+				            }
+				        }
+				    },
+				    legend: {
+				        data:['温度']
+				    },
+				   
+				    xAxis : [
+				        {
+				            type : 'value',
+				          	show:false,
+				            scale:true,
+				            axisLabel : {
+				                formatter: '{value} '
+				            }
+				        }
+				    ],
+				    yAxis : [
+				        {
+				          	show:false,
+				            type : 'value',
+				            scale:true,
+				            axisLabel : {
+				                formatter: '{value} '
+				            }
+				        }
+				    ],
+				    series : [
+				        {
+				            name:'温度',
+				            type:'scatter',
+				            data: temperatureArr2,
+				        },
+				    ]
+				};
+			myChart.setOption(option);
+	    };
+	    $scope.echarts();
+		
+	    $scope.showHistory=function(){
+	    	 new ShowDlog().showFrame("showHistory.html", "查看历史", function(data){
+	 			if(data=="SUCCESS"){
+	 			}
+	 		}, "dlog-edit"); 
+
+	    };
+	    
+		/* 加载属性信息 */
+		$scope.loadAttrs=function(paramsData){
+			$scope.httpGet({
+				url:"eap/pmsServices/om/deviceMgr/device/mctAttr?companyCode="+$scope.userData.companyCode,
+				data:paramsData,
+				success:function(response){
+					var i=0;
+					for(; i<response.list.length; i++){
+						var attr = response.list[i];
+						if(attr.isFeature=="1"){
+							$scope.featureField = attr;
+							return;
+						}
+					};
+				}
+			});
+		};
+	}
+});
+
+</script>
+</body>
+</html>

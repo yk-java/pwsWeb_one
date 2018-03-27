@@ -1,0 +1,346 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>保养管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/time.js"></script>
+<script type="text/javascript" src="../../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+
+<style type="text/css">
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">任务类型</label>
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">类型属性</a>
+			
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+				<tr>
+					
+					<th>项目分类</th>
+					
+					<td>
+						<input type="text" name="proType" id="proType" value="{{projectInfo.categoryName}}"  class="dropDownList" placeholder="请选择项目分类" />
+						<input type="hidden" name="companyCode" value="{{projectInfo.companyCode}}"  />
+						<input type="hidden" name="taskClassCode" value="{{projectInfo.taskClassCode}}"  />
+					</td>
+					<th>项目名称</th>
+					<td><input type="text" name="proName" id="proName" value="{{projectInfo.proName}}" class="dropDownList required"    placeholder="请选择项目"  />
+					<input type="hidden" name="proNo" value="{{projectInfo.proNo}}"  /></td>
+					
+				</tr>
+				<tr>
+					<th>任务性质</th>
+					<td>
+						<input type="text" name="taskTypeName"  id="taskTypeName"  class="dropDownList" placeholder="请选择任务性质" />
+						<input type="hidden" name="taskType" value="{{projectInfo.taskType}}"  />
+					</td>
+					<th>类型名称</th>
+					<td><input type="text" id="taskClassName"  value="{{projectInfo.taskClassName}}" name="taskClassName" class="required" />
+					</td>
+				</tr>
+				<tr>
+					<th>任务指标</th>
+					<td>
+						<input type="text" name="kpiName" id="kpiName" value="{{projectInfo.kpiName}}"  class="dropDownList" placeholder="请选择指标" />
+						<input type="hidden" name="kpiCode" value="{{projectInfo.kpiCode}}" />
+					</td>
+					<th>指标工作量</th>
+					<td>
+						<input type="text" id="kpiWordload" name="kpiWordload" class="number" value="{{projectInfo.kpiWordload}}" />
+						<span id="unit" style="font-family: '微软雅黑';font-size:12px;"></span>
+					</td>
+				</tr>
+				<tr>
+					<th>任务工作量</th>
+					<td><input type="text" name="taskWordload" value="{{projectInfo.taskWordload}}"   class="number" /></td>
+					<th>备注</th>
+					<td><input type="text" name="remarks" value="{{projectInfo.remarks}}"  /></td>
+				</tr>
+				
+			</table>
+			
+		</div>
+		
+		
+
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+
+
+var validator;
+var ngScope;
+var userData;
+var category_Code="";
+var proNo="";
+var proName="";
+var proTypes;
+var taskType=1;
+var kpitype;
+var proClass="";
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	
+	$scope.userList=[];
+	$scope.projectInfo={};
+	var params = getUrlParams();
+	
+	var mydate = new Date();
+	//alert(mydate.getFullYear()+"-"+(mydate.getMonth()+1)+"-"+mydate.getDate());
+	
+	
+	
+	/* 数据加载 */
+	$scope.loadProject=function(taskClassCode){
+	
+		
+		
+		$http.get(serviceBasePath+"eap/pmsServices/taskMgr/taskClass/get?taskClassCode="
+			+taskClassCode).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../../login.html";
+				return;
+			}
+			$scope.projectInfo = response.data;
+			if(response.data.taskType==1){//外业
+				$("#taskTypeName").val("外业");
+				taskType=1;
+			}else if(response.data.taskType==2){
+				$("#taskTypeName").val("内业");
+				taskType=2;
+			}
+			
+			proClass=response.data.categoryCode;
+			
+			$("#unit").html("("+response.data.kpiUnit+")");
+		});
+	};
+	/* 初始加载 */
+	$scope.loadProject(params.taskClassCode);
+	
+	
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	$("input[name=companyCode]").val(userData.companyCode);
+	/* 视图渲染 */
+	$(".tabs>a").each(function(){
+		var layId = $(this).attr("href");
+		var idx = $(".tabs>a").index($(this));
+		if(idx!=0){
+			$(layId).hide();
+			$(layId).attr("data-show", "0");
+		}else{
+			$(layId).attr("data-show", "1");
+		}
+		$(this).click(function(){
+			$(".tabs>.selected").removeClass("selected");
+			$(this).addClass("selected");
+			var layId = $(this).attr("href");
+			$("div[data-show=1]").hide();
+			$("div[data-show=1]").attr("data-show", "0");
+			$(layId).show();
+			$(layId).attr("data-show", "1");
+			
+		});
+	});
+	
+	/* 表单验证 */
+	validator = $("#saveForm").validate({
+		onsubmit: false,
+		focusInvalid: false,
+		focusCleanup: true,
+		errorElement: "span",
+		ignore:".ignore",
+		invalidHandler: function(form, validator) {
+			var errors = validator.numberOfInvalids();
+			if (errors) {
+				
+			} 
+		}
+	});
+	
+	new DropDownList().init({
+		renderTo:"#proType",
+		url:"../../../component/projectType.html?required=false&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$("#proType").val(result.categoryName);
+			category_Code = result.categoryCode;
+			//category_Name=result.categoryName;
+			var url = "../../../component/projectList.html?categoryCode="+category_Code+"&required=false&ticket="+ticket;
+			proTypes.setConfig("url", url);
+			
+			
+			
+		}
+	});
+	/* 项目列表 */
+	proTypes=new DropDownList();
+	proTypes.init({
+		renderTo:"#proName",
+		url:"../../../component/projectList.html?categoryCode="+category_Code+"&required=false&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$("#proName").val(result.proName);
+			proNo=result.proNo;
+			proName=result.proName;
+			
+			$("input[name=proNo]").val(result.proNo);
+			
+			proClass=result.categoryCode;
+			
+			var url1="../../../component/kpitype.html?categoryCode="+proClass+"&taskType="+taskType;
+			kpitype.setConfig("url", url1);
+			//ngScope.loadProjects(assetTypeCode, assetClassCode,fromDate, toDate,proNo);
+			
+		}
+	});
+	
+	
+	
+	
+	
+	
+ 	choosetasktype=new DropDownList();
+ 	choosetasktype.init({
+		renderTo:"#taskTypeName",
+		url:"../../../component/tasktype.html",
+		onSelected:function(item){
+			
+			$("#taskTypeName").val(item.name);
+			$("input[name=taskType]").val(item.value);
+			
+			taskType=item.value;
+			
+			var url="../../../component/kpitype.html?categoryCode="+proClass+"&taskType="+taskType;
+			kpitype.setConfig("url", url);
+			
+		}
+	});
+ 	
+ 	/* kpi指标 */
+	kpitype=new DropDownList();
+	kpitype.init({
+		renderTo:"#kpiName",
+		url:"../../../component/kpitype.html?categoryCode="+category_Code+"&taskType="+taskType,
+		onSelected:function(item){
+			$scope.cond_deviceType=item.deviceTypeCode;
+			$("#kpiName").val(item.kpiname);
+			$("input[name=kpiCode]").val(item.kpicode);
+			//$scope.loadData($scope.cond_proNo, $scope.cond_deviceType);
+			
+			
+			$("#unit").html("("+item.kpiunit+")");
+		}
+	});
+	
+	
+	
+	/* 保存 */
+	$scope.onSave = function(){
+		//$("input[name=companyCode]").val(userData.companyCode);
+		var formData = $("#saveForm").serialize();
+		
+		if($("#saveForm").valid()){
+			$.ajax({
+				url:serviceBasePath+"eap/pmsServices/taskMgr/taskClass/update",
+				cache:false,
+				method:"POST",
+				data:formData,
+				success:function(res){
+					if(res.statusCode==200){
+						new ShowDlog().prompt({msg:"保存成功！",
+							done:function(){
+								//location.href="maintainMgr.html?assetCode="+params.assetCode;
+								hrefTo({
+									url:"taskClassMgr.html",
+									data:getUrlParams()
+								});
+							},
+							t:1500
+						});
+					}else{
+						//
+					}
+				},
+				error:function(){
+					
+				}
+			});
+		}else{
+			//alert("表单填写异常，请检查修正后再提交");
+		}
+	};
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		
+		//location.href="maintainMgr.html?assetCode="+params.assetCode;
+		hrefTo({
+			url:"taskClassMgr.html",
+			data:getUrlParams()
+		});
+	};
+	
+	
+	
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.pe.boxCheck.dao.PeBcCheckBatchMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.pe.boxCheck.vo.PeBcCheckBatchVo" >
+    <id column="ROWID" property="rowid" jdbcType="BIGINT" />
+    <result column="BATCH_CODE" property="batchCode" jdbcType="VARCHAR" />
+    <result column="BATCH_NAME" property="batchName" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ROWID, BATCH_CODE, BATCH_NAME, CREATE_TIME
+  </sql>
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from pe_bc_check_batch
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </select>
+  
+  <select id="queryForCount" resultType="int" parameterType="map" >
+    select 
+    	count(*)
+    from pe_bc_check_batch
+    where 1=1
+    <if test="searchName != null and searchName != ''">
+    	AND BATCH_NAME like '%${searchName}%'
+    </if>
+  </select>
+  
+  <select id="queryForPage" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    <include refid="Base_Column_List" />
+    from pe_bc_check_batch
+    where 1=1
+    <if test="searchName != null and searchName != ''">
+    	AND BATCH_NAME like '%${searchName}%'
+    </if>
+    limit ${firstResult},${maxResult}
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from pe_bc_check_batch
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </delete>
+  
+  <insert id="insert" parameterType="com.glens.pwCloudOs.pe.boxCheck.vo.PeBcCheckBatchVo" >
+    insert into pe_bc_check_batch (BATCH_CODE, BATCH_NAME, 
+      CREATE_TIME)
+    values (#{batchCode,jdbcType=VARCHAR}, #{batchName,jdbcType=VARCHAR}, 
+      now())
+  </insert>
+  
+  <update id="update" parameterType="map" >
+    update pe_bc_check_batch
+    <set >
+      <if test="batchName != null" >
+        BATCH_NAME = #{batchName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </update>
+</mapper>

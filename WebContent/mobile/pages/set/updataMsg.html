@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="../../js/placeholder.js"></script>
+	<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../../js/config.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/iconfont/iconfont.css"/>
+	<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="../../js/util.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/bxyw1.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/mainindex.css"/>
+	<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+	<title>修改信息</title>
+	<style>
+		input.radiocss{width:15px !important;height: 15px !important;margin: 18px 8px 0 0 !important;background:#ccc !important;}
+	</style>
+</head>
+<body ng-app="pmsWeb" ng-controller="mainCtrl" style="background: #fff;">
+	 <header>
+		<div class="return"><img src="../../img/return.png"></div>
+		{{title}}
+	</header>
+	<section class="myset myMsg">
+		<ul class="myset_ul" ng-if="type=='SEX'">
+			<li>性别
+				<span ng-if="meg==1" class="sel_sex">
+					<input type="radio" name="sex" class="radiocss" onclick="getSex(this)" value="男"/><a style="margin-right:20px">男</a>
+					<input type="radio" name="sex" class="radiocss" onclick="getSex(this)" checked="checked" value="女"/><a>女</a>
+				</span>
+				<span ng-if="meg==0" class="sel_sex">
+					<input type="radio" name="sex1" class="radiocss" onclick="getSex(this)" checked="checked"/><a  style="margin-right:20px">男</a>
+					<input type="radio" name="sex1" class="radiocss" onclick="getSex(this)"/><a>女</a>
+				</span>
+			</li>
+			<li class="btn_upta" ng-click="updata('SEX')">确认修改</li>
+		</ul>
+		<ul class="myset_ul" ng-if="type=='MARITAL'">
+			<li>婚姻状况
+				<span ng-if="meg==1||meg==3" class="sel_sex">
+					<input type="radio" name="hunf" class="radiocss" onclick="getSex1(this)" checked="checked"  value="未婚"/><a  style="margin-right:20px">未婚</a>
+					<input type="radio" name="hunf" class="radiocss" onclick="getSex1(this)" value="已婚"/><a>已婚</a>
+				</span>
+				<span ng-if="meg==2" class="sel_sex">
+					<input type="radio" name="hunf1" class="radiocss" onclick="getSex1(this)" value="未婚"/><a style="margin-right:20px">未婚</a>
+					<input type="radio" name="hunf1" class="radiocss" onclick="getSex1(this)" checked="checked" value="已婚"/><a>已婚</a>
+				</span>
+			</li>
+			<li class="btn_upta" ng-click="updata('MARITAL')">确认修改</li>
+		</ul>
+		<ul class="myset_ul" ng-if="type=='ADDR'">
+			<li><input type="text" name="addr" id="addr" value="{{addr}}"/></li>
+			<li class="btn_upta" ng-click="updata('ADDR')">确认修改</li>
+		</ul>
+		<ul class="myset_ul" ng-if="type=='MOBILEPHONE1'">
+			<li><input type="text" name="mobilephone1" id="mobilephone1" value="{{MOBILEPHONE1}}"/></li>
+			<li class="btn_upta" ng-click="updata('MOBILEPHONE1')">确认修改</li>
+		</ul>
+		<ul class="myset_ul" ng-if="type=='MAIL'">
+			<li><input type="text" name="mail" id="mail" value="{{msg}}"/></li>
+			<li class="btn_upta" ng-click="updata('MAIL')">确认修改</li>
+		</ul>
+		<ul class="myset_ul" ng-if="type=='EMERGENCY_CONTACTOR_NAME'">
+			<li><input type="text" name="emergency_contactor_name" id="emergency_contactor_name" value="{{msg}}"/></li>
+			<li class="btn_upta" ng-click="updata('EMERGENCY_CONTACTOR_NAME')">确认修改</li>
+		</ul>
+		<ul class="myset_ul" ng-if="type=='EMERGENCY_CONTACTOR_PHONE'">
+			<li><input type="text" name="emergency_contactor_phone" id="emergency_contactor_phone" value="{{msg}}"/></li>
+			<li class="btn_upta" ng-click="updata('EMERGENCY_CONTACTOR_PHONE')">确认修改</li>
+		</ul>
+		<ul class="myset_ul" ng-if="type=='EMERGENCY_CONTACTOR_RELATION'">
+			<li><input type="text" name="emergency_contactor_relation" id="emergency_contactor_relation" value="{{msg}}"/></li>
+			<li class="btn_upta" ng-click="updata('EMERGENCY_CONTACTOR_RELATION')">确认修改</li>
+		</ul>
+	</section>
+<script>
+var mes="";
+var app = angular.module("pmsWeb", []);
+app.controller("mainCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	var urlParams = getUrlParams();
+	console.log(urlParams)
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	var userData = jQuery.parseJSON(userDataStr);
+	var employeeCode= userData.employeeCode;
+	$scope.addr=urlParams.ADDR;
+	$scope.MOBILEPHONE1=urlParams.MOBILEPHONE1;
+	$scope.MOBILEPHONE1=urlParams.MOBILEPHONE1;
+	$scope.msg=urlParams.msg;
+	$scope.type=urlParams.type;
+	$scope.meg=urlParams.msg;
+	mes=$scope.meg;
+	$scope.title=""; 
+	if($scope.type=="SEX"){
+		$scope.title = "性别";
+	}else if($scope.type=="MARITAL"){
+		$scope.title = "婚姻状况";
+	}else if($scope.type=="ADDR"){
+		$scope.title = "家庭住址";
+	}else if($scope.type=="MOBILEPHONE1"){
+		$scope.title = "手机";
+	}else if($scope.type=="MAIL"){
+		$scope.title = "邮箱";
+	}else if($scope.type=="EMERGENCY_CONTACTOR_NAME"){
+		$scope.title = "紧急联系人";
+	}else if($scope.type=="EMERGENCY_CONTACTOR_PHONE"){
+		$scope.title = "紧急联系人号码";
+	}else if($scope.type=="EMERGENCY_CONTACTOR_RELATION"){
+		$scope.title = "紧急联系人关系";
+	};
+	$scope.updata=function(typeName){
+		if(typeName=="SEX"){
+			$http.post(serviceBasePath+"eap/pmsServices/opsAppService/employeeField?employeeCode="+employeeCode+"&field=SEX&fieldValue="+mes).success(function(response){
+				if(response.statusCode==200){
+					new ShowDlog().prompt({
+						icon:"success",
+						msg:"保存成功！",
+						done:function(){
+							location.href="ownMsg.html"
+						},
+						t:1500
+					});
+				}
+			});
+		}else if(typeName=="MARITAL"){
+			if(mes==3){
+				mes=1;
+			};
+			$http.post(serviceBasePath+"eap/pmsServices/opsAppService/employeeField?employeeCode="+employeeCode+"&field=MARITAL&fieldValue="+mes).success(function(response){
+				if(response.statusCode==200){
+					new ShowDlog().prompt({
+						icon:"success",
+						msg:"保存成功！",
+						done:function(){
+							location.href="ownMsg.html"
+						},
+						t:1500
+					});
+				}
+			});
+		}else if(typeName=="ADDR"){
+			mes=$("input[name=addr]").val();
+			$http.post(serviceBasePath+"eap/pmsServices/opsAppService/employeeField?employeeCode="+employeeCode+"&field=ADDR&fieldValue="+"'"+mes+"'").success(function(response){
+				if(response.statusCode==200){
+					new ShowDlog().prompt({
+						icon:"success",
+						msg:"保存成功！",
+						done:function(){
+							location.href="ownMsg.html"
+						},
+						t:1500
+					});
+				}
+			});
+		}else if(typeName=="MOBILEPHONE1"){
+			mes=$("input[name=mobilephone1]").val();
+			$http.post(serviceBasePath+"eap/pmsServices/opsAppService/employeeField?employeeCode="+employeeCode+"&field=MOBILEPHONE1&fieldValue="+"'"+mes+"'").success(function(response){
+				if(response.statusCode==200){
+					new ShowDlog().prompt({
+						icon:"success",
+						msg:"保存成功！",
+						done:function(){
+							location.href="ownMsg.html"
+						},
+						t:1500
+					});
+				}
+			});
+		}else if(typeName=="MAIL"){
+			mes=$("input[name=mail]").val();
+			$http.post(serviceBasePath+"eap/pmsServices/opsAppService/employeeField?employeeCode="+employeeCode+"&field=MAIL&fieldValue="+"'"+mes+"'").success(function(response){
+				if(response.statusCode==200){
+					new ShowDlog().prompt({
+						icon:"success",
+						msg:"保存成功！",
+						done:function(){
+							location.href="ownMsg.html"
+						},
+						t:1500
+					});
+				}
+			});
+		}else if(typeName=="MAIL"){
+			mes=$("input[name=mail]").val();
+			$http.post(serviceBasePath+"eap/pmsServices/opsAppService/employeeField?employeeCode="+employeeCode+"&field=MAIL&fieldValue="+"'"+mes+"'").success(function(response){
+				if(response.statusCode==200){
+					new ShowDlog().prompt({
+						icon:"success",
+						msg:"保存成功！",
+						done:function(){
+							location.href="ownMsg.html"
+						},
+						t:1500
+					});
+				}
+			});
+		}else if(typeName=="EMERGENCY_CONTACTOR_NAME"){
+			mes=$("input[name=emergency_contactor_name]").val();
+			$http.post(serviceBasePath+"eap/pmsServices/opsAppService/employeeField?employeeCode="+employeeCode+"&field=EMERGENCY_CONTACTOR_NAME&fieldValue="+"'"+mes+"'").success(function(response){
+				if(response.statusCode==200){
+					new ShowDlog().prompt({
+						icon:"success",
+						msg:"保存成功！",
+						done:function(){
+							location.href="ownMsg.html"
+						},
+						t:1500
+					});
+				}
+			});
+		}else if(typeName=="EMERGENCY_CONTACTOR_PHONE"){
+			mes=$("input[name=emergency_contactor_phone]").val();
+			$http.post(serviceBasePath+"eap/pmsServices/opsAppService/employeeField?employeeCode="+employeeCode+"&field=EMERGENCY_CONTACTOR_PHONE&fieldValue="+"'"+mes+"'").success(function(response){
+				if(response.statusCode==200){
+					new ShowDlog().prompt({
+						icon:"success",
+						msg:"保存成功！",
+						done:function(){
+							location.href="ownMsg.html"
+						},
+						t:1500
+					});
+				}
+			});
+		}else if(typeName=="EMERGENCY_CONTACTOR_RELATION"){
+			mes=$("input[name=emergency_contactor_relation]").val();
+			$http.post(serviceBasePath+"eap/pmsServices/opsAppService/employeeField?employeeCode="+employeeCode+"&field=EMERGENCY_CONTACTOR_RELATION&fieldValue="+"'"+mes+"'").success(function(response){
+				if(response.statusCode==200){
+					new ShowDlog().prompt({
+						icon:"success",
+						msg:"保存成功！",
+						done:function(){
+							location.href="ownMsg.html"
+						},
+						t:1500
+					});
+				}
+			});
+		}
+		
+		
+		
+	}
+	
+});
+
+function getSex(obj){
+	if(mes==1){
+		obj.checked=true;
+		mes=0;
+	}else{
+		obj.checked=true;
+		mes=1;
+	}
+};
+function getSex1(obj){
+	if(mes==1||mes==3){
+		obj.src="../../img/switch_01.png";	
+		mes=2;
+	}else{
+		obj.src="../../img/switch_02.png";	
+		mes=1;
+	}
+};
+$(".return").click(function(){
+	window.history.back();
+});
+
+
+
+</script>
+</body>
+</html>

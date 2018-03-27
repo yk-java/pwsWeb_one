@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.questionnire.dao.QaQuestionnireMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.questionnire.vo.QaQuestionnire" >
+    <id column="ROWID" property="rowid" jdbcType="BIGINT" />
+    <result column="QUESTIONNIRE_CODE" property="questionnireCode" jdbcType="VARCHAR" />
+    <result column="TITLE" property="title" jdbcType="VARCHAR" />
+    <result column="DESCR" property="descr" jdbcType="VARCHAR" />
+    <result column="ENABLED_BEGIN_TIME" property="enabledBeginTime" jdbcType="TIMESTAMP" />
+    <result column="ENABLED_END_TIME" property="enabledEndTime" jdbcType="TIMESTAMP" />
+    <result column="STATUS" property="status" jdbcType="INTEGER" />
+    <result column="SYS_CREATE_TIME" property="sysCreateTime" jdbcType="TIMESTAMP" />
+    <result column="CREATER" property="creater" jdbcType="VARCHAR" />
+    <result column="EMPLOYEENAME" property="employeeName" jdbcType="VARCHAR" />
+    <result column="TYPE" property="type" jdbcType="INTEGER" />
+    <result column="sendedCnt" property="sendedCnt" jdbcType="INTEGER" />
+    <result column="answerSheetCnt" property="answerSheetCnt" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ROWID, QUESTIONNIRE_CODE, TITLE, DESCR, ENABLED_BEGIN_TIME, ENABLED_END_TIME, STATUS, 
+    SYS_CREATE_TIME, CREATER, TYPE
+  </sql>
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from qa_questionnire
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </select>
+  <select id="findByCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    SELECT 
+    	t1.ROWID,
+  		t1.QUESTIONNIRE_CODE,
+  		t1.TITLE,
+  		t1.DESCR,
+  		DATE_FORMAT(t1.ENABLED_BEGIN_TIME, '%Y-%m-%d %H:%i:%s') as ENABLED_BEGIN_TIME,
+  		DATE_FORMAT(t1.ENABLED_END_TIME, '%Y-%m-%d %H:%i:%s') as ENABLED_END_TIME,
+  		t1.STATUS,
+  		t1.SYS_CREATE_TIME,
+  		t1.CREATER,
+  		t3.EMPLOYEENAME,
+  		t1.TYPE,
+  		t1.sendedCnt,
+    	COUNT(t2.submit_user) AS answerSheetCnt 
+	FROM (SELECT tt1.*, COUNT(tt2.employee_code) AS sendedCnt FROM qa_questionnire tt1 
+		LEFT JOIN qa_questionnire_send tt2 ON tt1.questionnire_code = tt2.questionnire_code
+		GROUP BY tt1.questionnire_code
+		) t1
+	LEFT JOIN qa_answer_sheet t2 ON t1.questionnire_code = t2.questionnire_code
+	LEFT JOIN md_employee t3 ON t1.creater = t3.employeecode
+	where t1.QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+	GROUP BY t1.questionnire_code
+  </select>
+  <delete id="delete" parameterType="java.lang.String" >
+    delete from qa_questionnire
+    where QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.glens.pwCloudOs.questionnire.vo.QaQuestionnire" >
+    insert into qa_questionnire (QUESTIONNIRE_CODE, TITLE, 
+      DESCR, ENABLED_BEGIN_TIME, ENABLED_END_TIME, 
+      STATUS, SYS_CREATE_TIME, CREATER, 
+      TYPE)
+    values (#{questionnireCode,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
+      #{descr,jdbcType=VARCHAR}, #{enabledBeginTime,jdbcType=TIMESTAMP}, #{enabledEndTime,jdbcType=TIMESTAMP}, 
+      0, now(), #{creater,jdbcType=VARCHAR}, 
+      #{type,jdbcType=INTEGER})
+  </insert>
+  <update id="update" parameterType="map" >
+    update qa_questionnire
+    <set >
+      <if test="title != null" >
+        TITLE = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="descr != null" >
+        DESCR = #{descr,jdbcType=VARCHAR},
+      </if>
+      <if test="enabledBeginTime != null" >
+        ENABLED_BEGIN_TIME = #{enabledBeginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="enabledEndTime != null" >
+        ENABLED_END_TIME = #{enabledEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        TYPE = #{type,jdbcType=INTEGER},
+      </if>
+    </set>
+    where QUESTIONNIRE_CODE = #{questionnireCode,jdbcType=VARCHAR}
+  </update>
+  <select id="queryForCount" resultType="int" parameterType="map">
+  	select count(*) from qa_questionnire
+  	where 1=1
+  	<if test="searchName != null">
+    	and (title like "%"#{searchName}"%" or
+    		descr like "%"#{searchName}"%")
+    </if>
+    <if test="status != null">
+    	and status = #{status, jdbcType=INTEGER}
+    </if>
+    <if test="type != null">
+    	and type = #{type, jdbcType=INTEGER}
+    </if>
+  </select>
+  <select id="queryForPage" resultMap="BaseResultMap" parameterType="map">
+  	SELECT 
+    	t1.ROWID,
+  		t1.QUESTIONNIRE_CODE,
+  		t1.TITLE,
+  		t1.DESCR,
+  		DATE_FORMAT(t1.ENABLED_BEGIN_TIME, '%Y-%m-%d %H:%i:%s') as ENABLED_BEGIN_TIME,
+  		DATE_FORMAT(t1.ENABLED_END_TIME, '%Y-%m-%d %H:%i:%s') as ENABLED_END_TIME,
+  		t1.STATUS,
+  		t1.SYS_CREATE_TIME,
+  		t1.CREATER,
+  		t3.EMPLOYEENAME,
+  		t1.TYPE,
+  		t1.sendedCnt,
+    	COUNT(t2.submit_user) AS answerSheetCnt 
+	FROM (SELECT tt1.*, COUNT(tt2.employee_code) AS sendedCnt FROM qa_questionnire tt1 
+		LEFT JOIN qa_questionnire_send tt2 ON tt1.questionnire_code = tt2.questionnire_code
+		GROUP BY tt1.questionnire_code
+		) t1
+	LEFT JOIN qa_answer_sheet t2 ON t1.questionnire_code = t2.questionnire_code
+	LEFT JOIN md_employee t3 ON t1.creater = t3.employeecode
+	where 1=1
+	<if test="searchName != null">
+		and (t1.title like "%"#{searchName}"%" or
+			t1.descr like "%"#{searchName}"%")
+	</if>
+	<if test="status != null">
+		and t1.status = #{status, jdbcType=INTEGER}
+	</if>
+	<if test="type != null">
+		and t1.type = #{type, jdbcType=INTEGER}
+	</if>
+	GROUP BY t1.questionnire_code
+    limit #{firstResult},#{maxResult}
+  </select>
+</mapper>

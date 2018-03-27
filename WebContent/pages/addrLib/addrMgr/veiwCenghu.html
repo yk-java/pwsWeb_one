@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 子对象维护 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css"/>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style>
+		.cancar_plane{border:solid 1px;width:100%;margin: 0 auto;}
+		#canvas{width:96%;height:500px;position: relative;overflow: auto;margin: 0 auto;}
+		.floor{position:absolute;bottom:0;}
+		.floor p{text-align: center;}
+		.floor ul{padding:20px 0;background:#efe0c7;border:solid 1px #ccc;}
+		.floor ul li{line-height:30px;padding:0 10px;}
+		.floor ul li a{padding: 5px 10px; border:1px solid #ccc;margin-right:10px; color:#999999;}
+		.floor ul li a:last-child{margin-right: 0;}
+
+.title_cancel{float:left;width:70px;height:28px;background: url(../../../img/btn_cancel.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#666;cursor: pointer;}
+.title_cancel:hover{background: url(../../../img/btn_cancel.png) no-repeat 0 -29px;}
+
+
+	    li{list-style: none}
+	</style>
+
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">层户预览</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;返回
+			</a>
+		</div>
+		<div class="cancar_plane">
+		<div id="canvas" ></div>
+	</div>
+
+	
+	</div>
+</div>
+
+
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		var urlParams = getUrlParams();
+		
+		$scope.deviceAttrList=[];
+		$scope.deviceAttrTrs=[];
+		$scope.dependencyAttrs=[];
+		$scope.calcFields = [];
+		$scope.fieldCname=urlParams.fieldCname;
+		$scope.objValue = {};
+		if(urlParams.objStr && urlParams.objStr!='' && urlParams.objStr!='undefined'){
+			$scope.objValue = JSON.parse(urlParams.objStr);
+		}
+		
+		
+		//$scope.objStr=JSON.parse(urlParams.objStr);
+		
+		//alert(urlParams.objStr)
+		
+	
+		var jsonarray = eval('('+urlParams.objStr+')');
+		
+		
+		//var jsonarray = eval('('+FLOOR_HOUSE+')');
+		var floorNum="";
+		var jsonnumarr=[];
+		var prevUnitMaxNo=0;
+		/// 单元
+		for(var i=0;i<jsonarray.length;i++){
+			var div = document.createElement("div");
+			div.className="floor";
+			
+			var ul = document.createElement("ul");
+			div.appendChild(ul);
+			var p=document.createElement("p");
+			p.innerHTML=jsonarray[i].HOUSEHOLD_NAME
+			div.appendChild(p);
+			floorNum = jsonarray[i].FLOOR_NO;
+			floorNum=Number(floorNum);
+			var houseNum=jsonarray[i].HOUSE_HOLD;
+			houseNum=Number(houseNum);
+			// 楼层
+			for(var j=1;j<=floorNum;j++){
+				var li = document.createElement("li");
+				// 户
+				for(var k=1;k<=houseNum;k++){
+					var a = document.createElement("a");
+					var ch = floorNum+1-j;
+					a.innerHTML=ch+fmt(prevUnitMaxNo+k);
+					li.appendChild(a);
+					
+					if(j==floorNum && k==houseNum){
+						
+						prevUnitMaxNo=prevUnitMaxNo+houseNum;
+					}
+				}
+				ul.appendChild(li);
+			}
+			document.getElementById("canvas").appendChild(div);
+			alertV();
+		}
+
+	
+		
+		/* 取消 */
+		$scope.onCancel=function(){
+			parent.$dlog.data="CANCEL";
+			parent.$dlog.close();
+		};
+	
+	}
+});
+function alertV(){
+	var temppx=0;
+	$(".floor").each(function(index,item){
+		$(this).css("left",temppx+"px");
+		temppx=temppx+parseInt($(this).css("width").substring(0,$(this).css("width").length-2));
+	});
+}
+function fmt(n){
+	if(n<10){
+		return "0"+n;
+	}else{
+		return n;
+	}
+}
+
+
+
+</script>
+</body>
+</html>

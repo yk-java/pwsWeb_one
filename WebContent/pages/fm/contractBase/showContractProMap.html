@@ -1,0 +1,167 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 合同项目关系</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/echarts.min.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">合同项目关系</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">合同属性</a>
+			
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<div id="chart1" style="width:100%;height:600px;border:solid 0px;">
+				
+			</div>
+		</div>
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	$scope.params = getUrlParams();
+	
+	
+	/* 加载图表 */
+	$scope.loadChart=function(){
+		$.ajax({
+			url:serviceBasePath+"eap/pmsServices/fm/contractBase/contractBase/echatsData?&contractNo="
+				+$scope.params.contractNo+"&contractName="+$scope.params.contractName,
+			method:"GET",
+			cache:true,
+			success:function(res){
+				if(res.statusCode!=200){
+					alert("请求服务器失败！");
+					return;
+				}
+				$scope.pointArr = res.data.nodes;
+				var itemStyle={
+                    normal: {
+                        color: "#4CA9FF",
+                    }
+                };
+				for(var i=0;i<$scope.pointArr.length;i++){
+					var item =$scope.pointArr[i];
+					item.itemStyle=itemStyle;
+				}
+				$scope.aaa = res.data.links;
+				for(var i=0;i<$scope.aaa.length;i++){
+					var label= {};
+					label.normal={
+	                        show: true,
+	                        formatter:function(a){
+	                        	/* return $scope.aaa[i].price; */
+	                        	return a.data.price+"（万元）";
+	                        }
+	                    };
+	                $scope.aaa[i].label=label;
+				};
+				$scope.linkArr=$scope.aaa;
+				option = {
+				    title: {
+				        text: '合同和项目关系'
+				    },
+				    tooltip: {},
+				    animationDurationUpdate: 1500,
+				    animationEasingUpdate: 'linear',
+				    series : [
+				        {
+				            type: 'graph',
+				            layout: 'none',
+				            symbolSize:[300,60],
+				            symbol:"rect",
+				            zoom:0.5,
+				            roam: true,
+				            label: {
+				                normal: {
+				                    show: true
+				                }
+				            },
+				            edgeSymbol: ['circle', 'arrow'],
+				            edgeSymbolSize: [2, 5],
+				            edgeLabel: {
+				                normal: {
+				                    textStyle: {
+				                        fontSize: 16
+				                    },
+				                    padding: [3, 100, 5,0]
+				                }
+				            },
+				            data:$scope.pointArr,
+				            links: $scope.linkArr,
+				            lineStyle: {
+				                normal: {
+				                    opacity: 0.9,
+				                    width: 1,
+				                    curveness: 0
+				                }
+				            }
+				        }
+				    ]
+				};
+				var chart = echarts.init(document.getElementById('chart1'));
+				chart.setOption(option);
+			},
+			error:function(){
+				alert("请求服务器失败！");
+			}
+		});
+	};
+
+	$scope.loadChart();
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		 window.history.back();
+	};
+	
+});
+
+</script>
+</body>
+</html>

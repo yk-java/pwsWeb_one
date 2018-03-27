@@ -1,0 +1,137 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>项目版本比较</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css"/>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<style type="text/css">
+	ul,li{list-style:none;outline:none;padding:0;margin:0}
+	.versionul{overflow: hidden;margin-top:30px}
+	.versionul li{padding:5px 25px;border:solid 1px #4CA9FF;color:#4CA9FF;float:left;cursor:pointer;margin:5px 15px 5px 0}
+	.versionul li.act{background:#4CA9FF;color:#fff}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl" >
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div" >
+			<div class="title_left" style="background:none;color:#4CA9FF">
+				您选择了：{{versionStr}}
+			</div>
+			<div class="title_left" style="float:right;background:none">
+				<div class="query_div" ng-click="doQuery()">
+					比较
+				</div>
+			</div>
+		</div>
+		
+		<div class="table_div">
+			<ul class="versionul">
+				<li ng-repeat="item in ProList" ng-click="chooseVersion($index,item)" ng-class="{act:item.flag==1}">{{item.VERSION_NO}}</li>
+			</ul>	
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		noLogin(location.href);
+		return;
+	}
+	$scope.versionStr="";
+	var urlParams = getUrlParams();
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	var companyCode=userData.companyCode;
+	  $http.get(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/getPmVersion?proNo="+urlParams.proNo).success(function(response){
+          if(response.statusCode==200){
+              $scope.ProList=response.list;
+          }
+      });
+	  
+	  var arr=[];
+	  $scope.chooseVersion=function(index,item){
+		 if( $scope.ProList[index].flag==1){
+			 $scope.ProList[index].flag=2;
+			 $scope.versionStr="";
+			 for(var i=0;i<arr.length;i++){
+				 var item=arr[i];
+				 if(item.VERSION_NO==arr[i].VERSION_NO){
+					arr.splice(i,1); 
+				 }
+				 if($scope.versionStr==""){
+					$scope.versionStr=arr[i].VERSION_NO;				
+				}else{
+					$scope.versionStr+=","+arr[i].VERSION_NO;
+				}
+			 }
+		 }else{
+			 $scope.ProList[index].flag=1;
+			 var obj={};
+			 obj.VERSION_NO=item.VERSION_NO;
+			 obj.VERSION_CODE=item.VERSION_CODE;
+			 arr.push(obj);
+			 console.log( arr);
+			 $scope.versionStr="";
+			 for(var i=0;i<arr.length;i++){
+				if($scope.versionStr==""){
+					$scope.versionStr=arr[i].VERSION_NO;				
+				}else{
+					$scope.versionStr+=","+arr[i].VERSION_NO;
+				}
+			  }
+		 }
+	  };
+	  $scope.doQuery=function(){
+		  if(arr.length>2||arr.length==1||arr.length==0){
+			  new ShowDlog().prompt({
+					icon:"warnning",
+					msg:"请选择两个版本！",
+					done:function(){
+					},
+					t:1500
+				});
+		  }else{
+			  var str="";
+			  var v1=arr[0].VERSION_NO;
+			  var v2=arr[1].VERSION_NO;
+			  for(var i=0;i<arr.length;i++){
+				  var item=arr[i];
+				  if(str==""){
+					  str=item.VERSION_CODE;
+				  }else{
+					  str+=","+item.VERSION_CODE;
+				  }
+				  
+			  }
+				parent.$dlog.data={"resultCode":"SUCCESS",str:str,v1:v1,v2:v2};
+				parent.$dlog.close();
+		  }
+	  };
+});
+</script>
+</body>
+</html>

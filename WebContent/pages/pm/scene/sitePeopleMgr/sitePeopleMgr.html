@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 现场环境 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/ViewState.js"></script>
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/ng-base.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../css/list.css" />
+
+
+<style type="text/css">
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+	.dialog-position{width:600px;height:450px;}
+	.dialog-image{width:800px;height:600px;}
+	.dialog-audio{width:400px;height:220px;}
+	.dialog-video{width:800px;height:500px;}
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName" storagekey="pm.scene.sceneEnv">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="hidden" viewstate="proNo"/>
+				<input type="text" viewstate="proName" class="dropDownList" style="width:200px;" placeholder="请选择项目"/>
+				<input type="text" style="width:200px;" placeholder="请输入人员姓名" name="workerName"/>
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				&nbsp;&nbsp;
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+			<div class="title_add" ng-click="toAdd()">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新增
+				</div>
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">所属项目</div></th>
+				<th><div align="center">人员姓名</div></th>
+				<th><div align="center">工种</div></th>
+				<th><div align="center">身份证号码</div></th>
+				<th><div align="center">家庭地址</div></th>
+				<th><div align="center">手机号码</div></th>
+				<th><div align="center">操作</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in dataList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.proName}}</div></td>
+				<td><div align="center">{{item.workerName}}</div></td>
+				<td>
+					<div align="center" ng-if="item.workType==1">项目经理</div>
+					<div align="center" ng-if="item.workType==2">施工员</div>
+					<div align="center" ng-if="item.workType==3">安全员</div>
+					<div align="center" ng-if="item.workType==4">质量员</div>
+					<div align="center" ng-if="item.workType==5">材料员</div>
+					<div align="center" ng-if="item.workType==6">焊工</div>
+					<div align="center" ng-if="item.workType==7">电工</div>
+					<div align="center" ng-if="item.workType==8">桩机</div>
+					<div align="center" ng-if="item.workType==9">辅助工</div>
+				</td>
+				<td><div align="center">{{item.cardId}}</div></td>
+				<td><div align="center">{{item.address}}</div></td>
+				<td><div align="center">{{item.mobile}}</div></td>
+				<td>
+					<div align="center">						
+			    		<img ng-click="doUpdate(item)" class="operationImg" src="../../../../img/list_item_modify-icon.png" title="修改">
+			    		<img class="operationImg" ng-click="doShow(item)" src="../../../../img/list_see-icon.png" title="查看 ">
+			    		<img ng-click="doDelete(item)" class="operationImg" src="../../../../img/list_delete-icon.png" title="删除">
+		    		</div>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		/* init */
+		$scope.dataList=[];
+		
+		var viewstate = new ViewState();
+		
+		/* 项目 */
+		new DropDownList().init({
+			renderTo:"input[viewstate=proName]",
+			url:"../../../component/projectList.html",
+			height:"200px",
+			onSelected:function(result){
+				$("input[viewstate=proNo]").val(result.proNo);
+				$("input[viewstate=proName]").val(result.proName);
+			}
+		});
+		
+		/* 加载数据 */
+		$scope.loadData=function(workerName){
+			viewstate.collect();
+			$scope.httpGet({
+				url:"eap/pmsServices/pm/workers/list",
+				data:{proNo:viewstate.get("proNo"),"workerName":workerName},
+				success:function(res){
+					$scope.dataList = res.list;
+				},
+				pageChange:function(pageNum){
+					$scope.loadData(workerName);
+				},
+				error:function(res){
+					
+				}
+			});
+		};
+		var workerName="";
+		$scope.doQuery=function(){
+			workerName=$("input[name=workerName]").val();
+			$scope.loadData(workerName);
+		};
+		
+		/* 新增  */
+		$scope.toAdd=function(item){
+			location.href="sitePeopleAdd.html";
+		};
+		/* 查看 */
+		$scope.doShow=function(item){
+			location.href="sitePeopleDetail.html?workerCode="+item.workerCode;
+		};
+
+		/* 编辑 */
+		$scope.doUpdate=function(item){
+			location.href="sitePeopleEdit.html?workerCode="+item.workerCode;
+		};
+
+		/* 删除 */
+		$scope.doDelete=function(item){
+			new ShowDlog().confirm({
+				msg:"确定删除吗？",
+				ok:function(){
+					$scope.httpPost({
+						url:"eap/pmsServices/pm/workers/delete",
+						data:{"workerCode":item.workerCode},
+						success:function(res){
+							if(res.statusCode==200){
+								new ShowDlog().prompt({
+									icon:"success",
+									msg:"删除成功！",
+									done:function(){
+										$scope.doQuery();
+									},
+									t:1500
+								});
+							}
+						}
+					});
+				}
+			});
+
+		};
+
+		
+		
+		/* 初始查询 */
+		$scope.doQuery();
+	}
+});
+</script>
+</body>
+</html>

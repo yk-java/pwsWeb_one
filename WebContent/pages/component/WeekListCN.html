@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<HTML>
+<HEAD>
+<TITLE> New Document </TITLE>
+<META charset=utf-8>
+<META NAME="Generator" CONTENT="EditPlus">
+<META NAME="Author" CONTENT="">
+<META NAME="Keywords" CONTENT="">
+<META NAME="Description" CONTENT="">
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<style type="text/css">
+	body{padding:0;margin:0px;font-size:11px;background:#fff;}
+	ul{list-style-type:none;padding:0;margin:0px;}
+	ul>li{cursor:pointer;}
+	ul>li>label{display:inline-block;border:solid 0px red;padding:2px 3px 2px 2px;margin:0px 2px 0px 0px;width:38px;background:#f1f1f1;color:#666;font-size:11px;text-align:center;}
+	ul>li>span{display:inline-block;border:solid 1px #ccc;margin:-1px -1px 0px 0px;padding:2px;width:30px;font-size:11px;text-align:center;}
+	ul>li>span.dayoff{background:#ffff99;color:#ff0000;}
+	ul>li>span.istoday{background:#4CA9FF;color:#fff;}
+	ul>li:hover>label,ul>li:hover>span{background:#3385FF;color:#fff;}
+</style>
+<script type="text/javascript">
+	var G=function(objId){return document.getElementById(objId)};
+	var Gn=function(objName){return document.getElementsByName(objName)};
+	window.onload=function(){
+		var urlParams=getUrlParams();
+		new WeekList({
+			year:urlParams.year,
+			itemSelected:function(week){
+				window.frameElement.callback(week);
+				window.frameElement.close();
+			}}).draw();
+		var e_offset = $(".istoday").offset();
+		$("body").scrollTop(e_offset.top);
+	};
+	function WeekList(_setting){
+		/* 是否闰年 */
+		var isLeapYear = function(year) {
+			if (year % 4 == 0 && year % 100 != 0) {
+				return true;
+			} else {
+				if (year % 400 == 0) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		};
+		this.draw=function(){
+			var year=_setting.year;
+			var ul=document.createElement("ul");
+			
+			var weeks=[];
+			//var d = new Date(2016,6,21);
+			//alert(d);
+			weeks=this.getWeeks(year);
+			for(var i=0;i<weeks.length;i++){
+				var week=weeks[i];
+				var li = document.createElement("li");
+				li.setAttribute("dataValue", (i+1));
+				li.onclick=function(){
+					var dataValue = parseInt(this.getAttribute("dataValue"));
+					_setting.itemSelected(weeks[dataValue-1]);
+				};
+				var label = document.createElement("label");
+				label.innerHTML=week.label;
+				li.appendChild(label);
+				for(var j=0;j<week.days.length;j++){
+					var date = week.days[j];
+					var day = date.getDay();
+					// blanks
+					var day_t=day==0?7:day;
+					if(j==0 && week.days.length<7 && day_t>1){
+						for(var k=0;k<day_t-1;k++){
+							var blank = document.createElement("span");
+							blank.innerHTML="&nbsp;";
+							li.appendChild(blank);
+						}
+					}
+					var span=document.createElement("span");
+					if(day==0 || day==6){
+						span.className="dayoff";
+					}
+					if(date.getDate()==new Date().getDate() && date.getMonth()==new Date().getMonth() ){
+						span.className="istoday";
+					}
+					span.innerHTML=(date.getMonth()+1)+"-"+date.getDate()+"";
+					li.appendChild(span);
+					// blanks
+					if(j==week.days.length-1 && week.days.length<7 && day_t<7){
+						for(var k=0;k<7-day_t;k++){
+							var blank = document.createElement("span");
+							blank.innerHTML="&nbsp;";
+							li.appendChild(blank);
+						}
+					}
+				}
+				ul.appendChild(li);
+
+			}
+			document.body.appendChild(ul);
+		}
+		this.getWeeks = function(year){
+			var weeks=[];
+			for(var month=0;month<12;month++){
+				var totalDay=31;
+				switch(month+1){
+					case 4:
+					case 6:
+					case 9:
+					case 11:
+						totalDay=30;
+						break;
+					case 2:
+						if(isLeapYear(year)){
+							totalDay=29;
+						}else{
+							totalDay=28;
+						}
+						break;
+				}
+				for(var date=1;date<=totalDay;date++){
+					var d = new Date(year, month, date);
+					var day=d.getDay();
+					if(day==1){
+						var week={};
+						week.label="第"+(weeks.length+1)+"周";
+						week.days=[];
+						weeks.push(week);
+					}
+					if(weeks.length==0){
+						var week={};
+						week.label="第"+(weeks.length+1)+"周";
+						week.days=[];
+						weeks.push(week);
+					}
+					var week = weeks[weeks.length-1];
+					week.days.push(d);
+				}
+			}
+			return weeks;
+		}
+}
+</script>
+</HEAD>
+
+<BODY>
+
+</BODY>
+</HTML>

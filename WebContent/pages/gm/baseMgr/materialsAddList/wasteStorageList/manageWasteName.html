@@ -1,0 +1,148 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>等级设置 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../../../css/edit.css"/>
+<script type="text/javascript" src="../../../../../js/jquery.form.js"></script>
+<script type="text/javascript" src="../../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+body{overflow:hidden;}
+.form_bottom{float:right;}
+.form_bottom .title_save{float:right;}
+.form_bottom .title_cancel{float:right;}
+#saveForm input{text-indent:10px}
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1" style="height:200px">
+			<table style="width:100%;">
+				<tr>
+					<th>废料名称</th>
+					<td>
+						<input type="text" id="categoryName" placeholder="请输入名称" name="categoryName" style="width:250px;" class="required">
+					</td>
+				</tr>
+				<tr>
+					<th>单位</th>
+					<td>
+						<input type="text" id="unit" placeholder="请输入单位" name="unit" style="width:250px;" class="required">
+					</td>
+				</tr>
+			</table>
+		</div>
+		
+		<div class="form_bottom" style="width:100%;float:right;">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;确定
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		$scope.valObj={};
+		
+		// 参数
+		var urlParams = getUrlParams();
+		$scope.processType=urlParams.processType;
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			window.noLogin(location.href);
+			return;
+		}
+		var userData = jQuery.parseJSON(userDataStr);
+		var categoryCode="";
+
+		/* 表单验证 */
+		validator = $("#saveForm").validate({
+			onsubmit: false,
+			focusInvalid: false,
+			focusCleanup: true,
+			errorElement: "span",
+			ignore:".ignore",
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {
+				} 
+			}
+		});
+
+		
+		$scope.onSave=function(){
+			if($("#saveForm").valid()){
+				var params = serializeArrayToMap($("#saveForm").serializeArray());
+				if($("#saveForm").valid()){
+					new ShowDlog().prompt({
+						icon:"waitting",
+						msg:"正在保存...",
+						done:function(){},
+						t:60*1000
+					});
+					var options = {
+							success: function(responseText, statusText) {
+								if(responseText.statusCode=="200"){
+									$dlog.close();
+									new ShowDlog().prompt({
+										icon:"success",
+										msg:"保存成功！",
+										done:function(){
+											location.href="materialsAdd.html";
+											window.parent.$(".dlog_dialog_title").html('添加废料物资<a class="dlog_dialog_closeBtn" href="javascript:$dlog.close()"></a>');
+										},
+										t:1500
+									});
+								}
+							},      //提交后的回调函数   
+							type: "post",               //默认是form的method（get or post），如果申明，则会覆盖  
+							dataType: "json",           //html(默认), xml, script, json...接受服务端返回的类型  
+							clearForm: false,          //成功提交后，清除所有表单元素的值
+							url:serviceBasePath+"eap/pmsServices/goods/addCategory",
+							error: function(xhr, status, error) {
+								console.log(error);
+							}
+						};
+					$("#saveForm").ajaxSubmit(options);
+				}
+			}
+		};
+		
+		$scope.onCancel=function(){
+			location.href="materialsAdd.html";
+			window.parent.$(".dlog_dialog_title").html('添加废料物资<a class="dlog_dialog_closeBtn" href="javascript:$dlog.close()"></a>');
+		};
+	}
+});
+</script>
+</body>
+</html>

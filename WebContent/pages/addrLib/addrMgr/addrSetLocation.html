@@ -1,0 +1,834 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 设备管理 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css"/>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/suggest.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+ <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+<!--     <link rel="stylesheet" type="text/css" href="../../../css/mapGetPointCss.css"> -->
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=SSNeoF1lhE4QGx0oThlKXnEG"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+	<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+	
+	<script type="text/javascript">
+		
+		var mapProxy;
+		var g_lng = 0;
+		var g_lat = 0;
+		var damName;
+		var returnx;
+		var returny;
+		var _x = "";
+		var _y = "";
+		
+		var areaName = "";//区名称
+		
+		window.onload = function() {
+		
+			var params = getUrlParams();
+			//alert(params.x+","+params.y);
+			
+			//damAreaName = UrlParm.parm("damAreaName");
+			
+			
+			
+			//var _x = "118.8028910000";
+			//var _y = "32.0647350000";
+			if(params.x){
+				_x =params.x;
+			}
+			
+			
+			if(params.y){
+				_y =params.y;
+			}
+			
+			//alert(params.areaName)
+			if(params.areaName){
+				areaName=params.areaName;
+			}
+			
+			
+			
+			
+			
+			
+			
+			/*
+			if(_x==undefined){
+				_x = x;
+			}
+			if(_y==undefined){
+				_y = y;
+			}
+			
+			var opt = {
+				center: new MMap.LngLat(_x, _y),//设置地图中心点
+		        level: 13,//初始地图缩放级别
+		        zooms:[7,17]//地图缩放级别范围
+		    };
+		    
+		    mapProxy = new mmap.MapProxy("iCenter", opt);
+			mapProxy.init();
+			mapProxy.drawTool.eventDispatch.addEventListener("drawed", drawPointHandler);
+			
+			onMapReady.delayInvoke(this, 3000, []);
+			
+			*/
+			initMap(_x, _y);
+			/* damName = parent.art.dialog.data("damName");
+			if (!damName) {
+				
+				damName = "未命名水库";
+			} */
+			
+			initXY();
+			
+		};
+		
+		function initMap(x, y) {
+			
+			mapProxy = new BMap.Map("iCenter", {
+					
+				mapType: BMAP_NORMAL_MAP,enableMapClick:false
+			});
+			
+			mapProxy.enableScrollWheelZoom();
+			mapProxy.addControl(new BMap.MapTypeControl());
+			var top_left_navigation = new BMap.NavigationControl();
+			mapProxy.addControl(top_left_navigation);
+			
+			if (x && y) {
+				
+				var poi = new BMap.Point(x, y);
+				mapProxy.centerAndZoom(poi, 16);
+			}else if(areaName!="" && areaName!=undefined){
+				
+				mapProxy.centerAndZoom(areaName,15);
+			}
+			else {
+				
+				mapProxy.centerAndZoom("镇江",11);
+			}
+			
+			//drawTool
+		    //实例化鼠标绘制工具
+		    var drawingManager = new BMapLib.DrawingManager(mapProxy, {
+		        isOpen: false, //是否开启绘制模式
+		        enableDrawingTool: true, //是否显示工具栏
+		        drawingToolOptions: {
+		            anchor: BMAP_ANCHOR_BOTTOM_RIGHT, //位置
+		            offset: new BMap.Size(5, 5), //偏离值
+		            drawingModes: [BMAP_DRAWING_MARKER]
+		        }
+		    });  
+			 //添加鼠标绘制工具监听事件，用于获取绘制结果
+		    drawingManager.addEventListener('overlaycomplete', drawPointHandler);
+		    
+		}
+		
+		function initXY() {
+			
+			//var _x = "118.8028910000";
+			//var _y = "32.0647350000";
+			
+			
+			
+			
+			if (_x && _y) {
+				
+				setXY(_x, _y);
+				
+				drawPoint(_x, _y);
+			}
+		}
+		
+		var locations = "";
+		function drawPointHandler(event) {
+			
+			var p = event.overlay;
+			if (p) {
+				var lnglat = p.getPosition();
+				mapProxy.clearOverlays();
+				locations = "locations";
+				drawPoint(lnglat.lng, lnglat.lat);
+				$("input[name=showx]").val(lnglat.lng);
+				$("input[name=showy]").val(lnglat.lat);
+				//
+				$.ajax({
+					url:serviceBasePath+"eap/pmsServices/om/deviceMgr/device/coordsBD09ToWGS84?x="+lnglat.lng+"&y="+lnglat.lat,
+					data:{},
+					success:function(response){
+						if(response.statusCode==200){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"获取成功！",
+								done:function(){
+									var rx = response.data.x;
+									var ry = response.data.y;
+									$("input[name=wgs84x]").val(decim(rx, 6));
+									$("input[name=wgs84y]").val(decim(ry, 6));
+								},
+								t:1500
+							});
+						}else{
+							new ShowDlog().prompt({
+								msg:"获取失败！",
+								done:function(){
+									
+								},
+								t:1500
+							});
+						}
+					}
+				});
+			}
+		}
+		
+		function drawPoint(x, y) {
+			var point = new BMap.Point(Number(x), Number(y));
+			if(locations==""){
+
+				mapProxy.centerAndZoom(point, 18);
+
+			}
+			mapProxy.setCenter(x, y);
+			mapProxy.clearOverlays();
+			
+			var marker = new BMap.Marker(point);  // 创建标注
+			mapProxy.addOverlay(marker);              // 将标注添加到地图中
+			var addrName = $("input[name=addrName]").val();
+			var infoWindow = new BMap.InfoWindow("<div style='font-weight:bold;font-size:16px;'>"+addrName+"</div>", {offset:new BMap.Size(0, -20)});
+			mapProxy.openInfoWindow(infoWindow, point);
+			marker.enableDragging();
+			marker.addEventListener("dragend",function(e){
+				
+				
+				returnx=e.point.lng;
+				returny=e.point.lat;
+				
+				$("input[name=showx]").val(e.point.lng);
+				$("input[name=showy]").val(e.point.lat);
+				//
+				$.ajax({
+					url:serviceBasePath+"eap/pmsServices/om/deviceMgr/device/coordsBD09ToWGS84?x="+e.point.lng+"&y="+e.point.lat,
+					data:{},
+					success:function(response){
+						if(response.statusCode==200){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"获取成功！",
+								done:function(){
+									var rx = response.data.x;
+									var ry = response.data.y;
+									drawPoint(e.point.lng, e.point.lat);
+									$("input[name=wgs84x]").val(decim(rx, 6));
+									$("input[name=wgs84y]").val(decim(ry, 6));
+								},
+								t:1500
+							});
+						}else{
+							new ShowDlog().prompt({
+								msg:"获取失败！",
+								done:function(){
+									
+								},
+								t:1500
+							});
+						}
+					}
+				});
+				
+			});
+			//alert(Number(x)+","+Number(y));
+			returnx=Number(x);
+			returny=Number(y);
+			
+			
+			
+			//var label = new BMap.Label(getLabelHtml({text:damName}),{offset:new BMap.Size(-30, -24)});
+			//marker.setLabel(label);
+		}
+		
+		Function.prototype.delayInvoke = function(o, delay, args) {
+		
+			var fn = this;
+			return setTimeout(function() {fn.apply(o, args || []);}, delay);
+		};
+		
+		function setXY(_x, _y) {
+			
+			document.getElementById("x1").value = _x;
+			document.getElementById("y1").value = _y;
+			
+			setX123(_x);
+			setY123(_y);
+		}
+		var models = "map";
+		function onModelCheck(model) {
+			models = model;
+			switch(model) {
+				
+				case "map":
+					document.getElementById("iCenter").style.display = "block";
+					document.getElementById("lnglatDiv1").style.display = "none";
+					document.getElementById("lnglatDiv2").style.display = "none";
+					
+					if (document.getElementById("x1").value 
+					&& document.getElementById("y1").value) {
+						
+						drawPoint(document.getElementById("x1").value, document.getElementById("y1").value);
+					}
+					break;
+				case "1":
+					document.getElementById("iCenter").style.display = "none";
+					document.getElementById("lnglatDiv1").style.display = "block";
+					document.getElementById("lnglatDiv2").style.display = "none";
+					break;
+				case "2":
+					document.getElementById("iCenter").style.display = "none";
+					document.getElementById("lnglatDiv1").style.display = "none";
+					document.getElementById("lnglatDiv2").style.display = "block";
+					break;
+			}
+		}
+		
+		function setX123(x) {
+		
+			if (x) {
+				
+				var lng = Number(x);
+				var _d = Math.floor(lng);
+				var _l = (lng - _d) * 60;
+				var _m = Math.floor(_l);
+				var _s = (_l - _m) * 60;
+				
+				//document.getElementById("x2").value = _d + "." + _m + "." + _s + "''";
+				document.getElementById("x11").value = _d;
+				document.getElementById("x12").value = _l;
+				document.getElementById("x13").value = _s;
+			}
+		}
+		
+		function setY123(y) {
+			
+			var lat = Number(y);
+			var _d = Math.floor(lat);
+			var _l = (lat - _d) * 60;
+			var _m = Math.floor(_l);
+			var _s = (_l - _m) * 60;
+			
+			document.getElementById("y11").value = _d;
+			document.getElementById("y12").value = _l;
+			document.getElementById("y13").value = _s;
+		}
+		
+		function onX1BlurHandler() {
+			
+			if (document.getElementById("x1").value != "") {
+				
+				var lng = Number(document.getElementById("x1").value);
+				var _d = Math.floor(lng);
+				var _l = (lng - _d) * 60;
+				var _m = Math.floor(_l);
+				var _s = (_l - _m) * 60;
+				
+				//document.getElementById("x2").value = _d + "." + _m + "." + _s + "''";
+				document.getElementById("x11").value = _d;
+				document.getElementById("x12").value = _l;
+				document.getElementById("x13").value = _s;
+				
+				checkXYAndDrawPoint();
+			}
+		}
+		
+		function onY1BlurHandler() {
+		
+			if (!document.getElementById("y1").value || document.getElementById("y1").value == "") return;
+			
+			var lat = Number(document.getElementById("y1").value);
+			var _d = Math.floor(lat);
+			var _l = (lat - _d) * 60;
+			var _m = Math.floor(_l);
+			var _s = (_l - _m) * 60;
+			
+			document.getElementById("y11").value = _d;
+			document.getElementById("y12").value = _l;
+			document.getElementById("y13").value = _s;
+			
+			checkXYAndDrawPoint();
+		}
+		
+		function onOkClickHandler() {
+			var rx = $("input[name=wgs84x]").val();
+			var ry = $("input[name=wgs84y]").val();
+			
+			$.ajax({
+				url:serviceBasePath+"eap/pmsServices/om/deviceMgr/device/coordsWGS84ToBD09?x="+rx+"&y="+ry,
+				data:{},
+				success:function(response){
+					if(response.statusCode==200){
+						new ShowDlog().prompt({
+							icon:"success",
+							msg:"获取成功！",
+							done:function(){
+								var x = response.data.x;
+								var y = response.data.y;
+								$("input[name=showx]").val(decim(x, 6));
+								$("input[name=showy]").val(decim(y, 6));
+								// 画点
+								
+								drawPoint(x, y);
+							},
+							t:1500
+						});
+					}else{
+						new ShowDlog().prompt({
+							msg:"获取失败！",
+							done:function(){
+								
+							},
+							t:1500
+						});
+					}
+				}
+			});
+		}
+		
+		function isDecimal(str){ 
+			return str.replace(/^(\d*(\.\d*)?)$/,'')  
+		} 
+		
+		function onX11BlurHandler() {
+			
+			if (document.getElementById("x11").value && document.getElementById("x11").value != "") {
+				
+				g_lng += Number(document.getElementById("x11").value);
+				
+				checkAndSetLng();
+			}
+		}
+		
+		function onX12BlurHandler() {
+			
+			if (document.getElementById("x12").value && document.getElementById("x12").value != "") {
+				
+				g_lng += Number(document.getElementById("x12").value)/60.0;
+				
+				checkAndSetLng();
+			}
+		}
+		
+		function onX13BlurHandler() {
+			
+			if (document.getElementById("x13").value && document.getElementById("x13").value != "") {
+				
+				g_lng += Number(document.getElementById("x13").value)/3600.0;
+				
+				checkAndSetLng();
+			}
+		}
+		
+		function onY11BlurHandler() {
+			
+			if (document.getElementById("y11").value && document.getElementById("y11").value != "") {
+				
+				g_lat += Number(document.getElementById("y11").value);
+				
+				checkAndSetLat();
+			}
+		}
+		
+		function onY12BlurHandler() {
+			
+			if (document.getElementById("y12").value && document.getElementById("y12").value != "") {
+				
+				g_lat += Number(document.getElementById("y12").value)/60.0;
+				
+				checkAndSetLat();
+			}
+		}
+		
+		function onY13BlurHandler() {
+			
+			if (document.getElementById("y13").value && document.getElementById("y13").value != "") {
+				
+				g_lat += Number(document.getElementById("y13").value)/3600.0;
+				
+				checkAndSetLat();
+			}
+		}
+		
+		function checkAndSetLng() {
+			
+			if (g_lng && g_lng > 1) {
+				
+				document.getElementById("x1").value = g_lng;
+				
+				checkXYAndDrawPoint();
+			}
+		}
+		
+		function checkAndSetLat() {
+			
+			if (g_lat && g_lat > 1) {
+				
+				document.getElementById("y1").value = g_lat;
+				
+				checkXYAndDrawPoint();
+			}
+		}
+		
+		function checkXYAndDrawPoint() {
+			
+			if (document.getElementById("x1").value 
+			&& document.getElementById("x1").value != "" 
+			&& document.getElementById("y1").value 
+			&& document.getElementById("y1").value != "") {
+				
+				drawPoint(document.getElementById("x1").value, document.getElementById("y1").value);
+			}
+		}
+		
+		function getLabelHtml(options) {
+		
+			var htmls = [];
+			htmls.push("<div style='fontSize:12px;lineHeight:18px;width:100px;paddingLeft:4px;paddingRight:4px;whiteSpace:nowrap;text-align:center;");
+			if (options.className) {
+				
+				htmls.push("' class='");
+				htmls.push(options.className);
+				htmls.push("'>");
+			}
+			else {
+				
+				htmls.push("border:solid 1px #FF0000;background:#FFFFFF'>");
+				
+			}
+			htmls.push(options.text);
+			htmls.push("</div>");
+			return htmls.join("");
+		}
+		function btnok(){
+			var name=$("#areaName").val();
+			mapProxy.centerAndZoom(name,18);
+		}
+		
+		document.onkeydown=function(event){
+            var e = event || window.event || arguments.callee.caller.arguments[0];
+                      
+             if(e && e.keyCode==13){ // enter 键
+                 btnok();
+            }
+        }; 
+        
+        var local;	
+        
+        function query()
+        {
+        	//areaName
+        	var area = $("#areaName");
+        	//console.log(area.val().trim().length);
+        	if(area.val().trim().length==0)
+        	{
+        		$("#suggestDiv").hide();
+        		return false;
+        	}
+        	
+			var offset = area.offset();
+			//suggestDiv
+			var width=area.width();
+			var height=area.height();
+			var h=offset.top+height+5;			
+			$("#suggestDiv").css({'top':h+"px",'left':offset.left+"px"});
+			local = new BMap.LocalSearch(mapProxy, options);
+			local.search(area.val());
+			
+        }
+        
+        $(function(){
+       		 $(document).on('mouseenter', '#suggestDiv ul li', function() {
+         			 //function code here.
+         			 $(this).css({"background-color":"#DCDCDC","cursor":"pointer"});
+       		 });
+      		 $(document).on('mouseleave', '#suggestDiv ul li', function() {
+        			 //function code here.
+        			  $(this).css({"background-color":"#FFFFFF","cursor":"pointer"});
+      		 });
+      		  $(document).on('click', '#suggestDiv ul li', function() {
+        			 //function code here.
+        			$("#areaName").val($(this).attr('title'));
+        			$("#suggestDiv").hide();
+        			drawPoint($(this).attr('lng'),$(this).attr('lat'));
+        			$("input[name=showx]").val($(this).attr('lng'));
+					$("input[name=showy]").val($(this).attr('lat'));
+				//
+				$.ajax({
+					url:serviceBasePath+"eap/pmsServices/om/deviceMgr/device/coordsBD09ToWGS84?x="+$(this).attr('lng')+"&y="+$(this).attr('lat'),
+					data:{},
+					success:function(response){
+						if(response.statusCode==200){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"获取成功！",
+								done:function(){
+									var rx = response.data.x;
+									var ry = response.data.y;
+									$("input[name=wgs84x]").val(decim(rx, 6));
+									$("input[name=wgs84y]").val(decim(ry, 6));
+								},
+								t:1500
+							});
+						}else{
+							new ShowDlog().prompt({
+								msg:"获取失败！",
+								done:function(){
+									
+								},
+								t:1500
+							});
+						}
+					}
+				});
+      		 });
+      		 
+      		 
+      		 $("body").bind("mousedown", onBodyDown);
+      		 
+        });
+        
+        function onBodyDown(event) {
+			if (!(event.target.id == "suggestDiv" ||  $(event.target).parents("#suggestDiv").length>0)) {
+				$("#suggestDiv").hide();
+			}
+		}
+		
+        
+        var options = {
+				onSearchComplete : function(results) {
+					if (local.getStatus() == BMAP_STATUS_SUCCESS) {
+						// 判断状态是否正确      
+						var s = [];
+						$("#suggestDiv ul").empty();
+						for ( var i = 0; i < results.getCurrentNumPois(); i++) {
+							var  str=results.getPoi(i).title + ", "
+									+ results.getPoi(i).address + ", "
+									+ results.getPoi(i).point.lng + ", "
+									+ results.getPoi(i).point.lat;
+							$("<li title='"+results.getPoi(i).title+"'  lng='"+results.getPoi(i).point.lng+"' lat='"+results.getPoi(i).point.lat+"'>"+results.getPoi(i).title+"("+results.getPoi(i).address+")</li>").appendTo("#suggestDiv ul");
+						}
+						
+						$("#suggestDiv").show();
+					}
+				},
+				pageCapacity:10,
+				renderOptions: {    
+				   map: mapProxy,    
+				   autoViewport: true
+				 }    
+			};
+		
+		
+        
+	</script>
+
+<style type="text/css">
+	.chooseUser{width:1000px;height:500px;}
+	.dialog-map{height:500px;width:900px;}
+	
+	
+	.toolbar{position:absolute;top:50px;right:0;left:0;border:solid 0px;}
+	.toolbar .left{float:left;}
+	.toolbar .right{float:right;}
+	.toolbar .btn{display:inline-block;height:30px;line-height:30px;margin:0 4px;padding:0 15px 0 15px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; 
+border-radius:4px;}
+	.toolbar .blue{background:#3385FF;color:#fff;}
+	.toolbar .blue:hover{background:#186CE7;}
+	.toolbar .txt{font-family:'微软雅黑';color:#333;margin-left:5px;width:180px;height:26px;border:1px #ccc solid;font-size:12px;margin-top:0px;text-indent:10px;}
+	.content{position:absolute;top:90px;right:0;left:0;bottom:60px;}
+	.form_bottom{position:absolute;border:0;bottom:20px;}
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">地址位置信息维护</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1"  style="display:none;">
+			<input type="hidden" name="companyCode" value="{{data.companyCode}}"/>
+			<input type="hidden" name="addrCode" value="{{data.ADDR_CODE}}"/>
+			<input type="hidden" name="addrName" value="{{data.ADDR_NAME}}"/>
+		</div>
+		
+		
+		<div>
+			<div class="toolbar">
+	  			<div class="left">
+		  			<input placeholder="请输入参考地名地址"  type="text" class="txt" id="areaName"  name="areaName"  style="margin-right:-2px;width: 250px;" onkeyup="query()"/>
+		  			<input type="button" class="btn blue" value="搜索" onclick="btnok()" style="margin-left:-2px;border-radius:0;border:0;" />
+	  			</div>
+	  			
+	  			<div class="right">
+	  				<label>经度：</label>
+	  				<input type="text" class="txt" name="wgs84x" value="{{data.WGS84_X}}"/>
+	  				<input type="hidden" name="showx" value="{{data.SHOW_X}}"/>
+	  				&nbsp;&nbsp;
+	  				<label>纬度：</label>
+	  				<input type="text" class="txt" name="wgs84y" value="{{data.WGS84_Y}}"/>
+	  				<input type="hidden" name="showy" value="{{data.SHOW_Y}}"/>
+	  				<input type="button" class="btn blue" value="纠偏" onclick="onOkClickHandler()" >
+	  			</div>
+	  		</div>
+	  		<div class="content">
+	  			<div id="iCenter" style="height:100%; width:100%;">
+	  			</div>
+	  			<div id="lnglatDiv1" style="display: none; " align="center" >
+	  				<table width="95%" border="0" style="margin-top:10px;">
+					  <tr>
+					    <td><div align="right">东经(度)：</div></td>
+					    <td><div align="left"><input type="text" id="x1" onblur="onX1BlurHandler()" style="float:left;"/><label id="x1_label" style="color:#ff0000;float: left;margin-left:30px;"></label></div></td>
+					    <td><div align="right">北纬(度)：</div></td>
+					    <td><div align="left"><input type="text" id="y1" onblur="onY1BlurHandler()" style="float:left;"/><label id="y1_label" style="color:#ff0000;float: left;margin-left:30px;"></label></div></td>
+					  </tr>
+					</table>
+	  			</div>
+	  			<div id="lnglatDiv2" style="display: none;" align="center">
+	  				<table width="95%" border="0" style="margin-top:10px;">
+					  <tr>
+					    <td><div align="right">东经(度)：</div></td>
+					    <td><div align="left"><input type="text" id="x11" onblur="onX11BlurHandler()" style="width:110px;"/></div></td>
+					    <td><div align="right">东经(分)：</div></td>
+					    <td><div align="left"><input type="text" id="x12" onblur="onX12BlurHandler()" style="width:110px;"/></div></td>
+					    <td><div align="right">东经(秒)：</div></td>
+					    <td><div align="left"><input type="text" id="x13" onblur="onX13BlurHandler()" style="width:110px;"/></div></td>
+					  </tr>
+					  <tr>
+					    <td><div align="right">北纬(度)：</div></td>
+					    <td><div align="left"><input type="text" id="y11" onblur="onY11BlurHandler()" style="width:110px;"/></div></td>
+					    <td><div align="right">北纬(分)：</div></td>
+					    <td><div align="left"><input type="text" id="y12" onblur="onY12BlurHandler()" style="width:110px;"/></div></td>
+					    <td><div align="right">北纬(秒)：</div></td>
+					    <td><div align="left"><input type="text" id="y13" onblur="onY13BlurHandler()" style="width:110px;"/></div></td>
+					  </tr>
+					</table>
+					<label id="xy" style="color:#ff0000;float: left;margin-left:30px;"></label>
+	  			</div>
+	  		</div>
+		</div>
+		
+		
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+
+<div class="suggestDiv" id="suggestDiv">
+	<ul>
+		
+	</ul>
+</div>
+<script type="text/javascript">
+var comUrlParams;
+simpleController({
+	init:function($scope, $http){
+		$scope.data={};
+		/* 显示位置 */
+		$scope.loadAddrPosition=function(addrCode){
+			$scope.httpGet({
+				url:"eap/pmsServices/addrLib/addrBase/findDetail?companyCode="+$scope.userData.companyCode,
+				data:{"addrCode":addrCode},
+				success:function(response){
+					$scope.data = response.data;
+					if($scope.data.SHOW_X && $scope.data.SHOW_Y){
+						lazyCall('t1',function(){
+							drawPoint($scope.data.SHOW_X, $scope.data.SHOW_Y);
+							var poi = new BMap.Point($scope.data.SHOW_X, $scope.data.SHOW_Y);
+							mapProxy.centerAndZoom(poi, 19);
+						},300);
+					}
+				}
+			});
+		};
+		
+		var urlParams = getUrlParams();
+		comUrlParams = urlParams;
+		$scope.loadAddrPosition(urlParams.addrCode);
+		
+		/* 保存 */
+		$scope.onSave=function(){
+			$("input[name=companyCode]").val($scope.userData.companyCode);
+			var params = serializeArrayToMap($("#saveForm").serializeArray());
+			if($("#saveForm").valid()){
+				this.httpPost({
+					url:"eap/pmsServices/addrLib/addrBase/updateAddrPosition",
+					data:params,
+					success:function(response){
+						new ShowDlog().prompt({
+							icon:"success",
+							msg:"保存成功！",
+							done:function(){
+								hrefTo({
+									url:"addrMgr.html",
+									data:urlParams
+								});
+							},
+							t:1500
+						});
+						
+					}
+				});
+			}
+		};
+		
+		$scope.decim=function(num, len){
+			return decim(num, len);
+		}
+		
+		/* 取消 */
+		$scope.onCancel=function(){
+			hrefTo({
+				url:"addrMgr.html",
+				data:urlParams
+			});
+		};
+	
+	}
+});
+</script>
+</body>
+</html>

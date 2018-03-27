@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.addrLib.dao.AddPreliminaryAuditVoMapper" >
+  
+  
+  <insert id="insert" parameterType="com.glens.pwCloudOs.addrLib.vo.AddPreliminaryAuditVo" >
+    insert into add_preliminary_audit (FORM_CODE,PLACE_NAME,APP_ORG_NAME,
+APP_ORG_CODE,APP_ORG_TEL,APPLICAT,APPLICAT_NAME,
+APPLICAT_TEL,APPLICATION,CONFIRMATION,ACCEPT_STATUS,AUDIT_STATUS,AUDIT_STATUS2,
+SYS_CREATE_TIME,SYS_PROCESS_FLAG,REMARKS)
+    values (
+#{formCode, jdbcType=VARCHAR},
+#{placeName, jdbcType=VARCHAR},
+#{appOrgName, jdbcType=VARCHAR},
+#{appOrgCode, jdbcType=VARCHAR},
+#{appOrgTel, jdbcType=VARCHAR},
+#{applicat, jdbcType=VARCHAR},
+#{applicatName, jdbcType=VARCHAR},
+#{applicatTel, jdbcType=VARCHAR},
+#{application, jdbcType=VARCHAR},
+#{confirmation, jdbcType=VARCHAR},
+0,
+0,
+0,
+now(),
+1,
+#{remarks, jdbcType=VARCHAR})
+  </insert>
+  <select id="queryForCount" parameterType="java.util.HashMap" resultType="int">
+     select count(*) from ( select rowid,FORM_CODE formCode,APPLICAT applicat,APP_ORG_NAME appOrgName,APPLICAT_NAME applicatName,APP_ORG_TEL appOrgTel,PLACE_NAME placeName,APPLICATION application,
+		CONFIRMATION confirmation,ACCEPT_STATUS acceptStatus,ACCEPTOR_CODE acceptorCode,ACCEPTOR_NAME acceptorName,ACCEPT_TIME acceptTime,ACCEPT_SUGGEST acceptSuggest,NOTICE notice,
+		AUDIT_STATUS auditStatus,AUDIT_SUGGEST auditSuggest,AUDITOR_CODE auditorCode,AUDITOR_NAME auditorName,AUDIT_TIME auditTime,AUDIT_STATUS2 auditStatus2,AUDIT_SUGGEST2 auditSuggest2,
+		AUDITOR_CODE2 auditorCode2,AUDITOR_NAME2 auditorName2,AUDIT_TIME2 auditTime2,DISPATCH dispatch,REMARKS remarks
+		
+		from add_preliminary_audit
+		where SYS_PROCESS_FLAG='1'
+		
+		<if test="roleCode=='R20161207143642413959' and status==0">
+			and ACCEPT_STATUS=0
+		</if>
+		<if test="roleCode=='R20161207143642413959' and status==1">
+			and ((ACCEPT_STATUS=1 and ACCEPTOR_CODE=#{acceptorCode}) or (ACCEPT_STATUS=2 and ACCEPTOR_CODE=#{acceptorCode}))
+		</if>
+		<if test="roleCode =='R20161207143724432478' and status==0">
+			and ACCEPT_STATUS=1 and AUDIT_STATUS=0
+		</if>
+		<if test="roleCode =='R20161207143724432478' and status==1">
+			and ((ACCEPT_STATUS=1 and AUDIT_STATUS=1 and AUDITOR_CODE=#{acceptorCode}) or (ACCEPT_STATUS=1 and AUDIT_STATUS=2 and AUDITOR_CODE=#{acceptorCode}))
+		</if>
+		
+		<if test="roleCode=='R20161207143741114245' and status==0">
+			and ACCEPT_STATUS=1 and AUDIT_STATUS=1 and AUDIT_STATUS2=0
+		</if>
+		
+		<if test="roleCode=='R20161207143741114245' and status==1">
+			and ((ACCEPT_STATUS=1 and AUDIT_STATUS=1 and AUDIT_STATUS2=1 and AUDITOR_CODE2=#{acceptorCode}) or (ACCEPT_STATUS=1 and AUDIT_STATUS=1 and AUDIT_STATUS2=2 and AUDITOR_CODE2=#{acceptorCode}))
+		</if>
+		
+		<if test="formCode !=null and formCode !=''">
+			and (FORM_CODE like "%"#{formCode}"%" or PLACE_NAME like "%"#{formCode}"%")
+		</if>
+		
+		
+		 ) a
+  </select>
+  
+  
+  <select id="queryForPage" parameterType="java.util.HashMap" resultType="map">
+        select rowid,APPLICAT_TEL applicatTel,FORM_CODE formCode,APPLICAT applicat,APP_ORG_NAME appOrgName,APPLICAT_NAME applicatName,APP_ORG_TEL appOrgTel,PLACE_NAME placeName,APPLICATION application,
+		CONFIRMATION confirmation,ACCEPT_STATUS acceptStatus,ACCEPTOR_CODE acceptorCode,ACCEPTOR_NAME acceptorName,ACCEPT_TIME acceptTime,ACCEPT_SUGGEST acceptSuggest,NOTICE notice,
+		AUDIT_STATUS auditStatus,AUDIT_SUGGEST auditSuggest,AUDITOR_CODE auditorCode,AUDITOR_NAME auditorName,AUDIT_TIME auditTime,AUDIT_STATUS2 auditStatus2,AUDIT_SUGGEST2 auditSuggest2,
+		AUDITOR_CODE2 auditorCode2,AUDITOR_NAME2 auditorName2,AUDIT_TIME2 auditTime2,DISPATCH dispatch,REMARKS remarks
+		from add_preliminary_audit
+		where SYS_PROCESS_FLAG='1'
+		
+		
+		
+		<if test="roleCode=='R20161207143642413959' and status==0">
+			and ACCEPT_STATUS=0
+		</if>
+		<if test="roleCode=='R20161207143642413959' and status==1">
+			and ((ACCEPT_STATUS=1 and ACCEPTOR_CODE=#{acceptorCode}) or (ACCEPT_STATUS=2 and ACCEPTOR_CODE=#{acceptorCode}))
+		</if>
+		<if test="roleCode =='R20161207143724432478' and status==0">
+			and ACCEPT_STATUS=1 and AUDIT_STATUS=0
+		</if>
+		<if test="roleCode =='R20161207143724432478' and status==1">
+			and ((ACCEPT_STATUS=1 and AUDIT_STATUS=1 and AUDITOR_CODE=#{acceptorCode}) or (ACCEPT_STATUS=1 and AUDIT_STATUS=2 and AUDITOR_CODE=#{acceptorCode}))
+		</if>
+		
+		<if test="roleCode=='R20161207143741114245' and status==0">
+			and ACCEPT_STATUS=1 and AUDIT_STATUS=1 and AUDIT_STATUS2=0
+		</if>
+		
+		<if test="roleCode=='R20161207143741114245' and status==1">
+			and ((ACCEPT_STATUS=1 and AUDIT_STATUS=1 and AUDIT_STATUS2=1 and AUDITOR_CODE2=#{acceptorCode}) or (ACCEPT_STATUS=1 and AUDIT_STATUS=1 and AUDIT_STATUS2=2 and AUDITOR_CODE2=#{acceptorCode}))
+		</if>
+		
+		<if test="formCode !=null and formCode !=''">
+			and (FORM_CODE like "%"#{formCode}"%" or PLACE_NAME like "%"#{formCode}"%")
+		</if>
+		<if test="roleCode=='R20161207143642413959'">
+		     order by ACCEPT_STATUS 
+		</if>
+		<if test="roleCode =='R20161207143724432478'">
+			order by AUDIT_STATUS
+		</if>
+		<if test="roleCode=='R20161207143741114245'">
+			order by AUDIT_STATUS2
+		</if>
+		
+		
+		limit #{firstResult},#{maxResult}
+		
+  </select>
+  
+  <!-- 受理核准 -->
+  <update id="updateAccept" parameterType="map">
+  	    update add_preliminary_audit set ACCEPT_STATUS=#{acceptStatus},ACCEPTOR_CODE=#{acceptorCode},ACCEPTOR_NAME=#{acceptorName},ACCEPT_TIME=NOW(),ACCEPT_SUGGEST=#{acceptSuggest}
+		where ROWID=#{rowid}
+  </update>
+  
+  <!-- 审核 -->
+  <update id="updateAudit" parameterType="map">
+  	    update add_preliminary_audit set AUDIT_STATUS=#{auditStatus},AUDIT_SUGGEST=#{auditSuggest},AUDITOR_CODE=#{auditorCode},AUDITOR_NAME=#{auditorName},AUDIT_TIME=now()
+		where ROWID=#{rowid}
+  </update>
+  
+  <!-- 审批 -->
+  <update id="updateAudit2" parameterType="map">
+  	    update add_preliminary_audit set AUDIT_STATUS2=#{auditStatus2},AUDIT_SUGGEST2=#{auditSuggest2},AUDITOR_CODE2=#{auditorCode2},AUDITOR_NAME2=#{auditorName2},AUDIT_TIME2=now()
+		where ROWID=#{rowid}
+  </update>
+  
+  <select id="findById" parameterType="map" resultType="com.glens.pwCloudOs.addrLib.vo.AddPreliminaryAuditVo">
+  	select rowid,FORM_CODE formCode,APPLICAT applicat,APP_ORG_NAME appOrgName,APP_ORG_CODE appOrgCode,APPLICAT_NAME applicatName,APPLICAT_TEL applicatTel,APP_ORG_TEL appOrgTel,PLACE_NAME placeName,APPLICATION application,
+		CONFIRMATION confirmation,ACCEPT_STATUS acceptStatus,ACCEPTOR_CODE acceptorCode,ACCEPTOR_NAME acceptorName,ACCEPT_TIME acceptTime,ACCEPT_SUGGEST acceptSuggest,NOTICE notice,
+		AUDIT_STATUS auditStatus,AUDIT_SUGGEST auditSuggest,AUDITOR_CODE auditorCode,AUDITOR_NAME auditorName,AUDIT_TIME auditTime,AUDIT_STATUS2 auditStatus2,AUDIT_SUGGEST2 auditSuggest2,
+		AUDITOR_CODE2 auditorCode2,AUDITOR_NAME2 auditorName2,AUDIT_TIME2 auditTime2,DISPATCH dispatch,SYS_CREATE_TIME sysCreateTime,REMARKS remarks 
+  	from add_preliminary_audit
+  	where FORM_CODE = #{formCode, jdbcType=VARCHAR}
+  </select>
+ 
+  
+</mapper>

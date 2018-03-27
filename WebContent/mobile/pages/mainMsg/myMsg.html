@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>我的消息</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+	<script src="../../js/jquery-1.9.1.min.js"></script>
+	<script src="../../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+	<script src="../../js/util.js"></script>
+	<script type="text/javascript" src="../../js/config.js"></script>
+	<script src="../../js/ng-base.js"></script>
+	<script type="text/javascript" src="../../js/jquery.form.js"></script>
+	<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+	<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css"/>
+	<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/bxyw.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/mobile_main.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/mainindex.css"/>
+</head>
+<style>
+	section{padding-top: 161px;}
+	header{height:initial}
+	.sear_input a{display:block;position:relative}
+	.sear_input a .sea_btn {position: absolute;right: 14%;top:0;color: #ccebff;font-size: 20px;}
+	.header .sear_input{padding:20px 0}
+	.filter_sort ul.filter li{padding:5px 0;background: #f5f5f5;border-bottom:1px solid #fff}
+	.filter_sort ul.filter li dl.readStatus{overflow:hidden}
+	.filter_sort ul.filter li dl.readStatus *{float:left;}
+	.filter_sort ul.filter li dl.readStatus dt{width:25%;text-align:center}
+	.filter_sort ul.filter li dl.readStatus dd.act{border:1px solid #1a98ec;background:#ccedff;color:#1a98ec;}
+	.filter_sort ul.filter li dl.readStatus dd{width:20%;margin-left:3%;border:1px solid #fff;text-align:center;line-height:30px;margin-top:5px}
+	.filter_sort ul.filter li dl.begin_endtime{text-indent:5%}
+	.filter_sort ul.filter li dl.begin_endtime input[type=date]{height:35px;margin-left: 6%;width:216px;border:1px solid #fff;background:#f5f5f5}
+	.tabwarp ul li span.titleinspan{margin-left: 20px;font-size: 16px;}
+	.msg_tipcon{margin-top:15px}
+	.msg_tipcon span img{margin-right:5px}
+	.msg_tipcon span{font-size:13px;color:#ccc}
+</style>
+<body ng-app="userMgr" ng-controller="userMgrCtrl" style="background:#fff">
+	<header class="header">
+		<div class="return"><img src="../../img/return.png"/></div>
+		消息
+		<div class="sear_input">
+			<a href="#">
+				<input type="text" placeholder="输入搜素关键字" id="search" style="color:#fff !important;">
+				<div class="sea_btn" ng-click="search()">搜索</div>
+			</a>
+		</div>
+	</header>
+	
+	<section>
+		<ul class="cz_selpx ov" style="position:fixed;width:100%;z-index:100">
+			<li class="fl" style="height:50px;border-right: 1px solid rgb(16, 169, 255);width:49.5%">筛选<img src="../../img/down_icon.png" width="9px"/></li>
+			<li class="fr" style="width:49.5%">排序<img src="../../img/down_icon.png" width="9px"/></li>
+		</ul>
+		<div class="filter_sort" style="padding-top:50px">
+			<ul class="filter"  style="display: none;padding:0 0 40px 0">
+				<li class="ov">
+					<dl class="readStatus">
+						<dt>阅读状态</dt>
+						<dd class="act" ng-click="readStatus(0)">全部</dd>
+						<dd ng-click="readStatus(1)">未读</dd>
+						<dd ng-click="readStatus(2)">已读</dd>
+					</dl>
+				</li>
+				<li class="ov">
+					<dl class="begin_endtime">
+						<dt>起止时间</dt>
+						<dd style="margin-bottom:5px">
+							开始时间<input type="date" id="startDate"/>
+							
+						</dd>
+						<dd>结束时间<input type="date" id="endDate"/></dd>
+					</dl>
+					
+				</li>
+				<li class="ov">
+					<a href="#" class="filterbtn fl" ng-click="filterdoQuery()" style="line-height:30px">确定</a>
+					<a href="#" class="filterclose fr" ng-click="quxido()" style="height:30px;line-height:30px">重置</a>
+				</li>
+			</ul>
+			<ul class="sort" style="display: none;">
+				<li ng-click="sort(1)"><div class="sort_no">时间<img src="../../img/task_list_selete_icon.png" class="fr"/></div></li>
+				<li ng-click="sort(2)"><div class="sort_no">标题<img src="../../img/task_list_selete_icon.png" class="fr" style="display: none;"/></div></li>
+			</ul>
+		</div>
+		
+		<div class="con_list tabwarp">
+			<div ng-if="mesList.length==0" style="text-align: center;">
+				<img src="../../img/non_data.png" width="100px" style="margin-top:80px"/>
+				<p style="color:#6e6e6e">您当前没有消息</p>
+				<p style="color:#6e6e6e">一有消息我们会通知您</p>
+			</div>
+			<ul ng-if="mesList.length!=0">
+				<li ng-repeat="item in mesList">
+					<a href="msgDetail.html?rowid={{item.rowid}}" >
+						<span class="circle"></span><span class="titleinspan">{{item.TITLE}}</span>
+						<div class="msg_tipcon">
+							<span><img src="../../img/time_icon01.png" width="12px"/>{{item.PUBLISH_DATE}}</span>
+							<span style="margin-left:5%"><img src="../../img/geren.png" width="12px"/>{{item.SOURCE}}</span>
+						</div>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</section>
+	<script type="text/javascript">
+		
+		$(".sort li").each(function(){
+			$(this).click(function(){
+				$(this).find("img").show();
+				$(this).siblings().find("img").hide();
+			})
+		});
+		$(".readStatus dd").click(function(){
+			$(this).addClass("act").siblings().removeClass("act");
+		})
+		$(".cz_selpx li").click(function(){
+			$(this).attr("fsper","true")
+			if($(this).attr("fsper")=="true"){
+				$(this).css("color","#10a9ff").siblings().css("color","#666666");
+				$(this).find("img").attr("src","../../img/up_icon.png");
+				$(this).siblings().find("img").attr("src","../../img/down_icon.png")
+				var n = $(this).index();
+				$(".filter_sort ul").eq(n).show().siblings().hide();
+				$(".con_list").hide();
+				$(this).removeAttr("fsper","false")
+			}else{
+				var n = $(this).index();
+				$(".filter_sort ul").eq(n).hide();
+				$(".con_list").show();
+			}
+		});
+		
+		var app = angular.module("userMgr", []);
+		app.controller("userMgrCtrl", function($scope, $http){
+			/* init */
+			ngScope = $scope;
+			$scope.curUnit={};
+			$scope.projectList=[];
+			$scope.mctlistArr ="";
+			var userDataStr = $.cookie("pmsWeb_user_data");
+			if(!userDataStr){
+				
+				noLogin(location.href);
+				return;
+			}
+			var userData = jQuery.parseJSON(userDataStr);
+			ticket = $.cookie("pmsWeb_ticket");
+			var accountCode = userData.accountCode;
+			var orderType="";
+			var title="";
+			var startDate="";
+			var endDate="";
+			$scope.sort=function(ordert){
+				orderType=ordert;
+				$scope.getMesList(status,title,startDate,endDate,orderType);
+				$(".sort").hide();
+				$(".con_list").show();
+			};
+			var status = 0;
+			$scope.readStatus=function(stau){
+				status=stau;
+			}
+			
+			
+			$scope.getMesList=function(status,title,startDate,endDate,orderType){
+				$http.get(serviceBasePath+"eap/pmsServices/appNotice/pageList?status="+status+"&accountCode="+accountCode+"&title="+title+"&startDate="+startDate+"&endDate="+endDate+"&orderType="+orderType).success(function(response){
+					if(response.statusCode==200){
+						$scope.mesList= response.data;
+					}
+				});
+			};
+			$scope.getMesList(status,title,startDate,endDate,orderType);
+			$scope.search=function(){
+				title=$("#search").val();
+				$scope.getMesList(status,title,startDate,endDate,orderType);
+			}			
+			
+			$scope.filterdoQuery=function(){
+				title=$("#search").val();	
+				startDate=$("#startDate").val();
+				endDate=$("#endDate").val();
+				$scope.getMesList(status,title,startDate,endDate,orderType);
+				$(".filter").hide();
+				$(".con_list").show();
+			}			
+			$scope.quxido=function(){
+				window.location.reload();
+			}
+			
+		});
+		$(".return").click(function(){
+			window.history.back();
+		})
+		
+	</script>
+</body>
+</html>

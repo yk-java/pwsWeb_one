@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>人员调动进度信息</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	*{font-family: '微软雅黑';padding:0;margin:0;list-style:none}
+	.member_warp{padding:20px}
+	.member_warp .member_warpul li{height:80px;position:relative;border-left:1px dashed #d2d2d2}
+	.member_warp li{height:80px;position:relative;}
+	.member_warp li span.status{display:block;width:20px;height:20px;border-radius:50%;background:#ccc;position:absolute;left:-10px;top:1px}
+	.member_warp li span.success{background:#ff9205;}
+	.member_warp li span.title{font-size:14px;color:#568ee3;margin-left:20px;display: inline-block;width:150px}
+	.member_warp li span.title_name{margin-left:30px}
+	.member_warp li span.btn{padding:5px 10px;background:#e0e8f9;color:#fff;margin-left:30px;cursor:pointer;border-radius: 5px;background: #4ca9ff;}
+	.member_warp li span.btn:hover{background:#2494fb}
+	.member_warp li:last-child{border-left:none;height:30px}
+	.dialog-viewcyle1{width:600px;height:300px;}
+	.returnhtml{cursor: pointer;color: #3385FF;font-family: '微软雅黑';border: 1px #3385FF solid;border-radius: 10px;padding: 4px;width: 60px;text-align:center;margin-top:30px;margin-left:10px}
+	.movemes{padding:10px 20px;}
+	.movemes li{height:auto}
+	.movemes h3{line-height:30px}
+	.movemes p{text-indent:20px;line-height:30px}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">人员调动进度</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">进度信息</a>
+		</div>
+		<div class="member_warp" style="overflow:hidden">
+			<ul class="member_warpul" style="float:left">
+				<!-- <li ng-repeat="item in dataList">
+					<span class="status success" ng-if="item.SYS_PROCESS_FLAG==1" ></span>
+					<span class="status" ng-if="item.SYS_PROCESS_FLAG==0" ></span>
+					<span class="title">{{item.NODE_NAME}}</span>
+					<span class="title_name">{{item.PROCESSOR_NAME}}&nbsp;&nbsp;&nbsp;<span ng-if="item.SYS_PROCESS_FLAG==1">{{item.PROCESS_TIME}}</span></span>
+					<span class="btn" ng-click="showasset(item)" ng-if="item.SYS_PROCESS_FLAG==0">{{item.NODE_NAME}}</span>
+				</li> -->
+				<li>
+					<span class="status success" ng-if="obj1.SYS_PROCESS_FLAG==1" ></span>
+					<span class="status" ng-if="obj1.SYS_PROCESS_FLAG==0" ></span>
+					<span class="title">人员调动</span>
+				</li>
+				<li>
+					<span class="status success" ng-if="obj2.SYS_PROCESS_FLAG==1 " ></span>
+					<span class="status" ng-if="obj2.SYS_PROCESS_FLAG==0 || !obj2.SYS_PROCESS_FLAG" ></span>
+					<span class="title">资产调动发起</span>
+				</li>
+				<li>
+					<span class="status success" ng-if="obj3.SYS_PROCESS_FLAG==1 " ></span>
+					<span class="status" ng-if="obj3.SYS_PROCESS_FLAG==0 || !obj3.SYS_PROCESS_FLAG" ></span>
+					<span class="title">资产调动确认</span>
+				</li>
+				<li>
+					<span class="status success" ng-if="obj4.SYS_PROCESS_FLAG==1" ></span>
+					<span class="status" ng-if="obj4.SYS_PROCESS_FLAG==0 || !obj4.SYS_PROCESS_FLAG" ></span>
+					<span class="title">宿舍调动发起</span>
+				</li>
+				<li>
+					<span class="status success" ng-if="obj5.SYS_PROCESS_FLAG==1" ></span>
+					<span class="status" ng-if="obj5.SYS_PROCESS_FLAG==0 || !obj5.SYS_PROCESS_FLAG " ></span>
+					<span class="title">宿舍调动确认</span>
+				</li>
+				<li>
+					<span class="status success" ng-if="obj6.SYS_PROCESS_FLAG==1 " ></span>
+					<span class="status" ng-if="obj6.SYS_PROCESS_FLAG==0 || !obj6.SYS_PROCESS_FLAG" ></span>
+					<span class="title">人员调动完毕</span>
+				</li>
+			</ul>
+			<ul style="float:left">
+				<li>
+					<span class="title_name" ng-if="!obj1.PROCESSOR_NAME" style="color:#ccc">（无）</span>
+					<span class="title_name">{{obj1.PROCESSOR_NAME}}&nbsp;&nbsp;&nbsp;<span ng-if="obj1.SYS_PROCESS_FLAG==1">{{obj1.PROCESS_TIME}}</span></span>
+					<span class="btn" ng-click="showasset(obj1)" ng-if="obj1.SYS_PROCESS_FLAG==0">{{obj1.NODE_NAME}}</span>
+				</li>
+				<li>
+					<span class="title_name" ng-if="!obj2.PROCESSOR_NAME" style="color:#ccc">（无）</span>
+					<span class="title_name">{{obj2.PROCESSOR_NAME}}&nbsp;&nbsp;&nbsp;<span ng-if="obj2.SYS_PROCESS_FLAG==1">{{obj2.PROCESS_TIME}}</span></span>
+					<span class="btn" ng-click="showasset(obj2)" ng-if="obj2.SYS_PROCESS_FLAG==0">{{obj2.NODE_NAME}}</span>
+				</li>
+				<li>
+					<span class="title_name" ng-if="!obj3.PROCESSOR_NAME" style="color:#ccc">（无）</span>
+					<span class="title_name">{{obj3.PROCESSOR_NAME}}&nbsp;&nbsp;&nbsp;<span ng-if="obj3.SYS_PROCESS_FLAG==1">{{obj3.PROCESS_TIME}}</span></span>
+					<span class="btn" ng-click="showasset(obj3)" ng-if="obj3.SYS_PROCESS_FLAG==0">{{obj3.NODE_NAME}}</span>
+				</li>
+				<li>
+					<span class="title_name" ng-if="!obj4.PROCESSOR_NAME" style="color:#ccc">（无）</span>
+					<span class="title_name">{{obj4.PROCESSOR_NAME}}&nbsp;&nbsp;&nbsp;<span ng-if="obj4.SYS_PROCESS_FLAG==1">{{obj4.PROCESS_TIME}}</span></span>
+					<span class="btn" ng-click="showasset(obj4)" ng-if="obj4.SYS_PROCESS_FLAG==0">{{obj4.NODE_NAME}}</span>
+				</li>
+				<li>
+					<span class="title_name" ng-if="!obj5.PROCESSOR_NAME" style="color:#ccc">（无）</span>
+					<span class="title_name">{{obj5.PROCESSOR_NAME}}&nbsp;&nbsp;&nbsp;<span ng-if="obj5.SYS_PROCESS_FLAG==1">{{obj5.PROCESS_TIME}}</span></span>
+					<span class="btn" ng-click="showasset(obj5)" ng-if="obj5.SYS_PROCESS_FLAG==0">{{obj5.NODE_NAME}}</span>
+				</li>
+				<li>
+					<span class="title_name" ng-if="!obj6.PROCESSOR_NAME" style="color:#ccc">（无）</span>
+					<span class="title_name">{{obj6.PROCESSOR_NAME}}&nbsp;&nbsp;&nbsp;<span ng-if="obj6.SYS_PROCESS_FLAG==1">{{obj6.PROCESS_TIME}}</span></span>
+					<span class="btn" ng-click="showasset(obj6)" ng-if="obj6.SYS_PROCESS_FLAG==0">{{obj6.NODE_NAME}}</span>
+				</li>
+			</ul>
+			<div style="float:left;margin-left:100px;border-left:1px solid #ccc;width:50%">
+				<div class="movemes">
+					<h3>人员信息</h3>
+					<p>姓名：{{params.employeename}}</p>
+					<p>调动前：{{params.proName1}}&nbsp;&nbsp;&nbsp;&nbsp;[{{params.jobName1}}]</p>
+					<p>调动后：{{params.proName2}}&nbsp;&nbsp;&nbsp;&nbsp;[{{params.jobName2}}]</p>
+				</div>
+				<div class="movemes" style="overflow:auto;height:200px">
+					<h3>资产信息</h3>
+					<ul>
+						<li ng-if="movelist.list1.length>0" ng-repeat="item in movelist.list1">
+							<p style="text-indent:10px">{{$index+1}}、{{item.assetName}}&nbsp;&nbsp;{{item.brand}}</p>
+							<p>型号：{{item.modelNo}}</p>
+							<p>内容：{{item.FORMS}}</p>
+						</li>
+						<li ng-if="movelist.list1.length==0"><p>（无）</p></li>
+					</ul>
+				</div>
+				<div class="movemes">
+					<h3>宿舍信息</h3>
+					<ul>
+						<li ng-if="movelist.list.length>0" ng-repeat="item in movelist.list">
+								<p>地区：{{item.PROVINCE}}&nbsp;&nbsp;{{item.CITY}}&nbsp;&nbsp;{{item.DISTRICT}}</p>
+								<p>地址：{{item.DORM_NAME}}</p>
+								<p>项目：{{item.PRO_NAME}}</p>
+						</li>
+						<li ng-if="movelist.list.length==0"><p>（无）</p></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div ng-click="returnhtml()" class="returnhtml">返回</div>
+	</div>
+</div>
+<script type="text/javascript">
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	var params = getUrlParams();
+	$scope.params=params;
+	var moveType =params.moveType;
+	var moveCode =params.moveCode;
+	var validDate =params.validDate;
+	
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	
+	var companyCode=userData.companyCode;
+	
+	$scope.obj1={};
+	$scope.obj2={};
+	$scope.obj3={};
+	$scope.obj4={};
+	$scope.obj5={};
+	$scope.obj6={};
+	
+	
+	
+	
+	$http.get(serviceBasePath+"eap/pmsServices/memberMove/getDetail?moveCode="+moveCode).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.noLogin(location.href);
+				return;
+			}
+			$scope.dataList = response.list;
+			for(var i=0;i<response.list.length;i++){
+				
+				//alert(response.list[i].NODE_ORDER);
+				if(response.list[i].NODE_ORDER==1){
+					$scope.obj1.PROCESSOR_NAME=response.list[i].PROCESSOR_NAME;
+					$scope.obj1.PROCESS_TIME=response.list[i].PROCESS_TIME;
+					$scope.obj1.NODE_ORDER=response.list[i].NODE_ORDER;
+					$scope.obj1.NODE_NAME=response.list[i].NODE_NAME;
+					$scope.obj1.SYS_PROCESS_FLAG =response.list[i].SYS_PROCESS_FLAG;
+				}else if(response.list[i].NODE_ORDER==2){
+					$scope.obj2.PROCESSOR_NAME=response.list[i].PROCESSOR_NAME;
+					$scope.obj2.PROCESS_TIME=response.list[i].PROCESS_TIME;
+					$scope.obj2.NODE_ORDER=response.list[i].NODE_ORDER;
+					$scope.obj2.NODE_NAME=response.list[i].NODE_NAME;
+					$scope.obj2.SYS_PROCESS_FLAG =response.list[i].SYS_PROCESS_FLAG;
+				}else if(response.list[i].NODE_ORDER==3){
+					$scope.obj3.PROCESSOR_NAME=response.list[i].PROCESSOR_NAME;
+					$scope.obj3.PROCESS_TIME=response.list[i].PROCESS_TIME;
+					$scope.obj3.NODE_ORDER=response.list[i].NODE_ORDER;
+					$scope.obj3.NODE_NAME=response.list[i].NODE_NAME;
+					$scope.obj3.SYS_PROCESS_FLAG =response.list[i].SYS_PROCESS_FLAG;
+				}else if(response.list[i].NODE_ORDER==4){
+					$scope.obj4.PROCESSOR_NAME=response.list[i].PROCESSOR_NAME;
+					$scope.obj4.PROCESS_TIME=response.list[i].PROCESS_TIME;
+					$scope.obj4.NODE_ORDER=response.list[i].NODE_ORDER;
+					$scope.obj4.NODE_NAME=response.list[i].NODE_NAME;
+					$scope.obj4.SYS_PROCESS_FLAG =response.list[i].SYS_PROCESS_FLAG;
+				}
+				else if(response.list[i].NODE_ORDER==5){
+					$scope.obj5.PROCESSOR_NAME=response.list[i].PROCESSOR_NAME;
+					$scope.obj5.PROCESS_TIME=response.list[i].PROCESS_TIME;
+					$scope.obj5.NODE_ORDER=response.list[i].NODE_ORDER;
+					$scope.obj5.NODE_NAME=response.list[i].NODE_NAME;
+					$scope.obj5.SYS_PROCESS_FLAG =response.list[i].SYS_PROCESS_FLAG;
+				}else if(response.list[i].NODE_ORDER==6){
+					$scope.obj6.PROCESSOR_NAME=response.list[i].PROCESSOR_NAME;
+					$scope.obj6.PROCESS_TIME=response.list[i].PROCESS_TIME;
+					$scope.obj6.NODE_ORDER=response.list[i].NODE_ORDER;
+					$scope.obj6.NODE_NAME=response.list[i].NODE_NAME;
+					$scope.obj6.SYS_PROCESS_FLAG =response.list[i].SYS_PROCESS_FLAG;
+				}
+				
+			}
+		});
+	
+	
+	$scope.showasset=function(item){
+		
+		new ShowDlog().confirm({
+			icon:"custom",
+			iconHtml:"<img src='../../../img/info-icon.png' style='margin-left:30px;'/>",
+			msg:"请确认"+item.NODE_NAME+"?",
+			ok:function(){
+				 if(item.NODE_ORDER ==2){
+						new ShowDlog().showFrame("memberAsset.html?moveType="+moveType+"&moveCode="+moveCode, "资产调动发起", function(){
+							 
+						},"dialog-viewcyle1");
+					}else if(item.NODE_ORDER ==3){
+						$http.post(serviceBasePath+"eap/pmsServices/memberMove/comfirmAsset?moveCode="+moveCode+"&moveType="+moveType+"&companyCode="+companyCode).success(function(response){
+							if(response.statusCode==401){
+								alert("用户凭据过期！请重新登录！");
+								window.noLogin(location.href);
+								return;
+							}
+							new ShowDlog().prompt({msg:"确认成功！",
+								done:function(){
+									location.href="memberMovingMgr.html";
+								},
+								t:1500
+							});
+						});
+					}else if(item.NODE_ORDER ==4){
+						$http.post(serviceBasePath+"eap/pmsServices/memberMove/dormMove?moveCode="+moveCode+"&moveType="+moveType+"&companyCode="+companyCode).success(function(response){
+							if(response.statusCode==401){
+								alert("用户凭据过期！请重新登录！");
+								window.noLogin(location.href);
+								return;
+							}
+							new ShowDlog().prompt({msg:"发起成功！",
+								done:function(){
+									location.href="memberMovingMgr.html";
+								},
+								t:1500
+							});
+						});
+					}else if(item.NODE_ORDER ==5){
+						$http.post(serviceBasePath+"eap/pmsServices/memberMove/comfirmDorm?moveCode="+moveCode).success(function(response){
+							if(response.statusCode==401){
+								alert("用户凭据过期！请重新登录！");
+								window.noLogin(location.href);
+								return;
+							}	
+							new ShowDlog().prompt({msg:"确认成功！",
+								done:function(){
+									location.href="memberMovingMgr.html";
+								},
+								t:1500
+							});
+						});
+					}else if(item.NODE_ORDER ==6 ){
+						$http.post(serviceBasePath+"eap/pmsServices/memberMove/lastConfirm?moveCode="+moveCode+"&validDate="+validDate).success(function(response){
+							if(response.statusCode==401){
+								alert("用户凭据过期！请重新登录！");
+								window.noLogin(location.href);
+								return;
+							}
+							new ShowDlog().prompt({msg:"确认成功！",
+								done:function(){
+									location.href="memberMovingMgr.html";
+								},
+								t:1500
+							});
+						});
+					}
+			},
+			cancel:function(){}
+		});
+	};
+	$scope.showsure=function(){
+		new ShowDlog().confirm({
+			msg:"是否确定调动",
+			ok:function(){
+				
+			},
+			cancel:function(){}
+		});
+
+	};
+	
+	$scope.returnhtml=function(){
+		window.history.back()
+	};
+
+	$http.get(serviceBasePath+"eap/pmsServices/sys/orgEmployee/employee/getAssetOrDorm?employeecode="+params.employeecode).success(function(response){
+		if(response.statusCode==401){
+			alert("用户凭据过期！请重新登录！");
+			window.noLogin(location.href);
+			return;
+		}
+		$scope.movelist = response;
+	});
+});
+</script>
+</body>
+</html>

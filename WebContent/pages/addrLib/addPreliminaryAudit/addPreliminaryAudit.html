@@ -1,0 +1,427 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 合同管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+
+<script type="text/javascript" src="../../../js/time.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+
+<style type="text/css">
+	.dropDownArea{background-image:url(../../../img/flag.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+	
+	.switch_btn_group{border:solid 1px #3385FF;min-height:30px;float:left;border-radius:15px; position:absolute;right:20px;top:0px;}
+	.switch_btn_group a{display:inline-block;float:left;background:#fff;color:#3385FF;text-decoration:none;font-size:13px;
+		line-height:30px;text-align:center;margin:0 1px 0 0;min-width:60px;}
+	.switch_btn_group a.selected{background:#3385FF;color:#fff;}
+	.switch_btn_group a:first-of-type{border-top-left-radius:15px;border-bottom-left-radius:15px;}
+	.switch_btn_group a:last-of-type{border-top-right-radius:15px;border-bottom-right-radius:15px;margin:0;}
+	
+	.dialog-check{height:300px; width:480px;}
+	.wids{position:absolute;bottom:-26px;width:2000px;overflow:auto;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" name="formCode" style="width:150px;" placeholder="请输入申请单号或地址名称"  />
+				<!-- <input type="text" name="fromDate" class="select_2 dropDownList dateComponent" onclick="new Calendar().show(this)" placeholder="开始日期"/>
+				<input type="text" name="toDate" class="select_2 dropDownList dateComponent" onclick="new Calendar().show(this)" placeholder="结束日期"/>
+				 -->
+				<input type="text" id="status" class="dropDownList" placeholder="受理状态" style="width:87px;margin-right:2px;">
+				<input type="text" id="status1" class="dropDownList" placeholder="审核状态" style="width:87px;margin-right:2px;">
+				<input type="text" id="status2" class="dropDownList" placeholder="审批状态" style="width:87px;margin-right:2px;">
+				
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				
+				&nbsp;&nbsp;
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			
+			
+			
+		</div>
+		
+		<div class="table_div" >
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th><div  align="center">序号</div></th>
+				<th><div  align="center">申报单号</div></th>
+				<th><div  align="center">地名</div></th>
+				<th><div  align="center">申报单位名称</div></th>	
+				<th><div  align="center">代理人</div></th>
+				<th><div  align="center">代理人联系方式</div></th>
+				<th><div  align="center">申报单位联系方式</div></th>
+				<th><div  align="center">受理状态</div></th>
+				
+				<th ng-if="roleCode=='R20161207143642413959' && status==1 && viewstate1==0"><div  align="center">受理人</div></th>
+				<th ng-if="roleCode=='R20161207143642413959' && status==1"><div  align="center">受理时间</div></th>
+				<th ng-if="roleCode=='R20161207143642413959' && status==1"><div  align="center">受理意见</div></th>
+				
+				<th ng-if="roleCode=='R20161207143724432478'"><div  align="center">受理人</div></th>
+				<th ng-if="roleCode=='R20161207143724432478'"><div  align="center">受理时间</div></th>
+				<th ng-if="roleCode=='R20161207143724432478'"><div  align="center">受理意见</div></th>
+				<th ng-if="roleCode=='R20161207143724432478'"><div  align="center">审核状态</div></th>
+				<th ng-if="roleCode=='R20161207143724432478' && status==1 && viewstate2==0"><div align="center">审核人</div></th>
+				<th ng-if="roleCode=='R20161207143724432478' && status==1"><div align="center">审核时间</div></th>
+				<th ng-if="roleCode=='R20161207143724432478' && status==1"><div align="center">审核意见</div></th>
+				
+				<th ng-if="roleCode=='R20161207143741114245'"><div  align="center">受理人</div></th>
+				<th ng-if="roleCode=='R20161207143741114245'"><div  align="center">受理时间</div></th>
+				<th ng-if="roleCode=='R20161207143741114245'"><div  align="center">受理意见</div></th>
+				<th ng-if="roleCode=='R20161207143741114245'"><div  align="center">审核状态</div></th>
+				<th ng-if="roleCode=='R20161207143741114245'"><div align="center">审核人</div></th>
+				<th ng-if="roleCode=='R20161207143741114245'"><div align="center">审核时间</div></th>
+				<th ng-if="roleCode=='R20161207143741114245'"><div align="center">审核意见</div></th>
+				
+				<th ng-if="roleCode=='R20161207143741114245'"><div align="center">审批状态</div></th>
+				<th ng-if="roleCode=='R20161207143741114245' && status==1 && viewstate2==0"><div align="center">审批人</div></th>
+				<th ng-if="roleCode=='R20161207143741114245' && status==1"><div align="center">审批时间</div></th>
+				<th ng-if="roleCode=='R20161207143741114245' && status==1"><div align="center">审批意见</div></th>
+				
+				<th><div align="center">操作</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in projectList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.formCode}}</div></td>
+				<td><div align="center">{{item.placeName}}</div></td>
+				<td><div align="center">{{item.appOrgName}}</div></td>
+				<td><div align="center">{{item.applicatName}}</div></td>
+				<td><div align="center">{{item.applicatTel}}</div></td>
+				<td><div align="center">{{item.appOrgTel}}</div></td>
+				<td>
+					<div align="center" ng-if="item.acceptStatus==0"><span style="color:#33CC00;">未审</span></div>
+					<div align="center" ng-if="item.acceptStatus==1">受理</div>
+					<div align="center" ng-if="item.acceptStatus==2">不受理</div>
+				</td>
+				<td ng-if="roleCode=='R20161207143642413959' && status==1 && viewstate1==0"><div align="center">{{item.acceptorName}}</div></td>
+				<td ng-if="roleCode=='R20161207143642413959' && status==1"><div align="center">{{item.acceptTime}}</div></td>
+				<td ng-if="roleCode=='R20161207143642413959' && status==1"><div align="center">{{item.acceptSuggest}}</div></td>
+				
+				<td ng-if="roleCode=='R20161207143724432478'"><div align="center">{{item.acceptorName}}</div></td>
+				<td ng-if="roleCode=='R20161207143724432478'"><div align="center">{{item.acceptTime}}</div></td>
+				<td ng-if="roleCode=='R20161207143724432478'"><div align="center">{{item.acceptSuggest}}</div></td>
+				<td ng-if="roleCode=='R20161207143724432478'">
+				    <div align="center" ng-if="item.auditStatus==0"><span style="color:#33CC00;">未审</span></div>
+					<div align="center" ng-if="item.auditStatus==1">通过</div>
+					<div align="center" ng-if="item.auditStatus==2">不通过</div>
+				</td>
+				<td ng-if="roleCode=='R20161207143724432478' && status==1 && viewstate2==0"><div align="center">{{item.auditorName}}</div></td>
+				<td ng-if="roleCode=='R20161207143724432478' && status==1"><div align="center">{{item.auditTime}}</div></td>
+				<td ng-if="roleCode=='R20161207143724432478' && status==1"><div align="center">{{item.auditSuggest}}</div></td>
+				
+				<td ng-if="roleCode=='R20161207143741114245'"><div align="center">{{item.acceptorName}}</div></td>
+				<td ng-if="roleCode=='R20161207143741114245'"><div align="center">{{item.acceptTime}}</div></td>
+				<td ng-if="roleCode=='R20161207143741114245'"><div align="center">{{item.acceptSuggest}}</div></td>
+				<td ng-if="roleCode=='R20161207143741114245'">
+				    <div align="center" ng-if="item.auditStatus==0"><span style="color:#33CC00;">未审</span></div>
+					<div align="center" ng-if="item.auditStatus==1">通过</div>
+					<div align="center" ng-if="item.auditStatus==2">不通过</div>
+				</td>
+				<td ng-if="roleCode=='R20161207143741114245'"><div align="center">{{item.auditorName}}</div></td>
+				<td ng-if="roleCode=='R20161207143741114245'"><div align="center">{{item.auditTime}}</div></td>
+				<td ng-if="roleCode=='R20161207143741114245'"><div align="center">{{item.auditSuggest}}</div></td>
+				
+				
+				<td ng-if="roleCode=='R20161207143741114245'">
+				    <div align="center" ng-if="item.auditStatus2==0"><span style="color:#33CC00;">未审</span></div>
+				    <div align="center" ng-if="item.auditStatus2==1">通过</div>
+				    <div align="center" ng-if="item.auditStatus2==2">不通过</div>
+				 </td>
+				<td ng-if="roleCode=='R20161207143741114245' && status==1 && viewstate3==0"><div align="center">{{item.auditorName2}}</div></td>
+				<td ng-if="roleCode=='R20161207143741114245' && status==1"><div align="center">{{item.auditTime2}}</div></td>
+				<td ng-if="roleCode=='R20161207143741114245' && status==1"><div align="center">{{item.auditSuggest2}}</div></td>
+				
+				<td width="10%">
+					<div align="center">						
+			    		<img class="operationImg" ng-click="readonline(item)" src="../../../img/list_see-icon.png" title="查看申请材料 ">
+			    		<img ng-if="status==0" ng-click="doUpdate(item)" class="operationImg" src="../../../img/check.png" title="审核">
+			    		<!-- <img  ng-click="doDelete(item)" class="operationImg" src="../../../img/list_delete-icon.png" title="删除"> -->
+		    		</div>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+function createPageBar(totalPage, curPage){
+	new PageBar().init({
+		renderTo:"#page_bar",
+		totalPage:totalPage,
+		curPage:curPage,
+		prevPageText:"上一页",
+		nextPageText:"下一页",
+		onPage:function(pageNum){
+			_currentPage=pageNum;
+			ngScope.loadProjects(roleCode,_currentPage,formCode,status);
+		}
+	});
+}
+
+
+var assetCharacterCode="";
+var ticket="";
+var cond_proStatus="2";
+var _currentPage=1;
+var proNo="";
+var searchName="";
+var invoiceNo="";
+var cond_categoryCode="";
+var ngScope;
+var fromDate="";
+var toDate="";
+var roleCode="";
+var formCode="";
+var status=0;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.projectList=[];
+	
+	fromDate=getMonthStartDate();
+	toDate=getMonthEndDate();
+	
+
+	$scope.viewstate1=1;
+	$scope.viewstate2=1;
+	$scope.viewstate3=1;
+    $scope.status=0;
+	
+	
+	$("input[name=fromDate]").val(fromDate);
+	$("input[name=toDate]").val(toDate);
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		alert("请先登录！");
+		top.location.href=serviceBasePath+"login.html";
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	var params = getUrlParams();
+	
+	
+	if(params.formCode){
+		formCode=params.formCode;
+		$("input[name=formCode]").val(formCode);
+	}
+	if(params.currentPage){
+		_currentPage=params.currentPage;
+		
+	}
+	
+	$scope.roleCode=userData.roleCode;
+	roleCode=userData.roleCode;
+	
+	if(params.status){
+		
+		$scope.status=params.status;
+		status=params.status;
+		
+		if(roleCode=="R20161207143642413959"){
+			
+			if(params.status==0){
+				$("#status").val("未受理");
+			}else if(params.status==1){
+				$("#status").val("已受理");
+			}
+			
+			
+		}else if(roleCode=="R20161207143724432478"){
+			
+			if(params.status==0){
+				$("#status1").val("未审核");
+			}else if(params.status==1){
+				
+				$("#status1").val("已审核");
+			}
+			
+		}else if(roleCode=="R20161207143741114245"){
+			
+			if(params.status==0){
+				$("#status2").val("未审批");
+			}else if(params.status==1){
+				$("#status2").val("已审批");
+			}
+		}
+	}
+	
+	
+	//R20161207143642413959	  地名核准员	
+	//R20161207143724432478	  地名审核员	
+	//R20161207143741114245  地名审批员	
+	
+	    new DropDownList().init({
+			renderTo:"#status",
+			mode:"list",
+			data:[{id:1, name:"已受理"},{id:0, name:"未受理"}],
+			textField:"name",
+			onSelected:function(item){
+				
+				$("#status").val(item.name);
+				$scope.status=item.id;
+				$scope.viewstate1=item.id;
+				//ngScope.loadUsers(companyCode,unitCode,employeeName,appType,logFromTime,logToTime);
+				$scope.loadProjects(roleCode,1,formCode,$scope.status);
+			}
+		});
+	
+	    new DropDownList().init({
+			renderTo:"#status1",
+			mode:"list",
+			data:[{id:1, name:"已审核"},{id:0, name:"未审核"}],
+			textField:"name",
+			onSelected:function(item){
+				
+				$("#status1").val(item.name);
+				$scope.status=item.id;
+				$scope.viewstate2=item.id;
+				//ngScope.loadUsers(companyCode,unitCode,employeeName,appType,logFromTime,logToTime);
+				$scope.loadProjects(roleCode,1,formCode,$scope.status);
+			}
+		});
+	    
+	    new DropDownList().init({
+			renderTo:"#status2",
+			mode:"list",
+			data:[{id:1, name:"已审批"},{id:0, name:"未审批"}],
+			textField:"name",
+			onSelected:function(item){
+				
+				$("#status2").val(item.name);
+				$scope.status=item.id;
+				$scope.viewstate3=item.id;
+				//ngScope.loadUsers(companyCode,unitCode,employeeName,appType,logFromTime,logToTime);
+				$scope.loadProjects(roleCode,1,formCode,$scope.status);
+			}
+		});
+
+	
+	
+	
+
+	//R20161207143642413959	  地名核准员	
+	//R20161207143724432478	  地名审核员	
+	//R20161207143741114245  地名审批员
+	if(roleCode=="R20161207143642413959"){
+		$("#status").show();
+		$("#status1").hide();
+		$("#status2").hide();
+	}else if(roleCode=="R20161207143724432478"){
+		$("#status").hide();
+		$("#status1").show();
+		$("#status2").hide();
+	}else if(roleCode=="R20161207143741114245"){
+		$("#status").hide();
+		$("#status1").hide();
+		$("#status2").show();
+	}
+	
+	
+	/* 加载数据 */
+	$scope.loadProjects=function(roleCode,currentPage,formCode,status){
+	$http.get(serviceBasePath+"eap/pmsServices/addrLib/addPreliminaryAudit/list?ticket="+ticket+
+			"&currentPage="+currentPage+"&roleCode="+roleCode+"&formCode="+formCode+"&acceptorCode="+userData.employeeCode+"&status="+status).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../login.html";
+				return;
+			}
+			$scope.projectList = response.list;
+		
+			createPageBar(response.totalPage, response.currentPage);
+		});
+	};
+	/* 查询 */
+	$scope.doQuery=function(){
+		formCode = $("input[name=formCode]").val();
+		//fromDate=$("input[name=fromDate]").val();
+		//toDate=$("input[name=toDate]").val();
+		$scope.loadProjects(roleCode,1,formCode,$scope.status);
+	};
+	
+	$scope.doUpdate=function(item){
+		var name="";
+		if(roleCode=="R20161207143642413959"){
+			name="受理";
+		}else if(roleCode=="R20161207143724432478"){
+			name="审核";
+		}else if(roleCode=="R20161207143741114245"){
+			name="审批";
+		}
+		
+		//$scope.roleCode;
+		new ShowDlog().showFrame("check.html?rowid="+item.rowid,name, function(data){
+			// 
+			$scope.loadProjects(roleCode,_currentPage,formCode,$scope.status);
+			
+			//$scope.loadProjects(areaName, dormName, _currentPage,dormType);
+			//$scope.loadInvoice($scope.dormCode);
+			
+		},"dialog-check");
+		
+	};
+	
+	//在线阅读
+	$scope.readonline=function(item){
+		//alert(item.reVisitid);
+		
+		//location.href="fileDetail.html?reVisitid="+item.reVisitid+"&dlVisitid="+item.dlVisitid+"&attachment=0"+"&fileName="+encodeURIComponent(item.fileName)+"&suffixName="+item.suffixName+"&fileSize="+item.fileSize;
+		//alert(proName)
+		 
+		
+		
+		hrefTo({
+			url:"fileDetail.html",
+			data:{
+				application:item.application,
+				confirmation:item.confirmation,
+				formCode:formCode,
+		        currentPage:_currentPage,
+		        status:$scope.status
+			}
+		});
+
+	};
+
+	
+	
+	
+	/* 初始查询 */
+	ngScope.loadProjects(roleCode,1,formCode,status);
+});
+</script>
+</body>
+</html>

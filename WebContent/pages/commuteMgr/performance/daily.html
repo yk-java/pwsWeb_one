@@ -1,0 +1,324 @@
+<!DOCTYPE HTML>
+<html ng-app="daily">
+<head>
+<title> 通勤绩效-统计日报</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<style type="text/css">
+.dlog-showPic{width:1000px;height:500px;}
+.setJudging{width:500px;height:350px;}
+.dialog-viewcyle{width:900px;height:500px;}
+
+</style>
+</head>
+
+<body>
+
+<div class="list" ng-controller="dailyCtrl">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" style="width:200px;" id="projectType" viewstate="proCategoryName" class="dropDownList" placeholder="请选择项目类型"/>
+				<input type="hidden" name="proCategory" viewstate="proCategory"/>
+				<input type="text" style="width:200px;" id="projectList" viewstate="proName" class="dropDownList" placeholder="请选择项目"/>
+				<input type="hidden" name="proNo" viewstate="proNo"/>
+				<input type="text" style="width:200px;" name="jobName" viewstate="jobName" class="dropDownList" placeholder="请选择职务"/>
+				<input type="hidden" name="jobCode" viewstate="jobCode"/>
+				<input type="text" id="date" viewstate="date" class="dateComponent" onclick="new Calendar().show(this)" placeholder="请选择日期"/>
+				<input type="text" name="searchName" viewstate="searchName" placeholder="姓名搜索"/>
+				<div class="query_div" ng-click="doQuery()">
+					查 询
+				</div>
+				<div class="query_div" ng-click="doExport()">
+					导 出
+				</div>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">现项目</div></th>
+				<th><div align="center">查询当日所属项目</div></th>
+				<th><div align="center">员工姓名</div></th>
+				<th><div align="center">职务</div></th>
+				<th><div align="center">员工工号</div></th>
+				<th><div align="center">签到日期</div></th>
+				<th><div align="center">签到时间</div></th>
+				<th><div align="center">签退时间</div></th>
+				<th><div align="center">工作时长（小时）</div></th>
+				<th><div align="center">在线时长（分）</div></th>
+				<th><div align="center">上报点数</div></th>
+				<th><div align="center">里程(公里)</div></th>
+				<th><div align="center">状态</div></th>
+				<th><div align="center">异常说明</div></th>
+				<th><div align="center">异常判定</div></th>
+				<th><div align="center">相关操作</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in dailyList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td>
+					<div align="center">{{item.proName}}</div>
+				</td>
+				<td>
+					<div align="center">{{item.proName2}}</div>
+				</td>
+				<td><div align="center">{{item.employeename}}</div></td>
+				<td><div align="center">{{item.jobName}}</div></td>
+				<td><div align="center">{{item.jobNo}}</div></td>
+				<td><div align="center">{{item.checkDate}}</div></td>
+				<td><div align="center">{{item.checkinTime}}</div></td>
+				<td><div align="center">{{item.checkoutTime}}</div></td>
+				<td><div align="center">{{item.worktime}}</div></td>
+				<td><div align="center">{{item.onlinetime}}</div></td>
+				<td><div align="center">{{item.checkPointCount}}</div></td>
+				<td><div align="center">{{item.mileage}}</div></td>
+				<td>
+					<div ng-if="item.commuteStatus==1" align="center">正常</div>
+					<div ng-if="item.commuteStatus==0" align="center" style="color:#FF5400">异常</div>
+				</td>
+				<td><div align="center">{{item.commuteDesc}}</div></td>
+				<td width="200">
+					<div align="center" style="color:#ff6600;">{{item.judgingName}}</div>
+					<div align="center" style="color:#888;">{{item.judgingDescr}}</div>
+				</td>
+				<td>
+					<div align="center">
+<!-- 			    		<img class="operationImg" src="../../../img/list_items_location.png"> -->
+			    		<img class="operationImg" src="../../../img/viewimg.png" ng-click="showPic(item)" title="查看图片 "/>
+			    		<img ng-hide="roleCode=='004' && item.judgingName!=null && item.judgingName!=''" class="operationImg" ng-click="toCheck(item, $index)" src="../../../img/check.png" title="判定 ">
+			  			<img class="operationImg" ng-click="memberMap(item)" src="../../../img/memberMap.png" title="人员地图">
+			  		
+			  		</div>
+				</td>
+			  </tr>
+			  
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+
+var cond_categoryCode="",cond_proNo="",cond_date="",cond_searchName="",cond_jobCode="";
+var ngScope;
+var selectedUnitCode;
+
+
+
+var app = angular.module("daily", []);
+app.controller("dailyCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.dailyList=[];
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	var viewstate = new ViewState();
+	//初始化时间
+	var today = new SimpleDateFormat({formatString:"yyyy-MM-dd"}).format(new Date());
+	cond_date=today;
+	$("#date").val(today);
+	$scope.roleCode = userData.roleCode;
+	
+	
+	
+	new DropDownList().init({
+		renderTo:"#projectType",
+		url:"../../component/projectType.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$("input[viewstate=proCategory]").val(result.categoryCode);
+			$("#projectType").val(result.categoryName);
+			projectList.setConfig("url", "../../component/projectList.html?categoryCode="+cond_categoryCode+"&ticket="+ticket);
+		}
+	});
+	
+	$("input[name=jobCode]").val("3,4,5,8,9,26");
+	$("input[name=jobName]").val("外业主管,外业班长,外业组员,项目经理,项目主管,项目班长");
+	
+	
+	new DropDownList().init({
+		renderTo:"input[name=jobName]",
+		url:"../../component/roleCheck.html",
+		height:"200px",
+		onSelected:function(result){
+			
+			//alert(result.length)
+			//$("input[name=jobCode]").val(result.code);
+			//$("input[name=jobName]").val(result.name);
+			
+			var codes=[];
+			var names=[];
+			for(var i=0; i<result.length; i++){
+				var item = result[i];
+				codes.push(item.code);
+				names.push(item.name);
+			}
+			$("input[name=jobCode]").val(arrToStr(codes));
+			$("input[name=jobName]").val(arrToStr(names));
+		}
+	});
+	
+	var projectList = new DropDownList();
+	projectList.init({
+		renderTo:"#projectList",
+		url:"../../component/projectList.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$("input[viewstate=proNo]").val(result.proNo);
+			$("#projectList").val(result.proName);
+			viewstate.collect();
+			ngScope.loadDailySheet(1);
+		}
+	});
+	
+	$scope.loadDailySheet=function(currentPage){
+		new ShowDlog().prompt({
+			icon:"waitting",
+			msg:"正在查询...",
+			done:function(){},
+			t:60*1000
+		});
+		$http.get(serviceBasePath+"eap/pmsServices/commuteMgr/performance/statistic/dailySheet?companyCode="
+			+userData.companyCode+"&proNo="+viewstate.get("proNo")+"&date="+viewstate.get("date")+
+			"&currentPage="+currentPage+"&searchName="+viewstate.get("searchName")+"&jobCode="+viewstate.get("jobCode")+"&ticket="+ticket).success(function(response){
+				$dlog.close();
+				if(response.statusCode==401){
+				new parent.ShowDlog().prompt({
+					icon:"warning",
+					msg:"用户登录过期！请重新登录！",
+					done:function(){
+						window.noLogin(location.href);
+					},
+					t:2800
+				});
+				return;
+			}
+			if(response.statusCode==200){
+				$scope.dailyList = response.list;
+				$scope.createPageBar(response.totalPage, response.currentPage,response.totalRecord);
+			}else{
+				$scope.dailyList = [];
+			}
+		});
+	};
+	
+	$scope.doQuery=function(){
+		viewstate.collect();
+		$scope.loadDailySheet(1);
+	};
+	
+	$scope.doExport=function(){
+		viewstate.collect();
+		location.href=serviceBasePath+"eap/pmsServices/commuteMgr/performance/statistic/dailySheetExport?companyCode="
+		+userData.companyCode+"&proNo="+viewstate.get("proNo")+"&date="+viewstate.get("date")+"&searchName="+viewstate.get("searchName")+"&ticket="+ticket;
+	};
+	
+	$scope.createPageBar = function (totalPage, curPage,totalRecord){
+		new PageBar().init({
+			renderTo:"#page_bar",
+			totalPage:totalPage,
+			curPage:curPage,
+			totalRecord: totalRecord,
+			showPageInfo:true,
+			prevPageText:"上一页",
+			nextPageText:"下一页",
+			onPage:function(pageNum){
+				ngScope.loadDailySheet(pageNum);
+			}
+		});
+	}
+	$scope.showPic=function(item){
+		viewstate.collect();
+		new ShowDlog().showFrame("imags.html?accountCode="+item.accountCode+"&date="+viewstate.get("date"), "查看图片", function(){}, "dlog-showPic");
+	};
+	$scope.toCheck=function(item, index){
+		item.checkDate=$("#date").val();
+		var itemStr = toUrlParams(item);
+		new ShowDlog().showFrame("setJudging.html?"+itemStr, "判定", function(res){
+			if("SUCCESS"==res){
+				new ShowDlog().prompt({
+					icon:"success",
+					msg:"已判定！",
+					done:function(){
+						$scope.doQuery();
+					},
+					t:1500
+				});
+			}else if("FAIL"==res){
+				new ShowDlog().prompt({
+					msg:"判定失败！",
+					done:function(){
+					},
+					t:1500
+				});
+			}
+		}, "setJudging");
+	};
+	
+	$scope.memberMap=function(obj){
+		//alert(obj.employeecode)
+		
+		$http.get(serviceBasePath+"eap/pmsServices/memberMove/isManager?employeeCode="+obj.employeecode+"&ticket="+ticket).success(function(response){
+				if(response.statusCode!=200){
+					alert("请求服务器失败！");
+					return;
+				}
+				if(response.list.length>0){
+					//alert("项目负责人")
+					
+					/* 生命周期 */	
+					new ShowDlog().showFrame("../../orgEmployee/managerMap.html?employeeCode="+obj.employeecode, "人员职业地图", function(){
+							
+					},"dialog-viewcyle");
+				}else{
+					//alert("非项目负责人")
+					new ShowDlog().showFrame("../../orgEmployee/employeeMap.html?employeeCode="+obj.employeecode, "人员职业地图", function(){
+						
+					},"dialog-viewcyle");
+				}
+				
+		});
+		
+		
+	};
+
+	
+	
+	
+	$scope.doQuery();
+	selectedUnitCode=userData.unitCode;
+});
+window.onkeyup=function(e){
+	if(e.keyCode==13){
+		ngScope.doQuery();
+	}
+};
+</script>
+</body>
+</html>

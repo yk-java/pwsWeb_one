@@ -1,0 +1,655 @@
+<!DOCTYPE HTML>
+<html ng-app="realPosition">
+<head>
+<title> 实时监控 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=PL4wfqVofjrMVz7FMaPs8Dts"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/echarts-all.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<style type="text/css">
+	body{
+		margin:0px;
+		padding:0px;
+		font-size:12px;
+		font-family:"微软雅黑";
+	}
+	a{color:#4D4D4D;text-decoration: none;}
+
+	.list{position: absolute;left:4px;right:4px;top:4px;bottom:4px;border:solid 0px;}
+	.list .list_left{position: absolute;left:0px;top:0px;bottom:0px;width:390px;}
+	.list .list_left .left_title{width:100%;height:170px;background:#297BE6;}
+/* 	.list .list_left .left_title div> input{height:36px;border:solid 0px;margin-left:10px;color:#888;border-radius:3px;padding-left:2px;font-family:"微软雅黑";} */
+	.list .list_left .left_title .search_div{width:60px;height:38px;background:#1A4F93;color:#fff;line-height:40px;text-align:center;float:left;margin-left:10px;margin-top:20px;font-size:14px;font-weight: bold;}
+	.list .list_left .left_content{position: absolute;left:0px;right:0px;top:220px;bottom:0px;border-bottom:solid 1px #B2D1FF;z-index:1;}
+	.list .list_left .left_content .content_table{width:100%;top:0px;bottom:45px;}
+	.list .map_div{position: absolute;left:410px;top:0px;bottom:0px;right:0px;border:solid 1px #cccccc;}
+
+	.table,.table td,.table th{border:1px solid #EDEDED;border-collapse:collapse;}
+	.tr1{height:40px;background:#D9E9FF;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;font-weight:normal;}
+	.tr2{height:40px;background:#fff;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.tr2:hover{background:#F5F5F5;}
+	.tr3{height:40px;background:#F5F5F5;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.tr3:hover{background:#F5F5F5;}
+	.tr4{height:40px;background:#EFD397;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.operationImg{cursor: pointer;}
+
+	.paging_div{bottom:10px;width:390px;height:22px;;margin:0 auto;border:solid 0px;color:#4D4D4D;text-align:center;margin-top:10px;}
+	.dropDownList{background-image:url(../../../img/drop_down_list.png);background-repeat: no-repeat;background-position:right;cursor:pointer;}
+
+#page_bar .page_btn_prev{display:inline-black;border:solid 1px #3385FF;background:#3385FF;color:#fff;margin:0 4px;padding:2px 5px 2px 5px;}
+#page_bar .page_btn_next{display:inline-black;border:solid 1px #3385FF;background:#3385FF;color:#fff;margin:0 4px;padding:2px 5px 2px 5px;}
+#page_bar .page_btn{display:inline-black;border:solid 1px #3385FF;margin:0 4px;padding:2px 5px 2px 5px;}
+#page_bar .selected{font-weight:bold;border:solid 1px #666;background:#666;color:#fff;}
+
+
+	
+	.table td{cursor:pointer;}
+	
+	.marker{display:inline-block;width:22px;height:25px;background:url(../../../img/markers.png) -22px -275px no-repeat;padding:0;margin:0;}
+	.mkr_s{background:url(../../../img/markers.png) 0px -275px no-repeat;}
+	.mkr1{background:url(../../../img/markers.png) -22px 0px no-repeat;}
+	.mkr_s1{background:url(../../../img/markers.png) 0px 0px no-repeat;}
+	.mkr2{background:url(../../../img/markers.png) -22px -25px no-repeat;}
+	.mkr_s2{background:url(../../../img/markers.png) 0px -25px no-repeat;}
+	.mkr3{background:url(../../../img/markers.png) -22px -50px no-repeat;}
+	.mkr_s3{background:url(../../../img/markers.png) 0px -50px no-repeat;}
+	.mkr4{background:url(../../../img/markers.png) -22px -75px no-repeat;}
+	.mkr_s4{background:url(../../../img/markers.png) 0px -75px no-repeat;}
+	.mkr5{background:url(../../../img/markers.png) -22px -100px no-repeat;}
+	.mkr_s5{background:url(../../../img/markers.png) 0px -100px no-repeat;}
+	.mkr6{background:url(../../../img/markers.png) -22px -125px no-repeat;}
+	.mkr_s6{background:url(../../../img/markers.png) 0px -125px no-repeat;}
+	.mkr7{background:url(../../../img/markers.png) -22px -150px no-repeat;}
+	.mkr_s7{background:url(../../../img/markers.png) 0px -150px no-repeat;}
+	.mkr8{background:url(../../../img/markers.png) -22px -175px no-repeat;}
+	.mkr_s8{background:url(../../../img/markers.png) 0px -175px no-repeat;}
+	.mkr9{background:url(../../../img/markers.png) -22px -200px no-repeat;}
+	.mkr_s9{background:url(../../../img/markers.png) 0px -200px no-repeat;}
+	.mkr10{background:url(../../../img/markers.png) -22px -225px no-repeat;}
+	.mkr_s10{background:url(../../../img/markers.png) 0px -225px no-repeat;}
+	.marker:hover{cursor:pointer;}
+	
+	.cmkr1{background:url(../../../img/markers1.png) no-repeat;}
+	.cmkr2{background:url(../../../img/markers2.png) no-repeat;}
+	.cmkr3{background:url(../../../img/markers3.png) no-repeat;}
+	.cmkr4{background:url(../../../img/markers4.png) no-repeat;}
+	.cmkr5{background:url(../../../img/markers5.png) no-repeat;}
+	.cmkr6{background:url(../../../img/markers6.png) no-repeat;}
+	.cmkr7{background:url(../../../img/markers7.png) no-repeat;}
+	.cmkr8{background:url(../../../img/markers8.png) no-repeat;}
+	.cmkr9{background:url(../../../img/markers9.png) no-repeat;}
+	.cmkr10{background:url(../../../img/markers10.png) no-repeat;}
+	
+	.title{font-size:14px;color:#0066FF;}
+	.table_item{border:0;margin-top:10px;margin-bottom:10px;}
+	.table_item td{border:0;}	
+	/* 图表列表 */
+	.tab_ct{width:100%;margin-top:20px;}
+	.tab_ct .tab_com{width:100px;margin:0 auto;}
+	.tab_ct .tab_com span{padding:10px 10px;border-bottom:2px solid #ccc;color:#ccc;cursor:pointer}
+	.curt{border-bottom:2px solid #2f93ff !important;color:#2f93ff !important;}
+	.tc_con .table_list *{text-align:center;line-height:30px;}
+	.tc_con .table_list td,.tc_con .table_list th{border-bottom:1px solid #CCC	}
+	.tc_con .table_list td .tablelist_color{width:10px;height:10px;margin:0 auto}
+	.tc_con .table_list td img{vertical-align: middle;cursor:pointer}
+	
+.info_win{width:380px;}
+.info_win table td{font-size:12px;padding:6px;}
+
+.info_win .tiBar{height:30px;}
+.info_win .title{float:left;font-size:14px;color:#0066ff;font-weight:bold;}
+.info_win .dev_status{float:right;display:inline-block;padding:2px 4px 2px 4px;background:#ff7700;color:#fff;border-radius:5px;}
+.info_win .foBar{border-top:solid 1px #ccc;padding:10px 10px 10px 10px;}
+.info_win .foBar a{font-size:12px;color:#0066ff;}
+
+.device_detail{width:1000px;height:500px;}
+.cond_layer{position:absolute;display:none;width:388px;border:solid 1px #297BE6;border-radius:4px;margin:10px 0 0 0;z-index:99;background:rgba(41,123,230,0.9);}
+.cond_layer ul, cond_layer li{margin:0;padding:0;list-style-type:none;}
+.cond_layer ul{margin:20px 0 20px 0;}
+.cond_layer li{margin:4px 4px 4px 4px;}
+.cond_layer li>input{height:32px;border:solid 1px #ccc;margin-left:10px;color:#888;border-radius:3px;padding-left:2px;font-family:"微软雅黑";}
+.cond_layer .close_btn{position:absolute;bottom:4px;right:4px;font-size:18px;color:#fff;padding:4px;}
+
+.form_group .form_item{display:inline-block;width:175px;margin:6px;}
+.form_group .form_item label{color:#fff;display:block;font-size:14px;line-height:18px;}
+.form_group .form_item input{height:36px;border:solid 0px;color:#888;border-radius:3px;padding-left:2px;font-family:"微软雅黑";}
+
+.left_title .line{margin:10px auto;border-bottom:solid 1px #66A8FF;}
+
+.left_title .btn{display:inline-block;height:36px;vertical-align:middle;line-height:36px;margin:0 4px;padding:0 10px 0 10px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; border-radius:4px;}
+.left_title .blue{background:#3385FF;color:#fff;}
+.left_title .blue:hover{background:#186CE7;}
+
+.sw_btn{display:inline-block;width:26px;height:14px;background:url(../../../img/blue.png) no-repeat;}
+.sw_btn.close{background:url(../../../img/gray.png) no-repeat;}
+</style>
+</head>
+
+<body ng-controller="realPositionCtrl">
+	
+	<div class="list">
+		<div class="list_left">
+			<div class="left_title">
+<!-- 				<input type="text" style="width:120px;" id="projectType" class="dropDownList" placeholder="请选择项目类型"/> -->
+				<div style="border:solid 0px;padding:26px 0 0 0;margin:0 0 0 0;" class="form_group">
+				
+					<div class="form_item">
+<!-- 						<label>选择总控表</label> -->
+						<input type="text" name="searchName" style="height:34px;width:365px;vertical-align:middle;padding-left:4px;" placeholder="请输入地址名称"/>
+					</div>
+				</div>
+				<div class="line"></div>
+				<div style="border:solid 0px;padding:0;margin:12px 0 0 0;" class="form_group">
+					<div class="form_item" style="width:100%;">
+<!-- 						<label>选择统计项</label> -->
+						
+						<input type="text" id="datasourceName" style="height:34px;width:278px;vertical-align:middle;padding-left:4px;" class="dropDownList" placeholder="选择统计项"/>&nbsp;
+						
+						<a href="javascript:void(0)" ng-click="toQuery()" 
+							class="btn blue">搜索</a>
+					</div>
+				</div>
+				
+			</div>
+			<div class="left_content">
+				
+				<div class="content_table">
+					<div class="tc_con">
+						<div class="abc" id="chart1" style="width:390px;height:400px;"></div>
+						<div class="abc" id="table1" style="width:100%;min-height:400px;display:none">
+							<table border="0" width="100%" class="table_list" cellspacing="0" cellpadding="0">
+								<tr>
+									<th>标记</th>
+    								<th>名称</th>
+    								<th>数量</th>
+    								<th>占比</th>
+    								<th>操作</th>
+								</tr>
+								<tr ng-repeat="item in groupList">
+									<td><div class="tablelist_color" style="background:{{item.itemStyle.normal.color}};"></div></td>
+    								<td>{{item.DATASOURCE_NAME}}</td>
+    								<td>{{item.groupCount}}</td>
+    								<td>{{decim((item.groupCount/sumgc)*100, 2)}}%</td>
+    								<td><a href="#" class="sw_btn {{item.isClose?'close':''}}" ng-click="onSwitch(item, $index)"></a></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="tab_ct">
+						<div class="tab_com">
+							<span class="chart curt">饼图</span>
+							<span class="table1">列表</span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<div class="map_div" id="allmap">
+			
+		</div>
+	</div>
+<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("allmap", {enableMapClick:false});    // 创建Map实例
+	map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
+	map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+	var markergg = null;
+    
+	
+    var userData, ticket;
+    $(document).ready(function(){
+    	var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		userData = jQuery.parseJSON(userDataStr);
+		ticket = $.cookie("pmsWeb_ticket");
+    });
+ 
+    function setViewPort(points){
+		var minLng=999,minLat=999,maxLng=0,maxLat=0;
+		for (var i = 0; i < points.length; i++) {
+			var p = points[i];
+			var lng = p.lng;
+			var lat = p.lat;
+			if(lng<minLng){
+				minLng=lng;
+			}
+			if(lat<minLat){
+				minLat=lat;
+			}
+			if(lng>maxLng){
+				maxLng=lng;
+			}
+			if(lat>maxLat){
+				maxLat=lat;
+			}
+		}
+		var pts = [new BMap.Point(minLng,minLat),new BMap.Point(maxLng,minLat),new BMap.Point(maxLng,maxLat),new BMap.Point(minLng,maxLat)];
+		map.setViewport(pts);
+	}
+    
+    /* 自定义图标 */
+	function CustomMarker(point, markerIdx){
+    	this._div;
+		this._point = point;
+    	this.markerIndex=1;
+    	this.clickListener;
+		if(markerIdx)
+			this.markerIndex=markerIdx;
+	};
+    CustomMarker.prototype = new BMap.Overlay();
+    CustomMarker.prototype.initialize = function(map){
+        this._map = map;
+        var _self = this;
+        var div = this._div = document.createElement("div");
+        div.style.position = "absolute";
+        div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
+//         div.style.borderStyle="solid";
+//         div.style.borderWidth=1;
+//         div.style.backgroundColor="#fff";
+        
+        var span = this._span = document.createElement("span");
+        span.className="marker cmkr"+this.markerIndex;
+        div.appendChild(span);
+        //span.appendChild(document.createTextNode(this._text));      
+        var that = this;
+
+        div.onmouseover = function(){
+//         	e = e || window.event;
+//         	if (window.event) {
+//         	e.cancelBubble = true;
+//         	} else {
+//         	e.stopPropagation();
+//         	}
+        };
+
+        div.onmouseout = function(){
+        };
+		span.onclick=function() {
+			
+			if (_self.clickListener) {
+				
+				_self.clickListener(_self._point);
+			}
+		};
+        map.getPanes().labelPane.appendChild(div);
+        return div;
+      };
+    CustomMarker.prototype.addClickListener=function(fn){
+    	this.clickListener=fn;
+    };  
+    CustomMarker.prototype.draw = function(){
+      var map = this._map;
+      var pixel = map.pointToOverlayPixel(this._point);
+      this._div.style.left = pixel.x - 12 + "px";
+      this._div.style.top  = pixel.y - 25 + "px";
+    }
+   
+    // ================================================================================== //
+    
+var cond_categoryCode="", cond_proNo="",cond_searchName="", cond_statisticsType="";
+var cond_mct="", cond_condStr="";
+var colors=['#feef4d','#55fef4','#fc8a2e','#53C353','#5589EC','#FF4BA4','#BC5BD3','#CE6261','#E2A432','#4FDACB'];
+// var ngScope;
+var timer2=null;
+simpleController({
+	moduleName:"realPosition",
+	controllerName:"realPositionCtrl",
+	init:function($scope, $http){
+
+		$scope.theadData={};
+		$scope.dataList={};
+		$scope.statisticsTypeData=[];
+		$scope.legendData=[];
+		$scope.theadData.searchFields=[];
+
+		map.centerAndZoom(new BMap.Point($scope.userData.x, $scope.userData.y), 13);  // 初始化地图,设置中心点坐标和地图级别
+		
+		/* 地址来源 */
+		new DropDownList().init({
+			renderTo:"#datasourceName",
+			data:[{code:"DATASOURCE_NAME", name:"地址来源"}],
+			textField:"name",
+			onSelected:function(item){
+				$("#datasourceName").val(item.name);
+				cond_statisticsType=item.code;
+			}
+		});
+
+
+		
+		
+		$scope.clearCond=function(){
+			for(var i=0; i<$scope.theadData.searchFields.length; i++){
+				(function(){
+					var searchField = $scope.theadData.searchFields[i];
+					if(searchField.dtype==4){
+						/* 搜索条件*/ 
+						$("#"+searchField.ename).val("");
+					}
+				})();
+			}
+		};
+		
+		/* 数据加载 */
+		$scope.loadData=function(searchName,cond_statisticsType){
+			var dlog = new ShowDlog();
+			dlog.prompt({
+				icon:"waitting",
+				msg:"正在加载中...",
+				done:function(){},
+				t:30000
+			});
+			
+			var paramsData={"searchName":searchName, "groupField":cond_statisticsType};
+			
+			$scope.httpExecute({
+				method:"post",
+				url:"eap/pmsServices/addrLib/addrBase/addrDistribute",
+				data:paramsData,
+				success:function(response){
+					$scope.addrList = response.data.addrList;
+					$scope.groupList = response.data.groupList;
+					
+					
+					if(!$scope.dataList){
+						$dlog.close();
+						new ShowDlog().prompt({
+							icon:"error",
+							msg:"未查到数据",
+							done:function(){},
+							t:1500
+						});
+						return;
+					}
+					
+					$dlog.close();
+					
+					/* 确定图例数据 */
+					$scope.getLegendData($scope.groupList);
+					
+					$scope.getSeriesData($scope.groupList);
+					$scope.loadChart($scope.legendData, $scope.groupList);
+					$scope.showAll($scope.addrList);
+					
+
+				}
+
+
+			});
+		};
+		
+		
+		
+		$scope.loadChart=function(legendData, seriesData){
+			var option = {
+				    title : {
+				        text: '',
+				        subtext: '',
+				        x:'center'
+				    },
+				    tooltip : {
+				        trigger: 'item',
+				        formatter: "{a} <br/>{b} : {c} ({d}%)"
+				    },
+				    legend: {
+				        orient: 'horizontal',
+				        left: 'left',
+				        data: legendData// 图例数据
+				    },
+				    series : [
+				        {
+				            name: '访问来源',
+				            type: 'pie',
+				            radius : '55%',
+				            center: ['50%', '60%'],
+				            data:seriesData,// 图表数据
+				            itemStyle: {
+				                emphasis: {
+				                    shadowBlur: 10,
+				                    shadowOffsetX: 0,
+				                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+				                }
+				            }
+				        }
+				    ]
+				};
+			var chart = echarts.init(document.getElementById('chart1'));
+			chart.setOption(option);
+		};
+		
+		$scope.toQuery=function(){
+			//$(".cond_layer").hide();
+			
+				cond_searchName = $("input[name=searchName]").val();
+				
+				
+				
+				if((cond_statisticsType=="")){
+					new ShowDlog().prompt({
+						msg:"请选择查询条件和统计项",
+						done:function(){
+							
+						},
+						t:1500
+					});
+					return;
+				}
+				
+				
+				$scope.loadData(cond_searchName, cond_statisticsType);
+			//}
+		};
+		
+		
+		
+		window.onkeyup=function(e){
+			if(e.keyCode==13){
+				$scope.toQuery(cond_mct, cond_searchName, cond_condStr);
+			}
+		};
+		$scope.strCut=function(str, len){
+			if(str.length>len){
+				str = str.substring(0, len);
+				str+="...";
+			}
+			return str;
+		};
+		$scope.selectedUser=function(item){
+			if(item.x && item.y){
+				map.setCenter(new BMap.Point(item.x, item.y));  // 初始化地图,设置中心点坐标和地图级别
+				if(markergg != null){
+					map.removeOverlay(markergg);
+				}
+				markergg = new BMap.Marker(new BMap.Point(item.x, item.y));
+			    map.addOverlay(markergg);
+			}
+		};
+		$scope.showAll=function(users){
+			map.clearOverlays();
+			var groupPts={};
+			for(var i=0;i<users.length;i++){
+				var item=users[i];
+				
+				// 判断是否要显示此类设备位置信息
+				var isHide = $scope.isHidden(item);
+				if(isHide)continue;
+				if(item.SHOW_X && item.SHOW_Y){
+					(function(){
+						//map.setCenter(new BMap.Point(item.x, item.y));  // 初始化地图,设置中心点坐标和地图级别
+						var pts = groupPts[item.DATASOURCE_NAME];
+						if(!pts){
+							groupPts[item.DATASOURCE_NAME]=[];
+							pts = groupPts[item.DATASOURCE_NAME]
+						}
+						
+						var p=new BMap.Point(item.SHOW_X, item.SHOW_Y);
+						p.data=item;
+						pts.push(p);
+					
+					})();
+				}
+			}
+			for(var k in groupPts){
+				if(groupPts[k].length>0){
+					setViewPort(groupPts[k]);
+				}
+				break;
+			}
+			
+			for(var key in groupPts){
+				var pts = groupPts[key];
+				var options = {
+		            color: colors[$scope.getValIndex(key)],
+		            size: BMAP_POINT_SIZE_NORMAL
+		        }
+		        var pointCollection = new BMap.PointCollection(pts, options);  // 初始化PointCollection
+		       
+		        pointCollection.addEventListener('click', function (e) {
+		        	//var pros="";
+		        	//for(pro in e){
+		        	//	pros+=","+pro;
+		        	//}
+		        	//alert(pros);
+		            var devInfo = e.point.data;
+		            /* infoWindow */
+				    var infoWinContent = "<div class=\"info_win\">"
+						+"	<table width=\"100%\">"
+						+"		<tr>"
+						+"			<td>"
+						+"				<div class=\"tiBar\">"
+						+"					<label class=\"title\">"+devInfo.ADDR_NAME+"</label>"
+						+"				</div>"
+						+"				<div>"
+						+"					经度："+devInfo.SHOW_X+" 纬度："+devInfo.SHOW_Y
+						+"				</div>"
+						+"			</td>"
+						+"		</tr>"
+						+"	</table>"
+						+"</div>";
+					var infoWindow = new BMap.InfoWindow(infoWinContent);  // 创建信息窗口对象
+					
+					
+					//mctCode,companyCode,proNo,deviceObjCode
+					
+					map.openInfoWindow(infoWindow, e.point);
+		          });
+		        map.addOverlay(pointCollection);
+			}
+	       
+		};
+		$scope.locationTo=function(item){
+			var p=new BMap.Point(item.x, item.y);
+			setViewPort([p]);
+		};
+		$scope.showCond=function(){
+			$(".cond_layer").show();
+		};
+		$scope.closeCond=function(){
+			$(".cond_layer").hide();
+		};
+		$scope.openDetail=function(item){
+			new ShowDlog().showFrame("../device/deviceDetail.html?deviceObjCode="+item.deviceObjCode, "设备详情", function(){
+				
+			}, "device_detail");
+			
+		};
+		
+		/* 1、查出图例数据 */
+		$scope.getLegendData=function(groupList){
+			var arrN=[];
+			for(var i=0; i<groupList.length; i++){
+				var it=groupList[i].DATASOURCE_NAME;
+				arrN.push(it);
+			}
+			$scope.legendData=arrN; 
+			return arrN;
+		};
+		/* 2、获取值索引，用于决定颜色 */
+		$scope.getValIndex=function(val){
+			
+			
+			for(var j=0; j<$scope.legendData.length; j++){
+				var v = $scope.legendData[j];
+				if(v==val){
+					return j;
+				}
+			}
+			
+			
+		};
+		/* 3、组织图表数据与每项颜色 */
+		$scope.sumgc=0;
+		$scope.getSeriesData=function(data){
+			$scope.sumgc=0;
+			for(var i=0; i<data.length; i++){
+				var item= data[i];
+				item.name=item.DATASOURCE_NAME
+				item.value=item.groupCount;
+				$scope.sumgc+=item.groupCount;
+				item.itemStyle={normal:{color:colors[$scope.getValIndex(item.name)]}};
+			}
+		};
+		$scope.decim=function(num, len){
+			return decim(num, len);
+		};
+		$scope.isHidden=function(item){
+			for(var i=0; i<$scope.groupList.length; i++){
+				var grpItem = $scope.groupList[i];
+				if(grpItem.name==item.DATASOURCE_NAME){
+					if(grpItem.isClose){
+						return true;
+					}else{
+						return false;
+					}
+				}
+			}
+			return false;
+		};
+		$scope.onSwitch=function(item, index){
+			if(!item.isClose){
+				item.isClose=true;
+				// 地图不显示
+			}else{
+				item.isClose=false;
+				// 地图上显示
+			}
+			$scope.showAll($scope.addrList);
+		};
+		
+	}
+});
+
+function openDetail(deviceObjCode){
+	new ShowDlog().showFrame("../device/deviceDetail.html?deviceObjCode="+deviceObjCode, "设备详情", function(){
+		
+	}, "device_detail");
+	
+}
+
+var n= 0;
+var imgflag = true;
+$(".tab_com span").click(function(index){
+	$(this).addClass("curt").siblings("span").removeClass("curt");
+	n=$(this).index();
+	$(".tc_con .abc").eq(n).show().siblings().hide(); 
+});
+
+</script>
+</body>
+</html>

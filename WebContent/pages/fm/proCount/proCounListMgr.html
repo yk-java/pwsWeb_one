@@ -1,0 +1,769 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>项目概算列表</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css"/>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<style type="text/css">
+	.owWordLoad{text-decoration:underline;color:#0099ff;}
+	.owWordload-detail{border:solid 1px #666;background:#ffee99;color:#666;padding:4px 6px 4px 6px;position:absolute;display:none;}
+	.stutes_span{display:inline-block;width:20px;height:20px;border-radius:50%;position: relative; top: 5px;}
+	.hstu{background:#76b102}
+	.nostu{background:red}
+	.dlog-edit{height:300px;width:450px;}
+	.dlog-edit1{width:900px;height:500px;}
+
+	.dialog-imp{width:600px;height:340px;}
+	.dialog-viewcyle{width:900px;height:500px;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl"  storagekey="fm.proCount.proCounListMgr">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+
+			
+				<input type="text" id="category" viewstate="categoryName" class="dropDownList" placeholder="请选择项目分类"/>
+				<input type="hidden" name="categoryCode" viewstate="categoryCode" />
+				<input type="text" name="proName" viewstate="proName" class="required dropDownList" maxlength="32" style="width:220px" placeholder="请选择项目"/>
+				<input type="hidden" name="proNo" viewstate="proNo" />
+				<input type="text" id="proPhase" name="proPhase" class="dropDownList" placeholder="请选择项目阶段"/>
+				<input type="text" style="width:150px;" viewstate="searchName" name="searchName" class="" placeholder="项目名、编号、负责人"/>
+
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+		
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">项目编号</div></th>
+				<th><div align="center">项目名称</div></th>
+				<th><div align="center">项目地区</div></th>
+				<th><div align="center">项目所属部门</div></th>
+				<th><div align="center">项目负责人</div></th>
+				<th><div align="center">创建时间</div></th>
+				<th><div align="center">最近编辑时间</div></th>
+				
+				<th><div align="center">状态</div></th>
+				<th><div align="center">审核说明</div></th>
+				<th><div align="center">操作</div></th>
+			  </tr>
+			   <tr class="tr2" ng-repeat="item in userList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center"><a ng-click="viewFile(item)" style="color:blue;cursor: pointer;" title="点击查看项目相关文件">{{item.proCode}}</a></div></td>
+				<td><div align="center">{{item.proName}}</div></td>
+				<td><div align="center">{{item.province}} {{item.city}} {{item.district}}</div></td>
+				<td><div align="center">{{item.unitName}}</div></td>
+				<td><div align="center">{{item.proManager}}</div></td>
+				<td><div align="center">{{item.sysCreateTime}}</div></td>
+				<td><div align="center">{{item.budgetEstimateTime}}</div></td>
+				
+				<td>
+					<div align="center" ng-if="item.versionStatus==-1">未启用</div>
+					<div align="center" ng-if="item.versionStatus==0">已创建</div>
+					<div align="center" ng-if="item.versionStatus==1">未提交</div>
+					<div align="center" ng-if="item.versionStatus==2">已提交</div>
+					<div align="center" ng-if="item.versionStatus==3">部门副经理审核通过</div>
+					<div align="center" ng-if="item.versionStatus==4">部门副经理驳回</div>
+					<div align="center" ng-if="item.versionStatus==5">部门经理审核通过</div>
+					<div align="center" ng-if="item.versionStatus==6">部门经理驳回</div>
+					<div align="center" ng-if="item.versionStatus==7">财务审核通过</div>
+					<div align="center" ng-if="item.versionStatus==8">财务审核驳回</div>
+					<div align="center" ng-if="item.versionStatus==9">总经理审核通过</div>
+					<div align="center" ng-if="item.versionStatus==10">总经理审核驳回</div>
+					<div align="center" ng-if="item.versionStatus==11">提交调整申请</div>
+					<div align="center" ng-if="item.versionStatus==12">审批调整申请通过</div>
+					<div align="center" ng-if="item.versionStatus==13">驳回调整申请</div>
+				</td>
+				<td>
+					
+					<div align="center" ng-if="item.versionStatus==3">{{item.deputyOption}}</div>
+					<div align="center" ng-if="item.versionStatus==4">{{item.deputyOption}}</div>
+					<div align="center" ng-if="item.versionStatus==5">{{item.deptOption}}</div>
+					<div align="center" ng-if="item.versionStatus==6">{{item.deptOption}}</div>
+					<div align="center" ng-if="item.versionStatus==7">{{item.financeOption}}</div>
+					<div align="center" ng-if="item.versionStatus==8">{{item.financeOption}}</div>
+					<div align="center" ng-if="item.versionStatus==9">{{item.generalOption}}</div>
+					<div align="center" ng-if="item.versionStatus==10">{{item.generalOption}}</div>
+					<div align="center" ng-if="item.versionStatus==12">{{item.checkOption}}</div>
+					<div align="center" ng-if="item.versionStatus==13">{{item.checkOption}}</div>
+				</td>
+				<td>
+					<div align="center" ng-if="item.versionStatus==-1">
+						<img class="operationImg" ng-click="addbudget(item)" src="../../../img/qidongyusuan_icon.png" title="启动项目概算">
+						<img class="operationImg" ng-click="compare(item)" src="../../../img/list_item_conpare-icon.png" title="比校版本">
+					</div>
+					<div align="center" ng-if="item.versionStatus==0">
+						<img class="operationImg" ng-click="eadit(item)" src="../../../img/repeaira.png" title="阶段维护">
+						<img class="operationImg" ng-click="compare(item)" src="../../../img/list_item_conpare-icon.png" title="比校版本">
+					</div>
+					<div align="center" ng-if="item.versionStatus==1 || item.versionStatus==4 || item.versionStatus==6 || item.versionStatus==8 || item.versionStatus==10">
+						<img class="operationImg" ng-click="eadit(item)" src="../../../img/repeaira.png" title="阶段维护">
+						<img class="operationImg" ng-if="item.proManagerCode==empcode || item.districtManager==empcode"  src="../../../img/list_item_modify-icon.png" title="修改" ng-click="edit(item)">
+						<img class="operationImg" ng-click="doShow(item)" src="../../../img/list_see-icon.png" title="查看 ">
+						<img class="operationImg" ng-click="doBugShow(item)" src="../../../img/rizhi_view_icon.png" title="日志查看 ">
+						<img class="operationImg" src="../../../img/destroy.png" title="发布" ng-click="fabu(item)">
+						<img class="operationImg" ng-if="item.proManagerCode==empcode || item.districtManager==empcode" ng-click="updateLabour(item)" src="../../../img/updateLabour.png" title="更新人力资源成本">
+						<img class="operationImg" ng-click="compare(item)" src="../../../img/list_item_conpare-icon.png" title="比校版本">
+					</div>
+					<div align="center" ng-if="item.versionStatus==2">
+						<img class="operationImg" ng-click="doShow(item)" src="../../../img/list_see-icon.png" title="查看 ">
+						<img class="operationImg" ng-click="doBugShow(item)" src="../../../img/rizhi_view_icon.png" title="日志查看 ">
+						
+						<img class="operationImg" ng-if="item.deputyManager==empcode" ng-click="doCheck(item,1)" src="../../../img/fushen_icon.png" title="部门副经理审核 ">
+						
+						<img class="operationImg" ng-if="item.proManagerCode==empcode || item.districtManager==empcode" ng-click="updateLabour(item)" src="../../../img/updateLabour.png" title="更新人力资源成本">
+						<img class="operationImg" ng-click="compare(item)" src="../../../img/list_item_conpare-icon.png" title="比校版本">
+					</div>
+					<div align="center" ng-if="item.versionStatus==3">
+						<img class="operationImg" ng-click="doShow(item)" src="../../../img/list_see-icon.png" title="查看 ">
+						<img class="operationImg" ng-click="doBugShow(item)" src="../../../img/rizhi_view_icon.png" title="日志查看 ">
+						<!-- <img class="operationImg" ng-if="item.plevel==1 && item.financeAuditor==empcode" ng-click="doCheck(item,3)" src="../../../img/caiwushenhe.png" title="财务审核 "> -->
+						<img class="operationImg" ng-if="item.deptAuditor==empcode" ng-click="doCheck(item,2)" src="../../../img/jinglishenhe.png" title="部门经理审核 ">
+						<img class="operationImg" ng-if="item.proManagerCode==empcode || item.districtManager==empcode"  ng-click="updateLabour(item)" src="../../../img/updateLabour.png" title="更新人力资源成本">
+						<img class="operationImg" ng-click="compare(item)" src="../../../img/list_item_conpare-icon.png" title="比校版本">
+					</div>
+					<div align="center" ng-if="item.versionStatus==5">
+						<img class="operationImg" ng-click="doShow(item)" src="../../../img/list_see-icon.png" title="查看 ">
+						<img class="operationImg" ng-click="doBugShow(item)" src="../../../img/rizhi_view_icon.png" title="日志查看 ">
+						<img class="operationImg" ng-if="item.financeAuditor==empcode" ng-click="doCheck(item,3)" src="../../../img/caiwushenhe.png" title="财务审核 ">
+						<img class="operationImg" ng-if="item.proManagerCode==empcode || item.districtManager==empcode" ng-click="updateLabour(item)" src="../../../img/updateLabour.png" title="更新人力资源成本">
+						<img class="operationImg" ng-click="compare(item)" src="../../../img/list_item_conpare-icon.png" title="比校版本">
+					</div>
+					<div align="center" ng-if="item.versionStatus==7">
+						<img class="operationImg" ng-click="doShow(item)" src="../../../img/list_see-icon.png" title="查看 ">
+						<img class="operationImg" ng-click="doBugShow(item)" src="../../../img/rizhi_view_icon.png" title="日志查看 ">
+						<img class="operationImg" ng-if="item.plevel==1 && (item.proManagerCode==empcode || item.districtManager==empcode)" ng-click="doCheck(item,5)" src="../../../img/tijiaoshenqing.png" title="提交调整申请 ">
+						<img class="operationImg" ng-if="item.plevel==2 && item.generalManager==empcode" ng-click="doCheck(item,4)" src="../../../img/zongshen_icon.png" title="总经理审核 ">
+						<img class="operationImg" ng-if="item.proManagerCode==empcode || item.districtManager==empcode" ng-click="updateLabour(item)" src="../../../img/updateLabour.png" title="更新人力资源成本">
+						<img class="operationImg" ng-click="compare(item)" src="../../../img/list_item_conpare-icon.png" title="比校版本">
+					</div>
+					
+					<div align="center" ng-if="item.versionStatus==9 || item.versionStatus==13">
+						<img class="operationImg" ng-click="doShow(item)" src="../../../img/list_see-icon.png" title="查看 ">
+						<img class="operationImg" ng-click="doBugShow(item)" src="../../../img/rizhi_view_icon.png" title="日志查看 ">
+						<img class="operationImg" ng-if="item.proManagerCode==empcode || item.districtManager==empcode" ng-click="doCheck(item,5)" src="../../../img/tijiaoshenqing.png" title="提交调整申请 ">
+						<img class="operationImg" ng-if="item.proManagerCode==empcode || item.districtManager==empcode" ng-click="updateLabour(item)" src="../../../img/updateLabour.png" title="更新人力资源成本">
+						<img class="operationImg" ng-click="compare(item)" src="../../../img/list_item_conpare-icon.png" title="比校版本">
+					</div>
+					<div align="center" ng-if="item.versionStatus==11">
+						<img class="operationImg" ng-click="doShow(item)" src="../../../img/list_see-icon.png" title="查看 ">
+						<img class="operationImg" ng-click="doBugShow(item)" src="../../../img/rizhi_view_icon.png" title="日志查看 ">
+						<img class="operationImg" ng-if="item.deputyManager==empcode || item.deptAuditor==empcode" ng-click="doCheck(item,6)" src="../../../img/jinglishenhe.png" title="审核调整申请 ">
+						<img class="operationImg" ng-if="item.proManagerCode==empcode || item.districtManager==empcode" ng-click="updateLabour(item)" src="../../../img/updateLabour.png" title="更新人力资源成本">
+						<img class="operationImg" ng-click="compare(item)" src="../../../img/list_item_conpare-icon.png" title="比校版本">
+					</div>
+				</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var searchName="";
+var ngScope;
+var companyCode="";
+var employeeCode="";
+var proNo="";
+var categoryCode="";
+
+var proPhase="";
+
+
+var proName="";
+var categoryName="";
+
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.userList=[];
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	companyCode=userData.companyCode;
+	employeeCode=userData.employeeCode;
+	$scope.empcode=employeeCode;
+	var viewState = new ViewState();
+	console.log(viewState);
+	if(viewState.get("categoryCode") && viewState.get("categoryCode").length>0){
+		categoryCode=viewState.get("categoryCode");
+	}
+	if(viewState.get("categoryName") && viewState.get("categoryName").length>0){
+		categoryName=viewState.get("categoryName");
+	}
+	if(viewState.get("proNo") && viewState.get("proNo").length>0){
+		proNo=viewState.get("proNo");
+	}
+	if(viewState.get("proName") && viewState.get("proName").length>0){
+		proName=viewState.get("proName");
+	}
+	if(viewState.get("searchName") && viewState.get("searchName").length>0){
+		searchName=viewState.get("searchName");
+	}else{
+		searchName=$("input[name=searchName]").val();
+	}
+	
+	$scope.roleCode=userData.roleCode;
+	//alert($scope.roleCode)
+	
+	/* 项目分类 */
+	new DropDownList().init({
+		mode:"page",
+		renderTo:"#category",
+		url:"../../component/projectType.html?ticket="+$scope.ticket,
+		height:"200px",
+		onSelected:function(result){
+			$scope.cond_category=result.categoryCode;
+			categoryCode=result.categoryCode;
+			$("#category").val(result.categoryName);
+			$("input[name=categoryCode]").val(result.categoryCode);
+			proNameList.setConfig("url", "../../component/gaisuanprojectList.html?categoryCode="+result.categoryCode+"&ticket="+$scope.ticket);
+		}
+	});
+
+	
+	/* 项目名称 */
+	var proNameList = new DropDownList();
+	proNameList.init({
+		mode:"page",
+		renderTo:"input[name=proName]",
+		url:"../../component/gaisuanprojectList.html?required=false",
+		height:"200px",
+		onSelected:function(result){
+			$("input[name=proName]").val(result.proName);
+			$("input[name=proNo]").val(result.proNo);
+			proNo=result.proNo;
+			//$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+		}
+	});
+	
+	
+	/* 项目阶段 */
+	new DropDownList().init({
+		renderTo:"input[name=proPhase]",
+		data:[{code:"", name:'全部'},{code:1, name:'前期'},{code:2, name:'中期'},{code:3, name:'后期'},
+		      {code:4, name:'更新类'},{code:5, name:'维护类'},{code:6, name:'已竣工'},
+		      {code:7, name:'项目暂停'},{code:8, name:'暂未开展'},{code:9, name:'试点中'},
+		      {code:10, name:'作废取消'},{code:11, name:'外包'},{code:12, name:'备注'}],
+		textField:"name",
+		height:"150px",
+		onSelected:function(result){
+			$("input[name=proPhase]").val(result.name);
+			
+			$("input[name=proPhase]").focus();
+			proPhase=result.code;
+		}
+	});
+	
+	$scope.loadUsers=function(companyCode,proNo,categoryCode,searchName){
+		$http.get(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/proBudgetEstimateList?companyCode="
+		+companyCode+"&proNo="+proNo+"&categoryCode="+categoryCode+"&searchName="+searchName+"&ticket="+ticket+"&phaseCode="+proPhase).success(function(response){
+			if(response.statusCode==200){
+				
+				$scope.userList=response.list;
+				
+			}else if(response.statusCode==404){
+				$scope.userList=[];
+			}else{
+				alert("请求服务器失败！");
+				return;
+			}
+			
+		});
+	}; 
+	
+	$scope.doQuery=function(){
+		searchName=$("input[name=searchName]").val();
+		viewState.collect();
+		$scope.loadUsers(companyCode,proNo,categoryCode,searchName)
+	};	
+	$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+	/* 维护 */
+	$scope.eadit=function(item){
+		window.location.href="proCountEadit.html?proNo="+item.proNo+"&proName="+item.proName+"&budgetestimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode;
+	};
+	/* 修改 */
+	$scope.edit=function(item){
+		window.location.href="proCountMgrEdit.html?proNo="+item.proNo+"&proName="+item.proName+"&publishStatus="+item.publishStatus+"&budgetestimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode;
+	};
+	
+	/* 查看 */
+	$scope.doShow=function(item){
+		window.location.href="proCountMgr.html?proNo="+item.proNo+"&budgetestimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode;
+	};
+	//日志查看
+    $scope.doBugShow=function(item){
+                new ShowDlog().showFrame("BugShow.html?budgetEstimateCode="+item.budgetestimateCode, "日志查看", function(){
+
+                },"dialog-viewcyle");
+
+    };
+	
+	//查看项目相关文件
+	$scope.viewFile=function(item){
+	
+		
+		new ShowDlog().showFrame("projectFile.html?proNo="+item.proNo, "项目相关文件", function(data){
+			
+			
+		}, "dlog-edit1");
+		
+	};
+	
+	$scope.updateLabour=function(item){
+		
+		
+		
+		new ShowDlog().confirm({
+			msg:"<label style='color:red;font-weight:700;font-size:16px;'>您确认修改项目人力资源成本吗？</label>",
+			ok:function(){
+				new ShowDlog().prompt({
+					icon:"waitting",
+					msg:"正在更新...",
+					done:function(){},
+					t:60*1000
+				});
+				
+				
+				 $http({
+					  method: "post",
+					  url: serviceBasePath+"eap/pmsServices/hrm/salMgr/salaryFramwork/updateLabourcostByProNo",
+					  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode},
+					}).success(function(resp){
+						$dlog.close();
+						if(resp.statusCode=200){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"更新成功！",
+								done:function(){
+									$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+								},
+								t:1500
+							});
+						}
+				});
+                $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"修改项目人力资源成本'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                    if(response.statusCode==200){
+                        $scope.ProList=response.list;
+                    }
+                });
+			}
+		});
+	};
+	
+	
+	$scope.addbudget=function(item){
+		
+		new ShowDlog().confirm({
+			msg:"<label style='color:red;font-weight:700;font-size:16px;'>您确认启用该项目概算吗？</label>",
+			ok:function(){
+				 $http({
+					  method: "post",
+					  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/createProBudgetEstimate",
+					  params: {"companyCode":companyCode,"proNo":item.proNo,"proName":item.proName},
+					}).success(function(resp){
+						if(resp.statusCode=200){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"启用成功！",
+								done:function(){
+									$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+								},
+								t:1500
+							});
+						}
+				});
+                $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"提交调整申请'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                    if(response.statusCode==200){
+                        $scope.ProList=response.list;
+                    }
+                });
+			}
+		});
+		
+	};
+	//审核
+	$scope.doCheck=function(item,index){
+	    console.log(item);
+		
+		if(index==1){  //部门副经理审核
+			
+			new ShowDlog().showFrame("check.html?proNo="+item.proName+"&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode, "部门副经理审核", function(data){
+					
+					if(data.ispass=="SUCCESS"){
+						
+						$http({
+							  method: "post",
+							  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/publishProBudgetEstimate",
+							  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode,"versionStatus":3,"deputyOption":data.message,"plevel":item.plevel},
+							}).success(function(resp){
+								if(resp.statusCode=200){
+									new ShowDlog().prompt({
+										icon:"success",
+										msg:"审核成功！",
+										done:function(){
+											$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+										},
+										t:1500
+									});
+								}
+						});
+                        $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"提交调整申请'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                            if(response.statusCode==200){
+                                $scope.ProList=response.list;
+                            }
+                        });
+						
+					}else if(data.ispass=="FALSE"){
+						 $http({
+							  method: "post",
+							  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/publishProBudgetEstimate",
+							  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode,"versionStatus":4,"deputyOption":data.message},
+							}).success(function(resp){
+								if(resp.statusCode=200){
+									new ShowDlog().prompt({
+										icon:"success",
+										msg:"操作成功！",
+										done:function(){
+											$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+										},
+										t:1500
+									});
+								}
+						});
+                        $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"提交调整申请'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                            if(response.statusCode==200){
+                                $scope.ProList=response.list;
+                            }
+                        });
+					}
+			}, "dlog-edit");
+
+			
+		}else if(index==2){  //部门经理审核
+			
+			new ShowDlog().showFrame("check.html?proNo="+item.proName+"&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode, "部门经理审核", function(data){
+				
+				if(data.ispass=="SUCCESS"){
+					
+					 $http({
+						  method: "post",
+						  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/publishProBudgetEstimate",
+						  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode,"versionStatus":5,"deptOption":data.message,"plevel":item.plevel},
+						}).success(function(resp){
+							if(resp.statusCode=200){
+								new ShowDlog().prompt({
+									icon:"success",
+									msg:"审核成功！",
+									done:function(){
+										$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+									},
+									t:1500
+								});
+							}
+					});
+                    $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"提交调整申请'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                        if(response.statusCode==200){
+                            $scope.ProList=response.list;
+                        }
+                    });
+					
+				}else if(data.ispass=="FALSE"){
+					 $http({
+						  method: "post",
+						  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/publishProBudgetEstimate",
+						  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode,"versionStatus":6,"deptOption":data.message},
+						}).success(function(resp){
+							if(resp.statusCode=200){
+								new ShowDlog().prompt({
+									icon:"success",
+									msg:"操作成功！",
+									done:function(){
+										$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+									},
+									t:1500
+								});
+							}
+					});
+                    $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"提交调整申请'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                        if(response.statusCode==200){
+                            $scope.ProList=response.list;
+                        }
+                    });
+				}
+			}, "dlog-edit");
+			
+			
+			
+		}else if(index==3){//财务审核
+			
+				new ShowDlog().showFrame("check.html?proNo="+item.proName+"&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode, "财务审核", function(data){
+				
+				if(data.ispass=="SUCCESS"){
+					
+					 $http({
+						  method: "post",
+						  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/publishProBudgetEstimate",
+						  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode,"versionStatus":7,"financeOption":data.message,"plevel":item.plevel},
+						}).success(function(resp){
+							if(resp.statusCode=200){
+								new ShowDlog().prompt({
+									icon:"success",
+									msg:"审核成功！",
+									done:function(){
+										$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+									},
+									t:1500
+								});
+							}
+					});
+                    $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"提交调整申请'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                        if(response.statusCode==200){
+                            $scope.ProList=response.list;
+                        }
+                    });
+					
+				}else if(data.ispass=="FALSE"){
+					 $http({
+						  method: "post",
+						  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/publishProBudgetEstimate",
+						  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode,"versionStatus":8,"financeOption":data.message},
+						}).success(function(resp){
+							if(resp.statusCode=200){
+								new ShowDlog().prompt({
+									icon:"success",
+									msg:"操作成功！",
+									done:function(){
+										$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+									},
+									t:1500
+								});
+							}
+					});
+                    $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"提交调整申请'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                        if(response.statusCode==200){
+                            $scope.ProList=response.list;
+                        }
+                    });
+				}
+			}, "dlog-edit");
+			
+			
+		}else if(index==4){//总经理审核
+			
+			new ShowDlog().showFrame("check.html?proNo="+item.proName+"&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode, "总经理审核", function(data){
+			
+			if(data.ispass=="SUCCESS"){
+				
+				 $http({
+					  method: "post",
+					  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/publishProBudgetEstimate",
+					  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode,"versionStatus":9,"generalOption":data.message,"plevel":item.plevel},
+					}).success(function(resp){
+						if(resp.statusCode=200){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"审核成功！",
+								done:function(){
+									$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+								},
+								t:1500
+							});
+						}
+				});
+                $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"提交调整申请'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                    if(response.statusCode==200){
+                        $scope.ProList=response.list;
+                    }
+                });
+				
+			}else if(data.ispass=="FALSE"){
+				 $http({
+					  method: "post",
+					  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/publishProBudgetEstimate",
+					  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode,"versionStatus":10,"generalOption":data.message},
+					}).success(function(resp){
+						if(resp.statusCode=200){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"操作成功！",
+								done:function(){
+									$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+								},
+								t:1500
+							});
+						}
+				});
+                $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"提交调整申请'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                    if(response.statusCode==200){
+                        $scope.ProList=response.list;
+                    }
+                });
+			}
+		}, "dlog-edit");
+		
+		
+	}else if(index==5){  //提交调整
+			
+			
+			new ShowDlog().confirm({
+				msg:"<label style='color:red;font-weight:700;font-size:16px;'>您确认提交调整申请 ？</label>",
+				ok:function(){
+					
+					 $http({
+						  method: "post",
+						  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/publishProBudgetEstimate",
+						  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode,"versionStatus":11},
+						}).success(function(resp){
+							if(resp.statusCode=200){
+								new ShowDlog().prompt({
+									icon:"success",
+									msg:"申请成功！",
+									done:function(){
+										$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+									},
+									t:1500
+								});
+							}
+					});
+                    $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"提交调整申请'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                        if(response.statusCode==200){
+                            $scope.ProList=response.list;
+                        }
+                    });
+					
+				}
+			});
+			
+		}else if(index==6){  //审核调整申请
+			
+			new ShowDlog().showFrame("check.html?proNo="+item.proName+"&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode, "审核调整申请", function(data){
+				
+				if(data.ispass=="SUCCESS"){
+					
+					 $http({
+						  method: "post",
+						  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/publishProBudgetEstimate",
+						  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode,"versionStatus":12,"versionOrder":item.versionOrder,"checkOption":data.message,"plevel":item.plevel},
+						}).success(function(resp){
+							if(resp.statusCode=200){
+								new ShowDlog().prompt({
+									icon:"success",
+									msg:"审核成功！",
+									done:function(){
+										$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+									},
+									t:1500
+								});
+							}
+					});
+                    $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"提交调整申请'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                        if(response.statusCode==200){
+                            $scope.ProList=response.list;
+                        }
+                    });
+					
+				}else if(data.ispass=="FALSE"){
+					 $http({
+						  method: "post",
+						  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/publishProBudgetEstimate",
+						  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode,"versionStatus":13,"deptOption":data.message},
+						}).success(function(resp){
+							if(resp.statusCode=200){
+								new ShowDlog().prompt({
+									icon:"success",
+									msg:"操作成功！",
+									done:function(){
+										$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+									},
+									t:1500
+								});
+							}
+					});
+                    $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+proName+"提交调整申请'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                        if(response.statusCode==200){
+                            $scope.ProList=response.list;
+                        }
+                    });
+				}
+		}, "dlog-edit");
+			
+			
+			
+		}
+	};
+	
+	$scope.fabu=function(item){
+	    console.log(item)
+		new ShowDlog().confirm({
+			msg:"<label style='color:red;font-weight:700;font-size:16px;'>您确认发布该项目概算吗，发布后将无法进行修改操作？</label>",
+			ok:function(){
+				 $http({
+					  method: "post",
+					  url: serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/publishProBudgetEstimate",
+					  params: {"companyCode":companyCode,"proNo":item.proNo,"budgetEstimateCode":item.budgetestimateCode,"versionCode":item.versionCode,"versionStatus":2},
+					}).success(function(resp){
+						if(resp.statusCode=200){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"发布成功！",
+								done:function(){
+									$scope.loadUsers(companyCode,proNo,categoryCode,searchName);
+								},
+								t:1500
+							});
+						}
+				});
+                $http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/addPmpbLog?operator="+employeeCode+"&operateProNo="+item.proNo+"&operateContent='"+item.proName+"发布阶段'&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode+"&operateDesc="+"").success(function(response){
+                    if(response.statusCode==200){
+                        $scope.ProList=response.list;
+                    }
+                });
+			}
+		});
+
+	};
+	$scope.compare=function(item){
+		console.log(item);
+		location.href="proVersionCompare.html?proNo="+item.proNo+"&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode;
+	};
+	
+	
+});
+</script>
+</body>
+</html>

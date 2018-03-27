@@ -1,0 +1,448 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 人员管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+
+<style type="text/css">
+/* 	body{ */
+/* 		margin:0px; */
+/* 		padding:0px; */
+/* 		font-size:12px; */
+/* 		font-family:"微软雅黑"; */
+/* 	} */
+/* 	a{color:#4D4D4D;text-decoration: none;} */
+/* 	.table,.table td,.table th{border:1px solid #ccc;border-collapse:collapse;} */
+/* 	.tr1{height:40px;background:#D9E9FF;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;font-weight:normal;} */
+/* 	.tr2{height:40px;background:#fff;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;} */
+/* 	.tr2:hover{background:#F5F5F5;} */
+/* 	.tr3{height:40px;background:#F5F5F5;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;} */
+/* 	.tr3:hover{background:#F5F5F5;} */
+/* 	.tr4{height:40px;background:#EFD397;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;} */
+/* 	.operationImg{cursor: pointer;margin-right:14px;} */
+	
+/* 	.list{position: absolute;left:13px;right:13px;top:13px;bottom:10px;border:solid 0px;} */
+/* 	.list .list_content{position: absolute;left:0px;right:0px;top:0px;bottom:0px;border:solid 0px;} */
+/* 	.list .list_content .title_div{width:100%;height:39px;border-bottom:solid 3px #4CA9FF;} */
+/* 	.list .list_content .title_div .title_left{min-width:400px;height:39px;background:#4CA9FF;line-height:42px;color:#fff;font-size:14px;font-weight: bold;float:left;} */
+/* 	.list .list_content .title_div .title_left > select{width:250px;height:30px;border:solid 0px;margin-left:20px;color:#4D4D4D;float:left;margin-top:5px;} */
+/* 	.list .list_content .title_div .title_left > input{height:30px;border:solid 0px;margin-left:20px;color:#666;float:left;margin-top:5px;padding-left:4px;font-size:12px;font-family:"微软雅黑";} */
+/* 	.list .list_content .title_div .title_left .query_div{width:60px;height:30px;float:left;margin-left:20px;margin-top:7px;line-height:30px;text-align:center;color:#fff;background:#3385FF;cursor: pointer;} */
+/* 	.list .list_content .title_div > img{float:left;margin-top:1px;} */
+/* 	.list .list_content .title_div .title_add{float:left;width:70px;height:28px;background: url(../../../img/bnt_newly-added.png) repeat;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;} */
+/* 	.list .list_content .table_div{left:0px;right:0px;margin-bottom:32px;top:42px;border:solid 0px;} */
+/* 	.list .list_bottom{left:0px;right:0px;bottom:0px;height:22px;border:solid 0px;color:#4D4D4D;} */
+/* 	.list .list_bottom .paging_div{width:500px;height:22px;;margin:0 auto;border:solid 0px;} */
+/* 	.list .list_bottom .paging_div .page_div{width:58px;height:22px;border:solid 1px #E5F1FF;line-height:22px;text-align:center;float:left;cursor: pointer;} */
+/* 	.list .list_bottom .paging_div .page_div_1{width:auto;height:22px;line-height:22px;text-align:center;margin-left:30px;margin-right:30px;float:left;} */
+/* 	.list .list_bottom .paging_div .page_div_1 > a:hover{font-size:12px;color:#0078D7;text-decoration:underline;} */
+/* 	.list .list_bottom .paging_div .page_div_1 .page_a1{margin-left:10px;} */
+/* 	.list .list_bottom .paging_div .page_div_1 .page_a1:hover{font-size:12px;color:#0078D7;text-decoration:underline;} */
+/* 	.list .list_bottom .paging_div .page_div_1 .page_a2{margin-left:10px;font-size:14px;color:#0078D7;text-decoration:underline;} */
+/* 	.list .list_bottom .paging_div .page_div_1 .page_a2:hover{font-size:14px;color:#0078D7;text-decoration:underline;} */
+/* 	.dropDownProjectType{width:120px;background-image:url(../../../img/type.png);background-repeat: no-repeat;background-position:right;background-position:105px;cursor:pointer;} */
+/* 	.dropDownTree{width:220px;background-image:url(../../../img/open--icon.png);background-repeat: no-repeat;background-position:right;background-position:205px;cursor:pointer;} */
+/* 	#page_bar .page_btn{display:inline-black;margin:0 4px;} */
+/* 	#page_bar .selected{font-weight:bold;} */
+	
+/* 	.dateComponent{width:120px;background-image:url(../../../img/calendar.png);background-repeat: no-repeat;background-position:right;background-position:105px;cursor:pointer;} */
+	.warning{background:red;color:#fff;}
+	
+	.switch_btn_group{border:solid 1px #3385FF;min-height:30px;float:left;border-radius:15px; position:absolute;right:20px;top:0px;}
+	.switch_btn_group a{display:inline-block;float:left;background:#fff;color:#3385FF;text-decoration:none;font-size:13px;
+		line-height:30px;text-align:center;margin:0 1px 0 0;min-width:60px;}
+	.switch_btn_group a.selected{background:#3385FF;color:#fff;}
+	.switch_btn_group a:first-of-type{border-top-left-radius:15px;border-bottom-left-radius:15px;}
+	.switch_btn_group a:last-of-type{border-top-right-radius:15px;border-bottom-right-radius:15px;margin:0;}
+	.dialog-imp{width:600px;height:340px;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" class="dropDownProjectType" placeholder="请选择项目类别"/>
+				<input type="text" style="width:206px;" class="dropDownTree dropDownList" placeholder="请选择项目"/>
+				<input type="text" id="sdate" class="select_2 dropDownList dateComponent" onclick="new Calendar().show(this)" placeholder="请选择日期"/>
+				<input type="text" id="edate" class="select_2 dropDownList dateComponent" onclick="new Calendar().show(this)" placeholder="请选择日期"/>
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				<div class="query_div" ng-click="doExport()">
+					导出
+				</div>
+				<div class="query_div" ng-click="doReport1()">
+					批量上传
+				</div>
+				
+				&nbsp;&nbsp;&nbsp;&nbsp;
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			<div class="switch_btn_group">
+					<a href="#" datatype="2" class="selected">已激活</a>
+					<a href="#" datatype="3">已关闭</a>
+				</div>
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">日期</div></th>
+				<th><div align="center">项目名称</div></th>
+				<th><div align="center">项目类别</div></th>
+				<th><div align="center">项目编码</div></th>
+				<th><div align="center">项目负责人</div></th>
+				
+				<th><div align="center">内业填报数量</div></th>
+				<th><div align="center">外业填报数量</div></th>
+				<th><div align="center">总填报数量</div></th>
+				<th><div align="center">填报状态</div></th>
+				<th><div align="center">相关操作</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in dailyList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.reportDate}}</div></td>
+				<td><div align="center">{{item.proName}}</div></td>
+				<td><div align="center">{{item.categoryName}}</div></td>
+				<td><div align="center">{{item.proNo}}</div></td>
+				
+				<td><div align="center">{{item.proManager}}</div></td>
+				<td><div align="center">{{item.neiye}}</div></td>
+				<td><div align="center">{{item.waiye}}</div></td>
+				<td><div align="center">{{item.qcNum}}</div></td>
+				
+				<td>
+					<div ng-if="item.reportStatus==0" align="center"><img src="../../../img/unreport.png" style="vertical-align:middle;"/> 未报</div>
+					<div ng-if="item.reportStatus==1" align="center"><img src="../../../img/reported.png" style="vertical-align:middle;"/> 已报</div>
+				</td>
+				<td>
+					<div align="center">
+			    		<img ng-if="item.reportStatus==0" class="operationImg" src="../../../img/list_item_modify-icon.png" ng-click="doReport(item)" title="上报"/>
+			    		
+			    		<img ng-if="item.reportStatus==1" class="operationImg" src="../../../img/list_see-icon.png" ng-click="toDetail(item)" title="查看"/>
+			    		
+			  		</div>
+				</td>
+			  </tr>
+			  
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+function createPageBar(totalPage, curPage){
+	new PageBar().init({
+		renderTo:"#page_bar",
+		totalPage:totalPage,
+		curPage:curPage,
+		prevPageText:"上一页",
+		nextPageText:"下一页",
+		onPage:function(pageNum){
+			ngScope.loadUsers(selectedUnitCode, pageNum, "");
+			//$("#currPage").html(pageNum);
+		}
+	});
+}
+var cond_proStatus="2";
+var cond_categoryCode="";
+var cond_categoryName="";
+var cond_proNo="";
+var proName="";
+var cond_sdate="";
+var cond_edate="";
+var selectedUnitCode="";
+var ngScope;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.dailyList=[];
+	
+	cond_sdate=new SimpleDateFormat({formatString:"yyyy-MM-dd"}).format(new Date());
+	cond_edate=new SimpleDateFormat({formatString:"yyyy-MM-dd"}).format(new Date());
+	$("#sdate").val(cond_sdate);
+	$("#edate").val(cond_edate);
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	$scope.userData = userData;
+	
+	var params = getUrlParams();
+	if(params && params.proNo){
+		cond_proNo=params.proNo;
+	}
+	if(params && params.proName){
+		$(".dropDownTree").val(params.proName);
+	}
+	if(params && params.sdate){
+		cond_sdate=params.sdate;
+		$("#sdate").val(params.sdate);
+	}else{
+		cond_sdate=new SimpleDateFormat({formatString:"yyyy-MM-dd"}).format(new Date());
+		$("#sdate").val(cond_sdate);
+	}
+	if(params && params.edate){
+		cond_edate=params.edate;
+		$("#edate").val(params.edate);
+	}else{
+		cond_edate=new SimpleDateFormat({formatString:"yyyy-MM-dd"}).format(new Date());
+		$("#edate").val(cond_edate);
+	}
+	
+	
+	
+	/* 项目类型 */
+	new DropDownList().init({
+		renderTo:".dropDownProjectType",
+		url:"../../component/projectType.html?required=true&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownProjectType").val(result.categoryName);
+			cond_categoryCode = result.categoryCode;
+			
+			cond_categoryName=result.categoryName;
+			/* 联动 */
+			projectList1.setConfig("url", "../../component/projectList.html?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&required=true&ticket="+ticket);
+		}
+	});
+	
+	$(".switch_btn_group>a").each(function(){
+		$(this).click(function(){
+			$(this).addClass("selected");
+			$(this).siblings().removeClass("selected");
+			cond_proStatus = $(this).attr("datatype");
+			projectList1.setConfig("url", "../../component/projectList.html?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&ticket="+ticket);
+			$scope.doQuery();
+		});
+		
+	});
+	
+	/* 项目列表 */
+	var projectList1 = new DropDownList();
+	projectList1.init({
+		renderTo:".dropDownTree",
+		url:"../../component/projectList.html?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&required=true&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownTree").val(result.proName);
+			cond_proNo=result.proNo;
+			proName=result.proName;
+		}
+	});
+	
+	$scope.loadDailyList=function(proNo, sdate, edate, currentPage){//alert(unitCode);
+		$http.get(serviceBasePath+"eap/pmsServices/pm/schedulePlan/qualityDaily?companyCode="+userData.companyCode+"&proNo="+proNo+"&fromDate="
+			+sdate+"&toDate="+edate+"&currentPage="+currentPage+"&ticket="+ticket).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			
+			if(response.list.length>0&&response.list[0]!=null){
+				
+				$scope.dailyList = response.list;
+			}
+			//$scope.dailyList = response.list;
+// 			createPageBar(response.totalPage, response.currentPage);
+		});
+	};
+	
+	$scope.doQuery=function(){
+		var sdate = $("#sdate").val();
+		cond_sdate=sdate;
+		var edate = $("#edate").val();
+		cond_edate=edate;
+		$scope.loadDailyList(cond_proNo, cond_sdate, cond_edate, 1);
+	};
+
+	
+	
+	$scope.doReport = function(item){	
+		
+		//location.href="reportQualityDaily.html?proNo="+item.proNo+"&proName="+encodeURIComponent(item.proName)+"&reportDate="+item.reportDate;
+		var rectifyDate1="";
+		if(item.rectifyDate){
+			rectifyDate1=item.rectifyDate;
+		}else{
+			rectifyDate1="";
+		}
+		
+		if(item.reportStatus==1){ //已报   不符合 则修改
+			hrefTo({
+				url:"updateReportQualityDaily.html",
+				data:{
+					proNo:item.proNo,
+					proName:item.proName,
+					reportDate:item.reportDate,
+					sdate:cond_sdate,
+					edate:cond_edate,
+					station:item.station,
+					line:item.line,
+					cablepit:item.cablepit,
+					checkTypeCode:item.checkTypeCode,
+					checkTypeName:item.checkTypeName,
+					deviceLperson:item.deviceLperson,
+					checkResult:item.checkResult,
+					problemTypeCode:item.problemTypeCode,
+					problemTypeName:item.problemTypeName,
+					problemDesc:item.problemDesc,
+					rectifyStatus:item.rectifyStatus,
+					rectifyDate:rectifyDate1,
+					rectifyDesc:item.rectifyDesc,
+					remarks:item.remarks,
+					categoryName:item.categoryName,
+					proPhase:item.proPhase,
+					categoryCode:item.categoryCode
+				}
+			});
+		}else if(item.reportStatus==0){
+			hrefTo({
+				url:"qualityDailyAdd.html",
+				data:{
+					proNo:item.proNo,
+					proName:item.proName,
+					reportDate:item.reportDate,
+					sdate:cond_sdate,
+					edate:cond_edate,
+					categoryName:item.categoryName,
+					proPhase:item.proPhase,
+					categoryCode:item.categoryCode
+				}
+			});
+		}
+		
+		
+		
+		
+	};
+	
+	$scope.doReport1 = function(){	
+		
+		
+		if(cond_categoryCode==""){
+			
+			new ShowDlog().prompt({msg:"请您选择项目类型！",
+				done:function(){
+					
+					//parent.$dlog.close();
+				},
+				t:1500
+			})
+			
+			return false;
+			
+		}else if(cond_proNo==""){
+			new ShowDlog().prompt({msg:"请您选择项目！",
+				done:function(){
+					
+					//parent.$dlog.close();
+				},
+				t:1500
+			})
+			return false;
+		}
+		
+		
+		new ShowDlog().showFrame("impExcel.html?cond_categoryName="+cond_categoryName+"&proNo="+cond_proNo+"&proName="+proName+"&cond_categoryCode="+cond_categoryCode+"&companyCode="+$scope.userData.companyCode, "导入", function(data){
+			if(data=="SUCCESS"){
+				$scope.doQuery();
+			}
+		}, "dialog-imp");
+		
+			
+			
+	};
+	
+	
+	$scope.toDetail = function(item){	
+		
+		//alert($scope.userData.roleCode)
+		var url="";
+		
+		if($scope.userData.roleCode=="004"){
+			url="qualityDailyDetail.html";
+		}else{
+			url="qualityDailyUpdate.html";
+		}
+		
+		
+		
+		var rectifyDate1="";
+		if(item.rectifyDate){
+			rectifyDate1=item.rectifyDate;
+		}else{
+			rectifyDate1="";
+		}
+		
+		
+		hrefTo({
+			url:url,
+			data:{
+				proNo:item.proNo,
+				proName:item.proName,
+				reportDate:item.reportDate,
+				sdate:cond_sdate,
+				edate:cond_edate,
+				station:item.station,
+				line:item.line,
+				cablepit:item.cablepit,
+				checkTypeCode:item.checkTypeCode,
+				checkTypeName:item.checkTypeName,
+				deviceLperson:item.deviceLperson,
+				checkResult:item.checkResult,
+				problemTypeCode:item.problemTypeCode,
+				problemTypeName:item.problemTypeName,
+				problemDesc:item.problemDesc,
+				rectifyStatus:item.rectifyStatus,
+				rectifyDate:rectifyDate1,
+				rectifyDesc:item.rectifyDesc,
+				remarks:item.remarks,
+				categoryName:item.categoryName,
+				proPhase:item.proPhase
+			}
+		});
+		
+		
+		
+	}
+	$scope.doExport=function(){
+		excelExport("dataTable");
+	};
+	/* 初始查询 */
+	$scope.loadDailyList(cond_proNo, cond_sdate, cond_edate, 1);
+});
+</script>
+</body>
+</html>

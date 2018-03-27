@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glens.pwCloudOs.cj.base.dao.CjBdzMapper">
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.cj.base.vo.CjBdz">
+    <id column="COLLECT_ID" jdbcType="VARCHAR" property="collectId" />
+    <result column="COLLECTOR_CODE" jdbcType="VARCHAR" property="collectorCode" />
+    <result column="INTERID" jdbcType="VARCHAR" property="interid" />
+    <result column="AMNAME" jdbcType="VARCHAR" property="amname" />
+    <result column="VOLTAGELEVEL" jdbcType="DECIMAL" property="voltagelevel" />
+    <result column="RL" jdbcType="DECIMAL" property="rl" />
+    <result column="TYRQ" jdbcType="TIMESTAMP" property="tyrq" />
+    <result column="BZ" jdbcType="VARCHAR" property="bz" />
+    <result column="YDBYQBH" jdbcType="VARCHAR" property="ydbyqbh" />
+    <result column="TXBM" jdbcType="VARCHAR" property="txbm" />
+    <result column="SORTNUMBER" jdbcType="DECIMAL" property="sortnumber" />
+    <result column="DISORDER" jdbcType="DECIMAL" property="disorder" />
+    <result column="ZCBM" jdbcType="VARCHAR" property="zcbm" />
+    <result column="ZJLY" jdbcType="VARCHAR" property="zjly" />
+    <result column="JYFS" jdbcType="VARCHAR" property="jyfs" />
+    <result column="ZCXZ" jdbcType="VARCHAR" property="zcxz" />
+    <result column="ZCDWMC" jdbcType="VARCHAR" property="zcdwmc" />
+    <result column="XZ" jdbcType="VARCHAR" property="xz" />
+    <result column="ZBNUM" jdbcType="INTEGER" property="zbnum" />
+    <result column="ZBRL" jdbcType="DECIMAL" property="zbrl" />
+    <result column="JD" jdbcType="DECIMAL" property="jd" />
+    <result column="WD" jdbcType="DECIMAL" property="wd" />
+    <result column="CITY" jdbcType="VARCHAR" property="city" />
+    <result column="SYS_CREATE_TIME" jdbcType="TIMESTAMP" property="sysCreateTime" />
+    <result column="SYS_UPDATE_TIME" jdbcType="TIMESTAMP" property="sysUpdateTime" />
+    <result column="SYS_DELETE_TIME" jdbcType="TIMESTAMP" property="sysDeleteTime" />
+    <result column="SYS_PROCESS_FLAG" jdbcType="CHAR" property="sysProcessFlag" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    COLLECT_ID, COLLECTOR_CODE, INTERID, AMNAME, VOLTAGELEVEL, RL, TYRQ, BZ, YDBYQBH, 
+    TXBM, SORTNUMBER, DISORDER, ZCBM, ZJLY, JYFS, ZCXZ, ZCDWMC, XZ, ZBNUM, ZBRL, JD, 
+    WD, CITY, SYS_CREATE_TIME, SYS_UPDATE_TIME, SYS_DELETE_TIME, SYS_PROCESS_FLAG
+  </sql>
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    SELECT
+		<include refid="Base_Column_List" />
+	FROM
+		t_cj_bdz 
+	WHERE COLLECT_ID = #{collectId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="queryForList" resultMap="BaseResultMap" parameterType="map" >
+    SELECT
+		<include refid="Base_Column_List" />
+	FROM
+		t_cj_bdz 
+	WHERE
+		SYS_PROCESS_FLAG = '1'
+	<if test="interid != null and interid !='' ">
+		AND INTERID =#{interid}
+	</if>
+	<if test="amname != null and amname !='' ">
+		AND AMNAME LIKE concat('%',#{amname},'%')
+	</if>
+	<if test="city != null and city !='' ">
+		AND CITY LIKE concat('%',#{city},'%')
+	</if>
+	ORDER BY AMNAME
+  </select>
+  
+  <select id="queryForPage" parameterType="map" resultMap="BaseResultMap">
+	SELECT
+		<include refid="Base_Column_List" />
+	FROM
+		t_cj_bdz 
+	WHERE
+		SYS_PROCESS_FLAG = '1'
+	<if test="interid != null and interid !='' ">
+		AND INTERID =#{interid}
+	</if>
+	<if test="amname != null and amname !='' ">
+		AND AMNAME LIKE concat('%',#{amname},'%')
+	</if>
+	<if test="city != null and city !='' ">
+		AND CITY LIKE concat('%',#{city},'%')
+	</if>
+  	ORDER BY AMNAME
+  	limit #{firstResult},#{maxResult}
+  </select>
+  <select id="queryForCount" parameterType="map" resultType="int">
+  	select
+		count(*)
+	from t_cj_bdz
+	WHERE
+		SYS_PROCESS_FLAG = '1'
+	<if test="interid != null and interid !='' ">
+		AND INTERID =#{interid}
+	</if>
+	<if test="amname != null and amname !='' ">
+		AND AMNAME LIKE concat('%',#{amname},'%')
+	</if>
+	<if test="city != null and city !='' ">
+		AND CITY LIKE concat('%',#{city},'%')
+	</if>
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from t_cj_bdz
+    where COLLECT_ID = #{collectId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.glens.pwCloudOs.cj.base.vo.CjBdz">
+    insert into t_cj_bdz (COLLECT_ID, COLLECTOR_CODE, INTERID, 
+      AMNAME, VOLTAGELEVEL, RL, 
+      TYRQ, BZ, YDBYQBH, 
+      TXBM, SORTNUMBER, DISORDER, 
+      ZCBM, ZJLY, JYFS, ZCXZ, 
+      ZCDWMC, XZ, ZBNUM, 
+      ZBRL, JD, WD, CITY, 
+      SYS_CREATE_TIME, SYS_UPDATE_TIME, SYS_DELETE_TIME, 
+      SYS_PROCESS_FLAG)
+    values (#{collectId,jdbcType=VARCHAR}, #{collectorCode,jdbcType=VARCHAR}, #{interid,jdbcType=VARCHAR}, 
+      #{amname,jdbcType=VARCHAR}, #{voltagelevel,jdbcType=DECIMAL}, #{rl,jdbcType=DECIMAL}, 
+      #{tyrq,jdbcType=TIMESTAMP}, #{bz,jdbcType=VARCHAR}, #{ydbyqbh,jdbcType=VARCHAR}, 
+      #{txbm,jdbcType=VARCHAR}, #{sortnumber,jdbcType=DECIMAL}, #{disorder,jdbcType=DECIMAL}, 
+      #{zcbm,jdbcType=VARCHAR}, #{zjly,jdbcType=VARCHAR}, #{jyfs,jdbcType=VARCHAR}, #{zcxz,jdbcType=VARCHAR}, 
+      #{zcdwmc,jdbcType=VARCHAR}, #{xz,jdbcType=VARCHAR}, #{zbnum,jdbcType=INTEGER}, 
+      #{zbrl,jdbcType=DECIMAL}, #{jd,jdbcType=DECIMAL}, #{wd,jdbcType=DECIMAL}, #{city,jdbcType=VARCHAR}, 
+      #{sysCreateTime,jdbcType=TIMESTAMP}, #{sysUpdateTime,jdbcType=TIMESTAMP}, #{sysDeleteTime,jdbcType=TIMESTAMP}, 
+      #{sysProcessFlag,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.glens.pwCloudOs.cj.base.vo.CjBdz">
+    insert into t_cj_bdz
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="collectId != null">
+        COLLECT_ID,
+      </if>
+      <if test="collectorCode != null">
+        COLLECTOR_CODE,
+      </if>
+      <if test="interid != null">
+        INTERID,
+      </if>
+      <if test="amname != null">
+        AMNAME,
+      </if>
+      <if test="voltagelevel != null">
+        VOLTAGELEVEL,
+      </if>
+      <if test="rl != null">
+        RL,
+      </if>
+      <if test="tyrq != null">
+        TYRQ,
+      </if>
+      <if test="bz != null">
+        BZ,
+      </if>
+      <if test="ydbyqbh != null">
+        YDBYQBH,
+      </if>
+      <if test="txbm != null">
+        TXBM,
+      </if>
+      <if test="sortnumber != null">
+        SORTNUMBER,
+      </if>
+      <if test="disorder != null">
+        DISORDER,
+      </if>
+      <if test="zcbm != null">
+        ZCBM,
+      </if>
+      <if test="zjly != null">
+        ZJLY,
+      </if>
+      <if test="jyfs != null">
+        JYFS,
+      </if>
+      <if test="zcxz != null">
+        ZCXZ,
+      </if>
+      <if test="zcdwmc != null">
+        ZCDWMC,
+      </if>
+      <if test="xz != null">
+        XZ,
+      </if>
+      <if test="zbnum != null">
+        ZBNUM,
+      </if>
+      <if test="zbrl != null">
+        ZBRL,
+      </if>
+      <if test="jd != null">
+        JD,
+      </if>
+      <if test="wd != null">
+        WD,
+      </if>
+      <if test="city != null">
+        CITY,
+      </if>
+      <if test="sysCreateTime != null">
+        SYS_CREATE_TIME,
+      </if>
+      <if test="sysUpdateTime != null">
+        SYS_UPDATE_TIME,
+      </if>
+      <if test="sysDeleteTime != null">
+        SYS_DELETE_TIME,
+      </if>
+      <if test="sysProcessFlag != null">
+        SYS_PROCESS_FLAG,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="collectId != null">
+        #{collectId,jdbcType=VARCHAR},
+      </if>
+      <if test="collectorCode != null">
+        #{collectorCode,jdbcType=VARCHAR},
+      </if>
+      <if test="interid != null">
+        #{interid,jdbcType=VARCHAR},
+      </if>
+      <if test="amname != null">
+        #{amname,jdbcType=VARCHAR},
+      </if>
+      <if test="voltagelevel != null">
+        #{voltagelevel,jdbcType=DECIMAL},
+      </if>
+      <if test="rl != null">
+        #{rl,jdbcType=DECIMAL},
+      </if>
+      <if test="tyrq != null">
+        #{tyrq,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bz != null">
+        #{bz,jdbcType=VARCHAR},
+      </if>
+      <if test="ydbyqbh != null">
+        #{ydbyqbh,jdbcType=VARCHAR},
+      </if>
+      <if test="txbm != null">
+        #{txbm,jdbcType=VARCHAR},
+      </if>
+      <if test="sortnumber != null">
+        #{sortnumber,jdbcType=DECIMAL},
+      </if>
+      <if test="disorder != null">
+        #{disorder,jdbcType=DECIMAL},
+      </if>
+      <if test="zcbm != null">
+        #{zcbm,jdbcType=VARCHAR},
+      </if>
+      <if test="zjly != null">
+        #{zjly,jdbcType=VARCHAR},
+      </if>
+      <if test="jyfs != null">
+        #{jyfs,jdbcType=VARCHAR},
+      </if>
+      <if test="zcxz != null">
+        #{zcxz,jdbcType=VARCHAR},
+      </if>
+      <if test="zcdwmc != null">
+        #{zcdwmc,jdbcType=VARCHAR},
+      </if>
+      <if test="xz != null">
+        #{xz,jdbcType=VARCHAR},
+      </if>
+      <if test="zbnum != null">
+        #{zbnum,jdbcType=INTEGER},
+      </if>
+      <if test="zbrl != null">
+        #{zbrl,jdbcType=DECIMAL},
+      </if>
+      <if test="jd != null">
+        #{jd,jdbcType=DECIMAL},
+      </if>
+      <if test="wd != null">
+        #{wd,jdbcType=DECIMAL},
+      </if>
+      <if test="city != null">
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="sysCreateTime != null">
+        #{sysCreateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sysUpdateTime != null">
+        #{sysUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sysDeleteTime != null">
+        #{sysDeleteTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sysProcessFlag != null">
+        #{sysProcessFlag,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.glens.pwCloudOs.cj.base.vo.CjBdz">
+    update t_cj_bdz
+    <set>
+      <if test="collectorCode != null">
+        COLLECTOR_CODE = #{collectorCode,jdbcType=VARCHAR},
+      </if>
+      <if test="interid != null">
+        INTERID = #{interid,jdbcType=VARCHAR},
+      </if>
+      <if test="amname != null">
+        AMNAME = #{amname,jdbcType=VARCHAR},
+      </if>
+      <if test="voltagelevel != null">
+        VOLTAGELEVEL = #{voltagelevel,jdbcType=DECIMAL},
+      </if>
+      <if test="rl != null">
+        RL = #{rl,jdbcType=DECIMAL},
+      </if>
+      <if test="tyrq != null">
+        TYRQ = #{tyrq,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bz != null">
+        BZ = #{bz,jdbcType=VARCHAR},
+      </if>
+      <if test="ydbyqbh != null">
+        YDBYQBH = #{ydbyqbh,jdbcType=VARCHAR},
+      </if>
+      <if test="txbm != null">
+        TXBM = #{txbm,jdbcType=VARCHAR},
+      </if>
+      <if test="sortnumber != null">
+        SORTNUMBER = #{sortnumber,jdbcType=DECIMAL},
+      </if>
+      <if test="disorder != null">
+        DISORDER = #{disorder,jdbcType=DECIMAL},
+      </if>
+      <if test="zcbm != null">
+        ZCBM = #{zcbm,jdbcType=VARCHAR},
+      </if>
+      <if test="zjly != null">
+        ZJLY = #{zjly,jdbcType=VARCHAR},
+      </if>
+      <if test="jyfs != null">
+        JYFS = #{jyfs,jdbcType=VARCHAR},
+      </if>
+      <if test="zcxz != null">
+        ZCXZ = #{zcxz,jdbcType=VARCHAR},
+      </if>
+      <if test="zcdwmc != null">
+        ZCDWMC = #{zcdwmc,jdbcType=VARCHAR},
+      </if>
+      <if test="xz != null">
+        XZ = #{xz,jdbcType=VARCHAR},
+      </if>
+      <if test="zbnum != null">
+        ZBNUM = #{zbnum,jdbcType=INTEGER},
+      </if>
+      <if test="zbrl != null">
+        ZBRL = #{zbrl,jdbcType=DECIMAL},
+      </if>
+      <if test="jd != null">
+        JD = #{jd,jdbcType=DECIMAL},
+      </if>
+      <if test="wd != null">
+        WD = #{wd,jdbcType=DECIMAL},
+      </if>
+      <if test="city != null">
+        CITY = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="sysCreateTime != null">
+        SYS_CREATE_TIME = #{sysCreateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sysUpdateTime != null">
+        SYS_UPDATE_TIME = #{sysUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sysDeleteTime != null">
+        SYS_DELETE_TIME = #{sysDeleteTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sysProcessFlag != null">
+        SYS_PROCESS_FLAG = #{sysProcessFlag,jdbcType=CHAR},
+      </if>
+    </set>
+    where COLLECT_ID = #{collectId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.glens.pwCloudOs.cj.base.vo.CjBdz">
+    update t_cj_bdz
+    set COLLECTOR_CODE = #{collectorCode,jdbcType=VARCHAR},
+      INTERID = #{interid,jdbcType=VARCHAR},
+      AMNAME = #{amname,jdbcType=VARCHAR},
+      VOLTAGELEVEL = #{voltagelevel,jdbcType=DECIMAL},
+      RL = #{rl,jdbcType=DECIMAL},
+      TYRQ = #{tyrq,jdbcType=TIMESTAMP},
+      BZ = #{bz,jdbcType=VARCHAR},
+      YDBYQBH = #{ydbyqbh,jdbcType=VARCHAR},
+      TXBM = #{txbm,jdbcType=VARCHAR},
+      SORTNUMBER = #{sortnumber,jdbcType=DECIMAL},
+      DISORDER = #{disorder,jdbcType=DECIMAL},
+      ZCBM = #{zcbm,jdbcType=VARCHAR},
+      ZJLY = #{zjly,jdbcType=VARCHAR},
+      JYFS = #{jyfs,jdbcType=VARCHAR},
+      ZCXZ = #{zcxz,jdbcType=VARCHAR},
+      ZCDWMC = #{zcdwmc,jdbcType=VARCHAR},
+      XZ = #{xz,jdbcType=VARCHAR},
+      ZBNUM = #{zbnum,jdbcType=INTEGER},
+      ZBRL = #{zbrl,jdbcType=DECIMAL},
+      JD = #{jd,jdbcType=DECIMAL},
+      WD = #{wd,jdbcType=DECIMAL},
+      CITY = #{city,jdbcType=VARCHAR},
+      SYS_CREATE_TIME = #{sysCreateTime,jdbcType=TIMESTAMP},
+      SYS_UPDATE_TIME = #{sysUpdateTime,jdbcType=TIMESTAMP},
+      SYS_DELETE_TIME = #{sysDeleteTime,jdbcType=TIMESTAMP},
+      SYS_PROCESS_FLAG = #{sysProcessFlag,jdbcType=CHAR}
+    where COLLECT_ID = #{collectId,jdbcType=VARCHAR}
+  </update>
+</mapper>

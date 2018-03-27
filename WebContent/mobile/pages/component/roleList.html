@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 首页 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/Hz2Pinyin.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<style type="text/css">
+body{background:#fff;margin:0;padding:0;}
+.projectType{margin:0px;padding:0;}
+.projectType>li{margin:0px;}
+.projectType>li>a{display:block;padding:4px;line-height:26px;font-size:12px;font-family:微软雅黑;color:#666;text-decoration:none;}
+.projectType>li>a:hover{background:#3470CC;color:#fff;}
+.projectType>a{display:block;text-align:right;font-size:13px;color:#888;padding:2px;}
+</style>
+</head>
+
+<body ng-app="projectType" ng-controller="projectTypeCtrl">
+	<ul class="projectType">
+		<li ng-if="required!='true'">
+			<a href="javascript:" ng-click="onChooseBlank()">(全部)</a>
+		</li>
+		<li ng-repeat="item in projectType">
+			<a href="javascript:" ng-click="onChoose(item)">{{item.roleName}}</a>
+		</li>
+	</ul>
+	<script type="text/javascript">
+	var ngScope;
+	var app = angular.module("projectType", []);
+	app.controller("projectTypeCtrl", function($scope, $http){
+		/* init */
+		ngScope = $scope;
+		$scope.projectType=[];
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		$scope.userData = jQuery.parseJSON(userDataStr);
+		var ticket = $.cookie("pmsWeb_ticket");
+		
+		var params = getUrlParams();
+		$scope.required = params.required;
+		
+		var accountCode="";
+		/* 根据角色判断是否传accountCode */
+		if($scope.userData.roleCode=="004"){
+			accountCode=$scope.userData.accountCode;
+		}
+		
+		
+		/* 加载数据 */
+		$http.get(serviceBasePath+"eap/pmsServices/sys/funcConfig/role/list?companyCode="+$scope.userData.companyCode+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==200){
+				if(params.keywords){
+					$scope.projectType = $().filterByKeywords(response.list, "roleName", params.keywords);
+				}else{
+					$scope.projectType = response.list;
+				}
+			}else if(response.statusCode==401){
+				window.parent.location.href="../login.html";
+			}else{
+				alert("服务器访问出错！");
+			}
+		});
+		/* 选择 */
+		$scope.onChoose=function(obj){
+			window.frameElement.callback(obj);
+			window.frameElement.close();
+		};
+		/* 选择空白 */
+		$scope.onChooseBlank=function(){
+			var obj=new Object();
+			obj.roleName="";
+			obj.roleCode="";
+			window.frameElement.callback(obj);
+			window.frameElement.close();
+		};
+		
+	});
+	</script>
+</body>
+</html>

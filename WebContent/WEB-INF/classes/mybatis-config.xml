@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//www.mybatis.org//DTD Config 3.0//EN" 
+	"http://www.mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="lazyLoadingEnabled" value="true" />
+		<setting name="cacheEnabled" value="true" />
+		<setting name="aggressiveLazyLoading" value="false" />
+	</settings>
+	<mappers>
+
+		<!-- 认证 -->
+		<mapper
+			resource="com/glens/eap/platform/framework/auth/handler/Appclient_loginHandler_mysql.xml" />
+
+		<!-- 登录 -->
+		<mapper resource="com/glens/pwCloudOs/login/dao/login_mysql.xml" />
+
+		<!-- 账号管理 -->
+		<mapper
+			resource="com/glens/eap/sys/orgEmployee/account/dao/PfAccountMapper.xml" />
+
+		<!-- 角色管理 -->
+		<mapper resource="com/glens/eap/sys/funcConfig/role/dao/SmRoleMapper.xml" />
+
+		<!-- 人员管理 -->
+		<mapper
+			resource="com/glens/eap/sys/orgEmployee/employee/dao/MdEmployeeMapper.xml" />
+
+		<!-- 组织机构管理 -->
+		<mapper resource="com/glens/eap/sys/orgEmployee/orgunit/dao/OrgUnitMapper.xml" />
+
+		<!-- 通勤设置 -->
+		<mapper
+			resource="com/glens/pwCloudOs/commuteMgr/setting/commuteSetting/dao/CpCommuteConfigMapper.xml" />
+
+		<!-- 情报管理-上报统计-统计查询 -->
+		<mapper
+			resource="com/glens/pwCloudOs/information/reportStatistic/cpintelligenceinfo/dao/CpIntelligenceInfoMapper.xml" />
+
+		<!-- 我的月通勤情况 -->
+		<mapper
+			resource="com/glens/pwCloudOs/commuteMgr/app/myCommute/dao/myCommute_mysql.xml" />
+
+		<!-- 日报统计 -->
+		<mapper
+			resource="com/glens/pwCloudOs/commuteMgr/performance/statistic/dao/CommuteStatisticMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/commuteMgr/performance/statistic/dao/CpCommuteJudgingMapper.xml" />
+		<!-- 看板 -->
+		<mapper
+			resource="com/glens/pwCloudOs/commuteMgr/performance/digitalSignage/dao/CpCommuteCheckMapper.xml" />
+
+		<!-- 项目管理 -->
+		<mapper resource="com/glens/pwCloudOs/pm/baseMgr/pmBase/dao/PmBaseVoMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/pm/baseMgr/pmBase/dao/PmCategoryVoMapper.xml" />
+		<mapper resource="com/glens/pwCloudOs/pm/baseMgr/pmBase/dao/PmProKpiMapper.xml" />
+
+		<!-- 项目变更 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/baseMgr/pmChange/dao/PmModifyRecordVoMapper.xml" />
+
+		<!-- 通用 -->
+		<mapper resource="com/glens/pwCloudOs/common/dao/CommonMapper.xml" />
+
+		<!-- 项目进度日报 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/schedulePlan/scheduleDaily/dao/PmDayWordloadVoMapper.xml" />
+
+		<!-- 项目质量日报 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/schedulePlan/qualityDaily/dao/PmDayQcVoMapper.xml" />
+
+		<!-- 项目进度计划统计 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/schedulePlan/scheduleSummary/dao/scheduleSummaryMapper.xml" />
+
+		<!-- 项目下资产借用情况 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/everydayMgr/assetsMgr/dao/AssetsInProjectVoMapper.xml" />
+
+		<!-- 加油登记 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/everydayMgr/assetsMgr/dao/PmTmVehicleFuelchargeVoMapper.xml" />
+
+		<!-- 车辆派单 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/taskMgr/carDispach/dao/PmTmVehicleDispatchVoMapper.xml" />
+
+		<!-- 床位管理 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/everydayMgr/bedMgr/dao/GmBmBedrentVoMapper.xml" />
+
+		<!-- 资产分类 -->
+		<mapper
+			resource="com/glens/pwCloudOs/materielMg/assetMg/assetClass/dao/AssetClassVoMapper.xml" />
+
+		<!-- 资产类型 -->
+		<mapper
+			resource="com/glens/pwCloudOs/materielMg/assetMg/assetType/dao/AssetTypeVoMapper.xml" />
+
+		<!-- 资产管理 -->
+		<mapper
+			resource="com/glens/pwCloudOs/materielMg/assetMg/asset/dao/AssetVoMapper.xml" />
+
+		<!-- 加油卡管理 -->
+		<mapper
+			resource="com/glens/pwCloudOs/materielMg/vehicleMg/fuelCard/dao/FuelCardVoMapper.xml" />
+
+		<!-- 加油卡充值管理 -->
+		<mapper
+			resource="com/glens/pwCloudOs/materielMg/vehicleMg/recharge/dao/RechargeVoMapper.xml" />
+
+		<!-- 宿舍管理 -->
+		<mapper
+			resource="com/glens/pwCloudOs/materielMg/dormMg/dorm/dao/DormVoMapper.xml" />
+
+		<!-- ******* MaDx 专属区间 ＳＴＡＲＴ ******* -->
+		<!-- 资产借用申请 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/everydayMgr/assetsMgr/dao/GmAssetRentVoMapper.xml" />
+
+		<!-- 待办列表 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/prjMgr/processMgr/dao/ProcessMgrMapper.xml" />
+
+		<!-- 模块菜单 -->
+		<mapper
+			resource="com/glens/eap/sys/funcConfig/module/dao/AppModuleVoMapper.xml" />
+
+		<!-- 项目计划 -->
+		<mapper resource="com/glens/pwCloudOs/pm/plan/dao/PmPlanMapper.xml" />
+		<!-- 项目指标 -->
+		<mapper resource="com/glens/pwCloudOs/pm/plan/dao/PmPlanKpiMapper.xml" />
+		<!-- 指标库 -->
+		<mapper resource="com/glens/pwCloudOs/pm/plan/dao/PmKpiLibMapper.xml" />
+		<!-- 日报指标 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/schedulePlan/scheduleDaily/dao/PmDayKpiMapper.xml" />
+		<!-- 耗材领用 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/everydayMgr/consumableReceive/dao/GmMaterialUseMapper.xml" />
+		<!-- 设备类型 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/taskMgr/device/dao/PowerDeviceTypeMapper.xml" />
+		<!-- 设备属性 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/taskMgr/device/dao/PowerDeviceBaseAttrFieldMapper.xml" />
+		<!-- 设备健康 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/taskMgr/device/dao/PmDeviceHealthMapper.xml" />
+		<!-- 设备问题 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/taskMgr/device/dao/PmDeviceProblemMapper.xml" />
+		<!-- 质量问题 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/taskMgr/device/dao/PmQualityProblemMapper.xml" />
+			<!-- 箱表核查 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pe/boxCheck/dao/PeBcBoxMeterRelCheckMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/pe/boxCheck/dao/PeBcCheckBatchMapper.xml" />
+		<!-- 加油记录 -->
+		<mapper
+			resource="com/glens/pwCloudOs/gm/vm/filling/dao/GmVmFillingRecordMapper.xml" />
+		<!-- 中石化消费账单 -->
+		<mapper
+			resource="com/glens/pwCloudOs/gm/vm/filling/dao/GmVmSinopecBillMapper.xml" />
+		<!-- 现场监控 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/scene/dao/PmSceneMonitoringMapper.xml" />
+		<!-- 现场环境 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/scene/dao/PmSceneEnvMapper.xml" />
+		<!-- 工作明细 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/schedulePlan/worklist/dao/PmWorkListMapper.xml" />
+		<!-- 人员工时 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/schedulePlan/worklist/dao/PmWorkHoursMapper.xml" />
+		<!-- 测点管理 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/scene/dao/PmSceneMonitorPointMapper.xml" />
+		<!-- 测点历史 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/scene/dao/PmSceneMonitorPointHisMapper.xml" />
+		
+		<!-- ******* MaDx 专属区间 ＥＮＤ ******* -->
+
+		<!-- 物资管理-综合查询 -->
+		<mapper
+			resource="com/glens/pwCloudOs/materielMg/comprehensiveQuery/dao/comprehensiveQueryMapper.xml" />
+
+		<!-- 人员调动 -->
+		<mapper resource="com/glens/pwCloudOs/pm/memberMove/dao/MemberMoveVoMapper.xml" />
+
+		<!-- 车辆保险 -->
+		<mapper
+			resource="com/glens/pwCloudOs/materielMg/vehicleMg/insurance/dao/InsuranceVoMapper.xml" />
+
+		<!-- 车辆年检 -->
+		<mapper
+			resource="com/glens/pwCloudOs/materielMg/vehicleMg/check/dao/CheckVoMapper.xml" />
+
+		<!-- 通勤监控 -->
+		<mapper
+			resource="com/glens/pwCloudOs/commuteMgr/monitor/dao/commuteMonitor.xml" />
+
+		<!-- 人员汇总统计 -->
+		<mapper
+			resource="com/glens/eap/sys/orgEmployee/summary/dao/employeeSummary.xml" />
+
+		<!-- 项目文件 -->
+		<mapper resource="com/glens/pwCloudOs/pm/projDoc/dao/ProjDocVoMapper.xml" />
+
+		<!-- 财务管理 开票明细 -->
+		<mapper
+			resource="com/glens/pwCloudOs/fm/invoicebase/dao/InvoiceBaseVoMapper.xml" />
+		<!-- 财务管理回款明细 -->
+		<mapper resource="com/glens/pwCloudOs/fm/rpaymentbase/dao/RpaymentVoMapper.xml" />
+		<!-- 耗材管理 -->
+		<mapper
+			resource="com/glens/pwCloudOs/materielMg/assetMg/materialBase/dao/MaterialBaseVoMapper.xml" />
+		<!-- 项目拓展管理 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/everydayMgr/expInfoColle/dao/ExpInfoColleVoMapper.xml" />
+		<!-- 文档评核 -->
+		<mapper resource="com/glens/pwCloudOs/pm/projDoc/dao/DocumentCheckVoMapper.xml" />
+
+		<!-- 外业宝 -->
+		<mapper resource="com/glens/pwCloudOs/pwBaoApp/dao/pwBaoApp_mysql_Mapper.xml" />
+		<!-- 资产保养 -->
+		<mapper
+			resource="com/glens/pwCloudOs/materielMg/assetMg/asset/dao/AssetMaintainVoMapper.xml" />
+		<!-- 资产维修 -->
+		<mapper
+			resource="com/glens/pwCloudOs/materielMg/assetMg/asset/dao/AssetRepairVoMapper.xml" />
+		<!-- 项目总控表 -->
+		<mapper resource="com/glens/pwCloudOs/pm/taskMgr/mctMgr/dao/MctVoMapper.xml" />
+
+		<!-- 项目总控表 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/taskMgr/mctMgr/dao/MctCdevVoMapper.xml" />
+
+		<!-- 任务类型 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/taskMgr/taskClass/dao/TaskClassVoMapper.xml" />
+
+		<!-- 项目储备材料 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pe/baseMgr/materialType/dao/MaterialTypeVoMapper.xml" />
+
+		<!-- 储备项目改造方案 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pe/baseMgr/remouldScheme/dao/RemouldSchemeVoMapper.xml" />
+		<!-- 项目总控表视图 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pe/baseMgr/projectInit/dao/ProjectInitVoMapper.xml" />
+		<!-- 储备项目 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pe/baseMgr/reservePro/dao/ReserveProVoMapper.xml" />
+
+		<!-- 储备项目改造材料 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pe/baseMgr/rpMaterialBase/dao/RpMaterialBaseVoMapper.xml" />
+		<!-- 储备项目耗材领用 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pe/baseMgr/materialUse/dao/MaterialUseVoMapper.xml" />
+		<!-- 储备项目改造批次 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pe/baseMgr/remouldBatch/dao/RemouldBatchVoMapper.xml" />
+		<!-- 新增图片 -->
+		<mapper
+			resource="com/glens/pwCloudOs/om/deviceMgr/imagesMgr/dao/DeviceVoMapper.xml" />
+
+		<!-- 运维宝 -->
+		<mapper resource="com/glens/pwCloudOs/opsApp/dao/opsApp_mysql_Mapper.xml" />
+
+		<!-- 运维管控-设备管理 -->
+		<mapper
+			resource="com/glens/pwCloudOs/om/deviceMgr/device/dao/device_mysql_Mapper.xml" />
+		<!-- 设备质量检查 -->
+		<mapper
+			resource="com/glens/pwCloudOs/om/deviceMgr/device/dao/qualityCheckRecordMapper.xml" />
+
+		<!-- 表箱勘测-储备项目设备 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pe/proReserve/proDevice/dao/proDevice_mysql_Mapper.xml" />
+
+		<!-- 手机日志 -->
+		<mapper resource="com/glens/pwCloudOs/dailylog/dao/DailylogVoMapper.xml" />
+
+		<!-- 知识目录 -->
+		<mapper resource="com/glens/pwCloudOs/km/catalog/dao/CatalogVoMapper.xml" />
+		<!-- 知识管理 -->
+		<mapper resource="com/glens/pwCloudOs/km/base/dao/KmBaseVoMapper.xml" />
+
+		<!-- 知识附件 -->
+		<mapper resource="com/glens/pwCloudOs/km/attach/dao/kmAttachmentMapper.xml" />
+
+		<!-- 知识阅读 -->
+		<mapper resource="com/glens/pwCloudOs/km/read/dao/KmStudyReadMapper.xml" />
+
+		<!-- 知识下载 -->
+		<mapper
+			resource="com/glens/pwCloudOs/km/download/dao/KmStudyDownloadMapper.xml" />
+
+		<!-- 同步记录 -->
+		<mapper resource="com/glens/pwCloudOs/weixin/dao/WeixinSyncLogMapper.xml" />
+
+		<!-- 合同管理 -->
+		<mapper
+			resource="com/glens/pwCloudOs/fm/contractBase/dao/ContractBaseVoMapper.xml" />
+		<!-- 项目开票 -->
+		<mapper resource="com/glens/pwCloudOs/pm/ticket/dao/TicketVoMapper.xml" />
+		<!-- 调查问卷 -->
+		<mapper resource="com/glens/pwCloudOs/questionnire/dao/QaQuestionnireMapper.xml"/>
+		<mapper resource="com/glens/pwCloudOs/questionnire/dao/QaQuestionGroupMapper.xml"/>
+		<mapper resource="com/glens/pwCloudOs/questionnire/dao/QaQuestionMapper.xml"/>
+		<mapper resource="com/glens/pwCloudOs/questionnire/dao/QaOptionMapper.xml"/>
+		<mapper resource="com/glens/pwCloudOs/questionnire/dao/QaQuestionnireSendMapper.xml"/>
+		<mapper resource="com/glens/pwCloudOs/questionnire/dao/QaAnswerSheetMapper.xml"/>
+		<mapper resource="com/glens/pwCloudOs/questionnire/dao/QaAnswerMapper.xml"/>
+		<mapper resource="com/glens/pwCloudOs/questionnire/dao/QuestionnireStatisticMapper.xml"/>
+
+		<!-- pms2.0低压任务 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/pmStatsAn/pmsLowVolSa/dao/PmsLowVolSaMapper.xml" />
+		<!-- 地址库 -->
+		<mapper resource="com/glens/pwCloudOs/addrLib/dao/AddAddrClassVoMapper.xml" />
+		<mapper resource="com/glens/pwCloudOs/addrLib/dao/AddBaseAddrFieldVoMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/addrLib/dao/AddIndustryCategoryVoMapper.xml" />
+
+
+		<!-- 地名预核准申请表 -->
+		<mapper
+			resource="com/glens/pwCloudOs/addrLib/dao/AddPreliminaryAuditVoMapper.xml" />
+
+		<!-- 在线情况 -->
+		<mapper
+			resource="com/glens/pwCloudOs/commuteMgr/online/dao/CpOnlineUserHistoryMapper.xml" />
+
+		<!-- 消息通知 -->
+		<mapper resource="com/glens/pwCloudOs/notice/dao/SmNoticeReceiveMapper.xml" />
+		<mapper resource="com/glens/pwCloudOs/notice/dao/SmNoticeReadHistoryMapper.xml" />
+		<mapper resource="com/glens/pwCloudOs/notice/dao/SmNoticeMapper.xml" />
+
+		<!-- 考核测评统计 -->
+		<mapper
+			resource="com/glens/pwCloudOs/pm/assessment/AssessmentStatistics/dao/AssessmentStatisticsMapper.xml" />
+
+		<!-- 项目评核 -->
+		<mapper resource="com/glens/pwCloudOs/pm/checkScore/dao/CheckScoreVoMapper.xml" />
+
+		<!-- JOB管理 -->
+		<mapper resource="com/glens/pwCloudOs/task/dao/TaskListMapper.xml" />
+		<mapper resource="com/glens/pwCloudOs/task/dao/TaskLogMapper.xml" />
+
+		<!-- 费用科目 -->
+		<mapper resource="com/glens/pwCloudOs/fm/expense/dao/FmFeeTypeMapper.xml" />
+		<!-- 费用报销 -->
+		<mapper resource="com/glens/pwCloudOs/fm/expense/dao/FmMoneyReturnMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/fm/expense/dao/FmMoneyReturnDetailMapper.xml" />
+
+		<!-- 开票单 -->
+		<mapper
+			resource="com/glens/pwCloudOs/fm/billApply/dao/FmBillApplicationFormMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/fm/billApply/dao/FmBillApplicationLogMapper.xml" />
+		
+		<!-- 项目周进度 -->
+		<mapper resource="com/glens/pwCloudOs/pm/schedulePlan/weekJobSchedule/dao/PmWeekJobScheduleMapper.xml"/>
+		<!-- 人员任命 -->
+		<mapper resource="com/glens/pwCloudOs/pm/memberMove/dao/AppointmentVoMapper.xml"/>
+		
+		<!-- 项目概算 -->
+		<mapper resource="com/glens/pwCloudOs/pm/pb/budgetEstimate/dao/budgetEstimateMapper.xml"/>
+		
+		<!-- 项目预算 -->
+		<mapper resource="com/glens/pwCloudOs/pm/pb/rollingBudget/dao/rollingGudgetMapper.xml"/>
+		
+		<!-- 薪酬体系 -->
+		<mapper resource="com/glens/pwCloudOs/hrm/salMgr/salaryFramwork/dao/SalaryFramworkVoMapper.xml"/>
+		
+		<!-- 资产盘点 -->
+		<mapper resource="com/glens/pwCloudOs/materielMg/assetMg/asset/dao/GmAssetCheckMapper.xml"/>
+		
+		<!-- 仓库 -->
+		<mapper resource="com/glens/pwCloudOs/materielMg/goods/dao/StoreHouseMapper.xml"/>
+		
+		<!-- 物资出入库 -->
+		<mapper resource="com/glens/pwCloudOs/materielMg/goods/dao/GoodsMapper.xml"/>
+		<mapper resource="com/glens/pwCloudOs/materielMg/goods/dao/GoodsDetailMapper.xml"/>
+		<mapper resource="com/glens/pwCloudOs/materielMg/goods/dao/GoodsCategoryMapper.xml"/>
+		
+		<!-- 徐州输电 -->
+		<mapper resource="com/glens/pwCloudOs/transmission/tower/dao/towerDaoMapper.xml"/>
+		
+		<!-- 项目现场 -->
+		<mapper resource="com/glens/pwCloudOs/pm/scene/spot/dao/ProSpotMapper.xml"/>
+		
+		<!-- 现场人员 -->
+		<mapper resource="com/glens/pwCloudOs/pm/scene/workers/dao/ProWorkersMapper.xml"/>
+		
+		<!-- 标签管理 -->
+		<mapper resource="com/glens/pwCloudOs/pm/scene/card/dao/ProCardMapper.xml"/>
+		
+		<!-- 摄像头管理 -->
+		<mapper resource="com/glens/pwCloudOs/pm/scene/camera/dao/ProCameraMapper.xml"/>
+		
+		<!-- 问题库管理 -->
+		<mapper resource="com/glens/pwCloudOs/km/question/dao/QuestionVoMapper.xml"/>
+		<!-- 物资出入库管理 -->
+		<mapper resource="com/glens/pwCloudOs/goods/dao/goodsMapper.xml"/>
+		
+		<!-- 项目变动审请 -->
+		<mapper resource="com/glens/pwCloudOs/pm/baseMgr/pmBase/dao/PmProApplyFlowMapper.xml"/>
+		<!-- 数据采集管理 -->
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjBdzMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjLineMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjPoleMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjXlghMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjXldMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjByqMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjZbMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjKgMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjBdsMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjXsbMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjHwgMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjPdsMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjFzxMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjBdzLineDeviceMapper.xml" />
+		<mapper
+			resource="com/glens/pwCloudOs/cj/base/dao/CjAttachmentMapper.xml" />
+	</mappers>
+</configuration>

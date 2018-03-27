@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glens.pwCloudOs.commuteMgr.monitor.dao.monitorMapper">
+
+	<select id="selectRtCommuteStatusCount" parameterType="map" resultType="int">
+		select count(*) from md_employee a
+		join pm_member t on a.employeecode=t.employeecode and t.work_statue=1
+		join pm_base b on t.pro_no=b.pro_no
+		<if test="isProManager==1">
+			and b.EMPLOYEECODE = #{proManagerEmployeecode}
+		</if>
+		<if test="districtManager != null and districtManager != ''">
+		and b.DISTRICT_MANAGER=#{districtManager}
+		</if>
+		<if test="deptCode != null and deptCode != ''">
+		and b.MANAGE_DEPT=#{deptCode}
+		</if>
+		join md_org_unit e on a.unit_code=e.unit_code
+		join pf_account f on a.employeecode=f.employeecode
+		JOIN MD_EMPLOYEE_JOB g ON a.JOB_CODE=g.JOB_CODE
+		where e.company_code=#{companyCode} AND a.JOB_CLASS1=2 AND a.WORK_STATUS=1
+		and f.SYS_PROCESS_FLAG = '1'
+		<if test="proNo != null and proNo != ''" >
+	      AND b.pro_no=#{proNo}
+	    </if>
+	    <if test="employeeName != null and employeeName != ''">
+	     AND a.EMPLOYEENAME like "%"#{employeeName}"%"
+	    </if>
+	    <if test="jobCode != null and jobCode != ''">
+	    AND FIND_IN_SET(g.JOB_CODE, #{jobCode})
+	    </if>
+	</select>
+	
+	<select id="selectRtCommuteStatus" parameterType="map" resultType="com.glens.pwCloudOs.commuteMgr.monitor.vo.CpCommuteGpsVo">
+		
+		
+		SELECT IFNULL(b.pro_name,e.UNIT_NAME) proName,b.pro_no proNo,a.employeecode employeeCode,a.employeename employeeName,a.job_no jobNo,
+		e.company_code companyCode,f.account_code accountCode,a.unit_code unitCode,
+		CASE WHEN c.checkin_time IS NULL OR c.is_checkin=0 THEN 0 ELSE 1 END checkinStatus,
+		CASE WHEN c.checkout_time IS NULL OR c.is_checkout=0 THEN 0 ELSE 1 END checkoutStatus,
+		CASE
+		WHEN (
+			c.CHECKIN_IMG1 IS NULL
+			OR c.CHECKIN_IMG1 = ''
+		)
+		AND (
+			c.CHECKIN_IMG2 IS NULL
+			OR c.CHECKIN_IMG2 = ''
+		)
+		AND (
+			c.CHECKOUT_IMG1 IS NULL
+			OR c.CHECKOUT_IMG1 = ''
+		)
+		AND (
+			c.CHECKOUT_IMG2 IS NULL
+			OR c.CHECKOUT_IMG2 = ''
+		) THEN
+			0
+		ELSE
+			1
+		END isPciture,IFNULL(g.JOB_NAME,'') jobName
+		FROM md_employee a
+		JOIN pm_member t ON a.employeecode=t.employeecode AND t.work_statue=1
+		JOIN pm_base b ON t.pro_no=b.pro_no
+		<if test="isProManager==1">
+			and b.EMPLOYEECODE = #{proManagerEmployeecode}
+		</if>
+		<if test="districtManager != null and districtManager != ''">
+		and b.DISTRICT_MANAGER=#{districtManager}
+		</if>
+		<if test="deptCode != null and deptCode != ''">
+		and b.MANAGE_DEPT=#{deptCode}
+		</if>
+		LEFT JOIN ( SELECT COMPANY_CODE,UNIT_CODE,EMPLOYEECODE,ACCOUNT_CODE,CHECKIN_TIME,CHECKOUT_TIME,is_checkin,
+		is_checkout,CHECKIN_IMG1,CHECKIN_IMG2,CHECKOUT_IMG1,CHECKOUT_IMG2
+		FROM cp_commute_check WHERE DATE_FORMAT(checkin_time,'%Y-%m-%d')=DATE_FORMAT(CURDATE(),'%Y-%m-%d')) c ON a.employeecode=c.employeecode 
+		JOIN md_org_unit e ON a.unit_code=e.unit_code
+		JOIN pf_account f ON a.employeecode=f.employeecode
+		JOIN MD_EMPLOYEE_JOB g ON a.JOB_CODE=g.JOB_CODE
+		WHERE e.company_code=#{companyCode} AND a.JOB_CLASS1=2 AND a.WORK_STATUS=1
+		AND f.SYS_PROCESS_FLAG = '1'
+		<if test="proNo != null and proNo != ''" >
+	      AND b.pro_no=#{proNo}
+	    </if>
+	    <if test="employeeName != null and employeeName != ''">
+	     AND a.EMPLOYEENAME like "%"#{employeeName}"%"
+	    </if>
+	    <if test="jobCode != null and jobCode != ''">
+	    AND FIND_IN_SET(g.JOB_CODE, #{jobCode})
+	    </if>
+		order by b.pro_no
+		limit #{firstResult},#{maxResult}
+	</select>
+	
+	<select id="selectOutdorWorkersForCount" parameterType="map" resultType="int">
+		select count(*)
+		from md_employee a
+		join pm_member t on a.employeecode=t.employeecode and t.work_statue=1
+		join pm_base b on t.pro_no=b.pro_no
+		<if test="isProManager==1">
+			and b.EMPLOYEECODE = #{proManagerEmployeecode}
+		</if>
+		<if test="districtManager != null and districtManager != ''">
+		and b.DISTRICT_MANAGER=#{districtManager}
+		</if>
+		<if test="deptCode != null and deptCode != ''">
+		and b.MANAGE_DEPT=#{deptCode}
+		</if>
+		join md_org_unit e on a.unit_code=e.unit_code
+		join pf_account f on a.employeecode=f.employeecode
+		JOIN MD_EMPLOYEE_JOB g ON a.JOB_CODE=g.JOB_CODE
+		where e.company_code=#{companyCode} AND a.JOB_CLASS1=2 AND a.WORK_STATUS=1
+		and f.SYS_PROCESS_FLAG = '1'
+		<if test="proNo != null and proNo != ''" >
+	      AND b.pro_no=#{proNo}
+	    </if>
+	    <if test="employeeName != null and employeeName != ''">
+	     AND a.EMPLOYEENAME like "%"#{employeeName}"%"
+	    </if>
+	    <if test="jobCode != null and jobCode != ''">
+	    AND FIND_IN_SET(g.JOB_CODE, #{jobCode})
+	    </if>
+	</select>
+	
+	<select id="selectOutdoorWorkers" parameterType="map" resultType="map">
+		select IFNULL(b.pro_name,e.UNIT_NAME) proName,b.pro_no proNo,a.employeecode employeeCode,a.employeename employeeName,a.job_no jobNo,
+		e.company_code companyCode,f.account_code accountCode,a.unit_code unitCode,
+		CASE
+		WHEN (
+			c.CHECKIN_IMG1 IS NULL
+			OR c.CHECKIN_IMG1 = ''
+		)
+		AND (
+			c.CHECKIN_IMG2 IS NULL
+			OR c.CHECKIN_IMG2 = ''
+		)
+		AND (
+			c.CHECKOUT_IMG1 IS NULL
+			OR c.CHECKOUT_IMG1 = ''
+		)
+		AND (
+			c.CHECKOUT_IMG2 IS NULL
+			OR c.CHECKOUT_IMG2 = ''
+		) THEN
+			0
+		ELSE
+			1
+		END isPciture,IFNULL(g.JOB_NAME,'') jobName
+		from md_employee a
+		join pm_member t on a.employeecode=t.employeecode and t.work_statue=1
+		join pm_base b on t.pro_no=b.pro_no
+		<if test="isProManager==1">
+			and b.EMPLOYEECODE = #{proManagerEmployeecode}
+		</if>
+		<if test="districtManager != null and districtManager != ''">
+		and b.DISTRICT_MANAGER=#{districtManager}
+		</if>
+		<if test="deptCode != null and deptCode != ''">
+		and b.MANAGE_DEPT=#{deptCode}
+		</if>
+		join md_org_unit e on a.unit_code=e.unit_code
+		join pf_account f on a.employeecode=f.employeecode
+		LEFT JOIN ( SELECT COMPANY_CODE,UNIT_CODE,EMPLOYEECODE,ACCOUNT_CODE,CHECKIN_TIME,CHECKOUT_TIME,is_checkin,
+		is_checkout,CHECKIN_IMG1,CHECKIN_IMG2,CHECKOUT_IMG1,CHECKOUT_IMG2
+		FROM cp_commute_check WHERE DATE_FORMAT(checkin_time, '%Y-%m-%d') = #{curDate}) c ON a.employeecode = c.employeecode
+		JOIN MD_EMPLOYEE_JOB g ON a.JOB_CODE=g.JOB_CODE
+		where e.company_code=#{companyCode} AND a.JOB_CLASS1=2 and a.WORK_STATUS=1
+		and f.SYS_PROCESS_FLAG = '1'
+		<if test="proNo != null and proNo != ''" >
+	      AND b.pro_no=#{proNo}
+	    </if>
+	    <if test="employeeName != null and employeeName != ''">
+	     AND a.EMPLOYEENAME like "%"#{employeeName}"%"
+	    </if>
+	    <if test="jobCode != null and jobCode != ''">
+	    AND FIND_IN_SET(g.JOB_CODE, #{jobCode})
+	    </if>
+		order by b.pro_no
+		limit #{firstResult},#{maxResult}
+	</select>
+
+</mapper>
