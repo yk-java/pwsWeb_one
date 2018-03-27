@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.om.deviceMgr.deviceMapper">
+	
+	<select id="getMctDeviceAttr" parameterType="map" resultType="map">
+		select distinct a.E_NAME ename,C_NAME cname,a.D_TYPE dtype, ifnull(a.ENUM_SOURCE,0) enumSource,ifnull(a.ENUM_VALUE,'') enumValue,a.DIM_SEARCH dimSearch,
+		a.DIM_MAPRENDER dimMapRender,a.DIM_ORDER dimOrder,a.DIM_LIST dimList, a.DIM_PE_BS_MATERIAL as dimPeBsMaterial, a.IS_NOT_NULL as isNotNull, a.IS_FEATURE as isFeature
+		from power_device_base_attr_field a
+		<if test="mctCode != null and mctCode != ''">
+		join PM_MCT b on a.DEVICE_TYPE_CODE=b.DEVICE_TYPE_CODE and a.COMPANY_CODE=b.COMPANY_CODE and b.sys_process_flag='1'
+		</if>
+		where a.COMPANY_CODE=#{companyCode} and a.sys_process_flag='1'
+		<if test="mctCode != null and mctCode != ''">
+		and b.MCT_CODE=#{mctCode}
+		</if>
+		<if test="deviceTypeCode != null and deviceTypeCode != ''">
+		and a.DEVICE_TYPE_CODE=#{deviceTypeCode}
+		</if>
+	</select>
+	
+	<!-- 手机端显示 -->
+	<select id="getMobileMctDeviceAttr" parameterType="map" resultType="map">
+		select distinct a.E_NAME ename,C_NAME cname,a.D_TYPE dtype, ifnull(a.ENUM_SOURCE,0) enumSource,ifnull(a.ENUM_VALUE,'') enumValue,a.DIM_SEARCH dimSearch,
+		a.DIM_MAPRENDER dimMapRender,a.DIM_ORDER dimOrder,a.DIM_LIST dimList, a.DIM_PE_BS_MATERIAL as dimPeBsMaterial, a.IS_NOT_NULL as isNotNull, a.IS_FEATURE as isFeature
+		from power_device_base_attr_field a
+		<if test="mctCode != null and mctCode != ''">
+		join PM_MCT b on a.DEVICE_TYPE_CODE=b.DEVICE_TYPE_CODE and a.COMPANY_CODE=b.COMPANY_CODE and b.sys_process_flag='1'
+		</if>
+		where a.COMPANY_CODE=#{companyCode} and a.sys_process_flag='1' and a.DIM_MOBILE=1 
+		<if test="mctCode != null and mctCode != ''">
+		and b.MCT_CODE=#{mctCode}
+		</if>
+		<if test="deviceTypeCode != null and deviceTypeCode != ''">
+		and a.DEVICE_TYPE_CODE=#{deviceTypeCode}
+		</if>
+		
+		order by a.FIELD_ORDER asc
+	</select>
+	
+	<!-- 电表（运维） -->
+	<select id="getMctDeviceAttr1" parameterType="map" resultType="map">
+		select distinct a.E_NAME ename,C_NAME cname,a.D_TYPE dtype, ifnull(a.ENUM_SOURCE,0) enumSource,ifnull(a.ENUM_VALUE,'') enumValue,a.DIM_SEARCH dimSearch,
+		a.DIM_MAPRENDER dimMapRender,a.DIM_ORDER dimOrder,a.DIM_LIST dimList, a.DIM_PE_BS_MATERIAL as dimPeBsMaterial, a.IS_NOT_NULL as isNotNull, a.IS_FEATURE as isFeature
+		from power_device_base_attr_field a
+		
+		where a.COMPANY_CODE=#{companyCode} and a.sys_process_flag='1' 
+
+		<if test="deviceTypeCode != null and deviceTypeCode != ''">
+		and a.DEVICE_TYPE_CODE=#{deviceTypeCode}
+		</if>
+	</select>
+	
+	<select id="getMctView" parameterType="java.lang.String" resultType="map">
+		select MCT_VIEW_NAME mctViewName,MCT_VIEW_CODE mctViewCode,DEVICE_TYPE_CODE deviceTypeCode
+		from PM_MCT_VIEW where COMPANY_CODE=#{companyCode} and SYS_PROCESS_FLAG='1'
+	</select>
+	
+	<select id="getMctViewPros" parameterType="map" resultType="map">
+		select PRO_NOS proNos,PRO_NAMES proNames,PRO_MCT_CODES proMctCodes,PRO_MCT_NAMES proMctNames
+		from PM_MCT_VIEW where COMPANY_CODE=#{companyCode} and SYS_PROCESS_FLAG='1' and MCT_VIEW_CODE=#{mctViewCode}
+	</select>
+	
+	<!-- 获取项目组成员 -->
+	<select id="selectPmMemberCount" parameterType="map" resultType="int">
+		SELECT count(*)
+		FROM md_employee a
+		JOIN pm_member t ON a.employeecode=t.employeecode AND t.work_statue=1
+		JOIN pm_base b ON t.pro_no=b.pro_no
+		JOIN md_org_unit e ON a.unit_code=e.unit_code
+		WHERE e.company_code=#{companyCode} AND a.WORK_STATUS=1 AND t.WORK_STATUE=1
+		<if test="proNo != null and proNo != ''" >
+	      AND b.pro_no=#{proNo}
+	    </if>
+	    <if test="searchName != null and searchName != ''" >
+	      AND a.employeename like concat('%',#{searchName},'%')
+	    </if>
+	</select>
+	
+	<select id="selectPmMemberPage" parameterType="map" resultType="map">
+		SELECT b.pro_name proName,b.pro_no proNo,a.employeecode employeeCode,a.employeename employeeName,
+	  	a.unit_code unitCode,
+		e.company_code companyCode
+		FROM md_employee a
+		JOIN pm_member t ON a.employeecode=t.employeecode AND t.work_statue=1
+		JOIN pm_base b ON t.pro_no=b.pro_no
+		JOIN md_org_unit e ON a.unit_code=e.unit_code
+		WHERE e.company_code=#{companyCode} AND a.WORK_STATUS=1 AND t.WORK_STATUE=1
+		<if test="proNo != null and proNo != ''" >
+	      AND b.pro_no=#{proNo}
+	    </if>
+	    <if test="searchName != null and searchName != ''" >
+	      AND a.employeename like concat('%',#{searchName},'%')
+	    </if>
+		ORDER BY b.PRO_NO
+		limit #{firstResult},#{maxResult}
+	</select>
+	
+	<select id="getPicClass" parameterType="map" resultType="map">
+		select PIC_CLASSIFY_CODE classCode,PIC_CLASSIFY_NAME className from pm_device_pic_classify
+		where DEVICE_TYPE_CODE=#{deviceTypeCode}
+	</select>
+	
+	<select id="getFeatureField" parameterType="map" resultType="java.lang.String">
+		SELECT E_NAME FROM power_device_base_attr_field a 
+		<if test="mctCode != null and mctCode != ''">
+		JOIN pm_mct b ON a.DEVICE_TYPE_CODE=b.DEVICE_TYPE_CODE and a.COMPANY_CODE=b.COMPANY_CODE and b.sys_process_flag='1'
+		</if>
+		WHERE a.COMPANY_CODE=#{companyCode} AND a.IS_FEATURE=1
+		<if test="mctCode != null and mctCode != ''">
+		AND b.MCT_CODE=#{mctCode}
+		</if>
+		<if test="deviceTypeCode != null and deviceTypeCode != ''">
+		AND a.DEVICE_TYPE_CODE=#{deviceTypeCode}
+		</if>
+	</select>
+	
+</mapper>

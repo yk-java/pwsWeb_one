@@ -1,0 +1,277 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>宿舍基础信息表</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../../css/list.css" />
+
+
+<style type="text/css">
+	.dropDownArea{background-image:url(../../../../img/flag.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	.dropDownProjectType{background-image:url(../../../../img/type.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+	
+	.dropDownProjectType {
+	    background-image: url(../../../../img/icon-type.png);
+	    background-repeat: no-repeat;
+	    background-position: right;
+	    cursor: pointer;
+	}
+	.owWordLoad{text-decoration:underline;color:#0099ff;}
+	.owWordload-detail{border:solid 1px #666;background:#ffee99;color:#666;padding:4px 6px 4px 6px;
+	position:absolute;display:none;}
+	
+	
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+ 				<input type="text" class="dropDownProjectType" style="width:175px;" placeholder="请选择区域"/>
+				<input type="text" style="width:180px;" name="searchName" placeholder="请输入宿舍名称或行政区划"/>
+				<input type="text"  name="dormType" class="dropDownList" id="dormType" placeholder="请选择宿舍状态"/>
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				&nbsp;&nbsp;
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+		</div>
+		
+		<div class="table_div" style="overflow:auto">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+				<tr class="tr1">
+					<th colspan="6">基本信息</th>
+					<th colspan="4">租赁信息</th>
+					<th colspan="5">房东信息</th>
+					<th colspan="3">床位信息</th>
+					<th rowspan="2">备注</th>
+				</tr>
+			   <tr class="tr1">
+				<th><div align="center" style="width:40px">序号</div></th>
+				<th><div align="center" style="width:60px">地区</div></th>
+				<th><div align="center" style="width:100px">县/市</div></th>
+				<th><div align="center" style="width:100px">项目名称</div></th>
+				<th><div align="center">项目编码</div></th>
+				<th><div align="center">宿舍名称</div></th>
+				<th><div align="center">签订日期</div></th>
+				<th><div align="center">付款金额</div></th>
+				<th><div align="center">开票情况</div></th>
+				<th><div align="center">到期日期</div></th>
+				<th><div align="center">房东</div></th>
+				<th><div align="center">房东联系电话</div></th>
+				<th><div align="center">收款账号</div></th>
+				<th><div align="center">收款账户名称</div></th>
+				<th><div align="center">开户行</div></th>
+				<th><div align="center">入住人数</div></th>
+				<th><div align="center">宿舍床位数</div></th>
+				<th><div align="center">床位单价</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in projectList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.PROVINCE}}</div></td>
+				<td><div align="center">{{item.CITY}}-{{item.DISTRICT}}</div></td>
+				<td>
+					<span ng-repeat="pro in top2(toArr(item.CUR_PRO_NAMES))" align="left" style="margin-left:10px;">{{pro}}</span>
+					<div ng-if="toArr(item.CUR_PRO_NAMES).length>1" style="text-align: center;">
+						<a href="javascript:" onmouseover="$(this).next().show();" onmouseout="$(this).next().hide();" class="owWordLoad">[查看更多]</a>
+						<div class="owWordload-detail">
+							<div ng-repeat="pro in after2(toArr(item.CUR_PRO_NAMES)) track by $index">{{pro}}</div>
+						</div>
+					</div>
+				</td>
+				<td>
+					<span ng-repeat="pro in top2(toArr(item.CUR_PRO_NOS))" align="left" style="margin-left:10px;">{{pro}}</span>
+					<div ng-if="toArr(item.CUR_PRO_NOS).length>1" style="text-align: center;">
+						<a href="javascript:" onmouseover="$(this).next().show();" onmouseout="$(this).next().hide();" class="owWordLoad">[查看更多]</a>
+						<div class="owWordload-detail">
+							<div ng-repeat="pro in after2(toArr(item.CUR_PRO_NOS)) track by $index">{{pro}}</div>
+						</div>
+					</div>
+				</td>
+				<td>
+					<div align="center">{{sub(item.DORM_NAME)}}</div>
+					<div align="center" ng-if="item.DORM_NAME.length>10" style="text-align:center">
+					    <a href="javascript:" onmouseover="$(this).next().show();" onmouseout="$(this).next().hide();" class="owWordLoad">[查看全文]</a>
+					    <div class="owWordload-detail">
+							{{item.DORM_NAME}}
+						</div>
+					</div>
+				</td>
+				<td><div align="center">{{item.S_RENT_DATE}}</div></td>
+				<td><div align="center">{{item.INVOICE_AMOUNT}}</div></td>
+				<td><div align="center">{{item.INVOICE_DATE}}</div></td>
+				<td><div align="center">{{item.E_RENT_DATE}}</div></td>
+				<td><div align="center">{{item.LANDLORD}}</div></td>
+				<td><div align="center">{{item.LANDLORD_PHONE}}</div></td>
+				<td><div align="center">{{item.SHROFF_ACCOUNT}}</div></td>
+				<td><div align="center">{{item.BENEFICIARY_NAME}}</div></td>
+				<td><div align="center">{{item.BANK}}</div></td>
+				<td><div align="center">{{item.CUR_BEDS}}</div></td>
+				<td><div align="center">{{item.MAX_BEDS}}</div></td>
+				<td><div align="center">{{item.DAYRENT}}</div></td>
+				<td>
+					<div align="center" >{{sub(item.REMARKS)}}</div>
+					<div align="center" ng-if="item.REMARKS.length>20" style="text-align:center">
+					    <a href="javascript:" onmouseover="$(this).next().show();" onmouseout="$(this).next().hide();" class="owWordLoad">[查看全文]</a>
+					    <div class="owWordload-detail">
+							{{item.REMARKS}}
+						</div>
+					</div>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+var dormType="";
+var dormTypeName="";
+var ticket="";
+var areaName="";
+var dormName="";
+var _currentPage=1;
+var searchName="";
+function createPageBar(totalPage, curPage,totalRecord){
+	new PageBar().init({
+		renderTo:"#page_bar",
+		totalPage:totalPage,
+		curPage:curPage,
+		totalRecord: totalRecord,
+		showPageInfo:true,
+		prevPageText:"上一页",
+		nextPageText:"下一页",
+		onPage:function(pageNum){
+			_currentPage=pageNum;
+			ngScope.loadProjects(areaName,dormName,_currentPage,dormType,searchName);
+		}
+	});
+}
+
+var ngScope;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.projectList=[];
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	/* 区域 */
+	new DropDownList().init({
+		renderTo:".dropDownProjectType",
+		url:"../../../component/areaList.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownProjectType").val(result.name);
+			areaName=result.name;
+			ngScope.loadProjects(areaName, dormName,1,dormType,searchName);
+		}
+	});
+	
+	//宿舍状态
+	new DropDownList().init({
+		renderTo:"#dormType",
+		url:"../../../component/dormTypes.html",
+		height:"200px",
+		onSelected:function(result){
+			$("#dormType").val(result.name);
+			dormType=result.value;
+			dormTypeName=result.name;
+			ngScope.loadProjects(areaName, dormName,1,dormType,searchName);
+		}
+	});
+	
+	/* 加载数据 */
+	$scope.loadProjects=function(areaName, dormName,currentPage,dormType,searchName){//alert(unitCode);
+		$http.get(serviceBasePath+"eap/pmsServices/materielMg/dormMg/dorm/getVehicleList?&ticket="+ticket+"&currentPage="
+				+currentPage+"&searchName="+searchName+"&areaName="+areaName+"&dormName="+dormName+"&dormType="+dormType).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../login.html";
+				return;
+			}
+			$scope.projectList = response.list;
+			createPageBar(response.totalPage, response.currentPage,response.totalRecord);
+		});
+	};
+	/* 查询 */
+	$scope.doQuery=function(){
+		var searchName = $("input[name=searchName]").val();
+		$scope.loadProjects(areaName,dormName,_currentPage,dormType,searchName);
+	};
+	
+	/* 初始查询 */
+	ngScope.loadProjects(areaName,dormName,_currentPage,dormType,searchName);
+	
+	$scope.toArr=function(pros){
+		if(!pros)return;
+		var arr = pros.split(",");//alert(arr);
+		return arr;
+	};
+	
+	$scope.top2=function(arr){
+		var arrN=[];
+		if(!arr)return arrN;
+		for(var i=0;i<arr.length;i++){
+			if(i>0){
+				break;
+			}
+			arrN.push(arr[i]);
+		}
+		return arrN;
+	};
+	
+	$scope.after2=function(arr){
+		var arrN=[];
+		for(var i=0;i<arr.length;i++){
+			arrN.push(arr[i]);
+		}//alert(arrN.length);
+		console.log(arrN)
+		return arrN;
+	};
+
+	
+	$scope.sub=function(content){
+		    if(content.length>20){
+		    	var str=content.substring(0,20);
+		    	return str;
+		    }else{
+		    	return content;
+		    }
+		};
+
+});
+</script>
+</body>
+</html>

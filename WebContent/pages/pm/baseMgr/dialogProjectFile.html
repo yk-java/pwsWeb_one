@@ -1,0 +1,411 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 人员管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+
+
+
+<style type="text/css">
+
+
+	.warning{background:red;color:#fff;}
+	.week{width:50px;}
+	.bgcolor{background:yellow}
+	
+	.switch_btn_group{border:solid 1px #3385FF;min-height:30px;float:left;border-radius:15px; position:absolute;right:10px;top:0px;}
+	.switch_btn_group a{display:inline-block;float:left;background:#fff;color:#3385FF;text-decoration:none;font-size:13px;
+		line-height:30px;text-align:center;margin:0 1px 0 0;min-width:60px;}
+	.switch_btn_group a.selected{background:#3385FF;color:#fff;}
+	.switch_btn_group a:first-of-type{border-top-left-radius:15px;border-bottom-left-radius:15px;}
+	.switch_btn_group a:last-of-type{border-top-right-radius:15px;border-bottom-right-radius:15px;margin:0;}
+	
+	.owWordLoad{text-decoration:underline;color:#0099ff;}
+	.owWordload-detail{border:solid 1px #666;background:#ffee99;color:#666;padding:4px 6px 4px 6px;position:absolute;display:none;margin-left:-300px;width:580px;}
+	
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+			   <tr class="tr1">
+				<th ><div align="center">序号</div></th>
+				<th ><div align="center">项目名称</div></th>
+				<th><div align="center">项目编号</div></th>
+				<th ><div align="center">项目负责人</div></th>
+				<th ><div align="center">文档名称</div></th>
+				<th ><div align="center">文档类型</div></th>
+				<th ><div align="center">材料日期</div></th>
+				<th ><div align="center">上传日期</div></th>
+				<th ><div align="center">操作</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in dailyList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.proName}}</div></td>
+				<td><div align="center">{{item.proNo}}</div></td>
+				<td><div align="center">{{item.proManager}}</div></td>
+				<td>
+					{{sub(item.title)}}
+				  <div align="center" ng-if="item.title.length>20" style="display:inline-block;">
+				       <a href="javascript:" onmouseover="$(this).next().show();" onmouseout="$(this).next().hide();" class="owWordLoad">[查看全文]</a>
+				       <div class="owWordload-detail">
+							{{item.title}}
+						</div>
+				  </div>
+					
+				</td>
+				
+				
+				
+				<td><div align="center">{{item.docTypelibName}}</div></td>
+				<td><div align="center">{{item.uploadDate}}</div></td>
+				<td><div align="center">{{item.createTime| limitTo:19}}</div></td>
+				<td>
+					<div align="center">
+						
+			    		<img  ng-click="readonline(item)" class="operationImg" src="../../../img/readonline.png" title="在线阅读">
+			    
+			    		<img class="operationImg" ng-click="downFile(item)" src="../../../img/filedownload.png" title="下载 ">
+			    		
+			    		<!-- <img   class="operationImg" ng-click="doDelete(item)" src="../../../img/list_delete-icon.png" title="删除"> -->
+		    		</div>
+				</td>
+			  </tr>
+			  
+			</table>
+		</div>
+
+	
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+function createPageBar(totalPage, curPage,totalRecord){
+	new PageBar().init({
+		renderTo:"#page_bar",
+		totalPage:totalPage,
+		curPage:curPage,
+		totalRecord: totalRecord,
+		showPageInfo:true,
+		prevPageText:"上一页",
+		nextPageText:"下一页",
+		onPage:function(pageNum){
+			_currentPage=pageNum;
+			//$("#currPage").html(pageNum);
+			//ngScope.loadDailyList(proNo,docClass,docTypelibCode,pageNum);
+				ngScope.loadDailyList(proNo,docClass,docTypelibCode,fromDate,toDate,pageNum,searchName);
+		}
+	});
+}
+var cond_proStatus="2";
+var cond_categoryCode="";
+var cond_categoryName="";
+var docTypelibCode="";//文档类型
+var docTypelibName="";//文档类型名称
+var proNo="";//项目
+var proName="";
+var fromDate="";
+var toDate="";
+var searchName="";
+
+var docClass=1;//项目类型
+var fileNo="";
+var _currentPage=1;
+var ngScope;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.isDelete=0;
+	$scope.dailyList=[];
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	
+	if(userData.employeeName=="吴英"){
+		$scope.isDelete=1;
+	}
+	var accountCode="";
+	//alert(userData.roleCode)
+		/* 根据角色判断是否传accountCode */
+		 if(userData.roleCode=="004"){
+			accountCode=userData.accountCode;
+			
+		}
+	 
+	
+	
+	
+	
+	
+	
+	
+	var params = getUrlParams();
+	docClass=params.docClass;
+	
+	if(params){
+		
+		if(params.cond_categoryCode){
+			cond_categoryCode=params.cond_categoryCode;
+		}
+		if(params.cond_categoryName){
+			cond_categoryName=params.cond_categoryName;
+			$(".dropDownProjectType").val(cond_categoryName);
+		}
+		if(params.docTypelibCode){
+			docTypelibCode=params.docTypelibCode;
+		}
+		if(params.docTypelibName){
+			docTypelibName=params.docTypelibName;
+			$(".fielType").val(docTypelibName);
+		}
+		if(params.proNo){
+			proNo=params.proNo;
+		}
+		if(params.proName){
+			proName=params.proName;
+			
+			$(".dropDownTree").val(proName);
+		}
+		if(params.fromDate){
+			fromDate=params.fromDate;
+			$("input[name=fromDate]").val(fromDate);
+		}
+		if(params.toDate){
+			toDate=params.toDate;
+			$("input[name=toDate]").val(toDate);
+		}
+		if(params.searchName){
+			searchName=params.searchName;
+			$("input[name=searchName]").val(searchName);
+		}
+		if(params.currentPage){
+			_currentPage=params.currentPage;
+		}
+		
+	}
+	
+	ticket = $.cookie("pmsWeb_ticket");
+	var proUrl="../../component/projectList.html";
+	
+	if(docClass==2 || docClass=='2'){
+		proUrl="../../component/allProjectList.html";
+	}
+
+
+	
+	/* 项目类型 */
+	new DropDownList().init({
+		renderTo:".dropDownProjectType",
+		url:"../../component/projectType.html?required=false&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownProjectType").val(result.categoryName);
+			cond_categoryCode = result.categoryCode;
+			cond_categoryName =result.categoryName ;
+			/* 联动 */
+			projectList.setConfig("url", proUrl+"?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&required=false&ticket="+ticket);
+		}
+	});
+	
+	$(".switch_btn_group>a").each(function(){
+		$(this).click(function(){
+			$(this).addClass("selected");
+			$(this).siblings().removeClass("selected");
+			cond_proStatus = $(this).attr("datatype");
+			projectList.setConfig("url", proUrl+"?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&ticket="+ticket);
+			$scope.doQuery();
+		});
+		
+	});
+	
+	
+	
+
+	/* 项目列表 */
+	var projectList = new DropDownList();
+	projectList.init({
+		renderTo:".dropDownTree",
+		url:proUrl+"?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&required=false&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownTree").val(result.proName);
+			proNo=result.proNo;
+			proName=result.proName;
+			$scope.loadDailyList(proNo,docClass,docTypelibCode,fromDate,toDate,1,searchName);
+		}
+	});
+	
+	/* 项目文档类型 */
+	new DropDownList().init({
+		renderTo:".fielType",
+		url:"../../component/fileType.html?required=false&docClass="+docClass,
+		height:"200px",
+		onSelected:function(result){
+			$(".fielType").val(result.name);
+			
+			docTypelibCode=result.code;
+			docTypelibName=result.name;
+			$scope.loadDailyList(proNo,docClass,docTypelibCode,fromDate,toDate,1,searchName);
+		}
+	});
+	
+	
+	
+	$scope.loadDailyList=function(proNo,docClass,docTypelibCode,fromDate,toDate,currentPage,searchName){//alert(unitCode);
+	
+		
+		$http.get(serviceBasePath+"eap/pmsServices/pm/projDoc/list?docClass="+docClass+"&proStatus="+cond_proStatus+"&proNo="+proNo+"&docTypelibCode="+docTypelibCode+"&ticket="+ticket+"&currentPage="+currentPage+"&fromDate="+fromDate+"&toDate="+toDate+"&accountCode="+accountCode+"&searchName="+searchName).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$scope.dailyList = response.list;
+ 			createPageBar(response.totalPage, response.currentPage,response.totalRecord);
+		});
+	};
+	
+	$scope.doQuery=function(){
+		fromDate=$("input[name=fromDate]").val();
+		toDate=$("input[name=toDate]").val();
+		searchName=$("input[name=searchName]").val();
+		$scope.loadDailyList(proNo,docClass,docTypelibCode,fromDate,toDate,1,searchName);
+	};
+	
+	$scope.sub=function(content){
+		
+		//	alert(content)
+		    
+		    if(content.length>20){
+		    	var str=content.substring(0,20);
+		    	return str;
+		    }else{
+		    	return content;
+		    }
+			
+		};
+
+	
+	//在线阅读
+	$scope.readonline=function(item){
+		//alert(item.reVisitid);
+		
+		//location.href="fileDetail.html?reVisitid="+item.reVisitid+"&dlVisitid="+item.dlVisitid+"&attachment=0"+"&fileName="+encodeURIComponent(item.fileName)+"&suffixName="+item.suffixName+"&fileSize="+item.fileSize;
+		//alert(proName)
+		hrefTo({
+			url:"dialogFileDetail.html",
+			data:{
+				reVisitid:item.reVisitid,
+				dlVisitid:item.dlVisitid,
+				fileName:item.fileName,
+				suffixName:item.suffixName,
+				fileSize:item.fileSize,
+		        docTypelibCode:docTypelibCode,
+		        proNo:proNo,
+		        docClass:docClass,
+		        title:item.title,
+		        currentPage:_currentPage
+			}
+		});
+
+	};
+	
+	//下载
+	$scope.downFile=function(item){
+		//alert(item.dlVisitid);
+		location.href=filePath+"?fileCode="+item.dlVisitid+"&attachment=1";
+	};
+	
+	$scope.upload=function(){
+		//location.href="addProjectFile.html?docClass="+docClass;
+		
+		hrefTo({
+			url:"addProjectFile.html",
+			data:{
+				cond_categoryCode:cond_categoryCode,
+		        cond_categoryName:cond_categoryName,
+		        docTypelibCode:docTypelibCode,
+		        docTypelibName:docTypelibName,
+		        proNo:proNo,
+		        proName:proName,
+		        fromDate:fromDate,
+		        toDate:toDate,
+		        searchName:searchName,
+		        docClass:docClass,
+		        currentPage:_currentPage
+			}
+		});
+	};
+	
+	//删除
+	$scope.doDelete=function(item){
+		
+		/* var reVisitid=item.reVisitid;
+		var dlVisitid=item.dlVisitid;
+		alert(reVisitid==dlVisitid)
+		if(reVisitid==dlVisitid){
+			location.href="http://192.168.1.226:8080/fileServer/eap/fileService/file/delete?fileCode="+reVisitid;
+			
+			
+		}else{
+			location.href="http://192.168.1.226:8080/fileServer/eap/fileService/file/delete?fileCode="+reVisitid;
+			location.href="http://192.168.1.226:8080/fileServer/eap/fileService/file/delete?fileCode="+dlVisitid;
+		}
+		 */
+		
+		
+		$scope.doDelete=function(item){
+			new ShowDlog().confirm({
+				msg:"确定删除"+item.title+"文档吗？",
+				ok:function(){
+					$http.post(serviceBasePath+"eap/pmsServices/pm/projDoc/delete?rowid="+item.rowid+"&ticket="+ticket+"&reVisitid="+item.reVisitid+"&dlVisitid="+item.dlVisitid).success(function(response){
+						$scope.loadDailyList(proNo,docClass,docTypelibCode,fromDate,toDate,_currentPage,searchName);
+					});
+				},
+				cancel:function(){}
+			});
+		};
+		
+	};
+	
+	
+	/* 初始查询 */
+	$scope.loadDailyList(proNo,docClass,docTypelibCode,fromDate,toDate,_currentPage,searchName);
+	
+	
+});
+</script>
+</body>
+</html>

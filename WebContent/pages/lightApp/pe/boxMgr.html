@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en"  ng-app="realPosition">
+<head>
+	<meta charset="UTF-8" />
+	<title>Document</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="js/jquery.cookie.js"></script>
+	<script src="js/angular.min.js"></script>
+	<script src="js/util.js"></script>
+	<script src="js/ng-base.js?a=1"></script>
+	
+
+	<script type="text/javascript" src="js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="js/showDlog/showDlog-blue.css" />
+	<link rel="stylesheet" type="text/css" href="css/bxyw1.css"/>
+	<link rel="stylesheet" type="text/css" href="css/edit.css"/>
+	<script type="text/javascript" src="js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="js/DropDownList-1.2/DropDownList.css" />
+<style>
+	.inp{text-align: center;width:25%;padding:3px;}
+	.shownum{border: 2px #ccc solid;width:80%;height:40px;margin-top:10px;font-size: 16px;}
+	.btnok{width:80%;padding:3px;}
+</style>
+</head>
+<body ng-controller="realPositionCtrl">
+<form id="saveForm" class="required-validate">
+	<header> 
+		<div class="return"><img src="img/deviceAdd/return.png" onclick="window.top.nativeLib.exitApp()" /></div>
+			江宁箱表关系核查
+	</header>
+	<section>
+		
+		<div class="filter_sort" style="text-align: center;padding-top:10px;">
+			<input type="button" value="扫表箱号" class="inp" onclick="scan()" />
+			<input type="button" value="新增表箱" class="inp" />
+		</div>
+		
+		<div style="text-align: center;">
+			<input type="text" class="shownum" readonly="readonly" placeholder="表箱号码"  />
+		</div>
+		<div class="filter_sort" style="text-align: center;padding-top:10px;">
+			<input type="button" value=" 确 定 " class="btnok" onclick="save()" />
+		</div>
+		
+	</section>
+
+	
+	</form>
+	<script type="text/javascript">
+		
+		
+		var reseverOrgcode="";
+		
+		var searchName="";
+		
+		var reserveStatus="";
+		simpleController({
+			moduleName:"realPosition",
+			controllerName:"realPositionCtrl",
+			init:function($scope, $http){
+	
+				
+				
+				
+				
+				
+				
+				
+				
+				
+
+				
+			}
+
+		});
+		
+		function scan(){
+			
+			window.top.nativeLib.scanCode({callback:function(data){
+				//alert(data)
+				
+				 alert(data);
+			}});
+			
+			
+		}
+		
+		$(".clear_search1").click(function(){
+			$(".search_int input").val("");
+			$(".filter").hide();
+		})
+		
+	
+		$(".filter_no").each(function(){
+			$(this).click(function(){
+				$(this).find("img").attr("src","images/task_selete_icon.png")
+				$(this).siblings().find("img").attr("src","images/task_nonselete_icon.png")
+			})
+		});
+		$(".sort li").each(function(){
+			$(this).click(function(){
+				$(this).find("img").show();
+				$(this).siblings().find("img").hide();
+				$(".sort").hide();
+			})
+		});
+		
+		var fsper = "true";
+		$(".cz_selpx li").click(function(){
+			if(fsper == "true"){
+				var n = $(this).index();
+				$(".filter_sort ul").eq(n).show().siblings().hide();
+				fsper = "false";
+			}else{
+				var n = $(this).index();
+				$(".filter_sort ul").eq(n).hide();
+				fsper = "true";
+			}
+		});
+		
+		
+		$(".return").click(function(){
+			window.history.back();
+		})
+		
+	</script>
+</body>
+</html>

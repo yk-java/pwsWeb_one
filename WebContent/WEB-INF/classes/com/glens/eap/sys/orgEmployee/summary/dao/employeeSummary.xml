@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glens.eap.sys.orgEmployee.summary.summaryMapper">
+
+	<select id="selectEmployeeSummary" resultType="map" parameterType="map">
+		
+		select c.pro_no proNo,c.pro_name proName,sum(case JOB_CLASS2 when 1 then 1 else 0 end) indoorWorkerCount,sum(case JOB_CLASS2 when 2 then 1 else 0 end) outdoorWorkerCount,
+		count(a.job_no) totalWorkerCount,sum(case CONTRACT_PROPERTY_CODE when 1 then 1 else 0 end) regularCount,'1' flag
+		from md_employee a
+		join pm_member b on a.employeecode=b.employeecode
+		join pm_base c on b.pro_no=c.pro_no
+		where a.JOB_CLASS1=2 and b.WORK_STATUE=1 and a.WORK_STATUS=1
+		<if test="province != null and province != ''">
+			and c.PROVINCE=#{province}
+		</if>
+		<if test="city != null and city != ''">
+			and c.CITY=#{city}
+		</if>
+		<if test="district != null and district != ''">
+			and c.DISTRICT=#{district}
+		</if>
+		group by c.pro_no,c.pro_name
+		union 
+		select '' proNo,b.unit_name proName,count(a.job_no) indoorWorkerCount,0 outdoorWorkerCount,count(a.job_no) totalWorkerCount,
+		sum(case CONTRACT_PROPERTY_CODE when 1 then 1 else 0 end) regularCount,'2' flag
+		from md_employee a
+		join md_org_unit b on a.unit_code=b.unit_code
+		join es_company c on b.company_code=c.company_code
+		where a.JOB_CLASS1=1  and a.WORK_STATUS=1
+		and substring(c.region_code,0,2)=substring(#{regionCode},0,2) and cast(c.region_code as SIGNED) &gt;= cast(#{regionCode} as UNSIGNED)
+		group by b.unit_name
+		
+	</select>
+	
+	<select id="selectProEmployee" parameterType="map" resultType="map">
+		select a.employeecode employeeCode,a.employeename employeeName,a.RECORDNO recordNo,a.JOB_NO jobNo,
+		d.JOB_NAME jobName,e.JOB_PROPERTY_NAME jobPropertyName,f.CONTRACT_PROPERTY_NAME contractPropertyName,
+		a.JOB_CLASS1 jobClass1,a.JOB_CLASS2 jobClass2,a.SEX sex,a.IDCARD idcard,a.BIRTHDAY birthday
+		from md_employee a
+		left join pm_member b on a.employeecode=b.employeecode
+		left join pm_base c on b.pro_no=c.pro_no
+		left join MD_EMPLOYEE_JOB d on a.JOB_CODE=d.JOB_CODE
+		left join MD_EMPLOYEE_JOB_PROPERTY e on a.JOB_PROPERTY_CODE=e.JOB_PROPERTY_CODE
+		left join MD_EMPLOYEE_CONTRACT_PROPERTY f on a.CONTRACT_PROPERTY_CODE=f.CONTRACT_PROPERTY_CODE
+		where a.JOB_CLASS1=2 and b.WORK_STATUE=1 and a.WORK_STATUS=1
+		<if test="proNo != null and proNo != ''">
+			and c.PRO_NO=#{proNo}
+		</if>
+		<if test="jobClass2 != null and jobClass2 != 0">
+			and a.JOB_CLASS2=#{jobClass2}
+		</if>
+		<if test="contractPropertyCode != null and contractProtertyCode != ''">
+			and a.CONTRACT_PROPERTY_CODE=#{contractPropertyCode}
+		</if>
+	</select>
+	
+	<select id="selectUnitEmployee" parameterType="map" resultType="map">
+		select a.employeecode employeeCode,a.employeename employeeName,a.RECORDNO recordNo,a.JOB_NO jobNo,
+		d.JOB_NAME jobName,e.JOB_PROPERTY_NAME jobPropertyName,f.CONTRACT_PROPERTY_NAME contractPropertyName,
+		a.JOB_CLASS1 jobClass1,a.JOB_CLASS2 jobClass2,a.SEX sex,a.IDCARD idcard,ifnull(DATE_FORMAT(a.BIRTHDAY,'%Y-%m-%d'),'') birthday
+		from md_employee a
+		left join MD_EMPLOYEE_JOB d on a.JOB_CODE=d.JOB_CODE
+		left join MD_EMPLOYEE_JOB_PROPERTY e on a.JOB_PROPERTY_CODE=e.JOB_PROPERTY_CODE
+		left join MD_EMPLOYEE_CONTRACT_PROPERTY f on a.CONTRACT_PROPERTY_CODE=f.CONTRACT_PROPERTY_CODE
+		where a.JOB_CLASS1=1 and a.WORK_STATUS=1
+		<if test="proNo != null and proNo != ''">
+			and a.UNIT_CODE=#{proNo}
+		</if>
+		<if test="jobClass2 != null and jobClass2 != 0">
+			and a.JOB_CLASS2=#{jobClass2}
+		</if>
+		<if test="contractPropertyCode != null and contractProtertyCode != ''">
+			and a.CONTRACT_PROPERTY_CODE=#{contractPropertyCode}
+		</if>
+	</select>
+
+</mapper>

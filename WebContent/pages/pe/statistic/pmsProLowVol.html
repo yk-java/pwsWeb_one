@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>项目下PMS2.0低压工作量汇总</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.base64.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+<style type="text/css">
+	.dropDownArea{background-image:url(../../../img/flag.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	.dropDownProjectType{background-image:url(../../../img/type.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	.dropDownProjectType1{background-image:url(../../../img/type.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	
+	
+	.dialog_scheme_check{width:800px;height:620px;}
+	
+	.title_div2{border:solid 0px red;background:#4CA9FF;padding:8px 6px 8px 6px;}
+	.title_div2 .condLayer1{display:block;border:solid 0px;margin:6px;}
+	.title_div2 .condLayer2{border:solid 0px green;margin:6px;}
+	.title_div2 .condLayer1 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;padding:0 4px;font-family:微软雅黑;}
+	.title_div2 .condLayer2 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;padding:0 4px;background-color:#DAEDFF;font-family:微软雅黑;}
+	.title_div2 .btn{display:inline-block;height:28px;line-height:28px;margin:0 4px;padding:0 15px 0 15px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; border-radius:4px;}
+	.title_div2 .blue{background:#3385FF;color:#fff;}
+	.title_div2 .blue:hover{background:#186CE7;}
+	.title_div2 .pink{background:#ED7798;color:#fff;}
+	.title_div2 .pink:hover{background:#E54673;}
+	.table th{padding:0;}
+	.table th>div{padding:3px;}
+	
+	.col_list{border:solid 1px #ccc;background-color:#8FC4F6;background-image:url(../../../img/drop_down_list_w.png);background-repeat:no-repeat;background-position:right;color:#fff;width:382px;height:30px;}
+	.col_list label{display:inline-block;line-height:30px;margin:0 10px;}
+	
+	.col_list_content{display:none;position:absolute;z-index:1;border:solid 1px #ccc;border-top:0; background:#fff;width:382px;}
+	.col_list_content table{width:100%;padding:2px;}
+	.col_list_content table th, .col_list_content table td {padding:6px;}
+	.col_list_content table th{background:#E3EFFB;}
+	.col_list_content table td input{width:130px;}
+	
+	.cond_list{border:solid 1px #ccc;background-color:#8FC4F6;background-image:url(../../../img/drop_down_list_w.png);background-repeat:no-repeat;background-position:right;color:#fff;width:190px;height:30px;}
+	.cond_list label{display:inline-block;line-height:30px;margin:0 10px;}
+	.cond_list_content{display:none;position:absolute;z-index:1;border:solid 1px #ccc;border-top:0; background:#fff;width:190px;}
+	
+	.dropDownLayer{display:inline-block;border:solid 0px red;}
+</style>
+
+
+</head>
+<body ng-app="moduleName" ng-controller="controllerName" storagekey="pe.statistic.pmsProLowVol">
+<div class="list">
+	<div class="list_content" style="bottom:0;border:solid 0px;">
+		<div class="title_div2">
+			<div class="condLayer1">
+				<input type="text" id="proName" class="dropDownList" name="proName" viewstate="proName" style="width:180px;" placeholder="请选择项目"/>
+				<input type="hidden" name="proNo" viewstate="proNo"/>
+				<input type="text" name="beginDate" class="dateComponent" viewstate="beginDate" placeholder="启始时间" onclick="new Calendar().show(this)"/>
+				<input type="text" name="endDate" class="dateComponent" viewstate="endDate" placeholder="结止时间" onclick="new Calendar().show(this)"/>
+				
+				<div class="btn blue" ng-click="doQuery()">
+					查询
+				</div>
+				<div class="btn blue" ng-click="doExport()">
+					导出
+				</div>
+				
+			</div>
+		</div>
+		
+		<div class="table_div" style="position:absolute;top:55px;bottom:0;border:solid 0px red;overflow:auto;margin-bottom:0;">
+		
+			<table class="table" style="width:100%;" id="tb1">
+				<tr class="tr1">
+					<th rowspan="2">项目名称</th>
+					<th rowspan="2">项目负责人</th>
+					<th colspan="4">累计完成情况</th>
+					<th colspan="6">当期完成情况</th>
+<!-- 					<th colspan="2">当日红黑榜</th> -->
+<!-- 					<th rowspan="2">当日项目排名</th> -->
+				</tr>
+				<tr class="tr1">
+					<th>项目人数</th>
+					<th>总工作量</th>
+					<th>完成量</th>
+					<th>完成率</th>
+					
+					<th>人员投入</th>
+					<th>完成台区数</th>
+					<th>新增台区数</th>
+					<th>修改台区数</th>
+					<th>人均效率值</th>
+					<th>增长效率值</th>
+					
+<!-- 					<th>优胜（人员、业绩）</th> -->
+<!-- 					<th>后进（人员、作量）</th> -->
+				</tr>
+				<tr class="tr2" ng-repeat="item in dataList">
+					<td>{{item.proName}}</td>
+					<td>{{item.proManager}}</td>
+					<td>{{item.demandStaff}}</td>
+					<td>{{item.totalWorkload}}</td>
+					<td>{{item.allAccumulativeWordload}}</td>
+					<td>{{item.allAccumulativeProgress}}</td>
+					<td>{{item.personCount}}</td>
+					<td>{{item.dmrdCount}}</td>
+					<td>{{item.dmrdNewCount}}</td>
+					<td>{{item.dmrdMrCount}}</td>
+					<td>{{item.avgeFficiency}}</td>
+					<td>{{item.riseFficiency}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+simpleController({
+	viewStateInit:function($scope, $viewState){
+	},
+	init:function($scope, $http, $viewState){
+		$scope.dataList=[];
+		var viewState = new ViewState();
+		var urlParams = getUrlParams();
+		
+		if($("input[viewstate=date]").val()==""){
+			$("input[viewstate=date]").val(new SimpleDateFormat({formatString:"yyyy-MM-dd"}).format(new Date()));
+		}
+		/* 项目分类 */
+		new DropDownList().init({
+			mode:"page",
+			renderTo:"#category",
+			url:"../../component/projectType.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$viewState.categoryCode=result.categoryCode;
+				$("#category").val(result.categoryName);
+				$viewState.categoryName=result.categoryName;
+				proNameList.setConfig("url", "../../component/projectList.html?categoryCode="+result.categoryCode+"&ticket="+$scope.ticket);
+			}
+		});
+		
+		/* 项目列表 */
+		var proNameList = new DropDownList();
+		proNameList.init({
+			mode:"page",
+			renderTo:"#proName",
+			url:"../../component/projectList.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=proNo]").val(result.proNo);
+				$("input[name=proName]").val(result.proName);
+			}
+		});
+		
+		$scope.loadData=function(proNo, beginDate, endDate){
+			$scope.httpGet({
+				url:"eap/pmsServices/pm/pmStatsAn/pmsLowVolSa/pmProWorkloadStatsAn",
+				data:{"companyCode":$scope.userData.companyCode, "proNo":proNo, "fromDate":beginDate, "toDate":endDate},
+				success:function(res){
+					$scope.dataList = res.list;
+				}
+			});
+		}
+		
+		$scope.doQuery=function(){
+			viewState.collect();
+			$scope.loadData(viewState.get("proNo"), viewState.get("beginDate"), viewState.get("endDate"));
+		};
+		$scope.doExport=function(){
+			excelExport("tb1");
+		};
+		
+		$scope.doQuery();
+	}
+});
+</script>
+</html>

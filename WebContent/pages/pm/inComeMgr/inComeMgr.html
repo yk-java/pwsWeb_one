@@ -1,0 +1,374 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>薪酬管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+<style type="text/css">
+	.title_tabs{list-style-type:none;padding:0;margin:0;height:39px;}
+	.title_tabs li{position:relative;padding:0;margin:0;border:solid 0px;float:left;height:39px;background:#E1E1E1;}
+	.title_tabs li>a{display:block;line-height:39px;border:solid 0px;padding:0 70px 0 50px;margin-right:-14px;
+		background:url(../../../img/list_Header2-gray.png) right no-repeat;color:#666;font-size:14px;font-weight:bold;}
+	.title_tabs li.selected{background:#4CA9FF;z-index:9;}
+	.title_tabs li.selected>a{background:url(../../../img/list_Header2-.png) right no-repeat;color:#fff;font-size:14px;font-weight:bold;}
+	.dlog-edit{width:500px;height:420px;}
+	.dlog-copy{width:420px;height:450px;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+<div class="list">
+	<div class="list_content">
+	<div class="title_div">
+			<div class="title_left">
+				<input type="text" class="dropDownTree dropDownList" style="width:280px;" placeholder="请选择部门"/>
+				<input type="text" id="starttime" name="starttime" style="width:110px;" class="date dateComponent" placeholder="请选择开始时间" onclick="new Calendar().show(this)" />
+				<input type="text" id="endtime"   name="endtime" style="width:110px;" class="date dateComponent" placeholder="请选择结束时间" onclick="new Calendar().show(this)" />
+				<input type="text" id="searchName" placeholder="请输入搜索内容">
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			<div class="title_add" ng-click="addDo()">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新增
+			</div>
+		</div>
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+			   <tr class="tr1">
+				<th align="center"><div style="width:40px;">序号</div></th>
+				<th><div align="center">部门</div></th>
+				<th><div align="center">标题</div></th>
+				<th><div align="center">开始时间</div></th>
+				<th><div align="center">结束时间</div></th>
+				<th><div align="center">备注</div></th>
+				<th><div align="center">状态</div></th>
+				<th><div align="center">操作</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in userList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.unitName}}</div></td>
+				<td><div align="center">{{item.title}}</div></td>
+				<td><div align="center">{{item.validStartTime}}</div></td>
+				<td><div align="center">{{item.validEndTime}}</div></td>
+				<td><div align="center">{{item.remarks}}</div></td>
+				<td>
+					<div align="center" ng-if="item.status==1" style="color:blue">未启用</div>
+					<div align="center" ng-if="item.status==2" style="color:green">启用</div>
+					<div align="center" ng-if="item.status==3" style="color:red">停用</div>
+				</td>
+				
+				<td>
+					<div align="center">
+						<img ng-click="doEdit(item)" class="operationImg" src="../../../img/list_item_modify-icon.png" title="修改">
+						<img ng-click="doSet(item)" class="operationImg" src="../../../img/asset/assetRepair.png" title="设置">
+						<img ng-click="doShow(item)" class="operationImg" src="../../../img/list_see-icon.png" title="查看 ">						
+						<img ng-click="doDelete(item)" class="operationImg" src="../../../img/list_delete-icon.png" title="删除">
+						
+						<img ng-if="item.status==1 || item.status==3" ng-click="startOrClose(item)" class="operationImg" src="../../../img/startUse.png" title="启用">
+						<img ng-if="item.status==2"ng-click="startOrClose(item)" class="operationImg" src="../../../img/stopUse.png" title="停用">
+						
+						
+						<img ng-click="copyFramework(item)" class="operationImg" src="../../../img/copyFrame.png" title="复制">
+					</div>
+				</td>
+			  </tr>
+			</table>
+		</div>
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+var companyCode="";
+var unitCode="";
+var _currentPage=1;
+var validStartTime="";
+var validEndTime="";
+var ngScope;
+function createPageBar(totalPage, curPage,totalRecord){
+	new PageBar().init({
+		renderTo:"#page_bar",
+		totalPage:totalPage,
+		curPage:curPage,
+		totalRecord: totalRecord,
+		showPageInfo:true,
+		prevPageText:"上一页",
+		nextPageText:"下一页",
+		onPage:function(pageNum){
+			_currentPage=pageNum;
+			ngScope.getData(unitCode,_currentPage,validStartTime,validEndTime);
+		}
+	});
+}
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		window.noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	var companyCode=userData.companyCode;
+	var unitCode="";
+	ticket = $.cookie("pmsWeb_ticket");
+	new DropDownList().init({
+		renderTo:".dropDownTree",
+		url:"../../component/orgTree.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			unitCode=result.unitCode;
+			$(".dropDownTree").val(result.unitName);
+			$scope.getData(unitCode,_currentPage,validStartTime,validEndTime);
+			
+		}
+	});
+
+	ticket = $.cookie("pmsWeb_ticket");
+	var urlParams = getUrlParams();
+	$scope.getData=function(unitCode,_currentPage,validStartTime,validEndTime){
+		$http.get(serviceBasePath+"eap/pmsServices/hrm/salMgr/salaryFramwork/list?companyCode="+companyCode+"&unitCode="+unitCode+"&validStartTime="+validStartTime+"&validEndTime="+validEndTime+"&currentPage="+_currentPage).success(function(response){
+			if(response.statusCode==200){
+				$scope.userList=response.list;
+				createPageBar(response.totalPage, response.currentPage,response.totalRecord);
+			}
+		});
+	};
+	$scope.getData(unitCode,_currentPage,validStartTime,validEndTime);
+	
+	$scope.doQuery=function(){
+		validStartTime=$("input[name='starttime']").val();
+		validEndTime=$("input[name='endtime']").val();
+		
+		$scope.getData(unitCode,_currentPage,validStartTime,validEndTime);
+	}
+	
+	$scope.copyFramework=function(obj){
+		
+		var frameworkCode=obj.frameworkCode;
+		//var companyCode=obj.companyCode;
+		//var unitCode=obj.unitCode;
+		
+		new ShowDlog().showFrame("copyFrame.html", "复制"+obj.title, function(res){
+			
+		    
+			
+		    if(res){
+		    	
+		    	if("cancel"==res){
+					
+				}else{
+					
+					var newUnitCode=res.unitCode;
+					var newUnitName=res.unitName;
+					var validStartTime1=res.validStartTime;
+					var validEndTime1=res.validEndTime;	
+					
+					
+					$http.post(serviceBasePath+"eap/pmsServices/hrm/salMgr/salaryFramwork/copySalaryFramework?companyCode="+obj.companyCode+"&unitCode="+obj.unitCode+"&validStartTime="+validStartTime1+"&validEndTime="+validEndTime1+"&frameworkCode="+frameworkCode+"&newUnitCode="+newUnitCode).success(function(response){
+						if(response.statusCode==200){
+
+							new ShowDlog().prompt({
+									icon:"success",
+									msg:"复制成功！",
+									done:function(){
+										$scope.getData(unitCode,_currentPage,validStartTime,validEndTime);
+									},
+									t:1500
+							});
+
+						}else{
+							new ShowDlog().prompt({
+								icon:"warning",
+								msg:"复制失败！",
+								done:function(){
+									$scope.getData(unitCode,_currentPage,validStartTime,validEndTime);
+								},
+								t:1500
+							});
+						}
+						
+					});
+					
+					
+				}
+		    }
+			
+			
+		}, "dlog-copy");
+
+		
+	};
+	
+	
+	$scope.startOrClose=function(obj){
+		
+		
+		
+		
+		var tempstatus=obj.status;
+		
+		var subStatus;
+		var mess="";
+		if(tempstatus==1 || tempstatus==3){
+			subStatus=2;
+			mess="启用";
+		}else{
+			subStatus=3;
+			mess="停用";
+		}
+		
+		
+		
+		new ShowDlog().confirm({
+			msg:"确定要"+mess+"吗？",
+			ok:function(){
+				
+				var waittingDlog = new ShowDlog();
+				$http.get(serviceBasePath+"eap/pmsServices/hrm/salMgr/salaryFramwork/isStart?companyCode="+obj.companyCode+"&unitCode="+obj.unitCode+"&frameworkCode="+obj.frameworkCode+"&status="+subStatus).success(function(response){
+					if(response.statusCode==200){
+						
+						var title=response.data[0].title;
+						waittingDlog.prompt({
+							icon:"warning",
+							msg:"您已经启用"+title+"",
+							done:function(){
+								
+							},
+							t:1500
+						});
+						
+						
+					}else if(response.statusCode==100){
+						waittingDlog.prompt({
+							icon:"success",
+							msg:mess+"成功!",
+							done:function(){
+								$scope.getData(unitCode,_currentPage,validStartTime,validEndTime);
+							},
+							t:1500
+						});
+					}else{
+						waittingDlog.prompt({
+							icon:"error",
+							msg:mess+"失败!",
+							done:function(){
+								$scope.getData(unitCode,_currentPage,validStartTime,validEndTime);
+							},
+							t:1500
+						});
+					}
+				});
+				
+				
+			}
+		});
+		
+		
+		
+		
+		
+	};
+	
+	
+	$scope.addDo=function(){
+		location.href="inComeMgrAdd.html";
+	};
+	$scope.doEdit=function(item){
+		location.href="inComeMgrEdit.html?unitCode="+item.unitCode+"&unitName="+item.unitName+"&frameworkCode="+item.frameworkCode+"&title="+item.title+"&validStartTime="+item.validStartTime+"&validEndTime="+item.validEndTime+"&salaryGrade="+item.salaryGrade+"&salaryLevel="+item.salaryLevel+"&salaryGradeNamePrefix="+item.salaryGradeNamePrefix+"&salaryGradeStart="+item.salaryGradeStart+"&remarks="+item.remarks;
+	};
+	$scope.doSet=function(item){
+		location.href="inComeSet.html?unitCode="+item.unitCode+"&unitName="+item.unitName+"&frameworkCode="+item.frameworkCode+"&title="+item.title;	
+	};
+	
+	$scope.doShow=function(item){
+		location.href="inComeSetDetail.html?unitCode="+item.unitCode+"&frameworkCode="+item.frameworkCode;	
+	};
+	
+	
+	
+	$scope.doDelete=function(item){
+		var data={"companyCode":userData.companyCode,"unitCode":item.unitCode,"frameworkCode":item.frameworkCode};
+		
+		new ShowDlog().confirm({
+			msg:"是否确定删除？",
+			ok:function(){
+				$http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+
+				  /**
+				   * The workhorse; converts an object to x-www-form-urlencoded serialization.
+				   * @param {Object} obj
+				   * @return {String}
+				   */ 
+				  var param = function(obj) {
+				    var query = '', name, value, fullSubName, subName, subValue, innerObj, i;
+				      
+				    for(name in obj) {
+				      value = obj[name];
+				        
+				      if(value instanceof Array) {
+				        for(i=0; i<value.length; ++i) {
+				          subValue = value[i];
+				          fullSubName = name + '[' + i + ']';
+				          innerObj = {};
+				          innerObj[fullSubName] = subValue;
+				          query += param(innerObj) + '&';
+				        }
+				      }
+				      else if(value instanceof Object) {
+				        for(subName in value) {
+				          subValue = value[subName];
+				          fullSubName = name + '[' + subName + ']';
+				          innerObj = {};
+				          innerObj[fullSubName] = subValue;
+				          query += param(innerObj) + '&';
+				        }
+				      }
+				      else if(value !== undefined && value !== null)
+				        query += encodeURIComponent(name) + '=' + encodeURIComponent(value) + '&';
+				    }
+				      
+				    return query.length ? query.substr(0, query.length - 1) : query;
+				  };
+
+				  // Override $http service's default transformRequest
+				  $http.defaults.transformRequest = [function(data) {
+				    return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
+				  }];
+				 $http.post(serviceBasePath+"eap/pmsServices/hrm/salMgr/salaryFramwork/delete", data).success(function(response){
+						if(response.statusCode==200){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"删除成功！",
+								done:function(){
+									$scope.getData(unitCode,_currentPage,validStartTime,validEndTime);
+								},
+								t:1500
+							});
+						}
+					})
+			}
+		});
+		
+		
+	};
+
+});
+</script>
+</html>

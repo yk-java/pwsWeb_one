@@ -1,0 +1,288 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 类型管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/time.js"></script>
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../../css/list.css" />
+
+
+<style type="text/css">
+	.dropDownArea{background-image:url(../../../../img/flag.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	
+	.dropDownProjectType1{background-image:url(../../../../img/type.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+	.dialog-bedRent{width:950px; height:500px;}
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" class="dropDownProjectType" style="width:175px;" placeholder="请选择区域"/>
+				<input type="text" id="category" class="dropDownList" placeholder="请选择项目分类"/>
+				<input type="text" name="proName" class="required dropDownList" maxlength="32" style="width:220px" placeholder="请选择项目"/>
+				<input type="text" id="starttime" name="starttime" class="date dateComponent" placeholder="请选择开始时间" onclick="new Calendar().show(this)" />
+				<input type="text" id="endtime"   name="endtime" class="date dateComponent" placeholder="请选择结束时间" onclick="new Calendar().show(this)" />
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				<div class="query_div" ng-click="doExport()">
+					导出
+				</div>
+				&nbsp;&nbsp;
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">地区</div></th>
+				<th><div align="center">县级市</div></th>
+				<th><div align="center">对应部门</div></th>
+				<th><div align="center">对应项目</div></th>
+				<th><div align="center">项目编码</div></th>
+				<th><div align="center">项目负责人</div></th>
+				<th><div align="center">合计金额</div></th>
+				
+				
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in projectList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.city}}</div></td>
+				<td><div align="center">{{item.district}}</div></td>
+				<td><div align="center">{{item.unitName}}</div></td>
+				<td><div align="center"><a href="#" style="color:#0099ff" ng-click="showView(item)">{{item.proName}}</a></div></td>
+				<td><div align="center">{{item.proNo}}</div></td>
+				<td><div align="center">{{item.proManager}}</div></td>
+				<td><div align="center">{{item.rentalCost}}</div></td>
+				
+			  </tr>
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+function createPageBar(totalPage, curPage,totalRecord){
+	new PageBar().init({
+		renderTo:"#page_bar",
+		totalPage:totalPage,
+		curPage:curPage,
+		totalRecord: totalRecord,
+		showPageInfo:true,
+		prevPageText:"上一页",
+		nextPageText:"下一页",
+		onPage:function(pageNum){
+			_currentPage=pageNum;
+			ngScope.loadProjects(fromDate,toDate,areaName,categoryCode,proNo,pageNum);
+		}
+	});
+}
+
+var categoryCode="";
+var proNo="";
+var areaName="";
+
+var _currentPage=1;
+var fromDate="";
+var toDate="";
+var ngScope;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.projectList=[];
+	
+	fromDate=getWeekStartDate();
+	toDate=getWeekEndDate();
+	
+	$("#starttime").val(fromDate);
+	$("#endtime").val(toDate);
+
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	
+	var params = getUrlParams();
+	
+	if(params.currentPage){
+		_currentPage=params.currentPage;
+	}
+	
+	if(params.assetClassCode){
+		assetClassCode=params.assetClassCode;
+	}
+	if(params.assetClassName){
+		assetClassName=params.assetClassName;
+		$("#dropDownProjectType1").val(assetClassName);
+	}
+	if(params.assetCharacterCode){
+		assetCharacterCode=params.assetCharacterCode;
+	}
+	if(params.assetCharacterName){
+		assetCharacterName=params.assetCharacterName;
+		$("#dropDownProjectType").val(assetCharacterName);
+	}
+	
+	/* 区域 */
+	new DropDownList().init({
+		renderTo:".dropDownProjectType",
+		url:"../../../component/areaList.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownProjectType").val(result.name);
+			areaName=result.name;
+			
+			$scope.loadProjects(fromDate,toDate,areaName,categoryCode,proNo,_currentPage);
+		}
+	});
+
+	
+	/* 项目分类 */
+	new DropDownList().init({
+		mode:"page",
+		renderTo:"#category",
+		url:"../../../component/projectType.html?ticket="+$scope.ticket,
+		height:"200px",
+		onSelected:function(result){
+			categoryCode=result.categoryCode;
+			$("#category").val(result.categoryName);
+			
+			$scope.loadProjects(fromDate,toDate,areaName,categoryCode,proNo,_currentPage);
+			
+			proNameList.setConfig("url", "../../../component/projectList.html?categoryCode="+result.categoryCode+"&ticket="+$scope.ticket);
+		}
+	});
+
+	
+	/* 项目名称 */
+	var proNameList = new DropDownList();
+	proNameList.init({
+		mode:"page",
+		renderTo:"input[name=proName]",
+		url:"../../../component/projectList.html?required=false",
+		height:"200px",
+		onSelected:function(result){
+			$("input[name=proName]").val(result.proName);
+			proNo=result.proNo;
+			$scope.loadProjects(fromDate,toDate,areaName,categoryCode,proNo,_currentPage);
+		}
+	});
+	
+	$scope.showView=function(item){
+		
+		new ShowDlog().showFrame("dormRentList.html?proNo="+item.proNo+"&fromDate="+fromDate+"&toDate="+toDate, item.proName+"宿舍入住信息列表", function(){
+			
+			
+			
+		},"dialog-bedRent");
+
+		
+	};
+
+	
+	/* 加载数据 */
+	$scope.loadProjects=function(fromDate,toDate,areaName,categoryCode,proNo,currentPage){//alert(unitCode);
+	
+		fromDate = $("#starttime").val();
+		toDate  =$("#endtime").val();
+	
+		var waittingDlog = new ShowDlog();
+
+		
+		if(fromDate==""){
+			waittingDlog.prompt({
+				icon:"warning",
+				msg:"开始时间不能为空",
+				done:function(){
+					
+				},
+				t:1500
+			});
+			return false;
+		}
+		new ShowDlog().prompt({
+			icon:"waitting",
+			msg:"正在查询...",
+			done:function(){},
+			t:60*1000
+		});
+		$http.get(serviceBasePath+"eap/pmsServices/materielMg/comprehensiveQuery/proDormCostPage?fromDate="
+			+fromDate+"&toDate="+toDate+"&areaName="+areaName+
+			"&currentPage="+currentPage+"&categoryCode="+categoryCode+"&proNo="+proNo).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../login.html";
+				return;
+			}
+			$dlog.close();
+			$scope.projectList = response.list;
+			createPageBar(response.totalPage, response.currentPage,response.totalRecord);
+		});
+	};
+	/* 查询 */
+	$scope.doQuery=function(){
+		fromDate = $("#starttime").val();
+		toDate  =$("#endtime").val();
+		$scope.loadProjects(fromDate,toDate,areaName,categoryCode,proNo,_currentPage);
+	};
+	$scope.doExport=function(){
+		fromDate = $("#starttime").val();
+		toDate  =$("#endtime").val();
+		
+		
+		
+		hrefTo({url:serviceBasePath+"eap/pmsServices/materielMg/comprehensiveQuery/exportProDormCost?ticket="+ticket, 
+		data:{fromDate:fromDate, 
+			toDate:toDate,
+			areaName:areaName,
+			categoryCode:categoryCode,
+			proNo:proNo}});
+		
+		
+		
+	};
+
+
+	
+	
+	
+	/* 初始查询 */
+	ngScope.loadProjects(fromDate,toDate,areaName,categoryCode,proNo, _currentPage);
+});
+</script>
+</body>
+</html>

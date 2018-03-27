@@ -1,0 +1,214 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 宿舍管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../../css/list.css" />
+
+
+<style type="text/css">
+	.dropDownArea{background-image:url(../../../../img/flag.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+	.dialog-viewOil{height:500px;width:900px}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				
+				<input type="text" id="starttime" name="starttime" class="date dateComponent" placeholder="请选择开始时间" onclick="new Calendar().show(this)" />
+				<input type="text" id="endtime"   name="endtime" class="date dateComponent" placeholder="请选择结束时间" onclick="new Calendar().show(this)" />
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				
+				&nbsp;&nbsp;
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+			
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">车牌号</div></th>
+				<th><div align="center">车辆类型</div></th>
+				<th><div align="center">关联油卡</div></th>
+				<th><div align="center">加油品种</div></th>
+				<th><div align="center">总里程(公里)</div></th>
+				<th><div align="center">总耗油量(升)</div></th>
+				<th><div align="center">总油费(元)</div></th>
+				<th><div align="center">统计天数(天)</div></th>
+				
+				<th><div align="center">日均里程(公里)</div></th>
+				<th><div align="center">平均油价(元/升)</div></th>
+				<th><div align="center">平均耗油(升/百公里)</div></th>
+				<th><div align="center">平均耗油(元/公里)</div></th>
+				
+				<th><div align="center">操作</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in projectList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.vehicleNo}}</div></td>
+				<td><div align="center">{{item.brand}}{{item.modelNo}}</div></td>
+				<td><div align="center">{{item.fuelCardNo}}</div></td>
+				<td><div align="center">{{item.vaOil}}</div></td>
+				<td><div align="center">{{item.totalMileage}}</div></td>
+				<td><div align="center">{{item.totalVolume}}</div></td>
+				<td><div align="center">{{item.totalAmount}}</div></td>
+				<td><div align="center">{{item.totalDay}}</div></td>
+				
+				<td><div align="center">{{item.avgMileage}}</div></td>
+				<td><div align="center">{{item.avgPrice}}</div></td>
+				<td><div align="center">{{item.avgMiles}}</div></td>
+				<td><div align="center">{{item.avgFuel}}</div></td>
+			
+				<td width="12%">
+					<div align="center">
+						
+			    		
+			    		<img class="operationImg" ng-click="doShow(item)" src="../../../../img/list_see-icon.png" title="查看 ">
+		    		</div>
+				</td>
+				
+			  </tr>
+			</table>
+		</div>
+
+		
+
+	</div>
+</div>
+<script type="text/javascript">
+function createPageBar(totalPage, curPage,totalRecord){
+	new PageBar().init({
+		renderTo:"#page_bar",
+		totalPage:totalPage,
+		curPage:curPage,
+		totalRecord: totalRecord,
+		showPageInfo:true,
+		prevPageText:"上一页",
+		nextPageText:"下一页",
+		onPage:function(pageNum){
+			_currentPage=pageNum;
+			ngScope.loadProjects(areaName, dormName, pageNum);
+		}
+	});
+}
+
+function getFirstAndLastMonthDay( year, month){    
+               var   firstdate = year + '-' + month + '-01';  
+               var  day = new Date(year,month,0);   
+               var lastdate = year + '-' + month + '-' + day.getDate();//获取当月最后一天日期    
+  //给文本控件赋值。同下  
+               return lastdate;  
+}
+            
+            
+            
+var fromDate="";
+var toDate="";
+var _currentPage=1;
+var companyCode="";
+var ngScope;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.projectList=[];
+	
+	var myDate = new Date();
+	fromDate=myDate.getFullYear()+"-"+(myDate.getMonth()+1)+"-1";
+	toDate=myDate.getFullYear()+"-"+(myDate.getMonth()+1)+"-"+myDate.getDate();
+	toDate=getFirstAndLastMonthDay(myDate.getFullYear(),myDate.getMonth()+1);
+	//alert(toDate)
+	
+	$("#starttime").val(fromDate);
+	$("#endtime").val(toDate);
+	
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	companyCode=userData.companyCode;
+	ticket = $.cookie("pmsWeb_ticket");
+	//companyCode=
+	
+	
+	/* 加载数据 */
+	$scope.loadProjects=function(fromDate, toDate,currentPage){//alert(unitCode);
+		//alert(fromDate+","+toDate+","+companyCode)
+		$http.get(serviceBasePath+"eap/pmsServices/materielMg/comprehensiveQuery/vehicleOilConsumptionStatistics?fromDate="
+			+fromDate+"&toDate="+toDate+"&companyCode="+companyCode+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../../login.html";
+				return;
+			}
+			$scope.projectList = response.list;
+			createPageBar(response.totalPage, response.currentPage,response.totalRecord);
+		});
+	};
+	/* 查询 */
+	$scope.doQuery=function(){
+		//$("#starttime").val(fromDate);
+	   //$("#endtime").val(toDate);
+		fromDate = $("#starttime").val();
+		toDate = $("#endtime").val();
+		/* var t1 = new Date(fromDate);   
+ 		var t2 = new Date(toDate);
+		alert(Date.parse(t1) - Date.parse(t2));
+	    if(Date.parse(t1) - Date.parse(t2)>0)   
+	    {   
+	     	alert(1);  
+	    }   */ 
+		
+		$scope.loadProjects(fromDate, toDate,1);
+	};
+	
+	/*查看*/
+	$scope.doShow=function(item){
+		var tempfromDate = $("#starttime").val();
+		var temptoDate = $("#endtime").val();
+		new ShowDlog().showFrame("viewO.html?totalMileage="+item.totalMileage+"&totalDay="+item.totalDay+"&totalVolume="+item.totalVolume+"&totalAmount="+item.totalAmount+"&avgMiles="+item.avgMiles+"&avgMileage="+item.avgMileage+"&avgPrice="+item.avgPrice+"&avgFuel="+item.avgFuel+"&assetCode="+item.assetCode+"&tempfromDate="+tempfromDate+"&temptoDate="+temptoDate+"&vehicleNo="+item.vehicleNo, "汽车油耗统计表", function(){
+						// 
+		},"dialog-viewOil");
+		
+		//$("#starttime").val(fromDate);
+	   //$("#endtime").val(toDate);
+		
+	};
+	
+	
+	
+	/* 初始查询 */
+	ngScope.loadProjects(fromDate, toDate,1);
+});
+</script>
+</body>
+</html>

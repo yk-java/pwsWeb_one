@@ -1,0 +1,950 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>费用成本</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.good{background:url(../../../img/good.png) no-repeat top right;}
+	.low{background:url(../../../img/bad.png) no-repeat top right;}
+	.owWordLoad{text-decoration:underline;}
+	.owWordload-detail{border:solid 1px #666;background:#ffee99;color:#666;padding:4px 6px 4px 6px;position:absolute;display:none;}
+	.daily-detail{width:800px;height:500px;}
+	
+	.switch_btn_group{border:solid 1px #3385FF;min-height:30px;float:left;border-radius:15px; position:absolute;right:20px;top:0px;}
+	.switch_btn_group a{display:inline-block;float:left;background:#fff;color:#3385FF;text-decoration:none;font-size:13px;
+		line-height:30px;text-align:center;margin:0 1px 0 0;min-width:60px;}
+	.switch_btn_group a.selected{background:#3385FF;color:#fff;}
+	.switch_btn_group a:first-of-type{border-top-left-radius:15px;border-bottom-left-radius:15px;}
+	.switch_btn_group a:last-of-type{border-top-right-radius:15px;border-bottom-right-radius:15px;margin:0;}
+	.table, .table td, .table th{padding:0 !important}
+	.cls{text-decoration: underline;color: blue;}
+	.show_detail{ position: absolute;left: 0;right: 0;top: 0;bottom: 0;background: rgba(0,0,0,0.2);z-index: 1000;}
+	.show_detaildiv{position: absolute;bottom: 0;height: 500px;background: #fff;width: 100%;}
+	.search_warp{padding: 20px;border-bottom: 1px solid #eee;overflow:hidden}
+	.search_warp *{float:left}
+	.search_warp .query_div{display: inline-block;height: 30px;line-height: 30px;margin: 0 6px;padding: 0 18px 0 18px;background: #3385FF;color: #fff;font-weight: bold;cursor: pointer;border: solid 1px #89C6FF;border-radius: 4px;}
+	.search_warp input{width: 200px;height: 30px;border: 1px solid #ccc;margin-right:20px}
+	.tabel_accont{margin-top:10px;height:400px;overflow:auto}
+	.close_showdetail{float: right;font-size: 23px;margin-top: -10px;cursor:pointer}
+	.close_showdocument{float: right;font-size: 23px;margin-top: -10px;cursor:pointer}
+	.show_document{position: absolute;left: 0;right: 0;top: 0;bottom: 0;z-index: 1100;background: #D9E9FF;}
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+<div class="list" style="top:0;right:0">
+	<div class="list_content">
+		<div class="title_div" style="padding:13px 0 0 0;background:#fff;position:fixed;z-index:100">
+			<div style="position:absolute;width:100%;">
+				<div style="float:left;overflow:hidden">
+					<div class="title_left">
+						<input type="text" style="width:206px;" class="dropDownTree dropDownList" placeholder="项目"/>
+						<input type="text" id="searchName" name="searchName"  viewstate="searchName" style="width:200px;" placeholder="项目名称、负责人">
+						<div class="query_div" ng-click="doQuery()">
+							查询
+						</div>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+					</div>
+					<img src="../../../img/list_Header2-.png" style="margin-top:3px" id="aa">
+				</div>
+			</div>
+		</div>
+		
+		<div class="table_div" id="table_divMsg" style="position:absolute;top:55px;bottom:0;overflow: auto;left: 0; right: 0;margin-bottom: 0;" >
+			<div style="position:absolute;top:0;right: 0;z-index:99;width: 3000px;left: 0;" id="modeTab">
+				<table class="table" style="width: 100%;">
+					   <tr class="tr1">
+					<th style="width:2%" rowspan="2"><div align="center">序号</div></th>
+					<th style="width:3%" rowspan="2"><div align="center">地区</div></th>
+					<th style="width:4%" rowspan="2"><div align="center">县级市</div></th>
+					<th style="width:4%" rowspan="2"><div align="center">项目类别</div></th>
+					<th style="width:8%" rowspan="2"><div align="center">项目名称</div></th>
+					<th style="width:10%" rowspan="2"><div align="center">项目编号</div></th>
+					<th style="width:4%" rowspan="2"><div align="center">负责人</div></th>
+					<th style="width:4%" rowspan="2"><div align="center">总工作量</div></th>
+					<th style="width:4%" rowspan="2"><div align="center">单位</div></th>
+					<th style="width:5%" rowspan="2"><div align="center">开始时间</div></th>
+					<th style="width:5%" rowspan="2"><div align="center">结束时间</div></th>
+					<th style="width:4%" rowspan="2"><div align="center">当前人数</div></th>
+					<th colspan="4" style="background:#92D050;width:12%"><div align="center">完工进度</div></th>
+					<th colspan="2" style="background:#FFC000;width:9%"><div align="center">综合管控</div></th>
+					<th colspan="3" style="background:#FFFF00;width:9%"><div align="center">财务</div></th>
+					<th colspan="2" style="background:#ff002f;"><div align="center">文档</div></th>
+					<th colspan="4" style="background:#00B0F0;"><div align="center">成本</div></th>
+					</tr>
+					 <tr class="tr1">
+					<th style="background:#92D050;width:3%"><div align="center">周计划完成总量</div></th>
+					<th style="background:#92D050;width:3%"><div align="center">完工进度</div></th>
+					<th style="background:#92D050;width:3%"><div align="center">时间进度</div></th>
+					<th style="background:#92D050;width:3%"><div align="center">趋势</div></th>
+					<th style="background:#FFC000;width:4.4%"><div align="center">利润率</div></th>
+					<th style="background:#FFC000;width:4.6%"><div align="center">预算执行率</div></th>
+					<th style="background:#FFFF00;"><div align="center">合同</div></th>
+					<th style="background:#FFFF00;"><div align="center">开票</div></th>
+					<th style="background:#FFFF00;"><div align="center">回款</div></th>
+					<th style="background:#ff002f;"><div align="center">商务</div></th>
+					<th style="background:#ff002f;"><div align="center">项目</div></th>
+					<th style="background:#00B0F0;"><div align="center">人工</div></th>
+					<th style="background:#00B0F0;"><div align="center">设备</div></th>
+					<th style="background:#00B0F0;"><div align="center">宿舍</div></th>
+					<th style="background:#00B0F0;"><div align="center">报销</div></th>
+					  </tr>
+				</table>
+			</div>
+			<table id="tabelmsg"  style="TABLE-LAYOUT: fixed;margin-top: 0px;;width:3000px;position:relative;top:0;" class="table" >
+			  	   <tr class="tr1">
+					<th style="width:2%" rowspan="2"><div align="center">序号</div></th>
+					<th style="width:3%" rowspan="2"><div align="center">地区</div></th>
+					<th style="width:4%" rowspan="2"><div align="center">县级市</div></th>
+					<th style="width:4%" rowspan="2"><div align="center">项目类别</div></th>
+					<th style="width:8%" rowspan="2"><div align="center">项目名称</div></th>
+					<th style="width:10%" rowspan="2"><div align="center">项目编号</div></th>
+					<th style="width:4%" rowspan="2"><div align="center">负责人</div></th>
+					<th style="width:4%" rowspan="2"><div align="center">总工作量</div></th>
+					<th style="width:4%" rowspan="2"><div align="center">单位</div></th>
+					<th style="width:5%" rowspan="2"><div align="center">开始时间</div></th>
+					<th style="width:5%" rowspan="2"><div align="center">结束时间</div></th>
+					<th style="width:4%" rowspan="2"><div align="center">当前人数</div></th>
+					<th colspan="4" style="background:#92D050;width:12%"><div align="center">完工进度</div></th>
+					<th colspan="2" style="background:#FFC000;width:9%"><div align="center">综合管控</div></th>
+					<th colspan="3" style="background:#FFFF00;width:9%"><div align="center">财务</div></th>
+					<th colspan="2" style="background:#ff002f;"><div align="center">文档</div></th>
+					<th colspan="4" style="background:#00B0F0;"><div align="center">成本</div></th>
+					</tr>
+					   <tr class="tr1">
+					<th style="background:#92D050;width:3%"><div align="center">周计划完成总量</div></th>
+					<th style="background:#92D050;width:3%"><div align="center">完工进度</div></th>
+					<th style="background:#92D050;width:3%"><div align="center">时间进度</div></th>
+					<th style="background:#92D050;width:3%"><div align="center">趋势</div></th>
+					<th style="background:#FFC000;width:4%"><div align="center">利润率</div></th>
+					<th style="background:#FFC000;width:5%"><div align="center">预算执行率</div></th>
+					<th style="background:#FFFF00;"><div align="center">合同</div></th>
+					<th style="background:#FFFF00;"><div align="center">开票</div></th>
+					<th style="background:#FFFF00;"><div align="center">回款</div></th>
+					<th style="background:#ff002f;"><div align="center">商务</div></th>
+					<th style="background:#ff002f;"><div align="center">项目</div></th>
+					<th style="background:#00B0F0;"><div align="center">人工</div></th>
+					<th style="background:#00B0F0;"><div align="center">设备</div></th>
+					<th style="background:#00B0F0;"><div align="center">宿舍</div></th>
+					<th style="background:#00B0F0;"><div align="center">报销</div></th>
+					  </tr>
+			  <tr class="tr2" ng-repeat="item in dataList" on-finish-render-filters>
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center" style="word-wrap: break-word;word-break: normal;">{{item.PROVINCE}}</div></td>
+				<td><div align="center" style="word-wrap: break-word;word-break: normal;">{{item.CITY}}/{{item.DISTRICT}}</div></td>
+				<td ><div align="center" style="word-wrap: break-word;word-break: normal;">{{item.CATEGORY_NAME}}</div></td>
+				
+				<td><div align="center" style="word-wrap: break-word;word-break: normal;">{{item.PRO_NAME}}</div></td>
+				<td><div align="center" style="word-wrap: break-word;word-break: normal;">{{item.PRO_NO}}</div></td>
+				<td><div align="center" style="word-wrap: break-word;word-break: normal;">{{item.PRO_MANAGER}}</div></td>
+				<td><div align="center" style="word-wrap: break-word;word-break: normal;">{{item.TOTAL_WORKLOAD}}</div></td>
+				
+				<td><div align="center" style="word-wrap: break-word;word-break: normal;">{{item.UNIT_WORKLOAD}}</div></td>
+				<td><div align="center" style="word-wrap: break-word;word-break: normal;">{{item.S_DATE}}</div></td>
+				
+				<td><div align="center" style="word-wrap: break-word;word-break: normal;">{{item.E_DATE}}</div></td>
+				<td>
+					<div  ng-if="item.MEMBER_CNT>0" align="center" style="word-wrap: break-word;word-break: normal;"><a class="cls" href="javascript:;" ng-click="showMember(item)">{{item.MEMBER_CNT}}</a></div>
+					<div  ng-if="item.MEMBER_CNT==0" align="center" style="word-wrap: break-word;word-break: normal;">0</div>
+				</td>
+				
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="A1"><img src="../../../img/loading.gif"/></div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="A2"><img src="../../../img/loading.gif"/></div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="A3">{{item.TIMEPROGRESS}}%</div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="A4"><img src="../../../img/loading.gif"/></div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="B1"><img src="../../../img/loading.gif"/></div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="B2"><img src="../../../img/loading.gif"/></div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="C1"><img src="../../../img/loading.gif"/></div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="C2"><img src="../../../img/loading.gif"/></div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="C3"><img src="../../../img/loading.gif"/></div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="D1"><img src="../../../img/loading.gif"/></div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="D2"><img src="../../../img/loading.gif"/></div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="E1">0</div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="E2"><img src="../../../img/loading.gif"/></div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="E3"><img src="../../../img/loading.gif"/></div></td>
+				<td><div  style="word-wrap: break-word;word-break: normal;" align="center" proNo="{{item.PRO_NO}}" no="E4"><img src="../../../img/loading.gif"/></div></td>
+			  </tr>
+		  </table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+		
+	</div>
+</div>
+<div class="show_detail" style="display:none" id="member_detail">
+	<div class="show_detaildiv" style="display:none" id="member_detaildiv">
+		<div class="search_warp">
+			<div class="close_showdetail">╳</div>
+		</div>
+		<div class="tabel_accont">
+			<table class="table" style="width: 98%;margin-left: 5px;">
+			 <tr class="tr1">
+			 	<th><div align="center">序号</div></th>
+			 	<th><div align="center">项目名称</div></th>
+			 	<th><div align="center">项目编号</div></th>
+			 	<th><div align="center">部门</div></th>
+			 	<th><div align="center">姓名</div></th>
+			 	<th><div align="center">工号</div></th>
+			 	<th><div align="center">职务</div></th>
+			 	<th><div align="center">手机号码</div></th>
+			 	<th><div align="center">地址</div></th>
+			 </tr>
+			 <tr class="tr2" ng-repeat="item in data2List">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.PRO_NAME}}</div></td>
+				<td><div align="center">{{item.PRO_NO}}</div></td>
+				<td><div align="center">{{item.UNIT_NAME}}</div></td>
+				<td><div align="center">{{item.EMPLOYEENAME}}</div></td>
+				<td><div align="center">{{item.JOB_NO}}</div></td>
+				<td><div align="center">{{item.JOB_PROPERTY_NAME}}</div></td>
+				<td><div align="center">{{item.MOBILEPHONE1}}</div></td>
+				<td><div align="center">{{item.ADDR}}</div></td>
+			</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="show_detail" style="display:none" id="contract_detail">
+	<div class="show_detaildiv" style="display:none" id="contract_detaildiv">
+		<div class="search_warp">
+			<div class="close_showdetail">╳</div>
+		</div>
+		<div class="tabel_accont">
+			<table class="table" style="width: 98%;margin-left: 5px;">
+			 <tr class="tr1">
+			 	<th><div align="center">序号</div></th>
+			 	<th><div align="center">项目名称</div></th>
+			 	<th><div align="center">项目编号</div></th>
+			 	<th><div align="center">地区</div></th>
+			 	<th><div align="center">合同编号</div></th>
+			 	<th><div align="center">合同名称</div></th>
+			 	<th><div align="center">合同日期</div></th>
+			 	<th><div align="center">往来单位</div></th>
+			 	<th><div align="center">金额</div></th>
+			 	<th><div align="center">开票金额</div></th>
+			 </tr>
+			 <tr class="tr2" ng-repeat="item in data2List">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.PRO_NAME}}</div></td>
+				<td><div align="center">{{item.PRO_NO}}</div></td>
+				<td><div align="center">{{item.DISTRICT}}</div></td>
+				<td><div align="center">{{item.CONTRACT_NO}}</div></td>
+				<td><div align="center">{{item.CONTRACT_NAME}}</div></td>
+				<td><div align="center">{{item.CONTRACT_DATE}}</div></td>
+				<td><div align="center">{{item.FP_UNIT}}</div></td>
+				<td><div align="center">{{item.AMOUNT}}</div></td>
+				<td><div align="center">{{item.INVOICE_AMOUNT}}</div></td>
+			</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+<div class="show_detail" style="display:none" id="invoice_detail">
+	<div class="show_detaildiv" style="display:none" id="invoice_detaildiv">
+		<div class="search_warp">
+			<div class="close_showdetail">╳</div>
+		</div>
+		<div class="tabel_accont">
+			<table class="table" style="width: 98%;margin-left: 5px;">
+			 <tr class="tr1">
+			 	<th><div align="center">序号</div></th>
+			 	<th><div align="center">项目名称</div></th>
+			 	<th><div align="center">项目编号</div></th>
+			 	<th><div align="center">发票号</div></th>
+			 	<th><div align="center">发票类型</div></th>
+			 	<th><div align="center">税率</div></th>
+			 	<th><div align="center">开票日期</div></th>
+			 	<th><div align="center">开票内容</div></th>
+			 	<th><div align="center">往来单位</div></th>
+			 	<th><div align="center">不含税金额</div></th>
+			 	<th><div align="center">税额</div></th>
+			 	<th><div align="center">金额</div></th>
+			 </tr>
+			 <tr class="tr2" ng-repeat="item in data2List">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.PRO_NAME}}</div></td>
+				<td><div align="center">{{item.PRO_NO}}</div></td>
+				<td><div align="center">{{item.INVOICE_NO}}</div></td>
+				<td><div align="center">{{item.INVOICE_CLASS_NAME}}</div></td>
+				<td><div align="center">{{item.TAX_RATE}}</div></td>
+				<td><div align="center">{{item.INVOICE_DATE}}</div></td>
+				<td><div align="center">{{item.INVOICE_CONTENT}}</div></td>
+				<td><div align="center">{{item.CG_UNIT}}</div></td>
+				<td><div align="center">{{item.AMOUNT1}}</div></td>
+				<td><div align="center">{{item.TAX_AMOUNT}}</div></td>
+				<td><div align="center">{{item.AMOUNT2}}</div></td>
+			</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+<div class="show_detail" style="display:none" id="repayment_detail">
+	<div class="show_detaildiv" style="display:none" id="repayment_detaildiv">
+		<div class="search_warp">
+			<div class="close_showdetail">╳</div>
+		</div>
+		<div class="tabel_accont">
+			<table class="table" style="width: 98%;margin-left: 5px;">
+			 <tr class="tr1">
+			 	<th><div align="center">序号</div></th>
+			 	<th><div align="center">项目名称</div></th>
+			 	<th><div align="center">项目编号</div></th>
+			 	<th><div align="center">合同号</div></th>
+			 	<th><div align="center">回款日期</div></th>
+			 	<th><div align="center">往来单位</div></th>
+			 	<th><div align="center">发票号</div></th>
+			 	<th><div align="center">金额</div></th>
+			 </tr>
+			 <tr class="tr2" ng-repeat="item in data2List">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.PRO_NAME}}</div></td>
+				<td><div align="center">{{item.PRO_NO}}</div></td>
+				<td><div align="center">{{item.CONTRACT_NO}}</div></td>
+				<td><div align="center">{{item.RPAYMENT_DATE}}</div></td>
+				<td><div align="center">{{item.CG_UNIT}}</div></td>
+				<td><div align="center">{{item.INVOICE_NOS}}</div></td>
+				<td><div align="center">{{item.AMOUNT}}</div></td>
+			</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="show_detail" style="display:none" id="document_detail">
+	<div class="show_detaildiv title_div" style="display:none" id="document_detaildiv">
+		<div class="search_warp title_bar">
+			<input type="text" class="fielType dropDownList" placeholder="请选择文档类型" readonly/>
+			<input type="text" placeholder="请输入标题"  name="title">
+			<div class="query_div" ng-click="searchDoc()">查询</div>
+			<div class="close_showdetail">╳</div>
+		</div>
+		<div class="tabel_accont">
+			<table class="table" style="width: 98%;margin-left: 5px;">
+			 <tr class="tr1">
+			 	<th><div align="center">序号</div></th>
+			 	<th><div align="center">项目名称</div></th>
+			 	<th><div align="center">项目编号</div></th>
+			 	<th><div align="center">文档类型</div></th>
+			 	<th><div align="center">标题</div></th>
+			 	<th><div align="center">材料日期</div></th>
+			 	<th><div align="center">操作</div></th>
+			 </tr>
+			 <tr class="tr2" ng-repeat="item in data2List">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.PRO_NAME}}</div></td>
+				<td><div align="center">{{item.PRO_NO}}</div></td>
+				<td><div align="center">{{item.DOC_TYPELIB_NAME}}</div></td>
+				<td><div align="center">{{item.TITLE}}</div></td>
+				<td><div align="center">{{item.UPLOAD_DATE}}</div></td>
+				<td>
+					<div align="center">
+						<img  ng-click="readonline(item)" class="operationImg" src="../../../img/readonline.png" title="在线阅读">
+			    		<img class="operationImg" ng-click="downFile(item)" src="../../../img/filedownload.png" title="下载 ">
+					</div>
+				</td>
+			</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="show_detail" style="display:none" id="asset_detail">
+	<div class="show_detaildiv" style="display:none" id="asset_detaildiv">
+		<div class="search_warp">
+			<div class="close_showdetail">╳</div>
+		</div>
+		<div class="tabel_accont">
+			<table class="table" style="width: 98%;margin-left: 5px;">
+			 <tr class="tr1">
+			 	<th><div align="center">序号</div></th>
+			 	<th><div align="center">项目名称</div></th>
+			 	<th><div align="center">项目编号</div></th>
+			 	<th><div align="center">资产类型</div></th>
+			 	<th><div align="center">资产名称</div></th>
+			 	<th><div align="center">租用日期</div></th>
+			 	<th><div align="center">日租费用</div></th>
+			 	<th><div align="center">已租天数</div></th>
+			 	<th><div align="center">费用</div></th>
+			 </tr>
+			 <tr class="tr2" ng-repeat="item in data2List">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.LOAN_PRO_NAME}}</div></td>
+				<td><div align="center">{{item.LOAN_PRO_NO}}</div></td>
+				<td><div align="center">{{item.ASSET_TYPE_NAME}}</div></td>
+				<td><div align="center">{{item.ASSET_NAME}}</div></td>
+				<td><div align="center">{{item.RENT_DATE}}</div></td>
+				<td><div align="center">{{item.DAILY_RENT}}</div></td>
+				<td><div align="center">{{item.DAYS}}</div></td>
+				<td><div align="center">{{item.FEE}}</div></td>
+			</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="show_detail" style="display:none" id="dorm_detail">
+	<div class="show_detaildiv" style="display:none" id="dorm_detaildiv">
+		<div class="search_warp">
+			<div class="close_showdetail">╳</div>
+		</div>
+		<div class="tabel_accont">
+			<table class="table" style="width: 98%;margin-left: 5px;">
+			 <tr class="tr1">
+			 	<th><div align="center">序号</div></th>
+			 	<th><div align="center">项目名称</div></th>
+			 	<th><div align="center">项目编号</div></th>
+			 	<th><div align="center">地区</div></th>
+			 	<th><div align="center">宿舍地址</div></th>
+			 	<th><div align="center">日租费用</div></th>
+			 	<th><div align="center">租赁人</div></th>
+			 	<th><div align="center">租用日期</div></th>
+			 	<th><div align="center">已租天数</div></th>
+			 	<th><div align="center">费用</div></th>
+			 </tr>
+			 <tr class="tr2" ng-repeat="item in data2List">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.PRO_NAME}}</div></td>
+				<td><div align="center">{{item.PRO_NO}}</div></td>
+				<td><div align="center">{{item.PROVINCE}}/{{item.CITY}}/{{item.DISTRICT}}</div></td>
+				<td><div align="center">{{item.DORM_NAME}}</div></td>
+				<td><div align="center">{{item.DAYRENT}}</div></td>
+				<td><div align="center">{{item.EMPLOYEENAME}}</div></td>
+				<td><div align="center">{{item.RENT_DATE}}</div></td>
+				<td><div align="center">{{item.DAYS}}</div></td>
+				<td><div align="center">{{item.FEE}}</div></td>
+			</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+<div class="show_detail" style="display:none" id="return_detail">
+	<div class="show_detaildiv" style="display:none" id="return_detaildiv">
+		<div class="search_warp">
+			<div class="close_showdetail">╳</div>
+		</div>
+		<div class="tabel_accont">
+			<table class="table" style="width: 98%;margin-left: 5px;">
+			 <tr class="tr1">
+			 	<th><div align="center">序号</div></th>
+			 	<th><div align="center">项目名称</div></th>
+			 	<th><div align="center">项目编号</div></th>
+			 	<th><div align="center">标题</div></th>
+			 	<th><div align="center">内容</div></th>
+			 	<th><div align="center">报销日期</div></th>
+			 	<th><div align="center">报销人</div></th>
+			 	<th><div align="center">费用类型</div></th>
+			 	<th><div align="center">费用</div></th>
+			 </tr>
+			 <tr class="tr2" ng-repeat="item in data2List">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.PRO_NAME}}</div></td>
+				<td><div align="center">{{item.PRO_NO}}</div></td>
+				<td><div align="center">{{item.TITLE}}</div></td>
+				<td><div align="center">{{item.APPLY_CONTENT}}</div></td>
+				<td><div align="center">{{item.APPLY_DATE}}</div></td>
+				<td><div align="center">{{item.EMPLOYEE_NAME}}</div></td>
+				<td><div align="center">{{item.FEE_NAME}}</div></td>
+				<td><div align="center">{{item.TOTAL_MONEY}}</div></td>
+			</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="show_document"  style="display: none;">
+	<div class="search_warp" style="height: 30px;">
+		<div class="close_showdocument">╳</div>
+	</div>
+	<div style="position:absolute; bottom: 0;left: 0;right: 0;top: 30px;">
+		<iframe src="" width="100%" height="100%" frameborder=0  id="iframe"></iframe>
+	</div>
+</div>
+<script type="text/javascript">
+$("#table_divMsg").scroll(function () {
+    var scrollTop = $("#table_divMsg").scrollTop();
+   /*  var tabMsgtop=$("#tabelmsg").offset().top;
+    if(scrollTop>=tabMsgtop){ */
+    	$("#modeTab").css("top",scrollTop)
+    /* }else{
+    	$("#modeTab").css("top","0px")
+    } */
+});
+
+$(".close_showdetail").click(function(){
+	$(this).parents(".show_detaildiv").slideToggle("slow",function(){
+		$(this).parents(".show_detail").hide();
+	});
+});
+
+$(".close_showdocument").click(function(){
+	$(this).parents(".show_document").hide();
+});
+
+
+var cond_proStatus="";
+var cond_categoryCode="", cond_proNo="", cond_sdate="",cond_edate="";
+var cond_categoryName="", cond_proName="";
+var selectedItem={};
+var ngScope;
+var docTypelibCode="";
+var currentProNo="";
+var currentType="";
+//合同
+function showContract(proNo)
+{
+	ngScope.showContract(proNo);
+};
+
+//开票
+function showInvoice(proNo)
+{
+	ngScope.showInvoice(proNo);
+};
+//回款
+function showRepayment(proNo)
+{
+	ngScope.showRepayment(proNo);
+};
+//文档 1 商务  2项目
+function showDocument(proNo,type)
+{
+	ngScope.showDocument(proNo,type);
+};
+
+//设备
+function showAsset(proNo)
+{
+	ngScope.showAsset(proNo);
+};
+
+//宿舍
+function showDorm(proNo)
+{
+	ngScope.showDorm(proNo);
+};
+//回款
+function showReturn(proNo)
+{
+	ngScope.showReturn(proNo);
+};
+ 
+	
+var app = angular.module("userMgr", []);
+app.directive('onFinishRenderFilters', function ($timeout) {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attr) {
+            if (scope.$last === true) {
+                $timeout(function() {
+                    scope.$emit('ngRepeatFinished');
+                });
+            }
+        }
+    };
+});
+
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.dataList=[];
+	$scope.userData={};
+	$scope.currentProNo=[];
+	// 条件参数
+	// 初始参数赋值
+	// 传入参数赋值
+	// 条件显示
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	$scope.userData=userData;
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	
+	/* 项目列表 */
+	var proList = new DropDownList();
+	proList.init({
+		renderTo:".dropDownTree",
+		url:"../../component/projectList.html?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&required=false&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownTree").val(result.proName);
+			cond_proName=result.proName;
+			cond_proNo=result.proNo;
+		}
+	});
+	/* 加载日报数据 */
+	$scope.loadData=function(proNo,searchName){
+		$http.get(serviceBasePath+"eap/pmsServices/pm/progressCost/list?proNo="+proNo+"&searchName="+searchName+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				window.noLogin(location.href);
+			}
+			$scope.dataList = response.list;
+			for(var i=0;i<$scope.dataList.length;i++)
+       		{
+       			var proNo1=$scope.dataList[i].PRO_NO;
+       			$scope.currentProNo.push(proNo1);
+       		}
+		});
+	};
+	/* 按钮查询操作 */
+	$scope.doQuery=function(){
+		var searchName=$("#searchName").val();
+		$scope.loadData(cond_proNo,searchName);
+	};
+	
+	//项目成员
+	$scope.showMember=function(item)
+	{
+		console.log(item);
+		//PRO_NO
+		$http.get(serviceBasePath+"eap/pmsServices/pm/progressCost/queryProMember?proNo="+item.PRO_NO+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				window.noLogin(location.href);
+			}
+			console.log(response.list);
+			$scope.data2List = response.list;
+			$("#member_detail").show();
+			$("#member_detaildiv").slideToggle("slow");
+		});
+	}
+	
+	//项目合同
+	$scope.showContract=function(proNo)
+	{
+		$http.get(serviceBasePath+"eap/pmsServices/pm/progressCost/queryContract?proNo="+proNo+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				window.noLogin(location.href);
+			}
+			console.log(response.list);
+			$scope.data2List = response.list;
+			$("#contract_detail").show();
+			$("#contract_detaildiv").slideToggle("slow");
+		});
+	}
+	
+	//项目开票
+	$scope.showInvoice=function(proNo)
+	{
+		$http.get(serviceBasePath+"eap/pmsServices/pm/progressCost/queryInvoice?proNo="+proNo+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				window.noLogin(location.href);
+			}
+			console.log(response.list);
+			$scope.data2List = response.list;
+			$("#invoice_detail").show();
+			$("#invoice_detaildiv").slideToggle("slow");
+		});
+	}
+	
+	//项目回款
+	$scope.showRepayment=function(proNo)
+	{
+		$http.get(serviceBasePath+"eap/pmsServices/pm/progressCost/queryRepayment?proNo="+proNo+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				window.noLogin(location.href);
+			}
+			console.log(response.list);
+			$scope.data2List = response.list;
+			$("#repayment_detail").show();
+			$("#repayment_detaildiv").slideToggle("slow");
+		});
+	}
+
+	//文档查询
+	$scope.searchDoc=function()
+	{
+		var title=$("input[name=title]").val();
+		var data={
+				title:title,
+				docTypelibCode:docTypelibCode
+			};
+	  	var paramsStr = toUrlParams(data);
+	   	$http.get(serviceBasePath+"eap/pmsServices/pm/progressCost/queryDocument?proNo="+currentProNo+"&type="+currentType+"&"+paramsStr+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				window.noLogin(location.href);
+			}
+			console.log(response.list);
+			$scope.data2List = response.list;
+		});
+	}
+	
+	//项目文档
+	$scope.showDocument=function(proNo,type)
+	{
+		/* 项目文档类型 */
+		new DropDownList().init({
+			renderTo:".fielType",
+			url:"../../component/fileTypeA.html?required=false&type="+type,
+			height:"200px",
+			onSelected:function(result){
+				$(".fielType").val(result.name);
+				docTypelibCode=result.code;
+				docTypelibName=result.name;
+			}
+		});
+	
+		currentProNo=proNo;
+		currentType=type;
+		$http.get(serviceBasePath+"eap/pmsServices/pm/progressCost/queryDocument?proNo="+proNo+"&type="+type+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				window.noLogin(location.href);
+			}
+			console.log(response.list);
+			$scope.data2List = response.list;
+			$("#document_detail").show();
+			$("#document_detaildiv").slideToggle("slow");
+		});
+	}
+	
+	//项目设备
+	$scope.showAsset=function(proNo)
+	{
+		$http.get(serviceBasePath+"eap/pmsServices/pm/progressCost/queryProAsset?proNo="+proNo+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				window.noLogin(location.href);
+			}
+			console.log(response.list);
+			$scope.data2List = response.list;
+			$("#asset_detail").show();
+			$("#asset_detaildiv").slideToggle("slow");
+		});
+	}
+	//项目宿舍
+	$scope.showDorm=function(proNo)
+	{
+		$http.get(serviceBasePath+"eap/pmsServices/pm/progressCost/queryProDorm?proNo="+proNo+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				window.noLogin(location.href);
+			}
+			console.log(response.list);
+			$scope.data2List = response.list;
+			$("#dorm_detail").show();
+			$("#dorm_detaildiv").slideToggle("slow");
+		});
+	}
+	
+	//项目报销
+	$scope.showReturn=function(proNo)
+	{
+		$http.get(serviceBasePath+"eap/pmsServices/pm/progressCost/queryProReturn?proNo="+proNo+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				window.noLogin(location.href);
+			}
+			console.log(response.list);
+			$scope.data2List = response.list;
+			
+			$("#return_detail").show();
+			$("#return_detaildiv").slideToggle("slow");
+		});
+	}
+	
+	//下载
+	$scope.downFile=function(item){
+		//alert(item.dlVisitid);
+		location.href=filePath+"?fileCode="+item.DL_VISITID+"&attachment=1";
+	};
+	
+	
+	//在线阅读
+	$scope.readonline=function(item){
+	   var data={
+				reVisitid:item.RE_VISITID,
+				dlVisitid:item.DL_VISITID,
+				fileName:item.FILE_NAME,
+				suffixName:item.SUFFIX_NAME,
+				fileSize:item.FILE_SIZE,
+		        docTypelibName:item.DOC_TYPELIB_NAME,
+		        title:item.TITLE
+			};
+	   var paramsStr = toUrlParams(data);	
+	   $(".show_document").show();
+	   $("#iframe").attr('src','fileDetail.html?'+paramsStr);
+
+	};
+	
+	$scope.loadData("","");
+	
+	$scope.$on('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+			//完工进度 loading.gif
+         		//$("td[prono='"+$scope.currentProNo[i]+"'][no=A1]").html("hello");
+         	var proNoAttr=$scope.currentProNo.join(",");
+         	$.post(serviceBasePath+"eap/pmsServices/pm/progressCost/finishProgress",{'proNostr':proNoAttr},function(data){
+         		for(var i=0;i<data.list.length;i++)
+         		{
+         			var prono=data.list[i].prono;
+         			$("div[prono='"+prono+"'][no=A1]").text(data.list[i].A1);
+         			$("div[prono='"+prono+"'][no=A2]").text(data.list[i].A2);
+         			//$("div[prono='"+prono+"'][no=A3]").text(data.list[i].A3);
+         			$("div[prono='"+prono+"'][no=A4]").text(data.list[i].A4);
+         		}
+         	});
+         	
+         	//综合管控(暂时无数据)
+         	$.post(serviceBasePath+"eap/pmsServices/pm/progressCost/manageControl",{'proNostr':proNoAttr},function(data){
+         		for(var i=0;i<data.list.length;i++)
+         		{
+         			var prono=data.list[i].prono;
+         			$("div[prono='"+prono+"'][no=B1]").text(data.list[i].B1);
+         			$("div[prono='"+prono+"'][no=B2]").text(data.list[i].B2);
+         		}
+         	});
+         	
+         	//财务合同
+         	$.post(serviceBasePath+"eap/pmsServices/pm/progressCost/financial",{'proNostr':proNoAttr,'type':1},function(data){
+         		for(var i=0;i<data.list.length;i++)
+         		{
+         			var prono=data.list[i].prono;
+         			if(data.list[i].C1!=0)
+         			{
+         				$("div[prono='"+prono+"'][no=C1]").html("<a class='cls' href='javascript:;' onclick='showContract(&quot;"+prono+"&quot;)'>"+formatCurrency(data.list[i].C1)+"</a>");
+         			}
+         			else
+         			{
+         				$("div[prono='"+prono+"'][no=C1]").text(data.list[i].C1);
+         			}
+         		}
+         	});
+         	
+         	//财务开票
+         	$.post(serviceBasePath+"eap/pmsServices/pm/progressCost/financial",{'proNostr':proNoAttr,'type':2},function(data){
+         		for(var i=0;i<data.list.length;i++)
+         		{
+         			var prono=data.list[i].prono;
+         			if(data.list[i].C2!=0)
+         			{
+         				$("div[prono='"+prono+"'][no=C2]").html("<a class='cls' href='javascript:;' onclick='showInvoice(&quot;"+prono+"&quot;)'>"+formatCurrency(data.list[i].C2)+"</a>");
+         			}
+         			else
+         			{
+         				$("div[prono='"+prono+"'][no=C2]").text(data.list[i].C2);
+         			}
+         		}
+         	});
+         	
+         	//财务回款
+         	$.post(serviceBasePath+"eap/pmsServices/pm/progressCost/financial",{'proNostr':proNoAttr,'type':3},function(data){
+         		for(var i=0;i<data.list.length;i++)
+         		{
+         			var prono=data.list[i].prono;
+         			if(data.list[i].C3!=0)
+         			{
+         				$("div[prono='"+prono+"'][no=C3]").html("<a class='cls' href='javascript:;' onclick='showRepayment(&quot;"+prono+"&quot;)'>"+formatCurrency(data.list[i].C3)+"</a>");
+         			}
+         			else
+         			{
+         				$("div[prono='"+prono+"'][no=C3]").text(data.list[i].C3);
+         			}
+         			
+         		}
+         	});
+         	
+         	//文档
+         	$.post(serviceBasePath+"eap/pmsServices/pm/progressCost/document",{'proNostr':proNoAttr},function(data){
+         		for(var i=0;i<data.list.length;i++)
+         		{
+         			var prono=data.list[i].prono;
+         			
+         			if(data.list[i].D1!=0)
+         			{
+         				$("div[prono='"+prono+"'][no=D1]").html("<a class='cls' href='javascript:;' onclick='showDocument(&quot;"+prono+"&quot;,&quot;1&quot;)'>"+data.list[i].D1+"</a>");
+         			}
+         			else
+         			{
+         				$("div[prono='"+prono+"'][no=D1]").text(data.list[i].D1);
+         			}
+         			
+         			if(data.list[i].D2!=0)
+         			{
+         				$("div[prono='"+prono+"'][no=D2]").html("<a class='cls' href='javascript:;' onclick='showDocument(&quot;"+prono+"&quot;,&quot;2&quot;)'>"+data.list[i].D2+"</a>");
+         			}
+         			else
+         			{
+         				$("div[prono='"+prono+"'][no=D2]").text(data.list[i].D2);
+         			}
+         			
+         		}
+         	});
+         	
+         	//成本报销
+         	$.post(serviceBasePath+"eap/pmsServices/pm/progressCost/expensesClaim",{'proNostr':proNoAttr},function(data){
+         		for(var i=0;i<data.list.length;i++)
+         		{
+         			var prono=data.list[i].prono;
+         			if(data.list[i].E4!=0)
+         			{
+         				$("div[prono='"+prono+"'][no=E4]").html("<a class='cls' href='javascript:;' onclick='showReturn(&quot;"+prono+"&quot;)'>"+formatCurrency(data.list[i].E4)+"</a>");
+         			}
+         			else
+         			{
+         				$("div[prono='"+prono+"'][no=E4]").text(data.list[i].E4);
+         			}
+         		}
+         	});
+         	
+         	//宿舍
+         	$.post(serviceBasePath+"eap/pmsServices/pm/progressCost/expensesDorm",{'proNostr':proNoAttr},function(data){
+         		for(var i=0;i<data.list.length;i++)
+         		{
+         			var prono=data.list[i].prono;
+         			if(data.list[i].E3!=0)
+         			{
+         				$("div[prono='"+prono+"'][no=E3]").html("<a class='cls' href='javascript:;' onclick='showDorm(&quot;"+prono+"&quot;)'>"+formatCurrency(data.list[i].E3)+"</a>");
+         			}
+         			else
+         			{
+         				$("div[prono='"+prono+"'][no=E3]").text(data.list[i].E3);
+         			}
+         		}
+         	});
+         	//设备
+         	$.post(serviceBasePath+"eap/pmsServices/pm/progressCost/expensesAsset",{'proNostr':proNoAttr},function(data){
+         		for(var i=0;i<data.list.length;i++)
+         		{
+         			var prono=data.list[i].prono;
+         			if(data.list[i].E2!=0)
+         			{
+         				$("div[prono='"+prono+"'][no=E2]").html("<a class='cls' href='javascript:;' onclick='showAsset(&quot;"+prono+"&quot;)'>"+formatCurrency(data.list[i].E2)+"</a>");
+         			}
+         			else
+         			{
+         				$("div[prono='"+prono+"'][no=E2]").text(data.list[i].E2);
+         			}
+         			
+         		}
+         	});		
+		});
+
+});
+</script>
+</body>
+</html>

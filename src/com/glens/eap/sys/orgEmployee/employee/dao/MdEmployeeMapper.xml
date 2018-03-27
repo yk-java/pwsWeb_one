@@ -1,0 +1,949 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="MdEmployeeMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.eap.sys.orgEmployee.employee.vo.MdEmployee" >
+    
+    <id column="rowid" property="rowid" jdbcType="BIGINT" />
+    <id column="rowno" property="rowno" jdbcType="BIGINT" />
+    <result column="UNIT_CODE" property="unitCode" jdbcType="VARCHAR" />
+    <result column="UNIT_NAME" property="unitName" jdbcType="VARCHAR" />
+    <result column="PRO_NO" property="proNo" jdbcType="VARCHAR" />
+    <result column="PRO_NAME" property="proName" jdbcType="VARCHAR" />
+    <result column="ABOUT_PRO_NAME" property="aboutProName" jdbcType="VARCHAR" />
+    <result column="EMPLOYEECODE" property="employeecode" jdbcType="VARCHAR" />
+    <result column="EMPLOYEENAME" property="employeename" jdbcType="VARCHAR" />
+    <result column="NICKNAME" property="nickname" jdbcType="VARCHAR" />
+    <result column="JOB_NO" property="jobNo" jdbcType="INTEGER" />
+    <result column="SEX" property="sex" jdbcType="VARCHAR" />
+    <result column="SEX_LABEL" property="sexLabel" jdbcType="VARCHAR" />
+    <result column="NATIVE_PLACE" property="nativePlace" jdbcType="VARCHAR" />
+    <result column="MARITAL" property="marital" jdbcType="INTEGER" />
+    <result column="IDCARD" property="idcard" jdbcType="VARCHAR" />
+    <result column="ADDR" property="addr" jdbcType="VARCHAR" />
+    <result column="TEL" property="tel" jdbcType="VARCHAR" />
+    <result column="OFFICE_TEL" property="officeTel" jdbcType="VARCHAR" />
+    <result column="MOBILEPHONE1" property="mobilephone1" jdbcType="VARCHAR" />
+    <result column="MOBILEPHONE2" property="mobilephone2" jdbcType="VARCHAR" />
+    <result column="MAIL" property="mail" jdbcType="VARCHAR" />
+    <result column="DEGREE" property="degree" jdbcType="VARCHAR" />
+    <result column="MAJOR_DEGREE" property="majorDegree" jdbcType="VARCHAR" />
+    <result column="GRADUATE_TIME" property="graduateTime" jdbcType="VARCHAR" />
+    <result column="GRADUATE_SCHOOL" property="graduateSchool" jdbcType="VARCHAR" />
+    <result column="HEAD_PHOTOKEY" property="headPhotokey" jdbcType="VARCHAR" />
+    <result column="FACE_PHOTOKEY" property="facePhotokey" jdbcType="VARCHAR" />
+    <result column="GRADECLASSCODE" property="gradeclasscode" jdbcType="VARCHAR" />
+    <result column="EMERGENCY_CONTACTOR_NAME" property="emergencyContactorName" jdbcType="VARCHAR" />
+    <result column="EMERGENCY_CONTACTOR_PHONE" property="emergencyContactorPhone" jdbcType="VARCHAR" />
+    <result column="EMERGENCY_CONTACTOR_RELATION" property="emergencyContactorRelation" jdbcType="VARCHAR" />
+    <result column="REMARKS" property="remarks" jdbcType="VARCHAR" />
+    <!-- 加 -->
+    <result column="JOB_CODE" property="jobCode" jdbcType="VARCHAR" />
+    <result column="JOB_NAME" property="jobName" jdbcType="VARCHAR" />
+	<result column="JOB_PROPERTY_CODE" property="jobPropertyCode" jdbcType="VARCHAR" />
+	<result column="JOB_PROPERTY_NAME" property="jobPropertyName" jdbcType="VARCHAR" />
+	<result column="JOB_CLASS1" property="jobClass1" jdbcType="INTEGER" />
+	<result column="JOB_CLASS2" property="jobClass2" jdbcType="INTEGER" />
+	<result column="JOB_CLASS1_NAME" property="jobClass1Name" jdbcType="VARCHAR" />
+	<result column="JOB_CLASS2_NAME" property="jobClass2Name" jdbcType="VARCHAR" />
+	<result column="BIRTHDAY" property="birthday" jdbcType="TIMESTAMP" />
+	<result column="RECRUIT_PLACE" property="recruitPlace" jdbcType="VARCHAR" />
+	<result column="OFFICE_DATE" property="officeDate" jdbcType="TIMESTAMP" />
+	<result column="WORK_DATE" property="workDate" jdbcType="TIMESTAMP" />
+	<result column="CONTRACT_PROPERTY_CODE" property="contractPropertyCode" jdbcType="VARCHAR" />
+	<result column="CONTRACT_PROPERTY_NAME" property="contractPropertyName" jdbcType="VARCHAR" />
+	<result column="CONTRACT_DATE_S" property="contractDateS" jdbcType="TIMESTAMP" />
+	<result column="CONTRACT_DATE_E" property="contractDateE" jdbcType="TIMESTAMP" />
+	<result column="BANK_ACCOUNT" property="bankAccount" jdbcType="VARCHAR" />
+	<result column="BANK_NAME" property="bankName" jdbcType="VARCHAR" />
+	<result column="WEAL1_STATUS" property="weal1Status" jdbcType="VARCHAR" />
+	<result column="WEAL2_STATUS" property="weal2Status" jdbcType="VARCHAR" />
+	<result column="WEAL3_STATUS" property="weal3Status" jdbcType="VARCHAR" />
+	<!-- 加 -->
+	<result column="WORK_STATUS" property="workStatus" jdbcType="INTEGER" />
+	<result column="LEAVE_DATE" property="leaveDate" jdbcType="VARCHAR" />
+	<result column="LEAVE_EXPLAIN" property="leaveExplain" jdbcType="VARCHAR" />
+	<result column="RECORDNO" property="recordno" jdbcType="VARCHAR" />
+	<result column="LEADER_CODE" property="leaderCode" jdbcType="VARCHAR" />
+	<result column="LEADER_NAME" property="leaderName" jdbcType="VARCHAR" />
+	
+	<result column="WEIXIN_ID" property="weixinid" jdbcType="VARCHAR" />
+	
+	<result column="SALARY_GRADE" property="salaryGrade" jdbcType="INTEGER" />
+	<result column="SALARY_LEVEL" property="salaryLevel" jdbcType="INTEGER" />
+	<result column="SALARY_GRADE_NAME_PREFIX" property="prefix" jdbcType="VARCHAR" />
+	<result column="CONTRACT_PROPERTY_NAME" property="propertyName" jdbcType="VARCHAR" />
+	
+	
+  </resultMap>
+  <sql id="Base_Column_List" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+    -->
+    rowid, UNIT_CODE, EMPLOYEECODE, EMPLOYEENAME, NICKNAME, JOB_NO, SEX, NATIVE_PLACE, 
+    MARITAL, IDCARD, BIRTHDAY, ADDR, TEL, OFFICE_TEL, MOBILEPHONE1, MOBILEPHONE2, MAIL, 
+    DEGREE, MAJOR_DEGREE, GRADUATE_TIME, GRADUATE_SCHOOL, HEAD_PHOTOKEY, FACE_PHOTOKEY, 
+    GRADECLASSCODE, EMERGENCY_CONTACTOR_NAME, EMERGENCY_CONTACTOR_PHONE, EMERGENCY_CONTACTOR_RELATION, 
+    REMARKS,
+    JOB_CODE,JOB_PROPERTY_CODE,JOB_CLASS1,JOB_CLASS2,RECRUIT_PLACE,OFFICE_DATE,WORK_DATE,
+    CONTRACT_PROPERTY_CODE,CONTRACT_DATE_S,CONTRACT_DATE_E,BANK_ACCOUNT,BANK_NAME,WEAL1_STATUS,WEAL2_STATUS,WEAL3_STATUS,
+    WORK_STATUS,LEAVE_DATE,LEAVE_EXPLAIN,RECORDNO
+  </sql>
+  
+  <select id="queryEmployeeByJObNo" parameterType="string" resultType="map">
+	SELECT
+		b.EMPLOYEENAME,
+		b.BANK_ACCOUNT,
+		c.UNIT_CODE,
+		c.UNIT_NAME
+	FROM
+		md_employee b
+	LEFT JOIN md_org_unit c ON b.UNIT_CODE = c.UNIT_CODE
+	WHERE
+		b.WORK_STATUS = '1'
+	AND b.JOB_NO = #{jobNo}
+	limit 0,1
+  </select>
+  
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+    -->
+    select 
+    t.*, t2.UNIT_NAME, t3.JOB_NAME, t4.JOB_PROPERTY_NAME, t5.CONTRACT_PROPERTY_NAME
+    from md_employee t
+    left join md_org_unit t2 on t.unit_code = t2.unit_code
+    left join MD_EMPLOYEE_JOB t3 on t3.JOB_CODE=t.JOB_CODE
+    left join MD_EMPLOYEE_JOB_PROPERTY t4 on t4.JOB_PROPERTY_CODE = t.JOB_PROPERTY_CODE
+    left join MD_EMPLOYEE_CONTRACT_PROPERTY t5 on t5.CONTRACT_PROPERTY_CODE = t.CONTRACT_PROPERTY_CODE
+    where t.rowid = #{rowid,jdbcType=BIGINT}
+  </select>
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from md_employee
+    where rowid = #{rowid,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.glens.eap.sys.orgEmployee.employee.vo.MdEmployee" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+    -->
+    insert into md_employee (rowid, UNIT_CODE, EMPLOYEECODE, 
+      EMPLOYEENAME, NICKNAME, JOB_NO, 
+      SEX, NATIVE_PLACE, MARITAL, 
+      IDCARD, 
+      <if test="birthday!=null and birthday != ''">
+      BIRTHDAY, 
+      </if>
+      ADDR, 
+      TEL, OFFICE_TEL, MOBILEPHONE1, 
+      MOBILEPHONE2, MAIL, DEGREE, 
+      MAJOR_DEGREE, GRADUATE_TIME, GRADUATE_SCHOOL, 
+      HEAD_PHOTOKEY, FACE_PHOTOKEY, GRADECLASSCODE, 
+      EMERGENCY_CONTACTOR_NAME, EMERGENCY_CONTACTOR_PHONE, 
+      EMERGENCY_CONTACTOR_RELATION, REMARKS,
+      JOB_CODE,JOB_PROPERTY_CODE,JOB_CLASS1,JOB_CLASS2,RECRUIT_PLACE,
+      <if test="officeDate != null and officeDate != ''">
+      OFFICE_DATE,
+      </if>
+      <if test="workDate != null and workDate != ''">
+      WORK_DATE,
+    </if>
+    CONTRACT_PROPERTY_CODE,
+    <if test="contractDateS != null and contractDateS != ''">
+    CONTRACT_DATE_S,
+    </if>
+    <if test="contractDateE != null and contractDateE != ''">
+    CONTRACT_DATE_E,
+    </if>
+    BANK_ACCOUNT,BANK_NAME,WEAL1_STATUS,WEAL2_STATUS,WEAL3_STATUS,
+    WORK_STATUS,LEAVE_DATE,LEAVE_EXPLAIN,RECORDNO,SYS_CREATE_TIME,SYS_PROCESS_FLAG,LEADER_CODE,LEADER_NAME,WEIXIN_ID)
+    values (#{rowid,jdbcType=BIGINT}, #{unitCode,jdbcType=VARCHAR}, #{employeecode,jdbcType=VARCHAR}, 
+      #{employeename,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, #{jobNo,jdbcType=INTEGER}, 
+      #{sex,jdbcType=VARCHAR}, #{nativePlace,jdbcType=VARCHAR}, #{marital,jdbcType=INTEGER}, 
+      #{idcard,jdbcType=VARCHAR}, 
+      <if test="birthday!=null and birthday != ''">
+      #{birthday,jdbcType=DATE}, 
+      </if>
+      #{addr,jdbcType=VARCHAR}, 
+      #{tel,jdbcType=VARCHAR}, #{officeTel,jdbcType=VARCHAR}, #{mobilephone1,jdbcType=VARCHAR}, 
+      #{mobilephone2,jdbcType=VARCHAR}, #{mail,jdbcType=VARCHAR}, #{degree,jdbcType=VARCHAR}, 
+      #{majorDegree,jdbcType=VARCHAR}, #{graduateTime,jdbcType=VARCHAR}, #{graduateSchool,jdbcType=VARCHAR}, 
+      #{headPhotokey,jdbcType=VARCHAR}, #{facePhotokey,jdbcType=VARCHAR}, #{gradeclasscode,jdbcType=VARCHAR}, 
+      #{emergencyContactorName,jdbcType=VARCHAR}, #{emergencyContactorPhone,jdbcType=VARCHAR}, 
+      #{emergencyContactorRelation,jdbcType=VARCHAR}, #{remarks,jdbcType=VARCHAR},
+      #{jobCode,jdbcType=VARCHAR},
+		#{jobPropertyCode,jdbcType=VARCHAR},
+		#{jobClass1,jdbcType=INTEGER},
+		#{jobClass2,jdbcType=INTEGER},
+		#{recruitPlace,jdbcType=VARCHAR},
+		<if test="officeDate!=null and officeDate != ''">
+		#{officeDate,jdbcType=DATE},
+		</if>
+		<if test="workDate!=null and workDate != ''">
+		#{workDate,jdbcType=DATE},
+		</if>
+		#{contractPropertyCode,jdbcType=VARCHAR},
+		<if test="contractDateS!=null and contractDateS != ''">
+		#{contractDateS,jdbcType=DATE},
+		</if>
+		<if test="contractDateE!=null and contractDateE != ''">
+		#{contractDateE,jdbcType=DATE},
+		</if>
+		#{bankAccount,jdbcType=VARCHAR},
+		#{bankName,jdbcType=VARCHAR},
+		#{weal1Status,jdbcType=INTEGER},
+		#{weal2Status,jdbcType=INTEGER},
+		#{weal3Status,jdbcType=INTEGER},
+		1,#{leaveDate,jdbcType=VARCHAR},#{leaveExplain,jdbcType=VARCHAR},#{recordno,jdbcType=VARCHAR},now(),1,#{leaderCode},#{leaderName},#{weixinid})
+  </insert>
+  
+  
+  <insert id="[insertHistory]" parameterType="com.glens.eap.sys.orgEmployee.employee.vo.MdEmployee" >
+    insert into md_employee_sync_history (UNIT_CODE, EMPLOYEECODE, 
+      EMPLOYEENAME, NICKNAME, JOB_NO, 
+      SEX, NATIVE_PLACE, MARITAL, 
+      IDCARD, 
+      <if test="birthday!=null and birthday != ''">
+      BIRTHDAY, 
+      </if>
+      ADDR, 
+      TEL, OFFICE_TEL, MOBILEPHONE1, 
+      MOBILEPHONE2, MAIL, DEGREE, 
+      MAJOR_DEGREE, GRADUATE_TIME, GRADUATE_SCHOOL, 
+      HEAD_PHOTOKEY, FACE_PHOTOKEY, GRADECLASSCODE, 
+      EMERGENCY_CONTACTOR_NAME, EMERGENCY_CONTACTOR_PHONE, 
+      EMERGENCY_CONTACTOR_RELATION,
+      JOB_CODE,JOB_PROPERTY_CODE,JOB_CLASS1,JOB_CLASS2,RECRUIT_PLACE,
+      <if test="officeDate != null and officeDate != ''">
+      OFFICE_DATE,
+      </if>
+      <if test="workDate != null and workDate != ''">
+      WORK_DATE,
+    </if>
+    CONTRACT_PROPERTY_CODE,
+    <if test="contractDateS != null and contractDateS != ''">
+    CONTRACT_DATE_S,
+    </if>
+    <if test="contractDateE != null and contractDateE != ''">
+    CONTRACT_DATE_E,
+    </if>
+    BANK_ACCOUNT,BANK_NAME,WEAL1_STATUS,WEAL2_STATUS,WEAL3_STATUS,
+    WORK_STATUS,LEAVE_DATE,LEAVE_EXPLAIN,RECORDNO,SYS_CREATE_TIME)
+    values (#{unitCode,jdbcType=VARCHAR}, #{employeecode,jdbcType=VARCHAR}, 
+      #{employeename,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, #{jobNo,jdbcType=INTEGER}, 
+      #{sex,jdbcType=VARCHAR}, #{nativePlace,jdbcType=VARCHAR}, #{marital,jdbcType=INTEGER}, 
+      #{idcard,jdbcType=VARCHAR}, 
+      <if test="birthday!=null and birthday != ''">
+      #{birthday,jdbcType=DATE}, 
+      </if>
+      #{addr,jdbcType=VARCHAR}, 
+      #{tel,jdbcType=VARCHAR}, #{officeTel,jdbcType=VARCHAR}, #{mobilephone1,jdbcType=VARCHAR}, 
+      #{mobilephone2,jdbcType=VARCHAR}, #{mail,jdbcType=VARCHAR}, #{degree,jdbcType=VARCHAR}, 
+      #{majorDegree,jdbcType=VARCHAR}, #{graduateTime,jdbcType=VARCHAR}, #{graduateSchool,jdbcType=VARCHAR}, 
+      #{headPhotokey,jdbcType=VARCHAR}, #{facePhotokey,jdbcType=VARCHAR}, #{gradeclasscode,jdbcType=VARCHAR}, 
+      #{emergencyContactorName,jdbcType=VARCHAR}, #{emergencyContactorPhone,jdbcType=VARCHAR}, 
+      #{emergencyContactorRelation,jdbcType=VARCHAR},
+      #{jobCode,jdbcType=VARCHAR},
+		#{jobPropertyCode,jdbcType=VARCHAR},
+		#{jobClass1,jdbcType=INTEGER},
+		#{jobClass2,jdbcType=INTEGER},
+		#{recruitPlace,jdbcType=VARCHAR},
+		<if test="officeDate!=null and officeDate != ''">
+		#{officeDate,jdbcType=DATE},
+		</if>
+		<if test="workDate!=null and workDate != ''">
+		#{workDate,jdbcType=DATE},
+		</if>
+		#{contractPropertyCode,jdbcType=VARCHAR},
+		<if test="contractDateS!=null and contractDateS != ''">
+		#{contractDateS,jdbcType=DATE},
+		</if>
+		<if test="contractDateE!=null and contractDateE != ''">
+		#{contractDateE,jdbcType=DATE},
+		</if>
+		#{bankAccount,jdbcType=VARCHAR},
+		#{bankName,jdbcType=VARCHAR},
+		#{weal1Status,jdbcType=INTEGER},
+		#{weal2Status,jdbcType=INTEGER},
+		#{weal3Status,jdbcType=INTEGER},
+		1,#{leaveDate,jdbcType=VARCHAR},#{leaveExplain,jdbcType=VARCHAR},#{recordno,jdbcType=VARCHAR},now())
+  </insert>
+  
+  
+   <delete id="[deleteHistory]">
+  	delete from md_employee_sync_history
+  </delete>
+  
+
+  <update id="update" parameterType="com.glens.eap.sys.orgEmployee.employee.vo.MdEmployee" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+    -->
+    update md_employee
+    <set> 
+		<if test="unitCode!=null and unitCode!=''">
+		UNIT_CODE = #{unitCode,jdbcType=VARCHAR},
+		</if>
+		<if test="employeecode!=null and employeecode!=''">
+		EMPLOYEECODE = #{employeecode,jdbcType=VARCHAR},SYS_DELETE_TIME=NOW(),
+		</if>
+		<if test="employeecode==null or employeecode==''">
+		SYS_UPDATE_TIME=NOW(),
+		</if>
+		<if test="employeename!=null and employeename!=''">
+		EMPLOYEENAME = #{employeename,jdbcType=VARCHAR},
+		</if>
+		<if test="nickname!=null and nickname!=''">
+		NICKNAME = #{nickname,jdbcType=VARCHAR},
+		</if>
+		<if test="jobNo!=null and jobNo!=''">
+		JOB_NO = #{jobNo,jdbcType=INTEGER},
+		</if>
+		<if test="sex!=null and sex!=''">
+		SEX = #{sex,jdbcType=VARCHAR},
+		</if>
+		<if test="nativePlace!=null and nativePlace!=''">
+		NATIVE_PLACE = #{nativePlace,jdbcType=VARCHAR},
+		</if>
+		<if test="marital!=null and marital!=''">
+		MARITAL = #{marital,jdbcType=INTEGER},
+		</if>
+		<if test="idcard!=null and idcard!=''">
+		IDCARD = #{idcard,jdbcType=VARCHAR},
+		</if>
+		<if test="birthday!=null and birthday!=''">
+		BIRTHDAY = #{birthday,jdbcType=DATE},
+		</if>
+		<if test="addr!=null and addr!=''">
+		ADDR = #{addr,jdbcType=VARCHAR},
+		</if>
+		<if test="tel!=null and tel!=''">
+		TEL = #{tel,jdbcType=VARCHAR},
+		</if>
+		<if test="officeTel!=null and officeTel!=''">
+		OFFICE_TEL = #{officeTel,jdbcType=VARCHAR},
+		</if>
+		<if test="mobilephone1!=null and mobilephone1!=''">
+		MOBILEPHONE1 = #{mobilephone1,jdbcType=VARCHAR},
+		</if>
+		<if test="mobilephone2!=null and mobilephone2!=''">
+		MOBILEPHONE2 = #{mobilephone2,jdbcType=VARCHAR},
+		</if>
+		<if test="mail!=null and mail!=''">
+		MAIL = #{mail,jdbcType=VARCHAR},
+		</if>
+		<if test="degree!=null and degree!=''">
+		DEGREE = #{degree,jdbcType=VARCHAR},
+		</if>
+		<if test="majorDegree!=null and majorDegree!=''">
+		MAJOR_DEGREE = #{majorDegree,jdbcType=VARCHAR},
+		</if>
+		<if test="graduateTime!=null and graduateTime!=''">
+		GRADUATE_TIME = #{graduateTime,jdbcType=VARCHAR},
+		</if>
+		<if test="graduateSchool!=null and graduateSchool!=''">
+		GRADUATE_SCHOOL = #{graduateSchool,jdbcType=VARCHAR},
+		</if>
+		<if test="headPhotokey!=null and headPhotokey!=''">
+		HEAD_PHOTOKEY = #{headPhotokey,jdbcType=VARCHAR},
+		</if>
+		<if test="facePhotokey!=null and facePhotokey!=''">
+		FACE_PHOTOKEY = #{facePhotokey,jdbcType=VARCHAR},
+		</if>
+		<if test="gradeclasscode!=null and gradeclasscode!=''">
+		GRADECLASSCODE = #{gradeclasscode,jdbcType=VARCHAR},
+		</if>
+		<if test="emergencyContactorName!=null and emergencyContactorName!=''">
+		EMERGENCY_CONTACTOR_NAME = #{emergencyContactorName,jdbcType=VARCHAR},
+		</if>
+		<if test="emergencyContactorPhone!=null and emergencyContactorPhone!=''">
+		EMERGENCY_CONTACTOR_PHONE = #{emergencyContactorPhone,jdbcType=VARCHAR},
+		</if>
+		<if test="emergencyContactorRelation!=null and emergencyContactorRelation!=''">
+		EMERGENCY_CONTACTOR_RELATION = #{emergencyContactorRelation,jdbcType=VARCHAR},
+		</if>
+		<if test="remarks!=null and remarks!=''">
+		REMARKS = #{remarks,jdbcType=VARCHAR},
+		</if>
+<if test="jobCode!=null and jobCode!=''">
+JOB_CODE = #{jobCode,jdbcType=VARCHAR},
+</if>
+<if test="jobPropertyCode!=null and jobPropertyCode!=''">
+JOB_PROPERTY_CODE = #{jobPropertyCode,jdbcType=VARCHAR},
+</if>
+<if test="jobClass1!=null and jobClass1!=''">
+JOB_CLASS1 = #{jobClass1,jdbcType=INTEGER},
+</if>
+<if test="jobClass2!=null and jobClass2!=''">
+JOB_CLASS2 = #{jobClass2,jdbcType=INTEGER},
+</if>
+<if test="recruitPlace!=null and recruitPlace!=''">
+RECRUIT_PLACE = #{recruitPlace,jdbcType=VARCHAR},
+</if>
+<if test="officeDate!=null and officeDate!=''">
+OFFICE_DATE = #{officeDate,jdbcType=DATE},
+</if>
+<if test="workDate!=null and workDate!=''">
+WORK_DATE = #{workDate,jdbcType=DATE},
+</if>
+<if test="contractPropertyCode!=null and contractPropertyCode!=''">
+CONTRACT_PROPERTY_CODE = #{contractPropertyCode,jdbcType=VARCHAR},
+</if>
+<if test="contractDateS!=null and contractDateS!=''">
+CONTRACT_DATE_S = #{contractDateS,jdbcType=DATE},
+</if>
+<if test="contractDateE!=null and contractDateE!=''">
+CONTRACT_DATE_E = #{contractDateE,jdbcType=DATE},
+</if>
+<if test="bankAccount!=null and bankAccount!=''">
+BANK_ACCOUNT = #{bankAccount,jdbcType=VARCHAR},
+</if>
+<if test="bankName!=null and bankName!=''">
+BANK_NAME = #{bankName,jdbcType=VARCHAR},
+</if>
+<if test="weal1Status!=null and weal1Status!=''">
+WEAL1_STATUS = #{weal1Status,jdbcType=INTEGER},
+</if>
+<if test="weal2Status!=null and weal2Status!=''">
+WEAL2_STATUS = #{weal2Status,jdbcType=INTEGER},
+</if>
+<if test="weal3Status!=null and weal3Status!=''">
+WEAL3_STATUS = #{weal3Status,jdbcType=INTEGER},
+</if>
+<if test="workStatus != null and workStatus != ''">
+WORK_STATUS = #{workStatus,jdbcType=INTEGER},
+</if>
+<if test="leaveDate != null and leaveDate != ''">
+LEAVE_DATE = #{leaveDate,jdbcType=INTEGER},
+</if>
+<if test="leaveExplain != null and leaveExplain != ''">
+LEAVE_EXPLAIN = #{leaveExplain,jdbcType=INTEGER},
+</if>	
+<if test="recordno != null and recordno != ''">
+RECORDNO = #{recordno,jdbcType=INTEGER},
+</if>	
+<if test="leaderCode != null and leaderCode != ''">
+LEADER_CODE = #{leaderCode},
+</if>
+<if test="leaderName != null and leaderName != ''">
+LEADER_NAME = #{leaderName},
+</if>
+<if test="weixinid != null">
+WEIXIN_ID = #{weixinid},
+</if>	
+	</set>
+
+<!--     	UNIT_CODE = #{unitCode,jdbcType=VARCHAR}, -->
+<!--       EMPLOYEECODE = #{employeecode,jdbcType=VARCHAR}, -->
+<!--       EMPLOYEENAME = #{employeename,jdbcType=VARCHAR}, -->
+<!--       NICKNAME = #{nickname,jdbcType=VARCHAR}, -->
+<!--       JOB_NO = #{jobNo,jdbcType=INTEGER}, -->
+<!--       SEX = #{sex,jdbcType=VARCHAR}, -->
+<!--       NATIVE_PLACE = #{nativePlace,jdbcType=VARCHAR}, -->
+<!--       MARITAL = #{marital,jdbcType=INTEGER}, -->
+<!--       IDCARD = #{idcard,jdbcType=VARCHAR}, -->
+<!--       BIRTHDAY = #{birthday,jdbcType=TIMESTAMP}, -->
+<!--       ADDR = #{addr,jdbcType=VARCHAR}, -->
+<!--       TEL = #{tel,jdbcType=VARCHAR}, -->
+<!--       OFFICE_TEL = #{officeTel,jdbcType=VARCHAR}, -->
+<!--       MOBILEPHONE1 = #{mobilephone1,jdbcType=VARCHAR}, -->
+<!--       MOBILEPHONE2 = #{mobilephone2,jdbcType=VARCHAR}, -->
+<!--       MAIL = #{mail,jdbcType=VARCHAR}, -->
+<!--       DEGREE = #{degree,jdbcType=VARCHAR}, -->
+<!--       MAJOR_DEGREE = #{majorDegree,jdbcType=VARCHAR}, -->
+<!--       GRADUATE_TIME = #{graduateTime,jdbcType=VARCHAR}, -->
+<!--       GRADUATE_SCHOOL = #{graduateSchool,jdbcType=VARCHAR}, -->
+<!--       HEAD_PHOTOKEY = #{headPhotokey,jdbcType=VARCHAR}, -->
+<!--       FACE_PHOTOKEY = #{facePhotokey,jdbcType=VARCHAR}, -->
+<!--       GRADECLASSCODE = #{gradeclasscode,jdbcType=VARCHAR}, -->
+<!--       EMERGENCY_CONTACTOR_NAME = #{emergencyContactorName,jdbcType=VARCHAR}, -->
+<!--       EMERGENCY_CONTACTOR_PHONE = #{emergencyContactorPhone,jdbcType=VARCHAR}, -->
+<!--       EMERGENCY_CONTACTOR_RELATION = #{emergencyContactorRelation,jdbcType=VARCHAR}, -->
+<!--       REMARKS = #{remarks,jdbcType=VARCHAR} -->
+    where rowid = #{rowid,jdbcType=BIGINT}
+  </update>
+  
+  <sql id="querycon">
+  	where 1=1
+  	<if test="unitCode!=null and unitCode!=''">
+  		and UNIT_CODE=#{unitCode}
+  	</if>
+  	
+  	<if test="searchName!=null and searchName!=''">
+  		and EMPLOYEENAME like concat(#{searchName},'%')
+  	</if>
+  	<if test="workStatus!=null and workStatus!=''">
+  		and WORK_STATUS = #{workStatus, jdbcType=INTEGER}
+  	</if>
+  	
+  	<if test="workStatus==2 and fromDate!=null and fromDate!=''">
+  		and LEAVE_DATE &gt;=#{fromDate}
+  	</if>
+  	
+  	<if test="workStatus==2 and toDate!=null and toDate!=''">
+  		and LEAVE_DATE  &lt;= #{toDate}
+  	</if>
+  	
+  	<if test="workStatus==1 and fromDate!=null and fromDate!=''">
+  		and OFFICE_DATE &gt;=#{fromDate}
+  	</if>
+  	
+  	<if test="workStatus==1 and toDate!=null and toDate!=''">
+  		and OFFICE_DATE  &lt;= #{toDate}
+  	</if>
+  	
+  </sql>
+  
+  <select id="queryForCount" parameterType="map" resultType="int">
+  	select
+		count(*)
+	from md_employee a, md_org_unit b
+  	where a.unit_code = b.unit_code and b.company_Code=#{companyCode}
+  	<if test="unitCode!=null and unitCode!=''">
+  		and a.UNIT_CODE=#{unitCode}
+  	</if>
+  	
+  	<if test="searchName!=null and searchName!=''">
+  		and EMPLOYEENAME like concat(#{searchName},'%')
+  	</if>
+  	<if test="workStatus!=null and workStatus!=''">
+  		and WORK_STATUS = #{workStatus, jdbcType=INTEGER}
+  	</if>
+  	
+  	<if test="workStatus==2 and fromDate!=null and fromDate!=''">
+  		and LEAVE_DATE &gt;=#{fromDate}
+  	</if>
+  	
+  	<if test="workStatus==2 and toDate!=null and toDate!=''">
+  		and LEAVE_DATE  &lt;= #{toDate}
+  	</if>
+  	
+  	<if test="workStatus==1 and fromDate!=null and fromDate!=''">
+  		and OFFICE_DATE &gt;=#{fromDate}
+  	</if>
+  	
+  	<if test="workStatus==1 and toDate!=null and toDate!=''">
+  		and OFFICE_DATE  &lt;= #{toDate}
+  	</if>
+  </select>
+  
+  <update id="memberLeave"  parameterType="com.glens.eap.sys.orgEmployee.employee.vo.MdEmployee" >
+  	 
+     	update PM_MEMBER set WORK_STATUE=2 WHERE EMPLOYEECODE=#{employeecode}
+
+     	
+  </update>
+  
+  <!-- 删除账号 -->
+  <delete id="deleteAccount"  parameterType="com.glens.eap.sys.orgEmployee.employee.vo.MdEmployee" >
+    delete from pf_account
+    WHERE EMPLOYEECODE=#{employeecode}
+  </delete>
+  
+  
+  <select id="queryDorm"  parameterType="com.glens.eap.sys.orgEmployee.employee.vo.MdEmployee" resultType="map">
+  		
+	select d.DORM_NAME,p.PRO_NAME,d.PROVINCE,d.CITY,d.DISTRICT from gm_bm_bedrent g
+	left join gm_bm_dorm d on d.DORM_CODE=g.dorm_code
+	left join pm_base p on p.PRO_NO=g.PRO_NO
+	where g.employeecode=#{employeecode} and (g.rent_status=1  or g.rent_status=3 )
+	
+  </select>
+  
+   <select id="queryAsset"  parameterType="com.glens.eap.sys.orgEmployee.employee.vo.MdEmployee" resultType="map">
+  		
+	select b.ASSET_NAME assetName,b.ASSET_CODE assetCode,b.brand brand,b.model_No modelNo,g.LOAN_PRO_NAME,b.FORMS from GM_ASSET_RENT  g
+left join gm_asset_base b on g.ASSET_CODE=b.ASSET_CODE
+where g.LOAN_EMPLOYEECODE=#{employeecode} and (g.rent_status=1  or  g.rent_status=3)
+
+	
+  </select>
+  
+  
+  <select id="queryForPage" parameterType="map" resultMap="BaseResultMap">
+  	
+	select
+		bt1.*,
+		(case when bt2.has_pro>0 then bt2.manager_pro else bt1.pro_name end) as about_pro_name
+	from
+	(
+		select 
+			t1.*,
+			t7.pro_name,h.SALARY_GRADE_NAME_PREFIX,j.JOB_NAME,c.CONTRACT_PROPERTY_NAME
+		from md_employee t1
+		left join pm_member t6 on t6.employeecode = t1.employeecode and t6.work_statue=1   
+		left join pm_base t7 on t7.pro_no=t6.pro_no
+		left join HRM_SALARY_FRAMEWORK h on h.UNIT_CODE=t1.UNIT_CODE and h.STATUS=2
+		left join md_employee_job j on j.JOB_CODE=t1.JOB_CODE
+		left join md_employee_contract_property c on c.CONTRACT_PROPERTY_CODE=t1.CONTRACT_PROPERTY_CODE
+		where 1=1
+	) bt1
+	left join
+	(
+		select 
+			t1.employeecode,
+			group_concat(t7.pro_name) as manager_pro,
+			sum(case when t7.pro_name is not null then 1 else 0 end) as has_pro
+		from md_employee t1
+		left join pm_base t7 on t7.employeecode=t1.employeecode and t7.PRO_STATUS=2
+		where 1=1
+		group by employeecode
+	) bt2 on bt1.employeecode=bt2.employeecode
+  	left join md_org_unit b on bt1.unit_code=b.unit_code
+  	where b.company_Code=#{companyCode}
+  	<if test="unitCode!=null and unitCode!=''">
+  		and bt1.UNIT_CODE=#{unitCode}
+  	</if>
+  	<if test="searchName!=null and searchName!=''">
+  		and EMPLOYEENAME like concat(#{searchName},'%')
+  	</if>
+  	<if test="workStatus!=null and workStatus!=''">
+  		and WORK_STATUS = #{workStatus, jdbcType=INTEGER}
+  	</if>
+  	<if test="workStatus==2 and fromDate!=null and fromDate!=''">
+  		and LEAVE_DATE &gt;=#{fromDate}
+  	</if>
+  	<if test="workStatus==2 and toDate!=null and toDate!=''">
+  		and LEAVE_DATE  &lt;= #{toDate}
+  	</if>
+  	<if test="workStatus==1 and fromDate!=null and fromDate!=''">
+  		and OFFICE_DATE &gt;=#{fromDate}
+  	</if>
+  	<if test="workStatus==1 and toDate!=null and toDate!=''">
+  		and OFFICE_DATE  &lt;= #{toDate}
+  	</if>
+  	order by job_no
+  	limit #{firstResult},#{maxResult}
+  </select>
+  
+    <select id="queryForExport" parameterType="map" resultMap="BaseResultMap">
+  	set @mycnt=0;
+  	select 
+  		(@mycnt:=@mycnt+1) as rowno,
+  		t1.*,
+  		t2.unit_name, t3.job_name, t4.job_property_name, t5.contract_property_name,
+  	 	t7.pro_name,t6.pro_no,
+  	 	(case when t1.JOB_CLASS1=1 then '总部' when t1.JOB_CLASS1=2 then '项目' else '' end) as job_class1_name,
+  	 	(case when t1.JOB_CLASS2=1 then '内业' when t1.JOB_CLASS2=2 then '外业' else '' end) as job_class2_name,
+  	 	(case when t1.sex=0 then '男' when t1.sex=1 then '女' else '' end) as sex_label
+  	from md_employee t1
+  	left join md_org_unit t2 on t2.unit_code=t1.unit_code
+  	left join md_employee_job t3 on t3.job_code=t1.job_code
+  	left join md_employee_job_property t4 on t4.job_property_code = t1.job_property_code
+  	left join md_employee_contract_property t5 on t5.contract_property_code = t1.contract_property_code
+  	left join pm_member t6 on t6.employeecode = t1.employeecode and t6.work_statue=1   
+  	left join pm_base t7 on t7.pro_no=t6.pro_no
+  	where 1=1
+  	<if test="unitCode!=null and unitCode!=''">
+  		and UNIT_CODE=#{unitCode}
+  	</if>
+  	<if test="searchName!=null and searchName!=''">
+  		and EMPLOYEENAME like concat(#{searchName},'%')
+  	</if>
+  	
+  	<if test="workStatus!=null and workStatus!=''">
+  		and WORK_STATUS = #{workStatus, jdbcType=INTEGER}
+  	</if>
+  	
+  	<if test="workStatus==2 and fromDate!=null and fromDate!=''">
+  		and LEAVE_DATE &gt;=#{fromDate}
+  	</if>
+  	
+  	<if test="workStatus==2 and toDate!=null and toDate!=''">
+  		and LEAVE_DATE  &lt;= #{toDate}
+  	</if>
+  	
+  	<if test="workStatus==1 and fromDate!=null and fromDate!=''">
+  		and OFFICE_DATE &gt;=#{fromDate}
+  	</if>
+  	
+  	<if test="workStatus==1 and toDate!=null and toDate!=''">
+  		and OFFICE_DATE  &lt;= #{toDate}
+  	</if>
+  	
+  	
+  </select>
+  
+  <select id="[queryEmployee]" parameterType="string" resultMap="BaseResultMap">
+  	select b.* from md_employee b
+  	where b.UNIT_CODE=#{unitCode}
+  </select>
+  
+  <select id="[queryEmployeeInfo]" parameterType="string" resultType="map">
+	SELECT
+		c.COMPANY_CODE,
+		b.UNIT_CODE,
+		b.EMPLOYEECODE,
+		b.EMPLOYEENAME
+	FROM
+		md_employee b
+	JOIN md_org_unit c ON b.UNIT_CODE = c.UNIT_CODE
+	WHERE
+		b.SYS_PROCESS_FLAG = '1'
+	AND c.SYS_PROCESS_FLAG = '1'
+	AND b.EMPLOYEECODE = #{employeeCode}	
+  </select>
+  
+  
+   <select id="[queryEmployeeByMobile]" parameterType="string" resultType="map">
+		SELECT
+			c.EMPLOYEECODE,
+			c.EMPLOYEENAME,
+			c.JOB_NO
+		FROM
+			 md_employee c
+		WHERE
+			c.SYS_PROCESS_FLAG = '1'
+		AND c.MOBILEPHONE1 = #{mobilePhone}
+		limit 0,1
+  </select>
+  
+  <select id="queryRelatedEmployeeList" parameterType="string" resultType="map">
+	SELECT
+		d.JOB_NO
+	FROM
+		pm_member b
+	JOIN pm_base c ON b.PRO_NO = c.PRO_NO
+	LEFT JOIN md_employee d ON c.EMPLOYEECODE = d.EMPLOYEECODE
+	WHERE
+		b.EMPLOYEECODE = #{employeeCode}
+	UNION
+		SELECT
+			d.JOB_NO
+		FROM
+			pm_base c
+		LEFT JOIN md_employee d ON c.EMPLOYEECODE = d.EMPLOYEECODE
+		WHERE
+			c.EMPLOYEECODE = #{employeeCode}
+		UNION
+			SELECT
+				b.JOB_NO
+			FROM
+				md_employee b
+			WHERE
+				b.JOB_CODE in ('10','23','25')
+			AND b.UNIT_CODE IN (
+				SELECT
+					d.UNIT_CODE
+				FROM
+					md_employee d
+				WHERE
+					d.EMPLOYEECODE = #{employeeCode}
+			)
+			UNION
+			SELECT
+				201008040008   <!-- 吴英 -->
+			UNION
+			SELECT
+				201403010187   <!-- 金戋 -->
+				UNION
+			SELECT
+				201507210515  <!-- 刘淑颖 -->
+			UNION
+			SELECT
+				201708071205  <!-- 吴祖菊-->	
+			UNION
+			SELECT
+				201405050282  <!-- 郑雪娇-->	
+			UNION
+			SELECT
+				201309170173  <!-- 侍尧-->		
+					
+				
+  </select>
+  
+  
+  
+  <select id="[getJobNO]" parameterType="string" resultType="map">
+		SELECT
+			b.JOB_NO
+		FROM
+			md_employee b
+		LEFT JOIN pf_account c ON b.EMPLOYEECODE = c.EMPLOYEECODE
+		WHERE
+			b.SYS_PROCESS_FLAG = '1'
+		AND c.SYS_PROCESS_FLAG = '1'
+		AND c.ACCOUNT_CODE =#{accountCode}
+  </select>
+  
+  
+  <select id="[queryAllEmployee]"  resultMap="BaseResultMap">
+    select 
+    t.*, t2.UNIT_NAME, t3.JOB_NAME, t4.JOB_PROPERTY_NAME, t5.CONTRACT_PROPERTY_NAME
+    from md_employee t
+    left join md_org_unit t2 on t.unit_code = t2.unit_code
+    left join MD_EMPLOYEE_JOB t3 on t3.JOB_CODE=t.JOB_CODE
+    left join MD_EMPLOYEE_JOB_PROPERTY t4 on t4.JOB_PROPERTY_CODE = t.JOB_PROPERTY_CODE
+    left join MD_EMPLOYEE_CONTRACT_PROPERTY t5 on t5.CONTRACT_PROPERTY_CODE = t.CONTRACT_PROPERTY_CODE
+    where t.WORK_STATUS='1'
+  </select>
+  
+  
+   <select id="queryEmployeeForOAList"  resultType="map">
+	SELECT
+		t.*, t2.UNIT_NAME,
+		t3.JOB_NAME,
+		t4.JOB_PROPERTY_NAME,
+		t5.CONTRACT_PROPERTY_NAME
+	FROM
+		md_employee t
+	LEFT JOIN md_org_unit t2 ON t.unit_code = t2.unit_code
+	LEFT JOIN MD_EMPLOYEE_JOB t3 ON t3.JOB_CODE = t.JOB_CODE
+	LEFT JOIN MD_EMPLOYEE_JOB_PROPERTY t4 ON t4.JOB_PROPERTY_CODE = t.JOB_PROPERTY_CODE
+	LEFT JOIN MD_EMPLOYEE_CONTRACT_PROPERTY t5 ON t5.CONTRACT_PROPERTY_CODE = t.CONTRACT_PROPERTY_CODE
+	where t.SYS_PROCESS_FLAG='1'
+	AND t.EMPLOYEENAME  not LIKE '%管理%'
+   </select>
+  
+  
+  
+  <select id="[queryLeaveEmployee]" parameterType="map" resultMap="BaseResultMap">
+	SELECT
+		t.*
+	FROM
+		md_employee t
+	WHERE
+		WORK_STATUS = '2'  
+	</select>
+  
+  <select id="[queryProList]" parameterType="string" resultType="map">
+	SELECT
+		b.PRO_NAME
+	FROM
+		pm_base b
+	LEFT JOIN pm_member c ON b.PRO_NO = c.PRO_NO
+	WHERE
+		c.WORK_STATUE = '1'
+	AND b.PRO_STATUS = '2'
+	AND c.JOB_NO = #{jobNo}
+  </select>
+  
+  <select id="[queryEmployeeByCode]" parameterType="string" resultMap="BaseResultMap">
+  select b.*, t2.unit_name 
+  from md_employee b
+  left join md_org_unit t2 on t2.unit_code=b.unit_code
+  	where b.EMPLOYEECODE=#{employeeCode}
+  </select>
+  
+  <!-- 职务岗位字典 -->
+  <select id="selectJob" resultType="map">
+  	select
+	  	rowid as rowid,
+		JOB_CODE as jobCode,
+		JOB_NAME as jobName,
+		SYS_CREATE_TIME as sysCreateTime,
+		SYS_UPDATE_TIME as sysUpdateTime,
+		SYS_DELETE_TIME as sysDeleteTime,
+		SYS_PROCESS_FLAG as sysProcessFlag,
+		REMARKS as remarks
+	from MD_EMPLOYEE_JOB
+  </select>
+  <!-- 工作性质字典 -->
+  <select id="selectJobProperty" resultType="map">
+  	select
+  		rowid as rowid,
+		JOB_PROPERTY_CODE as jobPropertyCode,
+		JOB_PROPERTY_NAME as jobPropertyName,
+		SYS_CREATE_TIME as sysCreateTime,
+		SYS_UPDATE_TIME as sysUpdateTime,
+		SYS_DELETE_TIME as sysDeleteTime,
+		SYS_PROCESS_FLAG as sysProcessFlag,
+		REMARKS as remarks
+  	from MD_EMPLOYEE_JOB_PROPERTY
+  </select>
+  <!-- 合同性质字典 -->
+  <select id="selectContractProperty" resultType="map">
+  	select
+  		rowid as rowid,
+		CONTRACT_PROPERTY_CODE as contractPropertyCode,
+		CONTRACT_PROPERTY_NAME as contractPropertyName,
+		SYS_CREATE_TIME as sysCreateTime,
+		SYS_UPDATE_TIME as sysUpdateTime,
+		SYS_DELETE_TIME as sysDeleteTime,
+		SYS_PROCESS_FLAG as sysProcessFlag,
+		REMARKS as remarks
+  	from MD_EMPLOYEE_CONTRACT_PROPERTY
+  </select>
+  
+  <select id="queryNotInProForCount" parameterType="map" resultType="int">
+  	select count(*) 
+	from md_employee t1 left join md_org_unit b on t1.unit_code= b.unit_code
+	where not exists(
+		select 1 from pm_member t2 where t2.work_statue=1 and t2.employeecode=t1.employeecode
+	)
+	and b.company_code = #{companyCode}
+  	<if test="unitCode!=null and unitCode!=''">
+  		and t1.UNIT_CODE=#{unitCode}
+  	</if>
+  	
+  	<if test="searchName!=null and searchName!=''">
+  		and EMPLOYEENAME like concat(#{searchName},'%')
+  	</if>
+  	<if test="workStatus!=null and workStatus!=''">
+  		and WORK_STATUS = #{workStatus, jdbcType=INTEGER}
+  	</if>
+  </select>
+  
+  <select id="queryNotInProForPage" parameterType="map" resultMap="BaseResultMap">
+  	select t1.* 
+	from md_employee t1 left join md_org_unit b on t1.unit_code = b.unit_code
+	where not exists(
+		select 1 from pm_member t2 where t2.work_statue=1 and t2.employeecode=t1.employeecode
+	)
+	and b.company_code = #{companyCode}
+	<if test="unitCode!=null and unitCode!=''">
+  		and t1.UNIT_CODE=#{unitCode}
+  	</if>
+  	
+  	<if test="searchName!=null and searchName!=''">
+  		and EMPLOYEENAME like concat(#{searchName},'%')
+  	</if>
+  	<if test="workStatus!=null and workStatus!=''">
+  		and WORK_STATUS = #{workStatus, jdbcType=INTEGER}
+  	</if>
+  	order by job_no
+  	limit #{firstResult},#{maxResult}
+  </select>
+  
+  <select id="getUnits" parameterType="map" resultType="map">
+  	 select UNIT_NAME unitName,UNIT_CODE unitCode from md_org_unit where COMPANY_CODE='001'
+  </select>
+  
+  <select id="getJobs" parameterType="map" resultType="map">
+  	select JOB_CODE jobCode,JOB_NAME jobName from md_employee_job
+  </select>
+  
+  <select id="getProperty"  parameterType="map" resultType="map">
+  	select JOB_PROPERTY_CODE propertyCode,JOB_PROPERTY_NAME propertyName from md_employee_job_property
+  </select>
+  
+  
+  <select id="getContracts" parameterType="map" resultType="map">
+  	select CONTRACT_PROPERTY_CODE contractCode,CONTRACT_PROPERTY_NAME contractName from md_employee_contract_property
+  </select>
+  
+  <select id="queryEmployeeInfo" parameterType="map" resultType="map">
+	SELECT
+		b.ACCOUNT_NAME,
+		c.EMPLOYEENAME,
+		c.MOBILEPHONE1,
+		c.JOB_NO
+	FROM
+		pf_account b
+	LEFT JOIN md_employee c ON b.EMPLOYEECODE = c.EMPLOYEECODE
+	WHERE
+		b.SYS_PROCESS_FLAG = '1'
+	AND c.WORK_STATUS = 1
+	<if test="accountName!=null and accountName!=''">
+		AND b.ACCOUNT_NAME =#{accountName}
+	</if>
+	<if test="mobilePhone!=null and mobilePhone!=''">
+		AND c.MOBILEPHONE1 =#{mobilePhone}
+	</if>
+	<if test="employeeCode!=null and employeeCode!=''">
+		AND c.EMPLOYEECODE=#{employeeCode}
+	</if>
+  </select>
+</mapper>

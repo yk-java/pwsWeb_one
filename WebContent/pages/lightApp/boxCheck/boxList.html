@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en"  ng-app="realPosition">
+<head>
+	<meta charset="UTF-8" />
+	<title>Document</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+	<script src="../js/jquery-1.9.1.min.js"></script>
+	<script src="../js/jquery.cookie.js"></script>
+	<script src="../js/angular.min.js"></script>
+	<script src="../js/util.js"></script>
+	<script src="../js/ng-base.js?a=1"></script>
+	
+
+	<script type="text/javascript" src="../js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="../js/showDlog/showDlog-blue.css" />
+	<link rel="stylesheet" type="text/css" href="../css/boxMgr.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/edit.css"/>
+	<script type="text/javascript" src="../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../js/DropDownList-1.2/DropDownList.css" />
+<style>
+	.filter_sort {
+width:100%;
+height: 17%; 
+background:#fff;
+margin:0 auto;
+margin-top:10px;
+}
+
+.item{
+	height:32px;
+	width:95%;
+	margin: 0 auto;
+	
+	border-radius:4px;
+	padding-top:10px;
+	margin-bottom:10px;
+	background:#fff;
+}
+
+.bgwhite{
+background:#fff;
+}
+.bgblue{
+	background:#F0F9FF
+}
+.bggreen{background:#f7fff0}
+
+.itimg{float:left;margin-left:10px;}
+.itspan{float:left;margin-left:10px;margin-top:2px;font-size:16px;color:#999}
+
+.btnscan{float:right;margin-top:20px;margin-right:10px;}
+.btnsave{
+	height:32px;
+	
+	background:#02A2FF;
+	
+	padding-top:10px;
+	position: fixed;
+	bottom:10px;
+	color:#fff;
+	text-align: center;
+	left:2%;
+	right:2%
+	
+}
+.status{float: right;margin-right:8px;}
+
+.content{height:60%;overflow: auto;}
+</style>
+</head>
+<body ng-controller="realPositionCtrl">
+<form id="saveForm" class="required-validate">
+	<header> 
+		<div class="return">
+			<img src="../img/deviceAdd/return.png" onclick="returnBack()" />
+		</div>
+			详细信息
+			<img src="../images/mark_icon.png" class="btnscan" ng-click="scan()" />
+			
+	</header>
+	<section>
+		
+		<div class="filter_sort" >
+			<div style="color:#02A2FF;font-size:16px;padding-left:10px;padding-top:10px;height:50px;">表箱编号</div>
+			<div id="boxnum" style="font-size:16px;color:#333333;padding-left:10px;">
+				(电表号)
+			</div>
+		</div>
+		<div style="height:35px; text-align: center;padding-top:20px;color:#ccc">
+			 表箱内电表列表
+		</div>
+		
+		<div class="content">
+			<div class="item" ng-repeat="item in resultList">
+				<img src="../images/little_list.png" class="itimg" /> <span class="itspan" id="meter_{{item.meterCode}}">{{item.meterCode}}</span>
+				
+				<span ng-if="item.checkResult==0" class="status" style="color:red">未核查</span>
+				<span ng-if="item.checkResult==1" class="status" style="color:#02A2FF">已核查</span>
+				<span ng-if="item.checkResult==2" class="status" style="color:#5ccc00">未查到</span>
+				<span ng-if="item.checkResult==3" class="status" style="color:#5ccc00">新增</span>
+			</div>
+		</div>
+		
+		
+		<div class="btnsave" ng-click="save()">
+			提交更新
+		</div>
+		
+		
+	</section>
+
+	
+	</form>
+	<script type="text/javascript">
+	function returnBack(){
+		top.viewBack();
+		$scope.resultList=[];
+	}
+		
+		
+		var reseverOrgcode="";
+		
+		var searchName="";
+		
+		var reserveStatus="";
+		var ngScope;
+		simpleController({
+			moduleName:"realPosition",
+			controllerName:"realPositionCtrl",
+			init:function($scope, $http){
+				ngScope=$scope;
+				var params=getUrlParams();
+				$("#boxnum").html(params.boxnum);
+				
+				//alert($scope.userData.employeeName)
+				
+				$scope.httpExecute({
+					method:"get",
+					url:"eap/pmsServices/pe/boxCheck/listByBoxCode",
+					data:{"boxCode":params.boxnum},
+					success:function(resp){
+						
+						if(resp.list){
+							$scope.resultList=resp.list;
+						}else{
+							$scope.resultList=[];
+						}
+						
+						
+						
+						
+					}
+				});
+				
+				$scope.save=function(){
+					 var result=0;
+					 for(var i=0;i<$scope.resultList.length;i++){
+							$scope.resultList[i].checkUser=$scope.userData.employeeCode;
+							$scope.resultList[i].checkUserName=$scope.userData.employeeName;
+							if($scope.resultList[i].checkResult==0){
+								result=1;
+							}
+					 } 
+					 if(result==1){
+						 new ShowDlog().confirm({
+								icon:"warning",
+								msg:"您还有未查询到的电表,确认提交吗？",
+								ok:function(){
+									callNgFn({
+										ctrlEl:$("body")[0],
+										ngFn:function(scope){
+											scope.doSave();
+										}
+									});
+								},
+								cancel:function(){
+								}
+							});
+					 }else{
+						$scope.doSave();
+					 }
+				};
+				
+				$scope.doSave=function(){
+					for(var i=0;i<$scope.resultList.length;i++){
+						$scope.resultList[i].checkUser=$scope.userData.employeeCode;
+						$scope.resultList[i].checkUserName=$scope.userData.employeeName;
+						if($scope.resultList[i].checkResult==0){
+							$scope.resultList[i].checkResult=2;
+						}
+				     } 
+					
+					var condStr=JSON.stringify($scope.resultList);
+					$scope.httpExecute({
+						method:"post",
+						url:"eap/pmsServices/pe/boxCheck/checkResultSubmit",
+						data:{"checkUserName":$scope.userData.employeeName,"checkUser":$scope.userData.employeeCode,"checkResult":condStr,"boxCode":params.boxnum},
+						success:function(resp){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"提交成功！",
+								done:function(){
+									top.viewBack();
+									$scope.resultList=[];
+								},
+								t:1500
+							});
+						}
+					});
+				};
+				
+				
+				$scope.scan=function(){
+					
+					window.top.nativeLib.scanCode({callback:function(data){
+						
+						
+						callNgFn({
+							  ctrlEl:$("body")[0],
+							  ngFn:function(scope){
+							    if(data!=""){
+							    	
+							    	 if(scope.resultList.length>0){
+										 for(var i=0;i<scope.resultList.length;i++){
+											 	if(scope.resultList[i].meterCode==data){
+													if(scope.resultList[i].checkResult==0){
+														scope.resultList[i].checkResult=1;
+													}
+													break;
+											 	}
+												
+												if(i==scope.resultList.length-1){
+													var obj={};
+													obj["checkResult"] = 3;
+													obj["isNew"] = 1;
+													obj["meterCode"]=data;
+													obj["boxCode"] =params.boxnum;
+													obj["checkUser"]=$scope.userData.employeeCode;
+													obj["checkUserName"]=$scope.userData.employeeName;
+													obj["companyCode"]=$scope.userData.companyCode;
+													obj["mctCode"]="mct20170220115599999999";// 默认
+													obj["proName"]="江宁箱表关系核查";// 默认
+													obj["proNo"]="NJJN_XBGXHC";// 默认
+													scope.resultList.push(obj);
+													break;
+												}
+											 }
+									 }else{
+										 	
+										 	var obj={};
+											obj["checkResult"] = 3;
+											obj["isNew"] = 1;
+											obj["meterCode"]=data;
+											obj["boxCode"] =params.boxnum;
+											obj["checkUser"]=$scope.userData.employeeCode;
+											obj["checkUserName"]=$scope.userData.employeeName;
+											obj["companyCode"]=$scope.userData.companyCode;
+											obj["mctCode"]="mct20170220115599999999";// 默认
+											obj["proName"]="江宁箱表关系核查";// 默认
+											obj["proNo"]="NJJN_XBGXHC";// 默认
+											scope.resultList.push(obj);
+									 }
+									
+									 lazyCall('t2', function(){
+										 window.location.href="#meter_"+data;
+									 }, 100);
+								}
+							    
+							  }
+						})
+					}});
+					
+				};
+				
+			}
+		});
+		
+		
+		
+		$(".clear_search1").click(function(){
+			$(".search_int input").val("");
+			$(".filter").hide();
+		})
+		
+	
+		$(".filter_no").each(function(){
+			$(this).click(function(){
+				$(this).find("img").attr("src","images/task_selete_icon.png")
+				$(this).siblings().find("img").attr("src","images/task_nonselete_icon.png")
+			})
+		});
+		$(".sort li").each(function(){
+			$(this).click(function(){
+				$(this).find("img").show();
+				$(this).siblings().find("img").hide();
+				$(".sort").hide();
+			})
+		});
+		
+		var fsper = "true";
+		$(".cz_selpx li").click(function(){
+			if(fsper == "true"){
+				var n = $(this).index();
+				$(".filter_sort ul").eq(n).show().siblings().hide();
+				fsper = "false";
+			}else{
+				var n = $(this).index();
+				$(".filter_sort ul").eq(n).hide();
+				fsper = "true";
+			}
+		});
+		
+		
+		$(".return").click(function(){
+			window.history.back();
+		})
+		
+	</script>
+</body>
+</html>

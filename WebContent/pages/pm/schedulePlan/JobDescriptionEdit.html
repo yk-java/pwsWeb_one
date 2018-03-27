@@ -1,0 +1,597 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>工作明细填报</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.chooseAsset{width:1000px;height:600px;}
+	.chooseUser{width:1000px;height:500px;}
+	.addWork{width:80px;height:30px;line-height:30px;border:1px solid #3385ff;margin:0 auto;text-align:center;cursor:pointer;border-radius:20px;color:#3385ff}
+	.addWork:hover{background:#b6d3ff;}
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">工作明细填报</label> 
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<div class="form_div">
+			<form action="#" id="saveForm">
+			<table width="800px">
+				<tr>
+					<th align="right">项目名称</th>
+					<td>
+						<input type="text" style="display:none;" name="proNo" ng-model="workHours.proNo"/>
+						<input type="text" name="proName" ng-model="workHours.proName" class="readonly" readonly="readonly" placeholder="请选择项目" maxlength="32" style="width:180px;"/>
+					</td>
+					<th>作业人</th>
+					<td>
+						<input type="text" style="display:none;" name="worker" ng-model="workHours.worker"/>
+						<input type="text" name="workerName" ng-model="workHours.workerName" class="readonly" readonly="readonly" maxlength="32" style="width:180px;"/>
+					</td>
+					<th>日期</th>
+					<td>
+						<input type="text" name="workDate" ng-model="workHours.workDate" class="readonly" readonly="readonly" placeholder="请选择日期" maxlength="25" style="width:180px;font-size:16px;font-weight:bold;background-color:#ffff99"/>
+					</td>
+				</tr>
+			</table>
+			<div style="border:1px solid #ccc;background:#f3f3f3;width:762px;margin:20px 0;padding:10px 10px;position:relative" ng-repeat="item in workHours.workList">
+				<img src="../../../img/close_btn.png" ng-click="deleteWork($index)" style="position: absolute;top: 0;right: 0;"/>
+				<table width="100%">
+					<tr>
+						<td align="left" colspan="4" style="font-size:16px;color:#ff9206">工作内容</td>
+					</tr>
+					<tr>
+						<td align="right">作业类型</td>
+						<td>
+							<input type="text" style="display:none;" name="workType_{{$index}}" ng-model="item.workType"/>
+							<input type="text" name="workTypeName_{{$index}}" ng-model="item.workTypeName" class="dropDownList"  placeholder="请选择作业类型"/>
+						</td>
+						<td align="right">工作量</td>
+						<td>
+							<input type="text" name="workload_{{$index}}" ng-model="item.workload" class="number" placeholder="请输入工作量">
+							<span id="kpiUnit_{{$index}}">单位</span>
+						</td>
+					</tr>
+					<tr>
+						<td align="right">描述</td>
+						<td colspan="3">
+							<textarea name="workDescr_{{$index}}" ng-model="item.workDescr" style="width:86%;height:40px;"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right">工时评判依据</td>
+						<td colspan="3">
+							<textarea name="marker_{{$index}}" ng-model="item.marker" style="width:86%;height:40px;"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="left" colspan="4" style="font-size:16px;color:#ff9206">质量核查情况</td>
+					</tr>
+					<tr>
+						<td align="right">质量核查人员</td>
+						<td>
+							<input type="text" style="display:none;" name="qualityCheckUser_{{$index}}" ng-model="item.qualityCheckUser"/>
+							<input type="text" name="qualityCheckUserName_{{$index}}" ng-model="item.qualityCheckUserName" ng-click="chooseQualityCheckUser($index)" class="dropDownList"  placeholder="请输入核查人员">
+						</td>
+						<td align="right">质量核查日期</td>
+						<td>
+							<input type="text" name="qualityCheckDate_{{$index}}" ng-model="item.qualityCheckDate" class="dateComponent" onclick="new Calendar().show(this, null, null, dateSelected)" placeholder="请选择日期" maxlength="25" style="width:200px;"/>
+						</td>
+					</tr>
+					<tr>
+						<td align="right">是否有质量问题</td>
+						<td colspan="3">
+							<input type="radio" name="isFault_{{$index}}" ng-model="item.isFault" value="1">有
+							<input type="radio" name="isFault_{{$index}}" ng-model="item.isFault" value="0" ng-click="isNotFault(item)">无
+						</td>
+					</tr>
+					<tr ng-if="item.isFault==1">
+						<td align="right">问题备注</td>
+						<td colspan="3">
+							<textarea name="faultDescr_{{$index}}" ng-model="item.faultDescr" style="width:86%;height:40px;"></textarea>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div style="width:762px;">
+				<div class="addWork" ng-click="addWork()">添加工作项</div>
+			</div>
+			<div style="border:1px solid #ccc;background:#FFFF99;width:762px;margin:20px 0;padding:10px 10px;">
+				<table width="100%">
+					<tr>
+						<td align="left" colspan="4" style="font-size:16px;color:#ff9206">考勤信息</td>
+					</tr>
+					<tr>
+						<td align="right" width="100">出勤工时</td>
+						<td colspan="3">
+							<input type="text" name="attendanceHours" ng-model="workHours.attendanceHours"/>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" width="100">超出工时</td>
+						<td colspan="3">
+							<input type="text" name="moreHours" ng-model="workHours.moreHours"/>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" width="100">是否带薪休假</td>
+						<td colspan="3">
+							<input type="radio" name="isPaidLeave" ng-model="workHours.isPaidLeave" value="1">是
+							<input type="radio" name="isPaidLeave" ng-model="workHours.isPaidLeave" value="0" ng-click="isNotPaidLeave()">否
+						</td>
+					</tr>
+					<tr ng-show="workHours.isPaidLeave==1">
+						<td align="right">带薪休假类型</td>
+						<td>
+							<input type="text" style="display:none;" name="paidLeaveType" ng-model="workHours.paidLeaveType"/>
+							<input type="text" name="paidLeaveTypeName" ng-model="workHours.paidLeaveTypeName" class="dropDownList" ng-class="{required:workHours.isPaidLeave==1}"  placeholder="请选择休假类型">
+						</td>
+						<td align="right">带薪休假工时</td>
+						<td>
+							<input type="text" name="paidHours" ng-model="workHours.paidHours" class="number" ng-class="{required:workHours.isPaidLeave==1}" placeholder="请输入休假工时">
+						</td>
+					</tr>
+					<tr ng-show="workHours.paidLeaveType==9">
+						<td align="right">带薪休假备注</td>
+						<td colspan="3">
+							<textarea name="leaveDescr" ng-model="workHours.leaveDescr" rows="3" ng-class="{required:workHours.paidLeaveType==9}" style="width:200px;"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+						是否有异地补贴
+						</td>
+						<td>
+							<label>
+								<input type="radio" name="hasNotLocal" ng-model="workHours.hasNotLocal" value="1" ng-click="isLocal()">是
+								<input type="radio" name="hasNotLocal" ng-model="workHours.hasNotLocal" value="0" ng-click="isLocal()">否
+								
+<!-- 								<input type="checkbox" name="hasNotLocal" ng-false-value="0" ng-true-value="1" ng-model="workHours.hasNotLocal" placeholder="请输入异地补贴天数" -->
+<!-- 									ng-click="isLocal()" > -->
+							</label>
+						</td>
+						<td align="right">
+							<label ng-show="workHours.hasNotLocal==1">
+								异地补贴标准
+							</label>
+						</td>
+						<td>
+							<label ng-show="workHours.hasNotLocal==1">
+								<input type="text" style="display:none;" name="notLocalStandard" ng-model="workHours.notLocalStandard"/>
+								<input type="text" name="notLocalStandardName" ng-model="workHours.notLocalStandardName" class="dropDownList" ng-class="{required:workHours.hasNotLocal==1}"  placeholder="请选择异地补贴标准">
+							</label>
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+						是否有餐补
+						</td>
+						<td colspan="3">
+							<label>
+								<input type="radio" name="hasMeal" ng-model="workHours.hasMeal" value="1">是
+								<input type="radio" name="hasMeal" ng-model="workHours.hasMeal" value="0">否
+								
+<!-- 								<input type="checkbox" name="hasMeal" ng-false-value="0" ng-true-value="1" ng-model="workHours.hasMeal" placeholder="请输入餐补天"> -->
+							</label>
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+						</td>
+						<td colspan="3">
+							<a href="javascript:" ng-click="addHours()">
+							<label ng-show="!addHoursModel">添加月末调节工时</label>
+							<label ng-show="addHoursModel">取消月末调节工时</label>
+							</a>
+							<label style="color:red;">(到月末时再添加)</label>
+						</td>
+					</tr>
+					<tr ng-show="addHoursModel">
+						<td align="right">
+							月绩效系数
+						</td>
+						<td>
+							<input type="text" name="pfmCoefficient" ng-model="workHours.pfmCoefficient" class="number" ng-class="{required:addHoursModel}" placeholder="请输入月绩效系数">
+						</td>
+						<td align="right">
+							月调节工时数
+						</td>
+						<td>
+							<input type="text" name="regulativeHours" ng-model="workHours.regulativeHours" class="number" ng-class="{required:addHoursModel}" placeholder="请输入调节工时">
+						</td>
+					</tr>
+				</table>
+			</div>
+			</form>
+		</div>
+
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;提交
+			</a>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		/* init */
+		$scope.workHours={};
+		$scope.workHours.workList=[{}];
+		$scope.projectInfo={};
+		$scope.proNo="";
+		$scope.paidLeaveTypeData = [{id:"1",name:"病假"},{id:"2",name:"产假"},{id:"3",name:"陪产假"},{id:"4",name:"婚假"},{id:"5",name:"丧假"},{id:"6",name:"年假"},{id:"7",name:"哺乳假"},{id:"8",name:"法定节假日"},{id:"9",name:"其他"}];
+		$scope.notLocalStandardData = [{id:20,name:"（省内）组员/20元"},{id:30,name:"（省内）合伙人、经理/30元"},{id:40,name:"（省外）组员/40元"},{id:50,name:"（省外）合伙人、经理/50元"}];
+		$scope.addHoursModel=false;
+		
+		var urlParams = getUrlParams();
+		
+		/* 加载 */
+		$scope.httpGet({
+			url:"eap/pmsServices/pm/schedulePlan/workHours/findByWorkerAndWorkDate",
+			data:{proNo:urlParams.proNo, workDate:urlParams.workDate, worker:urlParams.worker},
+			success:function(res){
+				$scope.workHours = res.data;
+				for(var i in $scope.paidLeaveTypeData){
+					var type = $scope.paidLeaveTypeData[i];
+					if(type.id==$scope.workHours.paidLeaveType){
+						$scope.workHours.paidLeaveTypeName = type.name;
+					}
+				}
+				for(var i in $scope.notLocalStandardData){
+					var item = $scope.notLocalStandardData[i];
+					if(item.id==$scope.workHours.notLocalStandard){
+						$scope.workHours.notLocalStandardName = item.name;
+					}
+				}
+				if($scope.workHours.pfmCoefficient>0 || $scope.workHours.regulativeHours>0){
+					$scope.addHoursModel=true;
+				}
+			},
+			error:function(res){
+				
+			}
+		});
+		$scope.httpGet({
+			url:"eap/pmsServices/pm/baseMgr/pmBase/get",
+			data:{proNo:urlParams.proNo},
+			success:function(res){
+				$scope.projectInfo=res.data;
+				//chooseEmployeeInProjectList.setConfig("url", "../../component/chooseEmployeeInProject1.html?proNo="+$scope.projectInfo.proNo+"&ticket="+$scope.userData.ticket);
+				$scope.getKpiAll($scope.projectInfo.proNo);
+// 				$scope.reloadUserChoose($scope.projectInfo.proNo);
+				$scope.proNo=$scope.projectInfo.proNo;
+			},
+			error:function(){}
+		});
+		/* 项目列表 */
+// 		new DropDownList().init({
+// 			renderTo:"input[name=proName]",
+// 			url:"../../component/projectList.html?ticket="+$scope.userData.ticket,
+// 			height:"200px",
+// 			onSelected:function(result){
+// 				$("input[name=proName]").val(result.proName);
+// 				$("input[name=proNo]").val(result.proNo);
+// 				$("input[name=proNo]").change();
+// 				$("input[name=proNo]").focus();
+// 				$("input[name=proName]").change();
+// 				$("input[name=proName]").focus();
+// 				chooseEmployeeInProjectList.setConfig("url", "../../component/chooseEmployeeInProject1.html?proNo="+result.proNo+"&ticket="+$scope.userData.ticket);
+// 				$scope.getKpiAll(result.categoryCode);
+// 				$scope.reloadUserChoose(result.proNo);
+// 				$scope.proNo=result.proNo;
+// 			}
+// 		});
+			
+		/* 项目下成员列表 */
+// 		var chooseEmployeeInProjectList = new DropDownList();
+// 		chooseEmployeeInProjectList.init({
+// 			renderTo:"input[name=workerName]",
+// 			url:"../../component/chooseEmployeeInProject1.html?ticket="+$scope.userData.ticket,
+// 			height:"200px",
+// 			onSelected:function(result){
+// 				$("input[name=workerName]").val(result.employeeName);
+// 				$("input[name=worker]").val(result.employeeCode);
+// 				$("input[name=worker]").change();
+// 				$("input[name=worker]").focus();
+// 				$("input[name=workerName]").change();
+// 				$("input[name=workerName]").focus();
+// 			}
+// 		});
+		
+		/* 项目作业人 */
+		$scope.chooseQualityCheckUser=function(index){
+			new ShowDlog().showFrameFull("../../component/chooseUser.html", function(data){
+				if(data && data.length>0){
+					$("input[name=qualityCheckUserName_"+index+"]").val(data[0].employeename);
+					$("input[name=qualityCheckUser_"+index+"]").val(data[0].employeecode);
+					$("input[name=qualityCheckUser_"+index+"]").change();
+					$("input[name=qualityCheckUser_"+index+"]").focus();
+					$("input[name=qualityCheckUserName_"+index+"]").change();
+					$("input[name=qualityCheckUserName_"+index+"]").focus();
+				}
+			});
+		};
+		
+		/* 指标列表 */
+		$scope.kpiLib=[];
+		$scope.getKpiAll=function(proNo){
+			$scope.httpGet({
+				url:"eap/pmsServices/pm/baseMgr/pmProKpi/listAll",
+				data:{"proNo":proNo},
+				success:function(res){
+					$scope.kpiLib = res.list;
+					for(var i=0; i<$scope.kpiLib.length; i++){
+						var item = $scope.kpiLib[i];
+						if(item.isPersonCnt==1){
+							$scope.kpiLib.splice(i,1);
+							i--;
+						}
+					}
+					var workList = $scope.workHours.workList;
+					for(var i in workList){
+						(function(i){
+							new DropDownList().init({
+								renderTo:"input[name=workTypeName_"+i+"]",
+								data:$scope.kpiLib,
+								height:"200px",
+								textField:"kpiName",
+								onSelected:function(result){
+									$("input[name=workTypeName_"+i+"]").val(result.kpiName);
+									$("input[name=workType_"+i+"]").val(result.kpiCode);
+									$("#kpiUnit_"+i+"").html(result.kpiUnit);
+									$("input[name=workType_"+i+"]").change();
+									$("input[name=workType_"+i+"]").focus();
+									$("input[name=workTypeName_"+i+"]").change();
+									$("input[name=workTypeName_"+i+"]").focus();
+								}
+							});
+						})(i);
+					}
+					
+				}
+			});
+		}
+		
+// 		$scope.reloadUserChoose=function(proNo){
+// 			var workList = $scope.workHours.workList;
+// 			for(var i in workList){
+// 				(function(i){
+// 					new DropDownList().init({
+// 						renderTo:"input[name=qualityCheckUserName_"+i+"]",
+// 						url:"../../component/chooseEmployeeInProject1.html?proNo="+proNo+"&ticket="+$scope.userData.ticket,
+// 						height:"200px",
+// 						onSelected:function(result){
+// 							$("input[name=qualityCheckUserName_"+i+"]").val(result.employeeName);
+// 							$("input[name=qualityCheckUser_"+i+"]").val(result.employeeCode);
+// 							$("input[name=qualityCheckUser_"+i+"]").change();
+// 							$("input[name=qualityCheckUser_"+i+"]").focus();
+// 							$("input[name=qualityCheckUserName_"+i+"]").change();
+// 							$("input[name=qualityCheckUserName_"+i+"]").focus();
+// 						}
+// 					});
+// 				})(i);
+// 			}
+// 		};
+		/* 添加工作项 */
+		$scope.addWork=function(){
+			$scope.workHours.workList.push({});
+			var i = $scope.workHours.workList.length-1;
+			lazyCall('t1', function(){
+				new DropDownList().init({
+					renderTo:"input[name=workTypeName_"+i+"]",
+					data:$scope.kpiLib,
+					height:"200px",
+					textField:"kpiName",
+					onSelected:function(result){
+						$("input[name=workTypeName_"+i+"]").val(result.kpiName);
+						$("input[name=workType_"+i+"]").val(result.kpiCode);
+						$("#kpiUnit_"+i+"").html(result.kpiUnit);
+						$("input[name=workType_"+i+"]").change();
+						$("input[name=workType_"+i+"]").focus();
+						$("input[name=workTypeName_"+i+"]").change();
+						$("input[name=workTypeName_"+i+"]").focus();
+					}
+				});
+				
+// 				new DropDownList().init({
+// 					renderTo:"input[name=qualityCheckUserName_"+i+"]",
+// 					url:"../../component/chooseEmployeeInProject1.html?proNo="+$scope.proNo+"&ticket="+$scope.userData.ticket,
+// 					height:"200px",
+// 					onSelected:function(result){
+// 						$("input[name=qualityCheckUserName_"+i+"]").val(result.employeeName);
+// 						$("input[name=qualityCheckUser_"+i+"]").val(result.employeeCode);
+// 						$("input[name=qualityCheckUser_"+i+"]").change();
+// 						$("input[name=qualityCheckUser_"+i+"]").focus();
+// 						$("input[name=qualityCheckUserName_"+i+"]").change();
+// 						$("input[name=qualityCheckUserName_"+i+"]").focus();
+// 					}
+// 				});
+			}, 200);
+		};
+		/* 删除工作项 */
+		$scope.deleteWork=function(index){
+			new ShowDlog().confirm({
+				msg:"确认是否删除？",
+				ok:function(){
+					callNgFn({ctrlEl:$("body")[0], ngFn:function(scope){
+						scope.workHours.workList.splice(index,1);
+						lazyCall('t1', function(){
+							var workList = scope.workHours.workList;
+							for(var i in workList){
+								(function(i){
+									new DropDownList().init({
+										renderTo:"input[name=workTypeName_"+i+"]",
+										data:scope.kpiLib,
+										height:"200px",
+										textField:"kpiName",
+										onSelected:function(result){
+											$("input[name=workTypeName_"+i+"]").val(result.kpiName);
+											$("input[name=workType_"+i+"]").val(result.kpiCode);
+											$("#kpiUnit_"+i+"").html(result.kpiUnit);
+											$("input[name=workType_"+i+"]").change();
+											$("input[name=workType_"+i+"]").focus();
+											$("input[name=workTypeName_"+i+"]").change();
+											$("input[name=workTypeName_"+i+"]").focus();
+										}
+									});
+// 									new DropDownList().init({
+// 										renderTo:"input[name=qualityCheckUserName_"+i+"]",
+// 										url:"../../component/chooseEmployeeInProject1.html?proNo="+scope.proNo+"&ticket="+scope.userData.ticket,
+// 										height:"200px",
+// 										onSelected:function(result){
+// 											$("input[name=qualityCheckUserName_"+i+"]").val(result.employeeName);
+// 											$("input[name=qualityCheckUser_"+i+"]").val(result.employeeCode);
+// 											$("input[name=qualityCheckUser_"+i+"]").change();
+// 											$("input[name=qualityCheckUser_"+i+"]").focus();
+// 											$("input[name=qualityCheckUserName_"+i+"]").change();
+// 											$("input[name=qualityCheckUserName_"+i+"]").focus();
+// 										}
+// 									});
+								})(i);
+							}
+						}, 200);
+					}});
+				}
+			});
+		};
+		
+		
+		/* 带薪休假类型 */
+		new DropDownList().init({
+			renderTo:"input[name=paidLeaveTypeName]",
+			data:$scope.paidLeaveTypeData,//1病假，2产假、3陪产假、4婚假、5丧假、6年假、7哺乳假
+			textField:"name",
+			height:"100px",
+			onSelected:function(result){
+				$("input[name=paidLeaveTypeName]").val(result.name);
+				$("input[name=paidLeaveType]").val(result.id);
+				$("input[name=paidLeaveType]").change();
+				$("input[name=paidLeaveType]").focus();
+				$("input[name=paidLeaveTypeName]").change();
+				$("input[name=paidLeaveTypeName]").focus();
+				$scope.workHours.leaveDescr="";
+			}
+		});
+		/* 异地补贴类型 */
+		new DropDownList().init({
+			renderTo:"input[name=notLocalStandardName]",
+			data:$scope.notLocalStandardData,
+			textField:"name",
+			height:"100px",
+			onSelected:function(result){
+				$("input[name=notLocalStandardName]").val(result.name);
+				$("input[name=notLocalStandard]").val(result.id);
+				$("input[name=notLocalStandard]").change();
+				$("input[name=notLocalStandard]").focus();
+				$("input[name=notLocalStandardName]").change();
+				$("input[name=notLocalStandardName]").focus();
+			}
+		});
+		$scope.isNotPaidLeave=function(){
+			$scope.workHours.paidLeaveType=null;
+			$scope.workHours.paidLeaveTypeName=null;
+			$scope.workHours.paidHours=null;
+		};
+		$scope.isNotFault=function(item){
+			item.faultDescr=null;
+		};
+		$scope.isLocal=function(){
+			if($scope.workHours.hasNotLocal==0){
+				$scope.workHours.notLocalStandard=null;
+				$scope.workHours.notLocalStandardName=null;
+			}
+		}
+		$scope.onSave=function(){
+			if($("#saveForm").valid()){
+				new ShowDlog().confirm({
+					msg:"确认考勤信息已填写无误？",
+					ok:function(){
+						new ShowDlog().confirm({
+							msg:"确认无误后，请点击确认并提交",
+							ok:function(){
+								$scope.doSave();
+							},
+							cancel:function(){}
+						});
+					},
+					cancel:function(){}
+				});
+			}
+		};
+		$scope.doSave=function(){
+			//console.log($scope.workHours);
+			var workList = $scope.workHours.workList;
+			var workListJson = JSON.stringify(workList);
+			$scope.workHours.workList=null;
+			$scope.workHours.jsonStr=workListJson;
+			$scope.httpPost({
+				url:"eap/pmsServices/pm/schedulePlan/workHours/updateSave",
+				data:$scope.workHours,
+				success:function(res){
+					//console.log(res);
+					if(res.statusCode=="200"){
+						new ShowDlog().prompt({
+							icon:"success",
+							msg:"修改成功",
+							done:function(){
+								parent.$dlog.data="SUCCESS";
+								parent.$dlog.close();
+							},
+							t:1500
+						});
+					}
+				},
+				error:function(){}
+			});
+		};
+		
+		$scope.addHours=function(){
+			if($scope.addHoursModel){
+				$scope.addHoursModel=false;
+				$scope.workHours.pfmCoefficient=0;
+				$scope.workHours.regulativeHours=0;
+			}else{
+				$scope.addHoursModel=true;
+			}
+		};
+	}	
+});
+function dateSelected(dateControl){
+	//console.log(dateControl);
+	$(dateControl).change();
+	$(dateControl).focus();
+}
+</script>
+</body>
+</html>

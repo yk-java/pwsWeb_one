@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>项目概算列表</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css"/>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.owWordLoad{text-decoration:underline;color:#0099ff;}
+	.owWordload-detail{border:solid 1px #666;background:#ffee99;color:#666;padding:4px 6px 4px 6px;position:absolute;display:none;}
+	.stutes_span{display:inline-block;width:20px;height:20px;border-radius:50%;position: relative; top: 5px;}
+	.hstu{background:#76b102}
+	.nostu{background:red}
+
+	.dialog-imp{width:600px;height:340px;}
+	.dialog-viewcyle{width:900px;height:500px;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" class="dropDownArea" name="city" condition="city" viewstate="city" placeholder="请选择地区"/>
+				
+				<input type="text" id="category" class="dropDownList" placeholder="请选择项目分类"/>
+				<input type="text" name="proName" class="required dropDownList" maxlength="32" style="width:220px" placeholder="请选择项目"/>
+
+				<input type="text" id="proPhase" name="proPhase" class="dropDownList" placeholder="请选择项目阶段"/>
+				<input type="text" id="ditrictManager" class="dropDownList" placeholder="请选择区域经理"/>
+
+				<input type="text" style="width:200px;" id="searchName" name="searchName" class="" placeholder="项目名、编号、区域经理、负责人"/>
+
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">项目编号</div></th>
+				<th><div align="center">项目名称</div></th>
+
+				<th><div align="center">项目地区</div></th>
+				<th><div align="center">项目所属部门</div></th>
+				<th><div align="center">项目经理</div></th>
+
+				
+
+				<th><div align="center">创建时间</div></th>
+				<th><div align="center">最近编辑时间</div></th>
+				<th><div align="center">状态</div></th>
+				<th><div align="center">操作</div></th>
+			  </tr>
+			   <tr class="tr2" ng-repeat="item in userList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.proCode}}</div></td>
+				<td><div align="center">{{item.proName}}</div></td>
+				<td><div align="center">{{item.province}} {{item.city}} {{item.district}}</div></td>
+				<td><div align="center">{{item.unitName}}</div></td>
+				<td><div align="center">{{item.proManager}}</div></td>
+				<td><div align="center">{{item.sysCreateTime}}</div></td>
+				<td><div align="center">{{item.budgetEstimateTime}}</div></td>
+				
+				<td>
+					<div align="center" ng-if="item.versionStatus==-1">未启用</div>
+					<div align="center" ng-if="item.versionStatus==0">已创建</div>
+					<div align="center" ng-if="item.versionStatus==1">未提交</div>
+					<div align="center" ng-if="item.versionStatus==2">已提交</div>
+					<div align="center" ng-if="item.versionStatus==3">部门副经理审核通过</div>
+					<div align="center" ng-if="item.versionStatus==4">部门副经理驳回</div>
+					<div align="center" ng-if="item.versionStatus==5">部门经理审核通过</div>
+					<div align="center" ng-if="item.versionStatus==6">部门经理驳回</div>
+					<div align="center" ng-if="item.versionStatus==7">财务审核通过</div>
+					<div align="center" ng-if="item.versionStatus==8">财务审核驳回</div>
+					<div align="center" ng-if="item.versionStatus==9">总经理审核通过</div>
+					<div align="center" ng-if="item.versionStatus==10">总经理审核驳回</div>
+					<div align="center" ng-if="item.versionStatus==11">提交调整申请</div>
+					<div align="center" ng-if="item.versionStatus==12">审批调整申请通过</div>
+					<div align="center" ng-if="item.versionStatus==13">驳回调整申请</div>
+				</td>
+				<td>
+					<div align="center" ng-if="item.versionStatus>=1">
+						<img class="operationImg" ng-click="doShow(item)" src="../../../img/list_see-icon.png" title="查看 ">
+						<img class="operationImg" ng-click="doBugShow(item)" src="../../../img/rizhi_view_icon.png" title="日志查看 ">
+						<img class="operationImg" ng-click="compare(item)" src="../../../img/list_item_conpare-icon.png" title="比校版本">
+					</div>
+				
+				</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+
+var searchName="";
+var ngScope;
+var companyCode="";
+var employeeCode="";
+var searchPro="";
+var proName="";
+var categoryCode="";
+var categoryName="";
+var districtManager="";
+var districtManagerName="";
+var areaName="";
+var proPhase="";
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.userList=[];
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	companyCode=userData.companyCode;
+	employeeCode=userData.employeeCode;
+	
+	var urlParams = getUrlParams();
+	
+	if(urlParams.searchPro){
+		searchPro=urlParams.searchPro;
+	}
+	if(urlParams.proName){
+		proName=urlParams.proName;
+		$("input[name=proName]").val(proName);
+	}
+	if(urlParams.areaName){
+		areaName=urlParams.areaName;
+		$("input[name=city]").val(areaName);
+	}
+	if(urlParams.categoryCode){
+		categoryCode=urlParams.categoryCode;
+		//$("#category").val(categoryCode);
+	}
+	if(urlParams.categoryName){
+		categoryName=urlParams.categoryName;
+		$("#category").val(categoryName);
+	}
+	
+	if(urlParams.districtManager){
+		districtManager=urlParams.districtManager;
+	}
+	
+	if(urlParams.districtManagerName){
+		districtManagerName=urlParams.districtManagerName;
+		$("#ditrictManager").val(districtManagerName);
+	}
+	if(urlParams.searchName){
+		searchName=urlParams.searchName;
+		$("#searchName").val(searchName);
+	}
+	
+	
+	
+	
+	$http.get(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/getDistrictManager?companyCode="+companyCode+"&ticket="+ticket).success(function(response){
+				if(response.statusCode!=200){
+					alert("请求服务器失败！");
+					return;
+				}
+				
+				
+				var resultList=response.list;
+				var temp={};
+				temp.EMPLOYEENAME="全部";
+				temp.DISTRICT_MANAGER="";
+				resultList.splice(0,0,temp);
+				
+				new DropDownList().init({
+					renderTo:"#ditrictManager",
+					mode:"list",
+					data:resultList,
+					textField:"EMPLOYEENAME",
+					onSelected:function(item){
+						$("#ditrictManager").val(item.EMPLOYEENAME);
+						districtManager=item.DISTRICT_MANAGER;
+						districtManagerName=item.EMPLOYEENAME;
+						$scope.loadUsers(companyCode,searchPro,categoryCode,districtManager,areaName);
+					}
+				});
+	});
+	
+	
+	
+	/* 区域 */
+	new DropDownList().init({
+		renderTo:".dropDownArea",
+		url:"../../component/areaList.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownArea").val(result.name);
+			
+			areaName=result.name;
+			
+			$scope.loadUsers(companyCode,searchPro,categoryCode,districtManager,areaName);
+		}
+	});
+	
+	
+	/* 项目阶段 */
+	new DropDownList().init({
+		renderTo:"input[name=proPhase]",
+		data:[{code:"", name:'全部'},{code:1, name:'前期'},{code:2, name:'中期'},{code:3, name:'后期'},
+		      {code:4, name:'更新类'},{code:5, name:'维护类'},{code:6, name:'已竣工'},
+		      {code:7, name:'项目暂停'},{code:8, name:'暂未开展'},{code:9, name:'试点中'},
+		      {code:10, name:'作废取消'},{code:11, name:'外包'},{code:12, name:'备注'}],
+		textField:"name",
+		height:"150px",
+		onSelected:function(result){
+			$("input[name=proPhase]").val(result.name);
+			
+			$("input[name=proPhase]").focus();
+			proPhase=result.code;
+		}
+	});
+
+	
+	/* 项目分类 */
+	new DropDownList().init({
+		mode:"page",
+		renderTo:"#category",
+		url:"../../component/projectType.html?ticket="+$scope.ticket,
+		height:"200px",
+		onSelected:function(result){
+			$scope.cond_category=result.categoryCode;
+			categoryCode=result.categoryCode;
+			categoryName=result.categoryName;
+			$("#category").val(result.categoryName);
+			
+			$scope.loadUsers(companyCode,searchPro,categoryCode,districtManager,areaName);
+			
+			proNameList.setConfig("url", "../../component/gaisuanprojectList.html?categoryCode="+result.categoryCode+"&ticket="+$scope.ticket);
+		}
+	});
+	
+
+	
+	/* 项目名称 */
+	var proNameList = new DropDownList();
+	proNameList.init({
+		mode:"page",
+		renderTo:"input[name=proName]",
+		url:"../../component/gaisuanprojectList.html?required=true",
+		height:"200px",
+		onSelected:function(result){
+			$("input[name=proName]").val(result.proName);
+			searchPro=result.proNo;
+			proName=result.proName;
+			$scope.loadUsers(companyCode,searchPro,categoryCode,districtManager,areaName);
+		}
+	});
+	
+	$scope.loadUsers=function(companyCode,proNo,categoryCode,districtManager,areaName,searchName){
+		$http.get(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/proBudgetEstimateList?companyCode="
+
+		+companyCode+"&proNo="+proNo+"&categoryCode="+categoryCode+"&ticket="+ticket+"&districtManager="+districtManager+"&areaName="+areaName+"&searchName="+searchName+"&phaseCode="+proPhase).success(function(response){
+
+			if(response.statusCode==404){
+				$scope.userList=response.list;
+			}else if(response.statusCode==200){
+				$scope.userList=response.list;
+			}else{
+				alert("请求服务器失败！");
+				return;
+			}
+			
+		});
+	}; 
+	
+	$scope.doQuery=function(){
+		searchName=$("input[name=searchName]").val();
+		$scope.loadUsers(companyCode,searchPro,categoryCode,districtManager,areaName,searchName)
+	};	
+	$scope.loadUsers(companyCode,searchPro,categoryCode,districtManager,areaName,searchName);
+	
+	
+	/* 查看 */
+	$scope.doShow=function(item){
+		
+		hrefTo({
+			url:"proCountMgrView.html",
+			data:{
+				proNo:item.proNo,
+				proName:proName,
+				searchPro:searchPro,
+				categoryCode:categoryCode,
+				categoryName:categoryName,
+				districtManager:districtManager,
+				districtManagerName:districtManagerName,
+				areaName:areaName,
+				budgetestimateCode:item.budgetestimateCode,
+				versionCode:item.versionCode,
+				searchName:searchName
+			}
+		});
+
+		
+		
+		
+	};
+    //日志查看
+    $scope.doBugShow=function(item){
+        new ShowDlog().showFrame("BugShow.html?budgetEstimateCode="+item.budgetestimateCode, "日志查看", function(){
+
+        },"dialog-viewcyle");
+
+    };
+    $scope.compare=function(item){
+		console.log(item);
+		location.href="proVersionCompare.html?proNo="+item.proNo+"&budgetEstimateCode="+item.budgetestimateCode+"&versionCode="+item.versionCode;
+	};
+
+});
+</script>
+</body>
+</html>

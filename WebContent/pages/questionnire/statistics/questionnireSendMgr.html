@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html ng-app="moduleName">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<title> 问卷下发情况 </title>
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+<style type="text/css">
+.dialog-send{width:1000px;height:600px;}
+.dialog-show{width:800px;height:600px;}
+.title_div2{border:solid 0px red;background:#4CA9FF;padding:8px 6px 8px 6px;}
+.title_div2 .condLayer1{display:block;border:solid 0px;margin:6px;}
+.title_div2 .condLayer2{border:solid 0px green;margin:0 6px;}
+.title_div2 .condLayer1 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:0 4px;padding:0 4px;font-family:微软雅黑;border-radius:3px;}
+.title_div2 .condLayer2 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:6px 4px;padding:0 4px;background-color:#DAEDFF;font-family:微软雅黑;border-radius:3px;}
+.title_div2 .btn{display:inline-block;height:30px;line-height:30px;margin:0 4px;padding:0 15px 0 15px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; 
+border-radius:4px;}
+.title_div2 .blue{background:#3385FF;color:#fff;}
+.title_div2 .blue:hover{background:#186CE7;}
+.title_div2 .pink{background:#ED7798;color:#fff;}
+.title_div2 .pink:hover{background:#E54673;}
+
+.list .title{padding-bottom:4px;border-top:solid 1px #4CA9FF;background:#f3f3f3;}
+.list .title h2{color:#4CA9FF;margin-left:10px;}
+</style>
+
+</head>
+<body ng-controller="controllerName" storagekey="questionnire.questionnireMgr.questionnireSendMgr">
+<div class="list">
+	<div class="list_content">
+		<div class="title_div2">
+			<div class="condLayer1">
+				<input type="text" viewstate="searchName" style="width:180px;" placeholder="搜索"/>
+				<div class="btn blue" ng-click="doQuery()">
+					查询
+				</div>
+				<div class="btn blue" ng-click="doExport()">
+					导出
+				</div>
+				<div class="btn" ng-click="toBack()">
+					返回
+				</div>
+			</div>
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th width="80">序号</th>
+				<th>发送给</th>
+				<th>部门</th>
+				<th>项目</th>
+				<th>发送时间</th>
+				<th>问卷是否提交</th>
+				<th>分数</th>
+				<th>操作</th>
+			  </tr>
+			  <tr ng-repeat="item in dataList" class="tr2">
+				<td align="center">{{$index+1}}</td>
+				<td>{{item.employeeName}}</td>
+				<td>{{item.unitName}}</td>
+				<td>
+					<div ng-repeat="proName in top(toArr(item.proName), 3) track by $index" style="margin:2px 0;">{{proName}}</div>
+				</td>
+				<td align="center">{{item.sendTime}}</td>
+				<td align="center">
+					<label ng-show="item.status==0">未提交</label>
+					<label ng-show="item.status==1" style="color:green;font-weight:bold;">已提交</label>
+				</td>
+				<td align="center">
+					<label ng-show="item.status==1">{{item.score}}</label>
+				</td>
+				<td align="center" width="180">
+			    	<img class="operationImg" ng-if="item.status!=1" ng-click="doDel(item)" src="../../../img/list_delete-icon.png" title="删除">
+			    	<img class="operationImg" ng-if="item.status==1" ng-click="showUserAnswer(item)" src="../../../img/list_see-icon.png" title="查看 ">
+				</td>
+			  </tr>
+			</table>
+			<div ng-if="!dataList || dataList.length==0" style="border:solid 1px #ccc;padding:10px 0;margin-top:-1px;">
+		  	<span style="color:#ff6600;">&nbsp;&nbsp;暂无数据</span>
+		  	</div>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		$scope.dataList=[];
+		$scope.questionnire={};
+		$scope.sendedCnt=0;
+		var urlParams = getUrlParams();
+		$scope.questionnire=urlParams;
+		var viewState = new ViewState();
+		
+		
+		/* 初始（查询） */
+		$scope.doQuery=function(){
+			$scope.loadData();
+		};
+		/* 加载数据 */
+		$scope.loadData=function(){
+			viewState.collect();
+			new ShowDlog().prompt({
+				icon:"waitting",
+				msg:"正在查询...",
+				done:function(){},
+				t:20*60*1000
+			});
+			$scope.httpExecute({
+				url:"eap/pmsServices/questionnireSend/listAll",
+				method:"GET",
+				data:{questionnireCode:urlParams.questionnireCode, searchName:viewState.get("searchName"), status:1},
+				success:function(res){
+					$dlog.close();
+					if(res.statusCode==200){
+						$scope.dataList = res.list;
+						$scope.sendedCnt = res.totalRecord;
+					}
+				},
+				error:function(){
+					$dlog.close();
+					new ShowDlog().prompt({
+						msg:"网络异常！",
+						done:function(){},
+						t:1500
+					});
+				}
+			});
+		};
+		/* 导出数据 */
+		$scope.doExport=function(){
+			viewState.collect();
+			hrefTo({url:serviceBasePath+"eap/pmsServices/questionnireSend/export", data:{questionnireCode:urlParams.questionnireCode, searchName:viewState.get("searchName"), status:1}});
+		};
+		
+		/* 删除（撤销）所有下发问卷 */
+		$scope.doDel=function(item){
+			new ShowDlog().confirm({
+				msg:"确定撤回全部？",
+				ok:function(){
+					$scope.httpExecute({
+						url:"eap/pmsServices/questionnireSend/deleteByQuestionnireCode",
+						method:"POST",
+						data:{questionnireCode:urlParams.questionnireCode},
+						success:function(res){
+							if(res.statusCode==200){
+								new ShowDlog().prompt({
+									icon:"success",
+									msg:"撤回成功！",
+									done:function(){
+										$scope.doQuery();
+									},
+									t:1500
+								});
+							}
+						},
+						error:function(){}
+					});
+				},
+				cancel:function(){}
+			});
+		}
+		
+		/* 删除（撤回） */
+		$scope.doDel=function(item){
+			new ShowDlog().confirm({
+				msg:"确定撤回？",
+				ok:function(){
+					$scope.httpExecute({
+						url:"eap/pmsServices/questionnireSend/delete",
+						method:"POST",
+						data:{questionnireCode:item.questionnireCode, employeeCode:item.employeeCode},
+						success:function(res){
+							if(res.statusCode==200){
+								new ShowDlog().prompt({
+									icon:"success",
+									msg:"撤回成功！",
+									done:function(){
+										$scope.doQuery();
+									},
+									t:1500
+								});
+							}
+						},
+						error:function(){}
+					});
+				},
+				cancel:function(){}
+			});
+		}
+		/* 问卷下发 */
+		$scope.toSend=function(){
+			var params = toUrlParams(urlParams);
+			new ShowDlog().showFrame("questionnireSend.html?"+params, "问卷下发", function(data){
+				if("SUCCESS"==data){
+					$scope.doQuery();
+				}
+			}, "dialog-send");
+		};
+		
+		$scope.toBack=function(){
+			history.go(-1);
+			//hrefTo({url:"questionnireMgr.html"});
+		};
+		
+		$scope.showUserAnswer=function(item){
+			var params = toUrlParams(item);
+			new ShowDlog().showFrame("questionnireSimpAnswerView.html?"+params, "查看答卷信息", function(data){
+				
+			}, "dialog-show");
+		};
+		$scope.doQuery();
+		
+		$scope.toArr=function(strs){
+			if(strs)
+				return strs.split(",");
+			return [];
+		};
+		$scope.top=function(arr, len){
+			var arrN=[];
+			for(var i=0; i<arr.length; i++){
+				if(i<len){
+					arrN.push(arr[i]);
+				}
+			}
+			return arrN;
+		}
+	}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,820 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.goods.dao.goodsMapper" >
+  
+  
+  <select id="getProcessPage" parameterType="map" resultType="map">
+  	select p.PROCESS_TITLE,p.PROCESS_CODE,p.GTYPE,p.PROCESS_STATUS,DATE_FORMAT(p.START_TIME,'%T') START_TIME,p.START_TIME START_TIME1,
+	p.START_DESC,p.PRO_NO,m.EMPLOYEENAME SPONSOR,b.PRO_NAME,b.PRO_CODE  from GOODS_OUT_PROCESS p
+	join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+	join pm_base b on b.PRO_NO=p.PRO_NO
+
+	WHERE 1=1 
+	<if test="gtype!=null and gtype!=''">
+		and p.gtype=#{gtype}
+	</if>
+	<if test="userCode != null and userCode != ''">
+		and p.SPONSOR=#{userCode}
+	</if>
+	<if test="goodsName!=null and goodsName!=''">
+		and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%') or p.PRO_NO like CONCAT('%',#{goodsName},'%') or b.PRO_NAME like CONCAT('%',#{goodsName},'%') or p.SPONSOR like CONCAT('%',#{goodsName},'%') )
+	</if>
+	<if test="processStatus!=null and processStatus>0">
+		and p.PROCESS_STATUS=#{processStatus}
+	</if>
+	<if test="fromDate!=null and fromDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &gt;=#{fromDate}
+	</if>
+	<if test="toDate!=null and toDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &lt;=#{toDate}
+	</if>
+	
+	order by p.START_TIME desc
+    limit #{firstResult},#{maxResult}
+  </select>
+  
+  <select id="getProcessCount" parameterType="map" resultType="int">
+  	select count(*) from(
+  	select p.PROCESS_TITLE,p.PROCESS_CODE,p.GTYPE,p.PROCESS_STATUS,DATE_FORMAT(p.START_TIME,'%T') START_TIME,p.START_TIME START_TIME1,
+	p.START_DESC,p.PRO_NO,m.EMPLOYEENAME SPONSOR,b.PRO_NAME,b.PRO_CODE  from GOODS_OUT_PROCESS p
+	join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+	join pm_base b on b.PRO_NO=p.PRO_NO
+
+	WHERE 1=1 
+	<if test="gtype!=null and gtype!=''">
+		and p.gtype=#{gtype}
+	</if>
+	
+	<if test="userCode != null and userCode != ''">
+		and p.SPONSOR=#{userCode}
+	</if>
+	<if test="goodsName!=null and goodsName!=''">
+		and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%') or p.PRO_NO like CONCAT('%',#{goodsName},'%') or b.PRO_NAME like CONCAT('%',#{goodsName},'%') or p.SPONSOR like CONCAT('%',#{goodsName},'%') )
+	</if>
+	<if test="processStatus!=null and processStatus>0">
+		and p.PROCESS_STATUS=#{processStatus}
+	</if>
+	<if test="fromDate!=null and fromDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &gt;=#{fromDate}
+	</if>
+	<if test="toDate!=null and toDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &lt;=#{toDate}
+	</if>
+	) tpa
+  </select>
+  
+  <select id="getCheckPage" parameterType="map" resultType="map">
+  	select p.PROCESS_TITLE,p.PROCESS_CODE,p.GTYPE,p.PROCESS_STATUS,DATE_FORMAT(p.START_TIME,'%T') START_TIME,p.START_TIME START_TIME1,
+	p.START_DESC,p.PRO_NO,m.EMPLOYEENAME SPONSOR,b.PRO_NAME,b.PRO_CODE  from GOODS_OUT_PROCESS p
+	join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+	join pm_base b on b.PRO_NO=p.PRO_NO
+
+	WHERE 1=1 
+	<if test="gtype!=null and gtype!=''">
+		and p.gtype=#{gtype}
+	</if>
+	
+	and (STOREMAN=#{pmanager} and PROCESS_STATUS=1)
+	<if test="goodsName!=null and goodsName!=''">
+		and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%') or p.PRO_NO like CONCAT('%',#{goodsName},'%') or b.PRO_NAME like CONCAT('%',#{goodsName},'%') or p.SPONSOR like CONCAT('%',#{goodsName},'%') )
+	</if>
+	
+	<if test="fromDate!=null and fromDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &gt;=#{fromDate}
+	</if>
+	<if test="toDate!=null and toDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &lt;=#{toDate}
+	</if>
+	order by p.START_TIME desc
+    limit #{firstResult},#{maxResult}
+  </select>
+  <select id="getCheckPageCount" parameterType="map" resultType="int">
+	  select count(*) from(
+	  	
+	  	select p.PROCESS_TITLE,p.PROCESS_CODE,p.GTYPE,p.PROCESS_STATUS,DATE_FORMAT(p.START_TIME,'%T') START_TIME,p.START_TIME START_TIME1,
+		p.START_DESC,p.PRO_NO,m.EMPLOYEENAME SPONSOR,b.PRO_NAME,b.PRO_CODE  from GOODS_OUT_PROCESS p
+		join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+		join pm_base b on b.PRO_NO=p.PRO_NO
+	
+		WHERE 1=1 
+	<if test="gtype!=null and gtype!=''">
+		and p.gtype=#{gtype}
+	</if>
+		
+		and (STOREMAN=#{pmanager} and PROCESS_STATUS=1)
+	  
+	  	<if test="goodsName!=null and goodsName!=''">
+			and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%') or p.PRO_NO like CONCAT('%',#{goodsName},'%') or b.PRO_NAME like CONCAT('%',#{goodsName},'%') or p.SPONSOR like CONCAT('%',#{goodsName},'%') )
+		</if>
+		
+		<if test="fromDate!=null and fromDate!=''">
+			and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &gt;=#{fromDate}
+		</if>
+		<if test="toDate!=null and toDate!=''">
+			and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &lt;=#{toDate}
+		</if>
+	  )tpa
+  </select>
+  
+  
+  <insert id="addGoodsProcess" parameterType="map">
+  	insert into GOODS_OUT_PROCESS(PROCESS_CODE,PROCESS_TITLE,GTYPE,PROCESS_STATUS,START_TIME,SPONSOR,START_DESC,PRO_NO,PRO_MANAGER,PIC1,PIC2,SYS_CREATE_TIME,SYS_PROCESS_FLAG,STOREMAN)
+	VALUES(#{processCode},#{processTitle},#{gtype},1,NOW(),#{sponsor},#{startDesc},#{proNo},#{proManager},#{pic1},#{pic2},NOW(),'1',#{storeMan})
+  </insert>
+  
+  <insert id="addGoodsDetail" parameterType="map">
+	INSERT INTO GOODS_DETAIL(PROCESS_CODE,STOCK_CODE,GOODS_CODE,GOODS_NAME,AMOUNT,GTYPE,GOODS_TIME,STORE_CODE,SYS_CREATE_TIME,SYS_PROCESS_FLAG,ISCOMPLETE)
+	VALUES(#{processCode},#{storeNo},#{goodsCode},#{goodsName},#{num},#{gtype},NOW(),#{storeCode},NOW(),'1',0)
+  </insert>
+  
+  <select id="getGoodsTypes" parameterType="map" resultType="map">
+  	select g.GOODS_CODE,g.GOODS_NAME,s.STOCK_CODE,g.PRICE from GOODS_CATEGORY g
+	join  GOODS_STOCK s on g.GOODS_CODE=s.GOODS_CODE
+  </select>
+  
+  <select id="getGoodsUnit" parameterType="map" resultType="map">
+  	select UNIT_CODE,UNIT_NAME,IS_MAIN_UNIT,CONVERSION_FORMULA from GOODS_UNIT WHERE GOODS_CODE=#{goodsCode}
+  </select>
+  
+  <select id="getStores" parameterType="map" resultType="map">
+  	select STORE_CODE,STORE_NAME from STOREHOUSE  
+  </select>
+  
+  <select id="getProManager" parameterType="map" resultType="map">
+  	select PRO_NO,PRO_NAME,EMPLOYEECODE,PRO_MANAGER from pm_base where PRO_NO=#{proNo}
+  </select>
+  
+  <select id="getGoodsProcessDetail" parameterType="map" resultType="map">
+  	select p.PROCESS_TITLE,p.PROCESS_CODE,p.GTYPE,p.PROCESS_STATUS,p.START_TIME,p.START_DESC,p.PRO_NO,
+  	m.EMPLOYEENAME SPONSOR,b.PRO_NAME,b.PRO_CODE,p.PIC1,t.CATEGORY_NAME,p.STOREMAN_AUDIT_DESC,p.STOREMAN_AUDIT_TIME  from GOODS_OUT_PROCESS p
+	join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+	join pm_base b on b.PRO_NO=p.PRO_NO
+  	join pm_category t on t.CATEGORY_CODE=b.CATEGORY_CODE
+	where p.PROCESS_CODE=#{processCode}
+  </select>
+  
+  <select id="getWasteProcessDetail" parameterType="map" resultType="map">
+  	select p.PROCESS_TITLE,p.PROCESS_CODE,p.PROCESS_TYPE,p.PROCESS_STATUS,p.START_TIME,p.START_DESC,p.PRO_NO,m.EMPLOYEENAME SPONSOR,
+  	b.PRO_NAME,b.PRO_CODE,t.CATEGORY_NAME,p.OUT_AMOUNT,p.STOREMAN_AUDIT_DESC,p.STOREMAN_AUDIT_TIME,p.FINANCE_AUDIT_DESC,p.FINANCE_AUDIT_TIME  from gm_out_in_process p
+	join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+	join pm_base b on b.PRO_NO=p.PRO_NO
+  	join pm_category t on t.CATEGORY_CODE=b.CATEGORY_CODE
+	where p.PROCESS_CODE=#{processCode}
+  </select>
+  
+   <select id="getGoodsFlowDetail" parameterType="map" resultType="map">
+   
+    	select g.PROCESS_CODE processCode,g.GOODS_NAME goodsName,g.GOODS_CODE goodsCode,g.STOCK_CODE storeNo,g.AMOUNT num,g.STORE_CODE storeCode,h.STORE_NAME storeName,u.UNIT_NAME unitName,
+		u.IS_MAIN_UNIT isMainUnit,u.CONVERSION_FORMULA conversionFormula,u.UNIT_CODE unitCode from GOODS_DETAIL g
+		join STOREHOUSE h on h.STORE_CODE=g.STORE_CODE
+		join GOODS_UNIT u on u.GOODS_CODE=g.GOODS_CODE and u.IS_MAIN_UNIT=1
+		where g.PROCESS_CODE=#{processCode}
+		
+  </select>
+  
+  <select id="getWasteFlowDetail" parameterType="map" resultType="map">
+   
+    	select a.PROCESS_CODE processCode,a.STOCK_CODE storeNo ,a.CATEGORY_CODE categoryCode,b.CATEGORY_NAME categoryName,
+    	a.STORE_CODE storeCode,a.OUT_IN_COUNT num,d.STORE_NAME storeName,a.OUT_AMOUNT price from GM_OUT_IN_DETAIL a 
+join GM_WASTE_CATEGORY b on a.CATEGORY_CODE=b.CATEGORY_CODE
+left join GM_WASTE_STOCK c on b.CATEGORY_CODE=c.CATEGORY_CODE
+join STOREHOUSE d on a.STORE_CODE=d.STORE_CODE
+where a.PROCESS_CODE=#{processCode}
+	
+		
+  </select>
+  
+  <delete id="deleteGoodsDetail" parameterType="map" >
+  	delete from GOODS_DETAIL where PROCESS_CODE=#{processCode}
+  </delete>
+  
+   <delete id="deleteWasteDetail" parameterType="map" >
+  	delete from GM_OUT_IN_DETAIL where PROCESS_CODE=#{processCode}
+  </delete>
+  
+  <update id="updateProcess" parameterType="map">
+  	update GOODS_OUT_PROCESS set PROCESS_TITLE=#{processTitle},PRO_NO=#{proNo},
+  	<if test="gtype!=null and gtype!=''">
+  		GTYPE=#{gtype},
+  	</if>
+  	<if test="pic1!=null and pic1!=''">
+  		PIC1=#{pic1},
+  	</if>
+  	<if test="processStatus!=null and processStatus!=''">
+  		process_status=#{processStatus},
+  	</if>
+  	<if test="proManager!=null and proManager!=''">
+  		PRO_MANAGER=#{proManager},
+  	</if>
+  	REMARKS=#{remarks} where PROCESS_CODE=#{processCode}
+  </update>
+  
+  <update id="updateWasteProcess" parameterType="map">
+  	update GM_OUT_IN_PROCESS set PROCESS_TITLE=#{processTitle},PRO_NO=#{proNo},
+  	<if test="pic1!=null and pic1!=''">
+  		PIC1=#{pic1},
+  	</if>
+  	<if test="processStatus!=null and processStatus!=''">
+  		process_status=#{processStatus},
+  	</if>
+  	<if test="proManager!=null and proManager!=''">
+  		PRO_MANAGER=#{proManager},
+  	</if>
+  	
+  	<if test="finance!=null and finance!=null">
+  		FINANCE=#{finance},
+  	</if>
+  	<if test="outAmount!=null and outAmount!=''">
+  		OUT_AMOUNT=#{outAmount},
+  	</if>
+  	
+  	REMARKS=#{remarks} where PROCESS_CODE=#{processCode}
+  </update>
+  
+  <update id="checkProcess" parameterType="map">
+  	update GOODS_OUT_PROCESS set PROCESS_STATUS=#{processStatus}
+  	<if test="managerAuditDesc!=null and managerAuditDesc!=''">
+  		,MANAGER_AUDIT_DESC=#{managerAuditDesc},MANAGER_AUDIT_TIME=now()
+  	</if>
+  	<if test="storeMan!=null and storeMan!=''">
+  		,STOREMAN=#{storeMan}
+  	</if>
+  	<if test="storemanAuditDesc!=null and storemanAuditDesc!=''">
+  		,STOREMAN_AUDIT_DESC=#{storemanAuditDesc},STOREMAN_AUDIT_TIME=now()
+  	</if>
+	where PROCESS_CODE=#{processCode}
+  </update>
+
+<update id="checkWasteProcess" parameterType="map">
+  	
+  	update gm_out_in_process set PROCESS_STATUS=#{processStatus}
+  	<if test="managerAuditDesc!=null and managerAuditDesc!=''">
+  		,MANAGER_AUDIT_DESC=#{managerAuditDesc},MANAGER_AUDIT_TIME=now()
+  	</if>
+  	<if test="storeMan!=null and storeMan!=''">
+  		,STOREMAN=#{storeMan}
+  	</if>
+  	<if test="storemanAuditDesc!=null and storemanAuditDesc!=''">
+  		,STOREMAN_AUDIT_DESC=#{storemanAuditDesc},STOREMAN_AUDIT_TIME=now()
+  	</if>
+  	<if test="financeAuditDesc!=null and financeAuditDesc!=''">
+  		,FINANCE_AUDIT_DESC=#{financeAuditDesc},FINANCE_AUDIT_TIME=now()
+  	</if>
+  	
+	where PROCESS_CODE=#{processCode}
+	
+  </update>
+  
+  
+  <select id="getGoodsManager" parameterType="map" resultType="map">
+  	select EMPLOYEECODE,ACCOUNT_NAME from pf_account where ROLECODE=#{goodsManager}
+  </select>
+  
+  <select id="getCheckProcessDetail" parameterType="map" resultType="map">
+  	select STOCK_CODE,GOODS_NAME,GOODS_CODE,AMOUNT,STORE_CODE from goods_detail where PROCESS_CODE=#{processCode}
+  </select>
+  
+
+   <select id="getWasteCheckProcessDetail" parameterType="map" resultType="map">
+   select STOCK_CODE,CATEGORY_CODE,OUT_IN_COUNT,STORE_CODE from GM_OUT_IN_DETAIL where PROCESS_CODE=#{processCode}
+  </select>
+  
+  <select id="isHaveStore" parameterType="map" resultType="map">
+		select * from gm_waste_stock where CATEGORY_CODE=#{categoryCode} and STORE_CODE=#{storeCode}
+  </select>
+  
+  <update id="updateProcessDetail" parameterType="map">
+  	update GOODS_DETAIL set ISCOMPLETE=1 where PROCESS_CODE=#{processCode}
+  </update>
+  
+  <update id="updateWasteProcessDetail" parameterType="map">
+  	update GM_OUT_IN_DETAIL set IS_COMPLETE=1,STOCK_CODE=#{stockCode} where PROCESS_CODE=#{processCode} and STORE_CODE=#{storeCode} and CATEGORY_CODE=#{categoryCode}
+  </update>
+  
+  <update id="updateStock" parameterType="map">
+  	update GOODS_STOCK set STOCK=STOCK+#{amount} where STOCK_CODE=#{stockCode} and GOODS_CODE=#{goodsCode} and STORE_CODE=#{storeCode}
+  </update>
+   <update id="updateWasteStock" parameterType="map">
+  	
+  	update GM_WASTE_STOCK set STOCK_COUNT=STOCK_COUNT+#{amount} where STOCK_CODE=#{stockCode} and STORE_CODE=#{storeCode} and CATEGORY_CODE=#{categoryCode}
+  	
+  </update>
+  <update id="updateWasteStock1" parameterType="map">
+  	
+  	update GM_WASTE_STOCK set STOCK_COUNT=STOCK_COUNT-#{amount} where STOCK_CODE=#{stockCode} and STORE_CODE=#{storeCode} and CATEGORY_CODE=#{categoryCode}
+  	
+  </update>
+   <update id="updateStock1" parameterType="map">
+  	update GOODS_STOCK set STOCK=STOCK-#{amount} where STOCK_CODE=#{stockCode} and GOODS_CODE=#{goodsCode} and STORE_CODE=#{storeCode}
+  </update>
+  
+  
+  <select id="getProCategory" parameterType="map" resultType="map">
+  	select DISTINCT a.CATEGORY_CODE,p.CATEGORY_NAME from pm_base a 
+	join pm_category p on p.category_code=a.CATEGORY_CODE
+	where 1=1
+	and (a.EMPLOYEECODE =#{userCode} or EXISTS(SELECT PRO_NO from pm_member b where EMPLOYEECODE=#{userCode} and WORK_STATUE=1 and a.PRO_NO=b.pro_no)) 
+  </select>
+  
+  <select id="getPros" parameterType="map" resultType="map">
+  		select a.PRO_NO,a.PRO_NAME from pm_base a 
+		join pm_category p on p.category_code=a.CATEGORY_CODE
+		where 1=1
+		and (a.EMPLOYEECODE =#{userCode} or EXISTS(SELECT PRO_NO from pm_member b where EMPLOYEECODE=#{userCode} and WORK_STATUE=1 and a.PRO_NO=b.pro_no)) 
+		
+		and p.CATEGORY_CODE=#{categoryCode}
+  </select>
+  
+  
+  <insert id="addCategory" parameterType="map">
+  	    insert into GM_WASTE_CATEGORY(CATEGORY_CODE,CATEGORY_NAME,UNIT,SYS_PROCESS_FLAG)
+		VALUES(#{categoryCode},#{categoryName},#{unit},'1')
+  </insert>
+  
+
+  
+  <insert id="addWasteProcess" parameterType="map">
+  	insert into GM_OUT_IN_PROCESS(PROCESS_CODE,PROCESS_TITLE,PROCESS_TYPE,PROCESS_STATUS,START_TIME,SPONSOR,START_DESC,PRO_NO,PRO_MANAGER,SYS_CREATE_TIME,SYS_PROCESS_FLAG,FINANCE,OUT_AMOUNT,STOREMAN)
+	VALUES(#{processCode},#{processTitle},#{processType},#{processStatus},NOW(),#{sponsor},#{startDesc},#{proNo},#{proManager},NOW(),'1',#{finance},#{outAmount},#{storeMan})
+
+  </insert>
+  
+  <insert id="addWasteProcessDetail" parameterType="map">
+  		insert into GM_OUT_IN_DETAIL(PROCESS_CODE,STOCK_CODE,CATEGORY_CODE,OUT_IN_COUNT,DETAIL_TYPE,OUT_IN_TIME,STORE_CODE,IS_COMPLETE,SYS_CREATE_TIME,OUT_AMOUNT)
+		VALUES(#{processCode},#{storeNo},#{categoryCode},#{num},#{processType},NOW(),#{storeCode},'0',NOW(),#{price})
+  </insert>
+  
+  <select id="getWastTypes" parameterType="map" resultType="map">
+  		select a.CATEGORY_CODE categoryCode,a.CATEGORY_NAME categoryName,a.UNIT unit,b.STOCK_CODE storeNo,b.STORE_CODE storeCode from GM_WASTE_CATEGORY a
+		left join GM_WASTE_STOCK b on a.CATEGORY_CODE=b.CATEGORY_CODE
+  </select>
+  
+  <!-- 新增库存 -->
+	<insert id="addWasteStock" parameterType="map">
+			insert into GM_WASTE_STOCK(STOCK_CODE,CATEGORY_CODE,STOCK_COUNT,STORE_CODE)
+			VALUES(#{stockCode},#{categoryCode},#{amount},#{storeCode})
+			
+	</insert>
+	
+	
+	
+	<select id="getWasteProcessPage" parameterType="map" resultType="map">
+  	
+  	select p.PROCESS_TITLE,p.PROCESS_CODE,p.PROCESS_TYPE,p.PROCESS_STATUS,DATE_FORMAT(p.START_TIME,'%T') START_TIME,p.START_TIME START_TIME1,
+	p.START_DESC,p.PRO_NO,m.EMPLOYEENAME SPONSOR,b.PRO_NAME,b.PRO_CODE,p.OUT_AMOUNT  from GM_OUT_IN_PROCESS p
+	join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+	join pm_base b on b.PRO_NO=p.PRO_NO
+	WHERE 1=1 
+	<if test="processType!=null and processType!=''">
+		and p.PROCESS_TYPE=#{processType}
+	</if>
+	
+	<if test="userCode != null and userCode != ''">
+		and p.SPONSOR=#{userCode}
+	</if>	
+	
+	<if test="goodsName!=null and goodsName!=''">
+		and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%') or p.PRO_NO like CONCAT('%',#{goodsName},'%') or b.PRO_NAME like CONCAT('%',#{goodsName},'%') or p.SPONSOR like CONCAT('%',#{goodsName},'%') )
+	</if>
+	<if test="processStatus!=null and processStatus>0">
+		and p.PROCESS_STATUS=#{processStatus}
+	</if>
+	<if test="fromDate!=null and fromDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &gt;=#{fromDate}
+	</if>
+	<if test="toDate!=null and toDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &lt;=#{toDate}
+	</if>
+	
+	order by p.START_TIME desc
+    limit #{firstResult},#{maxResult}
+  </select>
+  
+  <select id="getWasteProcessCount" parameterType="map" resultType="int">
+  	select count(*) from(
+	  	select p.PROCESS_TITLE,p.PROCESS_CODE,p.PROCESS_TYPE,p.PROCESS_STATUS,DATE_FORMAT(p.START_TIME,'%T') START_TIME,
+		p.START_DESC,p.PRO_NO,m.EMPLOYEENAME SPONSOR,b.PRO_NAME,b.PRO_CODE  from GM_OUT_IN_PROCESS p
+		join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+		join pm_base b on b.PRO_NO=p.PRO_NO
+		WHERE 1=1
+		<if test="processType!=null and processType!=''">
+			and p.PROCESS_TYPE=#{processType}
+		</if>
+		
+		<if test="userCode != null and userCode != ''">
+			and p.SPONSOR=#{userCode}
+		</if>	
+		<if test="goodsName!=null and goodsName!=''">
+		and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%') or p.PRO_NO like CONCAT('%',#{goodsName},'%') or b.PRO_NAME like CONCAT('%',#{goodsName},'%') or p.SPONSOR like CONCAT('%',#{goodsName},'%') )
+	</if>
+	<if test="processStatus!=null and processStatus>0">
+		and p.PROCESS_STATUS=#{processStatus}
+	</if>
+	<if test="fromDate!=null and fromDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &gt;=#{fromDate}
+	</if>
+	<if test="toDate!=null and toDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &lt;=#{toDate}
+	</if>
+		order by p.START_TIME desc
+	) tpa
+  </select>
+
+ <select id="getCaiwuManager" parameterType="map" resultType="map">
+ 	select EMPLOYEECODE,ACCOUNT_NAME from pf_account a
+	join sm_role b on a.ROLECODE=b.ROLE_CODE
+	where b.ROLE_NAME='财务经理'
+ </select>
+ 
+ 
+ <select id="getMasteCheckPage" parameterType="map" resultType="map">
+  	select p.PROCESS_TITLE,p.PROCESS_CODE,p.PROCESS_TYPE,p.PROCESS_STATUS,DATE_FORMAT(p.START_TIME,'%T') START_TIME,p.START_TIME START_TIME1,
+	p.START_DESC,p.PRO_NO,m.EMPLOYEENAME SPONSOR,b.PRO_NAME,b.PRO_CODE,p.OUT_AMOUNT  from GM_OUT_IN_PROCESS p
+	join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+	join pm_base b on b.PRO_NO=p.PRO_NO
+
+	WHERE 1=1
+	<if test="processType!=null and processType!=''">
+		and p.PROCESS_TYPE=#{processType}
+	</if>
+	
+	
+	and ((STOREMAN=#{userCode} and PROCESS_STATUS=1) or (FINANCE=#{userCode} and PROCESS_STATUS=1))
+	<if test="goodsName!=null and goodsName!=''">
+		and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%') or p.PRO_NO like CONCAT('%',#{goodsName},'%') or b.PRO_NAME like CONCAT('%',#{goodsName},'%') or p.SPONSOR like CONCAT('%',#{goodsName},'%') )
+	</if>
+
+	<if test="fromDate!=null and fromDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &gt;=#{fromDate}
+	</if>
+	<if test="toDate!=null and toDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &lt;=#{toDate}
+	</if>
+	order by p.START_TIME desc
+
+  limit #{firstResult},#{maxResult}
+  </select>
+  
+  <select id="getMasteCheckPageCount" parameterType="map" resultType="int">
+	  select count(*) from(
+	  	select p.PROCESS_TITLE,p.PROCESS_CODE,p.PROCESS_TYPE,p.PROCESS_STATUS,DATE_FORMAT(p.START_TIME,'%T') START_TIME,p.START_TIME START_TIME1,
+	p.START_DESC,p.PRO_NO,m.EMPLOYEENAME SPONSOR,b.PRO_NAME,b.PRO_CODE  from GM_OUT_IN_PROCESS p
+	join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+	join pm_base b on b.PRO_NO=p.PRO_NO
+
+	WHERE 1=1
+	<if test="processType!=null and processType!=''">
+		and p.PROCESS_TYPE=#{processType}
+	</if>
+	<if test="goodsName!=null and goodsName!=''">
+		and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%') or p.PRO_NO like CONCAT('%',#{goodsName},'%') or b.PRO_NAME like CONCAT('%',#{goodsName},'%') or p.SPONSOR like CONCAT('%',#{goodsName},'%') )
+	</if>
+
+	<if test="fromDate!=null and fromDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &gt;=#{fromDate}
+	</if>
+	<if test="toDate!=null and toDate!=''">
+		and DATE_FORMAT(p.START_TIME,'%Y-%m-%d')  &lt;=#{toDate}
+	</if>
+	and ((STOREMAN=#{userCode} and PROCESS_STATUS=1) or (FINANCE=#{userCode} and PROCESS_STATUS=1))
+
+	order by p.START_TIME desc
+	  )tpa
+  </select>
+  
+  <!-- 物资库存查询 -->
+  
+  <select id="getGoodsStocks" parameterType="map" resultType="map">
+  	select a.GOODS_CODE,a.GOODS_NAME,a.STOCK,b.UNIT_CODE,b.UNIT_NAME,c.STORE_NAME from goods_stock a
+
+	join goods_unit b on a.GOODS_CODE=b.GOODS_CODE
+	
+	join storehouse c on c.STORE_CODE=a.STORE_CODE
+	
+	where b.IS_MAIN_UNIT=1
+	
+	<if test="goodsName!=null and goodsName!=''">
+		and a.GOODS_NAME like CONCAT('%',#{goodsName},'%')
+	</if>
+  	
+  	
+  limit #{firstResult},#{maxResult}
+  </select>
+  
+  <select id="getGoodsStocksCount" parameterType="map" resultType="int">
+	 select count(*) from(
+	 	select a.GOODS_CODE,a.GOODS_NAME,a.STOCK,b.UNIT_CODE,b.UNIT_NAME,c.STORE_NAME from goods_stock a
+
+		join goods_unit b on a.GOODS_CODE=b.GOODS_CODE
+		
+		join storehouse c on c.STORE_CODE=a.STORE_CODE
+		
+		where b.IS_MAIN_UNIT=1
+		
+		<if test="goodsName!=null and goodsName!=''">
+			and a.GOODS_NAME like CONCAT('%',#{goodsName},'%')
+		</if>
+	 ) t
+  </select>
+  
+   <select id="exportGoodsStocks" parameterType="map" resultType="map">
+  	select a.GOODS_CODE,a.GOODS_NAME,a.STOCK,b.UNIT_CODE,b.UNIT_NAME,c.STORE_NAME from goods_stock a
+
+	join goods_unit b on a.GOODS_CODE=b.GOODS_CODE
+	
+	join storehouse c on c.STORE_CODE=a.STORE_CODE
+	
+	where b.IS_MAIN_UNIT=1
+	
+	<if test="goodsName!=null and goodsName!=''">
+		and a.GOODS_NAME like CONCAT('%',#{goodsName},'%')
+	</if>
+  </select>
+  
+  <select id="exportWasteStocks" parameterType="map" resultType="map">
+  		
+  		select a.CATEGORY_CODE,a.STOCK_COUNT,b.CATEGORY_NAME,b.UNIT,c.STORE_NAME from gm_waste_stock a
+		join gm_waste_category b on a.CATEGORY_CODE=b.CATEGORY_CODE
+		join storehouse c on c.STORE_CODE=a.STORE_CODE
+  		<if test="goodsName!=null and goodsName!=''">
+			and b.CATEGORY_NAME like CONCAT('%',#{goodsName},'%')
+		</if>
+  	
+  	
+  </select>
+  <select id="getWasteStocks" parameterType="map" resultType="map">
+  		
+  		select a.CATEGORY_CODE,a.STOCK_COUNT,b.CATEGORY_NAME,b.UNIT,c.STORE_NAME from gm_waste_stock a
+		join gm_waste_category b on a.CATEGORY_CODE=b.CATEGORY_CODE
+		join storehouse c on c.STORE_CODE=a.STORE_CODE
+  		<if test="goodsName!=null and goodsName!=''">
+			and b.CATEGORY_NAME like CONCAT('%',#{goodsName},'%')
+		</if>
+  	
+  	
+  		limit #{firstResult},#{maxResult}
+  </select>
+ <select id="getWasteStocksCount" parameterType="map" resultType="int">
+ 		select count(*) from(
+ 			select a.CATEGORY_CODE,a.STOCK_COUNT,b.CATEGORY_NAME,b.UNIT,c.STORE_NAME from gm_waste_stock a
+			join gm_waste_category b on a.CATEGORY_CODE=b.CATEGORY_CODE
+			join storehouse c on c.STORE_CODE=a.STORE_CODE
+	  		<if test="goodsName!=null and goodsName!=''">
+				and b.CATEGORY_NAME like CONCAT('%',#{goodsName},'%')
+			</if>
+ 		) tpa
+  		
+ </select>
+ 
+ <select id="searchGoodsProcess" parameterType="map" resultType="map">
+  		
+  		select p.PROCESS_CODE,p.PROCESS_TITLE,p.GTYPE,p.PROCESS_STATUS,p.PROCESS_STATUS STATUS,p.START_TIME,m.EMPLOYEENAME SPONSOR,p.PRO_NO,b.PRO_NAME,
+		c.EMPLOYEENAME PRO_MANAGER,P.MANAGER_AUDIT_TIME,P.MANAGER_AUDIT_DESC,e.EMPLOYEENAME STOREMAN,p.STOREMAN_AUDIT_TIME,p.STOREMAN_AUDIT_DESC,p.PIC1 from goods_out_process p
+		join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+		join pm_base b on p.PRO_NO=b.PRO_NO
+		left join md_employee c on c.EMPLOYEECODE=p.PRO_MANAGER
+		LEFT JOIN md_employee e on e.EMPLOYEECODE=p.STOREMAN
+		where 1=1
+		<if test="gtype!=null and gtype!=''">
+			and p.GTYPE=#{gtype}
+		</if>
+		<if test="goodsName!=null and goodsName!=''">
+			and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%')    
+			or m.EMPLOYEENAME like CONCAT('%',#{goodsName},'%') 
+			or p.PRO_NO like  CONCAT('%',#{goodsName},'%')
+			or b.PRO_NAME like  CONCAT('%',#{goodsName},'%')
+			or e.EMPLOYEENAME like  CONCAT('%',#{goodsName},'%')
+			or c.EMPLOYEENAME like  CONCAT('%',#{goodsName},'%')
+			)
+		</if>
+		<if test="proNo!=null and proNo!=''">
+			 and p.PRO_NO=#{proNo}
+		</if>
+		<if test="fromDate!=null and fromDate!=''">
+			and DATE_FORMAT(p.START_TIME,'%Y-%m-%d') >=#{fromDate}
+		</if>
+		<if test="toDate!=null and toDate!=''">
+			and DATE_FORMAT(p.START_TIME,'%Y-%m-%d') &lt;=#{fromDate}
+		</if>
+		<if test="processStatus!=null and processStatus==1">
+			  and p.PROCESS_STATUS=4
+		</if>
+		<if test="processStatus!=null and processStatus==2">
+			  and p.PROCESS_STATUS!=4
+		</if>
+		order by p.START_TIME desc
+  		limit #{firstResult},#{maxResult}
+  </select>
+  <select id="searchGoodsProcessList" parameterType="map" resultType="map">
+  		
+  		select p.PROCESS_CODE,p.PROCESS_TITLE,p.GTYPE,p.PROCESS_STATUS,p.PROCESS_STATUS STATUS,p.START_TIME,m.EMPLOYEENAME SPONSOR,p.PRO_NO,b.PRO_NAME,
+		c.EMPLOYEENAME PRO_MANAGER,P.MANAGER_AUDIT_TIME,P.MANAGER_AUDIT_DESC,e.EMPLOYEENAME STOREMAN,p.STOREMAN_AUDIT_TIME,p.STOREMAN_AUDIT_DESC,p.PIC1 from goods_out_process p
+		join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+		join pm_base b on p.PRO_NO=b.PRO_NO
+		left join md_employee c on c.EMPLOYEECODE=p.PRO_MANAGER
+		LEFT JOIN md_employee e on e.EMPLOYEECODE=p.STOREMAN
+		where 1=1
+		<if test="gtype!=null and gtype!=''">
+			and p.GTYPE=#{gtype}
+		</if>
+		<if test="goodsName!=null and goodsName!=''">
+			and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%')    
+			or m.EMPLOYEENAME like CONCAT('%',#{goodsName},'%') 
+			or p.PRO_NO like  CONCAT('%',#{goodsName},'%')
+			or b.PRO_NAME like  CONCAT('%',#{goodsName},'%')
+			or e.EMPLOYEENAME like  CONCAT('%',#{goodsName},'%')
+			or c.EMPLOYEENAME like  CONCAT('%',#{goodsName},'%')
+			)
+		</if>
+		<if test="proNo!=null and proNo!=''">
+			 and p.PRO_NO=#{proNo}
+		</if>
+		<if test="fromDate!=null and fromDate!=''">
+			and DATE_FORMAT(p.START_TIME,'%Y-%m-%d') >=#{fromDate}
+		</if>
+		<if test="toDate!=null and toDate!=''">
+			and DATE_FORMAT(p.START_TIME,'%Y-%m-%d') &lt;=#{fromDate}
+		</if>
+		<if test="processStatus!=null and processStatus==1">
+			  and p.PROCESS_STATUS=4
+		</if>
+		<if test="processStatus!=null and processStatus==2">
+			  and p.PROCESS_STATUS!=4
+		</if>
+		order by p.START_TIME desc
+  		
+  </select>
+ <select id="searchGoodsProcessCount" parameterType="map" resultType="int">
+ 		select count(*) from(
+ 			select p.PROCESS_CODE,p.PROCESS_TITLE,p.GTYPE,p.PROCESS_STATUS,p.START_TIME,m.EMPLOYEENAME SPONSOR,p.PRO_NO,b.PRO_NAME,
+		c.EMPLOYEENAME PRO_MANAGER,P.MANAGER_AUDIT_TIME,P.MANAGER_AUDIT_DESC,e.EMPLOYEENAME STOREMAN,p.STOREMAN_AUDIT_TIME,p.STOREMAN_AUDIT_DESC,p.PIC1 from goods_out_process p
+		join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+		join pm_base b on p.PRO_NO=b.PRO_NO
+		left join md_employee c on c.EMPLOYEECODE=p.PRO_MANAGER
+		LEFT JOIN md_employee e on e.EMPLOYEECODE=p.STOREMAN
+		where 1=1
+		<if test="gtype!=null and gtype!=''">
+			and p.GTYPE=#{gtype}
+		</if>
+		<if test="goodsName!=null and goodsName!=''">
+			and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%')    
+			or m.EMPLOYEENAME like CONCAT('%',#{goodsName},'%') 
+			or p.PRO_NO like  CONCAT('%',#{goodsName},'%')
+			or b.PRO_NAME like  CONCAT('%',#{goodsName},'%')
+			or e.EMPLOYEENAME like  CONCAT('%',#{goodsName},'%')
+			or c.EMPLOYEENAME like  CONCAT('%',#{goodsName},'%')
+			)
+		</if>
+		<if test="proNo!=null and proNo!=''">
+			 and p.PRO_NO=#{proNo}
+		</if>
+		<if test="fromDate!=null and fromDate!=''">
+			and DATE_FORMAT(p.START_TIME,'%Y-%m-%d') >=#{fromDate}
+		</if>
+		<if test="toDate!=null and toDate!=''">
+			and DATE_FORMAT(p.START_TIME,'%Y-%m-%d') &lt;=#{fromDate}
+		</if>
+		<if test="processStatus!=null and processStatus==1">
+			  and p.PROCESS_STATUS=4
+		</if>
+		<if test="processStatus!=null and processStatus==2">
+			  and p.PROCESS_STATUS!=4
+		</if>
+		order by p.START_TIME desc
+ 		) tpa
+ </select>
+ 
+ 
+  <select id="searchWasteProcess" parameterType="map" resultType="map">
+  		
+  		select p.PROCESS_CODE,p.PROCESS_TITLE,p.PROCESS_TYPE,p.PROCESS_STATUS,p.PROCESS_STATUS STATUS,p.START_TIME,
+		m.EMPLOYEENAME  SPONSOR,b.PRO_NAME,c.EMPLOYEENAME PRO_MANAGER,p.MANAGER_AUDIT_TIME,
+		p.MANAGER_AUDIT_DESC,e.EMPLOYEENAME STOREMAN,p.STOREMAN_AUDIT_TIME,p.STOREMAN_AUDIT_DESC,f.EMPLOYEENAME FINANCE
+		from gm_out_in_process p
+		join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+		join pm_base b on p.PRO_NO=b.PRO_NO
+		left join md_employee c on c.EMPLOYEECODE=p.PRO_MANAGER
+		left join md_employee e on e.EMPLOYEECODE=p.STOREMAN
+		left join md_employee f on f.EMPLOYEECODE=p.FINANCE
+		where 1=1 
+
+		<if test="gtype!=null and gtype!=''">
+			and p.PROCESS_TYPE=#{gtype}
+		</if>
+		<if test="goodsName!=null and goodsName!=''">
+			and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%')    
+			or m.EMPLOYEENAME like CONCAT('%',#{goodsName},'%') 
+			or p.PRO_NO like  CONCAT('%',#{goodsName},'%')
+			or b.PRO_NAME like  CONCAT('%',#{goodsName},'%')
+			or e.EMPLOYEENAME like  CONCAT('%',#{goodsName},'%')
+			or c.EMPLOYEENAME like  CONCAT('%',#{goodsName},'%')
+			)
+		</if>
+		<if test="proNo!=null and proNo!=''">
+			 and p.PRO_NO=#{proNo}
+		</if>
+		<if test="fromDate!=null and fromDate!=''">
+			and DATE_FORMAT(p.START_TIME,'%Y-%m-%d') >=#{fromDate}
+		</if>
+		<if test="toDate!=null and toDate!=''">
+			and DATE_FORMAT(p.START_TIME,'%Y-%m-%d') &lt;=#{fromDate}
+		</if>
+		<if test="processStatus!=null and processStatus==1">
+			  and  ((p.PROCESS_STATUS=4 and p.PROCESS_TYPE=1) or (p.PROCESS_STATUS=6 and p.PROCESS_TYPE=2))
+		</if>
+		<if test="processStatus!=null and processStatus==2">
+			  and ((p.PROCESS_STATUS!=4 and p.PROCESS_TYPE==1) or (p.PROCESS_STATUS!=6 and p.PROCESS_TYPE==2))
+		</if>
+		order by p.START_TIME desc
+  		limit #{firstResult},#{maxResult}
+  </select>
+  
+   <select id="searchWasteProcessCount" parameterType="map" resultType="int">
+   		select count(*) from(
+   			select p.PROCESS_CODE,p.PROCESS_TITLE,p.PROCESS_TYPE,p.PROCESS_STATUS,p.START_TIME,
+			m.EMPLOYEENAME  SPONSOR,b.PRO_NAME,c.EMPLOYEENAME PRO_MANAGER,p.MANAGER_AUDIT_TIME,
+			p.MANAGER_AUDIT_DESC,e.EMPLOYEENAME STOREMAN,p.STOREMAN_AUDIT_TIME,p.STOREMAN_AUDIT_DESC,f.EMPLOYEENAME FINANCE
+			from gm_out_in_process p
+			join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+			join pm_base b on p.PRO_NO=b.PRO_NO
+			left join md_employee c on c.EMPLOYEECODE=p.PRO_MANAGER
+			left join md_employee e on e.EMPLOYEECODE=p.STOREMAN
+			left join md_employee f on f.EMPLOYEECODE=p.FINANCE
+			where 1=1 
+				<if test="gtype!=null and gtype!=''">
+					and p.PROCESS_TYPE=#{gtype}
+				</if>
+				<if test="goodsName!=null and goodsName!=''">
+					and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%')    
+					or m.EMPLOYEENAME like CONCAT('%',#{goodsName},'%') 
+					or p.PRO_NO like  CONCAT('%',#{goodsName},'%')
+					or b.PRO_NAME like  CONCAT('%',#{goodsName},'%')
+					or e.EMPLOYEENAME like  CONCAT('%',#{goodsName},'%')
+					or c.EMPLOYEENAME like  CONCAT('%',#{goodsName},'%')
+					)
+				</if>
+				<if test="proNo!=null and proNo!=''">
+					 and p.PRO_NO=#{proNo}
+				</if>
+				<if test="fromDate!=null and fromDate!=''">
+					and DATE_FORMAT(p.START_TIME,'%Y-%m-%d') >=#{fromDate}
+				</if>
+				<if test="toDate!=null and toDate!=''">
+					and DATE_FORMAT(p.START_TIME,'%Y-%m-%d') &lt;=#{fromDate}
+				</if>
+				<if test="processStatus!=null and processStatus==1">
+					  and  ((p.PROCESS_STATUS=4 and p.PROCESS_TYPE=1) or (p.PROCESS_STATUS=6 and p.PROCESS_TYPE=2))
+				</if>
+				<if test="processStatus!=null and processStatus==2">
+					  and ((p.PROCESS_STATUS!=4 and p.PROCESS_TYPE==1) or (p.PROCESS_STATUS!=6 and p.PROCESS_TYPE==2))
+				</if>
+		order by p.START_TIME desc
+   		) tpa
+   </select>
+   
+   
+   <select id="exportWasteProcess" parameterType="map" resultType="map">
+  		
+  		select p.PROCESS_CODE,p.PROCESS_TITLE,p.PROCESS_TYPE,p.PROCESS_STATUS,p.PROCESS_STATUS STATUS,p.START_TIME,
+		m.EMPLOYEENAME  SPONSOR,b.PRO_NAME,c.EMPLOYEENAME PRO_MANAGER,p.MANAGER_AUDIT_TIME,
+		p.MANAGER_AUDIT_DESC,e.EMPLOYEENAME STOREMAN,p.STOREMAN_AUDIT_TIME,p.STOREMAN_AUDIT_DESC,f.EMPLOYEENAME FINANCE,p.FINANCE_AUDIT_DESC,p.FINANCE_AUDIT_TIME
+		from gm_out_in_process p
+		join md_employee m on m.EMPLOYEECODE=p.SPONSOR
+		join pm_base b on p.PRO_NO=b.PRO_NO
+		left join md_employee c on c.EMPLOYEECODE=p.PRO_MANAGER
+		left join md_employee e on e.EMPLOYEECODE=p.STOREMAN
+		left join md_employee f on f.EMPLOYEECODE=p.FINANCE
+		where 1=1 
+
+		<if test="gtype!=null and gtype!=''">
+			and p.PROCESS_TYPE=#{gtype}
+		</if>
+		<if test="goodsName!=null and goodsName!=''">
+			and (p.PROCESS_TITLE like CONCAT('%',#{goodsName},'%')    
+			or m.EMPLOYEENAME like CONCAT('%',#{goodsName},'%') 
+			or p.PRO_NO like  CONCAT('%',#{goodsName},'%')
+			or b.PRO_NAME like  CONCAT('%',#{goodsName},'%')
+			or e.EMPLOYEENAME like  CONCAT('%',#{goodsName},'%')
+			or c.EMPLOYEENAME like  CONCAT('%',#{goodsName},'%')
+			)
+		</if>
+		<if test="proNo!=null and proNo!=''">
+			 and p.PRO_NO=#{proNo}
+		</if>
+		<if test="fromDate!=null and fromDate!=''">
+			and DATE_FORMAT(p.START_TIME,'%Y-%m-%d') >=#{fromDate}
+		</if>
+		<if test="toDate!=null and toDate!=''">
+			and DATE_FORMAT(p.START_TIME,'%Y-%m-%d') &lt;=#{fromDate}
+		</if>
+		<if test="processStatus!=null and processStatus==1">
+			  and  ((p.PROCESS_STATUS=4 and p.PROCESS_TYPE=1) or (p.PROCESS_STATUS=6 and p.PROCESS_TYPE=2))
+		</if>
+		<if test="processStatus!=null and processStatus==2">
+			  and ((p.PROCESS_STATUS!=4 and p.PROCESS_TYPE==1) or (p.PROCESS_STATUS!=6 and p.PROCESS_TYPE==2))
+		</if>
+		order by p.START_TIME desc
+  		
+  </select>
+  
+</mapper>

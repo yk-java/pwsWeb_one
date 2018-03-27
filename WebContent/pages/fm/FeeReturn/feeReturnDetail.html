@@ -1,0 +1,167 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>费用报</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+<style type="text/css">
+	.sgreen{background:#EDF4FF;border:dashed 1px #72BBFF;}
+	.sred{background:#FFFF99;border:dashed 1px #FF9900;}
+	
+	.form_detail{padding: 20px 10px}
+	.form_detail table {width: 60%;border: 1px solid #ccc;border-collapse: collapse; }
+	.form_detail table th{width: 20px;border: 1px solid #ccc;border-collapse: collapse;background: #4CA9FF;height: 25px;font-weight: normal;text-align: center;}
+	.form_detail table td{width: 20px;height: 25px;border: 1px solid #ccc;border-collapse: collapse;font-weight: normal;text-align: center;}
+	.form_div table th{width: 60px;}
+}
+</style>
+</head>
+
+<body ng-app="mdu" ng-controller="ctrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">费用报销</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div">
+			<table style="width: 60%">
+				<tr>
+					<th>标题</th>
+					<td  colspan="3">
+						<input type="text" style="width: 100%" name="proName" class="required readonly"  readonly="readonly" maxlength="16" value="{{fmMoneyReturn.title}}"/></td>
+				</tr>
+				<tr>
+					<th>员工编号</th>
+					<td>
+						<input type="text" style="width: 100%"  name="proYear" class="number readonly" readonly="readonly" value="{{fmMoneyReturn.jobNo}}"/>
+					</td>
+					<th>姓名</th>
+					<td><input type="text"   style="width: 100%"name="proYear" class="number readonly" readonly="readonly" value="{{fmMoneyReturn.employeeName}}"/></td>
+				</tr>
+				<tr>
+					<th>所在部门</th>
+					<td>
+						<input type="text" style="width: 100%" name="proYear" class="number readonly" readonly="readonly" value="{{fmMoneyReturn.unitName}}"/>
+					</td>
+					<th>申请日期</th>
+					<td><input type="text"  style="width: 100%" name="proYear" class="number readonly" readonly="readonly" value="{{fmMoneyReturn.applyDate}}"/></td>
+				</tr>
+				<tr>
+					<th>费用类型</th>
+					<td><input type="text" style="width: 100%" name="proYear" class="number readonly" readonly="readonly" value="{{fmMoneyReturn.feeName}}"/></td>
+					<th>银行帐号</th>
+					<td><input type="text"  style="width: 100%" name="proYear" class="number readonly" readonly="readonly" value="{{fmMoneyReturn.bankAccount}}"/></td>
+				</tr>
+				<tr>
+					<th>费用合计</th>
+					<td><input type="text"  name="proYear"  style="width: 100%;color: red;font-weight: bold;" class="number readonly" readonly="readonly" value="{{fmMoneyReturn.totalMoney}}"/></td>
+				</tr>
+				<tr>
+					<th>事由</th>
+					<td colspan="3">
+						<textarea name="remarks"  style="width: 100%" cols="98" rows="4" class="readonly" readonly="readonly" >{{fmMoneyReturn.applyContent}}</textarea>
+					</td>
+				</tr>
+			</table>
+		</div>
+		
+		<div class="form_detail">
+			<table>
+				<tr>
+					<th>序号</th>
+					<th>费用日期</th>
+					<th>费用说明</th>
+					<th>费用金额</th>
+					<th>发票张数</th>
+				</tr>
+				<tr ng-repeat="item in fmMoneyReturn.detailList">
+					<td>{{$index+1}}</td>
+					<td>{{item.feeDate}}</td>
+					<td>{{item.feeDesc}}</td>
+					<td>{{item.money}}</td>
+					<td>{{item.invoiceCnt}}</td>
+				</tr>
+			</table>
+		</div>
+		
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+var userData;
+
+var ngScope;
+var app = angular.module("mdu", []);
+app.controller("ctrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.projectInfo={};
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	var params = getUrlParams();
+	console.log(params);
+	
+	
+	/* 数据加载 */
+	$scope.loadProject=function(rowid){
+		$http.get(serviceBasePath+"eap/pmsServices/fm/expense/feeReturn/get?rowid="
+			+rowid+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../login.html";
+				return;
+			}
+			$scope.fmMoneyReturn = response.data;
+		});
+	};
+	/* 初始加载 */
+	$scope.loadProject(params.rowid);
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		hrefTo({
+		url:"feeReturnList.html",
+		data:getUrlParams()
+	});
+		
+	};
+	
+});
+</script>
+</body>
+</html>

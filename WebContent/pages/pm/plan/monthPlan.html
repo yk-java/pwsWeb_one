@@ -1,0 +1,407 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 项目月计划 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../js/jquery.base64.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+.good{background:url(../../../img/good.png) no-repeat top right;}
+.low{background:url(../../../img/bad.png) no-repeat top right;}
+table td{padding-left:4px;}
+.feedbackDialog{width:1000px;height:600px;}
+.owWordLoad{text-decoration:underline;color:#0099ff;}
+	.owWordload-detail{border:solid 1px #666;background:#ffee99;color:#666;padding:4px 6px 4px 6px;position:absolute;display:none;}
+	
+	.switch_btn_group{border:solid 1px #3385FF;min-height:30px;float:left;border-radius:15px; position:absolute;right:20px;top:0px;}
+	.switch_btn_group a{display:inline-block;float:left;background:#fff;color:#3385FF;text-decoration:none;font-size:13px;
+		line-height:30px;text-align:center;margin:0 1px 0 0;min-width:60px;}
+	.switch_btn_group a.selected{background:#3385FF;color:#fff;}
+	.switch_btn_group a:first-of-type{border-top-left-radius:15px;border-bottom-left-radius:15px;}
+	.switch_btn_group a:last-of-type{border-top-right-radius:15px;border-bottom-right-radius:15px;margin:0;}
+	
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+<!-- 				<input type="text" class="dropDownList" name="proStatusName" condition="proStatusName" viewstate="proStatusName" placeholder="项目状态"/> -->
+				<input type="hidden" name="proStatus" viewstate="proStatus"/>
+				<input type="hidden" name="pageNo" viewstate="pageNo"/>
+				<input type="text" class="dropDownProjectType" name="categoryName" condition="categoryName" viewstate="categoryName" placeholder="项目分类"/>
+				<input type="hidden" name="categoryCode" condition="categoryCode" viewstate="categoryCode"/>
+				
+				<input type="text" style="width:206px;" class="dropDownTree dropDownList" name="proName" condition="proName" viewstate="proName" placeholder="项目"/>
+				<input type="hidden" name="proNo" condition="proNo" viewstate="proNo"/>
+				
+<!-- 				<input type="text" style="width:80px;" id="year" class="dropDownList" name="year" condition="year" viewstate="year" placeholder="年度"/> -->
+				<input type="text" name="startTime" condition="startTime" viewstate="startTime" class="dateComponent" onclick='new Calendar().show(this)' style="width:90px;" placeholder="计划时间起"/>
+				<input type="text" name="endTime" condition="endTime" viewstate="endTime" class="dateComponent" onclick='new Calendar().show(this)' style="width:90px;" placeholder="计划时间止"/>
+
+				<label><input type="checkbox" name="isEval" condition="isEval" viewstate="isEval" value="1"/>计划已评定</label>
+				<label><input type="checkbox" name="isFeedback" condition="isFeedback" viewstate="isFeedback" value="1"/>已反馈</label>
+				<label><input type="checkbox" name="isFeedbackEval" condition="isFeedbackEval" viewstate="isFeedbackEval" value="1"/>反馈已评定</label>
+				<input type="text" style="width:80px;" id="planType" class="dropDownList" name="planTypeName" condition="planTypeName" viewstate="planTypeName" placeholder="计划类型"/>
+				<input type="text" style="width:150px;" name="searchName" viewstate="searchName" class="" placeholder="项目名、编码、负责人"/>
+				<input type="hidden" name="planType" condition="planType" viewstate="planType"/>
+				
+<!-- 				<input type="text" id="beginDate" class="select_2 dropDownList dateComponent" onclick="new Calendar().show(this)" placeholder="请选择启始日期"/> -->
+<!-- 				<input type="text" id="endDate" class="select_2 dropDownList dateComponent" onclick="new Calendar().show(this)" placeholder="请选择结束日期"/> -->
+				<div class="query_div" ng-click="doQuery(1)">
+					查询
+				</div>
+				<div class="query_div" ng-click="doExport()">
+					导出
+				</div>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			<div class="switch_btn_group">
+				<a href="#" datatype="2" class="selected">已激活</a>
+				<a href="#" datatype="3">已关闭</a>
+			</div>
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+			   <tr class="tr1">
+				<th>序号</th>
+				<th>项目名称</th>
+				<th>项目编码</th>
+				<th>负责人</th>
+				<th>计划编号</th>
+				<th>开始时间</th>
+				<th>结束时间</th>
+				<th>计划说明</th>
+				<th>计划指标工作量</th>
+				<th>计划<br>工作量</th>
+				<th>完成<br>工作量</th>
+				<th>内业<br>投入<br>人员</th>
+				<th>外业<br>投入<br>人员</th>
+				<th>计划<br>执行率</th>
+				<th>计划评定</th>
+				<th>计划<br>考核<br>分值</th>
+				<th>反馈</th>
+				<th>反馈评定</th>
+				<th>反馈<br>考核<br>分值</th>
+				<th style="background:#96BAFF;">累计<br>计划量</th>
+				<th style="background:#96BAFF;">项目<br>计划进度</th>
+				<th>操作</th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in dataList">
+				<td>{{$index+1}}</td>
+				<td>{{item.proName}}</td>
+				<td>{{item.proNo}}</td>
+				<td>{{item.proManager}}</td>
+				<td>{{item.planNo}}</td>
+				<td>{{item.sdate}}</td>
+				<td>{{item.edate}}</td>
+				<td>
+					<a ng-if="item.planDesc!=null && item.planDesc != ''" href="javascript:" onmouseover="$(this).next().show();" onmouseout="$(this).next().hide();" class="owWordLoad">[查看详细]</a>
+					<div class="owWordload-detail">{{item.planDesc}}</div>
+				</td>
+				<td>
+					<span ng-repeat="pro in top4(toArr(item.kpiPlanDesc))" align="left" style="margin-left:10px;">{{pro}}</span>
+					<div ng-if="toArr(item.kpiPlanDesc).length>4" style="display:inline-block;">
+						<a href="javascript:" onmouseover="$(this).next().show();" onmouseout="$(this).next().hide();" class="owWordLoad">[查看更多]</a>
+						<div class="owWordload-detail">
+							<div ng-repeat="pro in after4(toArr(item.kpiPlanDesc)) track by $index">{{pro}}</div>
+						</div>
+					</div>
+				</td>
+				<td>{{decim(item.planWordload, 1)}}</td>
+				<td>{{decim(item.sumWordload, 1)}}</td>
+				<td>{{item.iwPercnt}}</td>
+				<td>{{item.owPercnt}}</td>
+				<td>{{decim(item.planComplatePer, 1)}}%</td>
+				<td>
+					<div ng-if="item.evaluate==null || item.evaluate==''" align="center"><img src="../../../img/unreport.png" style="vertical-align:middle;"/> 未评定</div>
+					<a ng-if="item.evaluate!=null" href="javascript:" onmouseover="$(this).next().show();" onmouseout="$(this).next().hide();" class="owWordLoad">[查看详细]</a>
+					<div class="owWordload-detail">{{item.evaluate}}</div>
+				</td>
+				<td>{{item.planCheckScore}}</td>
+				<td>
+					<div ng-if="item.feedback==null || item.feedback==''" align="center"><img src="../../../img/unreport.png" style="vertical-align:middle;"/> 未反馈</div>
+					<a ng-if="item.feedback!=null" href="javascript:" onmouseover="$(this).next().show();" onmouseout="$(this).next().hide();" class="owWordLoad">[查看详细]</a>
+					<div class="owWordload-detail">{{item.feedback}}</div>
+				</td>
+				<td>
+					<div ng-if="item.feedbackEval==null || item.feedbackEval==''" align="center"><img src="../../../img/unreport.png" style="vertical-align:middle;"/> 未评定</div>
+					<a ng-if="item.feedbackEval!=null && item.feedbackEval!=''" href="javascript:" onmouseover="$(this).next().show();" onmouseout="$(this).next().hide();" class="owWordLoad">[查看详细]</a>
+					<div class="owWordload-detail">{{item.feedbackEval}}</div>
+				</td>
+				<td>{{item.feedbackCheckScore}}</td>
+				<td>{{item.allPlanWordload}}</td>
+				<td>{{decim(item.proPlanProgress?item.proPlanProgress:0, 1)}}%</td>
+				<td>
+		    		<a href="javascript:" ng-click="evaluate(item)" title="评价"><img class="operationImg" src="../../../img/evaluate.png"></a>
+		    		<a href="javascript:" ng-click="toUpdate(item)" title="修改"><img class="operationImg" src="../../../img/list_item_modify-icon.png"></a>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+
+var searchName="";
+
+simpleController({
+	viewStateInit:function($scope, $viewState){
+		$viewState.cond_proStatus=2;
+		$viewState.cond_proStatusName="激活";
+		$viewState.cond_proNo="";
+		$viewState.cond_proName="";
+		$viewState.cond_categoryCode="";
+		$viewState.cond_categoryName="";
+		$viewState.cond_planType=0;
+		$viewState.cond_planTypeName="全部";
+		var curYear=new Date().getFullYear();
+		$viewState.cond_year=curYear;
+	},
+	init:function($scope, $http, $viewState){
+		
+		var viewState = new ViewState();
+		
+		$scope.toArr=function(pros){
+			if(!pros)return;
+			var arr = pros.split(",");//alert(arr);
+			return arr;
+		};
+		
+		$scope.top4=function(arr){
+			var arrN=[];
+			if(!arr)
+				return arrN;
+			for(var i=0;i<arr.length;i++){
+				if(i>3){
+					break;
+				}
+				arrN.push(arr[i]);
+			}
+			return arrN;
+		};
+		
+		$scope.after4=function(arr){
+			var arrN=[];
+			for(var i=4;i<arr.length;i++){
+				arrN.push(arr[i]);
+			}
+			return arrN;
+		};
+		
+		$scope.dataList=[];
+		
+		var urlParams = getUrlParams();
+		var ticket=$scope.ticket;
+		
+		
+		$(".switch_btn_group>a").each(function(){
+			$(this).click(function(){
+				$(this).addClass("selected");
+				$(this).siblings().removeClass("selected");
+				$viewState.cond_proStatus = $(this).attr("datatype");
+				$("input[name=proStatus]").val($viewState.cond_proStatus);
+				viewState.put("proStatus", $viewState.cond_proStatus);
+				proList.setConfig("url", "../../component/projectList.html?categoryCode="+viewState.get("categoryCode")+"&proStatus="+$viewState.cond_proStatus+"&ticket="+ticket);
+				$scope.doQuery(1);
+			});
+			
+		});
+		
+		/* 项目列表 */
+		var proList = new DropDownList();
+		proList.init({
+			renderTo:"input[name=proName]",
+			url:"../../component/projectList.html?categoryCode="+viewState.get("categoryCode")+"&proStatus="+$viewState.cond_proStatus+"&ticket="+ticket,
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=proName]").val(result.proName);
+				$("input[name=proNo]").val(result.proNo);
+				$scope.doQuery(1);
+			}
+		});
+		
+		/* 项目类型 */
+		new DropDownList().init({
+			renderTo:"input[name=categoryName]",
+			url:"../../component/projectType.html?ticket="+ticket,
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=categoryName]").val(result.categoryName);
+				$("input[name=categoryCode]").val(result.categoryCode);
+				/* 联动 */
+				proList.setConfig("url","../../component/projectList.html?categoryCode="+result.categoryCode+"&proStatus="+viewState.get("proStatus")+"&ticket="+ticket);
+			}
+		});
+		
+		/* 计划类型 */
+		new DropDownList().init({
+			renderTo:"input[name=planTypeName]",
+			data:[{code:0, name:"(全部)"},{code:1, name:"周计划"},{code:2,name:"月计划"}],
+			textField:"name",
+			onSelected:function(result){
+				if(result.code==0){
+					$("input[name=planTypeName]").val("");
+					$("input[name=planType]").val(0);
+				}else{
+					$("input[name=planTypeName]").val(result.name);
+					$("input[name=planType]").val(result.code);
+				}
+				$scope.doQuery(1);
+			}
+		});
+		
+		var years=[];
+		var curYear=new Date().getFullYear();
+		$("input[name=year]").val($viewState.cond_year);
+		for(var i=-2;i<=2;i++)
+			years.push(curYear+i);
+		/* 年 */
+		new DropDownList().init({
+			renderTo:"input[name=year]",
+			data:years,
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=year]").val(result);
+				$scope.doQuery(1);
+			}
+		});
+		
+		
+		$scope.loadData=function(proNo, proStatus, planType, startTime, endTime, isEval, isFeedback, isFeedbackEval,searchName){
+			var accountCode="";
+			/* 根据角色判断是否传accountCode */
+			if($scope.userData.roleCode=="004"){
+				accountCode=$scope.userData.accountCode;
+			}
+			$scope.httpGet({
+				url:"eap/pmsServices/pm/plan/list",
+				data:{"proNo":proNo, "proStatus":proStatus, "planType":planType, "accountCode":accountCode,
+					"startTime":startTime, "endTime":endTime, "isEval":isEval, "isFeedback":isFeedback, "isFeedbackEval":isFeedbackEval,"searchName":searchName},
+				success:function(res){
+					if(res.statusCode==200){
+						$scope.dataList = res.list;
+					}
+				},
+				pageChange:function(pageNum){
+					$scope.doQuery();
+				}
+			});
+		};
+		
+		$scope.doQuery=function(newQuery){
+			viewState.collect();
+			if(newQuery==1){
+				$scope.currentPage = 1;
+				viewState.put("pageNo", 1);// 存储
+			}else{
+				viewState.put("pageNo", $scope.currentPage);// 存储
+			}
+			
+			
+			$scope.loadData(viewState.get("proNo"), viewState.get("proStatus"), viewState.get("planType"), viewState.get("startTime"), viewState.get("endTime"), 
+					viewState.get("isEval"), viewState.get("isFeedback"), viewState.get("isFeedbackEval"), viewState.get("searchName"));
+		};
+		$scope.refresh=function(){
+			viewState.collect();
+			$scope.currentPage = viewState.get("pageNo");// 恢复
+			$scope.loadData(viewState.get("proNo"), viewState.get("proStatus"), viewState.get("planType"), viewState.get("startTime"), viewState.get("endTime"), 
+					viewState.get("isEval"), viewState.get("isFeedback"), viewState.get("isFeedbackEval"), viewState.get("searchName"));
+		};
+		$scope.doExport=function(){
+			new ShowDlog().prompt({
+				icon:"waitting",
+				msg:"正在下载...",
+				t:3000
+			});
+			// excelExport("dataTable");
+			viewState.collect();
+			var accountCode="";
+			/* 根据角色判断是否传accountCode */
+			if($scope.userData.roleCode=="004"){
+				accountCode=$scope.userData.accountCode;
+			}
+			hrefTo({
+				url:serviceBasePath+"eap/pmsServices/pm/plan/export", 
+				data:{"proNo":viewState.get("proNo"), "proStatus":viewState.get("proStatus"), "planType":viewState.get("planType"), "accountCode":accountCode,
+					"startTime":viewState.get("startTime"), "endTime":viewState.get("endTime"), "isEval":viewState.get("isEval"), 
+					"isFeedback":viewState.get("isFeedback"), "isFeedbackEval":viewState.get("isFeedbackEval")}
+			});
+		};
+		$scope.refresh();
+		/* 新增计划 */
+		$scope.toAdd=function(){
+			hrefTo({
+				url:"reportMonthPlan.html"
+			});
+		};
+		
+		$scope.evaluate=function(item){
+			new ShowDlog().showFrame("evaluate.html?rowid="+item.rowid+"&planNo="+encodeURIComponent(item.planNo)+"&planType="+item.planType+"&proNo="+item.proNo, "评价", function(data){
+				if(data=="SUCCESS"){
+					//location.reload();
+					$scope.to({
+						url:"monthPlan.html"
+					});
+				}
+			}, "feedbackDialog");
+		};
+		
+		$scope.toUpdate=function(item){
+			hrefTo({
+				url:"updateMonthPlan.html",
+				data:{
+					"rowid":item.rowid
+				}
+			});
+		};
+		$scope.decim=function(num, len){
+			return decim(num, len);
+		};
+		
+	}
+});
+	
+	/*****************************/
+// 	var now = new Date();
+// 	var year=now.getFullYear();
+// 	var month=now.getMonth()+1;
+// 	var beginDay=1;
+// 	var endDay=getMonthDays(year, month);
+	
+// 	cond_fromDate=year+"-"+numFormat(month,2)+"-"+numFormat(beginDay,2);
+// 	cond_toDate=year+"-"+numFormat(month,2)+"-"+numFormat(endDay,2);
+	
+// 	$("#beginDate").val(cond_fromDate);
+// 	$("#endDate").val(cond_toDate);
+	
+
+</script>
+</body>
+</html>

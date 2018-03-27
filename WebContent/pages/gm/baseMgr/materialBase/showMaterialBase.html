@@ -1,0 +1,235 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 资产管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+
+<script type="text/javascript" src="../../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../../css/edit.css"/>
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+
+<style type="text/css">
+	.dialog-viewcode{width:500px;height:400px;}
+    .dialog-viewcyle{width:1100px;height:710px;}
+</style>
+</head>
+
+<body ng-app="mdu" ng-controller="ctrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">耗材查看</label>
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">耗材属性</a>
+			
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+			
+				
+				<tr>
+					
+					<th style="width:100px">耗材名称</th>
+					<td>
+						
+						<input type="text" name="materialName" value="{{projectInfo.materialName}}" class="required readonly" readonly="readonly" />
+					</td>
+					<th >耗材批次</th>
+					<td>
+						<input  type="text" name="materialBatchno" value="{{projectInfo.materialBatchno}}" class="required readonly" readonly="readonly" />
+					</td>
+				</tr>
+				<tr>
+					<th>资产分类</th>
+					<td>
+						<input type="text" name="assetClassName" class="required readonly" readonly="readonly" placeholder="请选择" value="{{projectInfo.assetClassName}}"/>
+						
+					</td>
+					<th>资产类型</th>
+					<td>
+						<input type="text" name="assetTypeName" class="required readonly" readonly="readonly" placeholder="请选择" value="{{projectInfo.assetTypeName}}"/>
+						
+					</td>
+					
+				</tr>
+				
+				<tr>
+					<th>品牌</th>
+					<td><input type="text"  name="brand" value="{{projectInfo.brand}}"  class="readonly" readonly="readonly"/></td>
+					<th>型号</th>
+					<td><input type="text"  name="modelNo" value="{{projectInfo.modelNo}}" class="readonly" readonly="readonly" /></td>
+					
+				</tr>
+				<tr>
+					<th>发票类型</th>
+					<td><input type="text"  name="invoiceType"   class="readonly" readonly="readonly"/></td>
+					
+				</tr>
+				<tr>
+					<th>含税单价</th>
+					<td><input type="text"  name="price1"  value="{{projectInfo.price1}}" class="readonly" readonly="readonly" /></td>
+					<th>不含税单价</th>
+					<td><input type="text"  name="price2"  value="{{projectInfo.price2}}" class="readonly" readonly="readonly" /></td>
+				</tr>
+				<tr>
+					<th>含税总价</th>
+					<td><input type="text"  name="total1" value="{{projectInfo.total1}}" class="readonly" readonly="readonly" /></td>
+					<th>不含税总价</th>
+					<td><input type="text"  name="total2" value="{{projectInfo.total2}}" class="readonly" readonly="readonly" /></td>
+					
+				</tr>
+				<tr>
+					<th>发票凭证</th>
+					<td><input type="text" name="bill"  value="{{projectInfo.bill}}" class="readonly" readonly="readonly" /></td>
+					<th>采购时间</th>
+					<td><input type="text" name="datePurchase" value="{{projectInfo.datePurchase}}" class="readonly" readonly="readonly" /></td>
+				</tr>
+				
+				<tr>
+					<th>入库时间</th>
+					<td><input type="text" name="dateStorage" value="{{projectInfo.dateStorage}}" class="readonly" readonly="readonly" /></td>
+					<th>入库数量</th>
+					<td><input type="text"  name="countStorage" value="{{projectInfo.countStorage}}" class="readonly" readonly="readonly"  /></td>
+														
+				</tr>
+				<tr>
+					<th>当前库存</th>
+					<td><input type="text" name="curcountStorage" value="{{projectInfo.curcountStorage}}" class="readonly" readonly="readonly" /></td>
+					<th>资产内容</th>
+					<td><input type="text" name="forms" value="{{projectInfo.forms}}" class="readonly" readonly="readonly" /></td>
+					
+				</tr>
+				<tr>
+					<th>备注</th>
+					<td><input type="text" name="remarks" value="{{projectInfo.remarks}}" class="readonly" readonly="readonly" /></td>
+					
+				</tr>
+			</table>
+			
+		</div>
+		
+		
+
+		<div class="form_bottom">
+			
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+
+var selectedUnitCode="";
+var validator;
+var userData;
+
+var assetCode1="";
+
+var ngScope;
+var app = angular.module("mdu", []);
+app.controller("ctrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	
+	$scope.projectInfo={};
+	
+	
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	var params = getUrlParams();
+	
+	/* 视图渲染 */
+	$(".tabs>a").each(function(){
+		var layId = $(this).attr("href");
+		var idx = $(".tabs>a").index($(this));
+		if(idx!=0){
+			$(layId).hide();
+			$(layId).attr("data-show", "0");
+		}else{
+			$(layId).attr("data-show", "1");
+		}
+		$(this).click(function(){
+			$(".tabs>.selected").removeClass("selected");
+			$(this).addClass("selected");
+			var layId = $(this).attr("href");
+			$("div[data-show=1]").hide();
+			$("div[data-show=1]").attr("data-show", "0");
+			$(layId).show();
+			$(layId).attr("data-show", "1");
+			
+		});
+	});
+	
+	/* 数据加载 */
+	$scope.loadProject=function(materialBatchno){
+		
+		$http.get(serviceBasePath+"eap/pmsServices/materielMg/assetMg/material/get?materialBatchno="
+			+materialBatchno+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../../login.html";
+				return;
+			}
+			$scope.projectInfo = response.data;
+			
+			if(response.data.invoiceType==2){
+				
+				$("input[name=invoiceType]").val("增值税发票");
+			}else{
+				
+				$("input[name=invoiceType]").val("普通发票");
+			}
+		});
+	};
+	/* 初始加载 */
+	$scope.loadProject(params.materialBatchno);
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		//location.href="materialBaseMgr.html";
+		
+		
+		hrefTo({
+			url:"materialBaseMgr.html",
+			data:getUrlParams()
+		});
+		
+	};
+	
+
+});
+</script>
+</body>
+</html>

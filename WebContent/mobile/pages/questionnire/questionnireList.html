@@ -1,0 +1,167 @@
+<!doctype html>
+<html ng-app="moduleName">
+<head>
+	<meta charset="UTF-8" />
+	<title> 问卷调查 </title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+	<script src="../../js/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/bxyw1.css"/>
+	<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="../../js/PageBar.js"></script>
+	<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css"/>
+	<script type="text/javascript" src="../../js/Calendar.js"></script>
+	<script type="text/javascript" src="../../js/config.js"></script>
+	<script type="text/javascript" src="../../js/util.js"></script>
+	<script type="text/javascript" src="../../js/ViewState.js"></script>
+	<script type="text/javascript" src="../../js/ng-base.js"></script>
+	<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+	<script type="text/javascript" src="../../js/eapJs/core/eap.core.js" ></script>
+	<script type="text/javascript" src="../../js/eapJs/plugins/eap.tip.js" ></script>
+	<script type="text/javascript" src="../../js/eapJs/plugins/eap.validate.js"></script>
+	<script type="text/javascript" src="../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/validate.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/edit.css"/>
+	
+	<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+	
+	<style>
+		header{position:fixed;z-index:10}
+		section{padding:60px 0 65px 0}
+		.title1 span{color: #999;font-size: 12px;}
+		.con_list{padding-right:40px;background: #fff url(../../img/list_icon_forward.png) no-repeat 98% center;}
+		.sort li{text-align:center}
+		.fenye_warp span.fen_btn{padding: 8px 9px;line-height: normal;background: #ededed;color:#a7a7a7}
+		.fl{height:inherit}
+		.filter li .filter_no{width: 47%;}
+		.dblist_cons .martp5 span.do{display:inline-block;width:23%;text-align:center}
+		.mr_20{margin-top:20px}
+		.more_filter{text-align:center;color:#02a2ff}
+		.disnone{display:none}
+		#date{width:200px;height:30px;display: inline-block;border:1px solid #ccc;background:none;line-height:30px;text-indent:5px}
+		.dblist_cons .martp5 span.do{width:45%}
+		.setJudging{width:90%;min-height:400px}
+		.dlog-showPic{width:90%;min-height:500px}
+		
+		.title1 h3{display:inline-block;color: #02a2ff;font-size: 18px;font-weight:normal;}
+		.status_label{display:inline-block;width:50px;line-height:20px;font-size:12px;color:#FFF !important;text-align:center;border-radius:10px;}
+		.bg_green{background:#419A00;}
+		.bg_red{background:#ffae00;}
+	</style>
+</head>
+<body id="dblist" ng-controller="controllerName" storagekey="questionnire.questionnire">
+	<header>
+		<div class="return"><img src="../../img/return.png"/></div>
+		问卷调查
+	</header>
+	<section>
+		<div id="warp_id">
+			
+			<div class="con_list" ng-repeat="item in dataList"  ng-click="selectQuestionnire(item)">
+				<div class="title1">
+					<h3>{{item.title}}</h3>	
+					<span ng-if="item.type==1">（问卷）</span>
+					<span ng-if="item.type==2">（测评）</span>
+					<span ng-if="item.type==3">（试卷）</span>
+					<span ng-if="item.status==1" class="status_label bg_green">已提交</span>
+						<span ng-if="item.status==0" class="status_label bg_red">未提交</span>
+				</div>
+				<div class="dblist_cons">
+					<div class="martp5">
+						<span style="color:#ffa800">有效时间（{{item.enabledBeginTime}}至{{item.enabledEndTime}}）</span>
+					</div>
+					<div class="martp5">
+						发布日期：<span>{{item.sendTime}}</span>
+					</div>
+				</div>				
+			</div>
+			
+		</div>
+	</section>
+	<script type="text/javascript">
+	simpleController({
+		init:function($scope, $http){
+			$scope.dataList=[];
+			var viewState = new ViewState();
+			var urlParams = getUrlParams();
+			
+			$(".return").click(function(){
+				if(urlParams.web==1){
+					top.viewBack();
+				}else{
+					window.top.exitApp();
+				}
+				
+			});	
+			
+			/* 初始（查询） */
+			$scope.doQuery=function(){
+				$scope.loadData();
+			};
+			/* 加载数据 */
+			$scope.loadData=function(){
+				new ShowDlog().prompt({
+					icon:"waitting",
+					msg:"正在查询...",
+					done:function(){},
+					t:20*60*1000
+				});
+				$scope.httpExecute({
+					url:"eap/pmsServices/myQuestionnire/questionnireList",
+					method:"GET",
+					data:{employeeCode:$scope.userData.employeeCode},
+					success:function(res){
+						$dlog.close();
+						if(res.statusCode==200){
+							$scope.dataList = res.list;
+						}
+					},
+					error:function(){
+						$dlog.close();
+						new ShowDlog().prompt({
+							msg:"网络异常！",
+							done:function(){},
+							t:1500
+						});
+					}
+				});
+			};
+			/* 问卷跳转 */
+			$scope.selectQuestionnire=function(item){
+				var params = toUrlParams(item);
+// 				var beginTime = new SimpleDateFormat({formatString:"yyyy-MM-dd"}).parse(item.enabledBeginTime);
+// 				var endTime = new SimpleDateFormat({formatString:"yyyy-MM-dd"}).parse(item.enabledEndTime);
+// 				if(new Date().getTime()< beginTime.getTime()){
+// 					new ShowDlog().prompt({
+// 						msg:"答题时间未开始",
+// 						done:function(){},
+// 						t:1500
+// 					});
+// 					return;
+// 				}
+// 				if(new Date().getTime()> endTime.getTime()){
+// 					new ShowDlog().prompt({
+// 						msg:"答题时间已结束",
+// 						done:function(){},
+// 						t:1500
+// 					});
+// 					return;
+// 				}	
+				
+				if(item.status==0){
+					//hrefTo({url:"questionnireSubmit.html", data:item});
+					top.viewTo("questionnire/questionnireSubmit.html?"+params);
+				}else{
+					//hrefTo({url:"questionnireAnswerView.html", data:item});
+					top.viewTo("questionnire/questionnireAnswerView.html?"+params);
+				}
+			};
+			$scope.doQuery();
+		}
+	});
+	</script>
+</body>
+</html>

@@ -1,0 +1,696 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>项目预算</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<style type="text/css">
+	.title_tabs{list-style-type:none;padding:0;margin:0;height:39px;}
+	.title_tabs li{position:relative;padding:0;margin:0;float:left;height:39px;background:#E1E1E1;}
+	.title_tabs li>a{display:block;line-height:39px;border:solid 0px;padding:0 66px 0 50px;margin-right:-14px;
+		background:url(../../../img/list_Header2-gray.png) right no-repeat;color:#666;font-size:14px;font-weight:bold;}
+	.title_tabs li.selected{background:#4CA9FF;z-index:9;}
+	.title_tabs li.selected>a{background:url(../../../img/list_Header2-.png) right no-repeat;color:#fff;font-size:14px;font-weight:bold;}
+	.table, .table td, .table th{padding:0 !important}
+	.title_back{float: left;width: 70px;height: 28px;background: url(../../../img/bnt_back.png) repeat;line-height: 28px;text-align: center;margin-left: 30px;margin-top: 5px;color: #2D7CF0;cursor: pointer;}
+	.chooseUser{width:1000px;height:500px;}
+	.dlog-edit{width:500px;height:220px;}
+	.dlog-edit1{width:500px;height:450px;}
+	.excSave{margin-left:20px;margin-top: 6px;float: left;display: block;border:1px solid #ed7798;color:#ed7798;border-radius:15px;padding:5px 20px;cursor:pointer}
+	.excSave:hover{background:#f7bacb;color:#fff}
+	.excSave_upload{border:1px solid #ea7700;color:#ea7700}
+	.excSave_upload:hover{background:#ffc78e;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+<div class="list">
+	<div class="list_content">
+		<ul class="title_tabs">
+			<li class="selected" >
+				<a href="javascript:" ui-id="#lay1">滚动预算总表</a>
+			</li>
+			
+			<li>
+				<a href="javascript:" ui-id="#lay3">人力资源成本</a>
+			</li>
+			<li style="background:#fff;margin-left:20%;border:none">
+				<span ng-click="saveTab1(1)" class="excSave" >保存</span>
+				<span ng-click="saveTab1(2)" class="excSave excSave_upload" >提交</span>
+				<div class="title_back" ng-click="goBack()">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;返回
+				</div>
+			</li>
+		</ul>
+		<form id="saveForm" class="required-validate">
+		
+			<div id="lay1">
+				<div class="table_div">
+					<div style="line-height:40px;">
+						<span>项目编号：{{urlParams.proCode}}</span><span style="margin-left:100px">项目名称：{{urlParams.proName}}</span>
+						
+						<span style="margin-left:100px">编号：
+						  <input style="background:#fff;border:1px dashed #ddd;width:200px;line-height:25px" placeholder="请填写编号"  class="editInput" name="budgetNo" value="{{userList.budgetNo}}">
+						 </span>
+					</div>
+					<div style="width:100%;overflow:auto;position: absolute;top: 80px;left: 0;bottom: 0;right: 0;">
+						<table width="2000px" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+						    <tr class="tr1">
+						    	<th align="center"rowspan="2" width="40px">序号</th>
+							  	<th align="center">预算期间启</th>
+								<th ng-repeat="item in sectionList" align="center">{{item.startTime}}</th>
+								<th width="5%" align="center" rowspan="2">合计</th>
+						    </tr>
+						    <tr class="tr1">
+							  	<th align="center">预算期间止</th>
+								<th ng-repeat="item in sectionList" align="center">{{item.endTime}}</th>
+						    </tr>
+						 	<tr ng-repeat="item in proCostList" class="tr2">
+						 		<td align="center">{{$index+1}}</td>
+						 		<td align="left" style="text-indent:10px">{{item.itemName}}</td>
+								<td align="right" ng-if="item.itemName=='人力资源成本' ||item.itemName=='合计'" ng-repeat="it in sectionList"><div style="padding-right:10px">{{item[it.sectionCode]}}</div></td>
+								<td align="right" ng-if="item.itemName!='人力资源成本' &&item.itemName!='合计'" ng-repeat="it in sectionList">
+									<div ng-if="it.readOnly==1" style="padding-right:10px">{{item[it.sectionCode]}}</div>
+									<input ng-if="it.readOnly!=1" class="number required" style="text-align:right;border: 1px dashed #ddd;padding-right:10px;line-height: 25px;width: 100px;" ng-model="item[it.sectionCode]">
+								</td>
+								<td align="right"><div style="padding-right:10px">{{item.total}}</div></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+			
+			<div id="lay3">
+				<div class="table_div">
+					<div style="line-height:40px">
+						<span>项目编号：{{urlParams.proCode}}</span><span style="margin-left:100px">项目名称：{{urlParams.proName}}</span>
+					</div>
+					<div style="width:100%;overflow:auto;position: absolute;top: 80px;left: 0;bottom: 0;right: 0;">
+						<table width="60%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable2" style="border:none">
+						  <tr style="border:none" ng-repeat="tab2 in table2list">
+						  	<td style="border:none">
+						  		<table border="0" cellspacing="0" cellpadding="0" class="table" style="width: 98%;margin-bottom:10px">
+						  			 <tr class="tr1">
+										<th colspan="7"><div align="center"><div style="font-weight: normal;">{{tab2.startTime}}至{{tab2.endTime}}</div></div></th>
+									  	<th rowspan="2" ng-if="tab2.readOnly==0" width="135px"><div align="center">操作</div></th>
+									  </tr>
+									   <tr class="tr1">
+										<th style="width:40px;"><div align="center">序号</div></th>
+										<th><div align="center">姓名</div></th>
+										<th><div align="center">岗位</div></th>
+										<th><div align="center">薪酬等级/档次</div></th>
+										<th><div align="center">人员性质</div></th>
+										<th><div align="center">项目有效工时</div></th>
+										<th><div align="center">人力资源成本</div></th>
+									  </tr>
+									   <tr class="tr2" ng-if="tab2.list!=''" ng-repeat="obj1 in tab2.list" >
+										<td><div align="center">{{$index+1}}</div></td>
+										<td ng-if="obj1.employeeName=='总计'" colspan="4">
+											<div align="center" ng-if="obj1.employeeName!=''">{{obj1.employeeName}}</div>
+											<div align="center" ng-if="obj1.employeeName=='' || !obj1.employeeName">人员</div>
+										</td>
+										<td ng-if="obj1.employeeName!='总计'">
+											<div align="center" ng-if="obj1.employeeName!=''">{{obj1.employeeName}}</div>
+											<div align="center" ng-if="obj1.employeeName=='' || !obj1.employeeName">人员</div>
+										</td>
+										<td ng-if="obj1.employeeName!='总计'"><div align="center">{{obj1.jobName}}</div></td>
+										<td ng-if="obj1.employeeName!='总计'">
+											<div align="center" ng-if="obj1.employeeName!='总计'">{{obj1.gradeFix}}{{obj1.salaryGrade}} / {{obj1.salaryLevel}}档</div>
+										</td>
+										<td ng-if="obj1.employeeName!='总计'"><div align="center">{{obj1.propertyName}}</div></td>
+										<td><div align="center">{{fmoney(obj1.workTime,2)}}</div></td>
+										<td><div align="center">{{fmoney(obj1.labourCost,2)}}</div></td>
+										<td ng-if="obj1.employeeName!='总计' && tab2.readOnly==0"><div align="center">
+											<img class="operationImg" ng-if="obj1.employeeName" src="../../../img/list_item_modify-icon.png" title="修改" ng-click="editPeople(obj1,$index)">
+											<img class="operationImg" ng-if="!obj1.employeeName" src="../../../img/list_item_modify-icon.png" title="修改" ng-click="editUnit(obj1,$index)">
+											<img class="operationImg" ng-click="doDeleteUser($index,obj1,tab2)"  src="../../../img/list_delete-icon.png" title="删除">
+										</div></td>
+										<td ng-if="obj1.employeeName=='总计'"><div align="center"></div></td>
+									  </tr>
+									  <tr class="tr2" ng-if="tab2.readOnly==0">
+										<td colspan="8"><div align="center">
+											<img ng-click="chooseUser2(tab2)" class="operationImg" src="../../../img/addUser.png" title="添加人员">
+											<img ng-click="importBudget(tab2)" class="operationImg" src="../../../img/impUser.png" title="从概算导入">
+											
+										</div></td>
+									  </tr>
+						  		</table>
+						  	</td>
+						  </tr>
+						</table>
+					</div>
+					
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+var ngScope;
+
+var versionCode="";
+var budgetCode="";
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+ngScope = $scope;
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		window.noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	var companyCode=userData.companyCode;
+	ticket = $.cookie("pmsWeb_ticket");
+	var urlParams = getUrlParams();
+	///versionCode=urlParams.versionCode;
+	//budgetCode=urlParams.budgetCode;
+	
+	
+	
+	$scope.urlParams=urlParams;
+	var proNo =urlParams.proNo;
+	$scope.phaseCount;
+	var getCn="";
+	$scope.tableList=[];
+	$scope.newarry=[];
+	$scope.sectionList=[];
+	$scope.proCostList=[];
+	$scope.loadUsers=function(){
+		new ShowDlog().prompt({
+			icon:"waitting",
+			msg:"正在查询...",
+			done:function(){},
+			t:60*1000
+		});
+		$http.get(serviceBasePath+"eap/pmsServices/pm/pb/rollingGudget/proCostDetail?companyCode="+companyCode+"&proNo="+proNo+"&budgetCode="+budgetCode+"&versionCode="+versionCode).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$dlog.close();
+			$scope.userList=response.data;
+			
+			if(response.data.budgetNo==""){
+				if(response.data.versionOrder<10){
+					$("input[name=budgetNo]").val(urlParams.proNo+"-YS0000"+response.data.versionOrder);
+				}else{
+					$("input[name=budgetNo]").val(urlParams.proNo+"-YS000"+response.data.versionOrder);
+				}
+				
+			}
+			
+			$scope.sectionList=$scope.userList.sectionList;
+			$scope.proCostList=$scope.userList.proCostList;
+			
+			versionCode=$scope.userList.versionCode;
+			budgetCode=$scope.userList.budgetCode;
+			
+			$scope.loadTab3();
+			
+		});
+	}; 
+	$scope.loadUsers();
+	
+	$scope.saveTab1=function(isSub){
+		if(isSub==2){
+			new ShowDlog().confirm({
+				msg:"<label style='color:red;font-weight:700;font-size:16px;'>您确认提交该版本预算吗，提交后将无法进行修改操作？</label>",
+				ok:function(){
+					if(!$("#saveForm").valid()){
+						return;
+					}
+					
+					var releventFund="";
+					for(var i=0;i<$scope.proCostList.length;i++){
+						var item = $scope.proCostList[i];
+						if("人力资源成本" != item.itemName  && "合计" != item.itemName){
+							for(var j in $scope.sectionList){
+								var it = $scope.sectionList[j];
+								if(releventFund.length>0){
+									releventFund+=";";
+								}
+								releventFund+=item.itemCode+","+it.sectionCode+","+item[it.sectionCode];
+							}
+						}
+					};
+					
+					
+					var _labourCostList = [];
+					 if ($scope.table2list && $scope.table2list.length > 0) {
+					
+						for (var i in $scope.table2list) {
+							
+							if ($scope.table2list[i].list) {
+								
+								for (var j in $scope.table2list[i].list) {
+									
+									_labourCostList.push($scope.table2list[i].list[j]);
+								}
+							}
+						}
+					} 
+					
+					
+					var jsonattr=JSON.stringify(_labourCostList);
+					
+					var budgetNo=$("input[name=budgetNo]").val();
+					
+					var postParams={"budgetNo":budgetNo,"companyCode":companyCode,"proNo":proNo,"itemCosts":releventFund,"attrJson":jsonattr,"budgetCode":budgetCode,"versionCode":versionCode,"isSubmit":isSub};
+					$http.post(serviceBasePath+"eap/pmsServices/pm/pb/rollingGudget/insertProSectionCost",postParams,{
+						headers:{"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"},
+						transformRequest:function(data){
+							return $.param(data);
+						}
+					}).success(function(response){
+						if(response.statusCode=="200"){
+							new ShowDlog().prompt({
+								icon:"success",
+								msg:"修改成功！",
+								done:function(){
+									location.href="proBudgetListMgr.html"
+								},
+								t:1500
+							});
+						}
+					});
+				}
+			})
+		}else{
+				
+				if(!$("#saveForm").valid()){
+					return;
+				}
+				
+				var releventFund="";
+				for(var i=0;i<$scope.proCostList.length;i++){
+					var item = $scope.proCostList[i];
+					if("人力资源成本" != item.itemName && "合计" != item.itemName){
+						for(var j in $scope.sectionList){
+							var it = $scope.sectionList[j];
+							if(releventFund.length>0){
+								releventFund+=";";
+							}
+							releventFund+=item.itemCode+","+it.sectionCode+","+item[it.sectionCode];
+						}
+					}
+				};
+				
+				
+				var _labourCostList = [];
+				 if ($scope.table2list && $scope.table2list.length > 0) {
+				
+					for (var i in $scope.table2list) {
+						
+						if ($scope.table2list[i].list) {
+							
+							for (var j in $scope.table2list[i].list) {
+								
+								_labourCostList.push($scope.table2list[i].list[j]);
+							}
+						}
+					}
+				} 
+				
+				
+				var jsonattr=JSON.stringify(_labourCostList);
+				
+				
+				var budgetNo=$("input[name=budgetNo]").val();
+				
+				var postParams={"budgetNo":budgetNo,"companyCode":companyCode,"proNo":proNo,"itemCosts":releventFund,"attrJson":jsonattr,"budgetCode":budgetCode,"versionCode":versionCode,"isSubmit":isSub};
+				$http.post(serviceBasePath+"eap/pmsServices/pm/pb/rollingGudget/insertProSectionCost",postParams,{
+					headers:{"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"},
+					transformRequest:function(data){
+						return $.param(data);
+					}
+				}).success(function(response){
+					if(response.statusCode=="200"){
+						new ShowDlog().prompt({
+							icon:"success",
+							msg:"修改成功！",
+							done:function(){
+								$scope.loadUsers();
+								$scope.loadTab3();
+							},
+							t:1500
+						});
+					}
+				});
+			}
+	};
+	
+	$scope.dataList1=[];
+	$scope.sectionList1=[];
+	$scope.labourCostList = [];
+	
+	
+	
+
+	$scope.chooseUser2=function(item){
+		
+		/* 选择员工 */
+		new ShowDlog().showFrame("chooseUserforBudet.html?proNo="+proNo+"&sectionCode="+item.sectionCode, "选择员工", function(data){
+			if(data!=null){
+				
+				
+				callNgFn({ctrlEl:$("body")[0],ngFn:function(scope){
+					//scope.tab3List.dataList.push(data);
+					
+					
+					
+					for (var i in scope.table2list) {
+						if(scope.table2list[i].sectionCode==data.sectionCode){
+							//scope.table2list[i].list.push(data);
+							if(scope.table2list[i].list.length==0){
+								var tempObj={"employeeName":"总计","labourCost":0.0,"workTime":0.0,"employeeCode":"总计"};
+								scope.table2list[i].list.push(tempObj)
+							}
+							scope.table2list[i].list.splice(scope.table2list[i].list.length-1, 0, data);
+							
+							scope.table2list[i].list[scope.table2list[i].list.length-1].labourCost=parseFloat(scope.table2list[i].list[scope.table2list[i].list.length-1].labourCost)+parseFloat(data.labourCost);
+							scope.table2list[i].list[scope.table2list[i].list.length-1].workTime=parseFloat(scope.table2list[i].list[scope.table2list[i].list.length-1].workTime)+parseFloat(data.workTime);
+							break;
+						}
+					}
+
+					//console.log(data);
+					console.log(scope.table2list);
+				}});
+			}
+		}, "dlog-edit1");
+	};
+	
+	
+	$scope.importBudget=function(item){
+		
+		//item.sectionCode   proNo.
+		
+		new ShowDlog().confirm({
+				msg:"确定从概算导入人员吗？",
+				ok:function(){
+					$http.get(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/proEstimateLabour?companyCode="+companyCode+"&proNo="+proNo+"&sectionCode="+item.sectionCode).success(function(response){
+						
+						if(response.list){
+							for(var j=0;j<response.list.length;j++){
+								var data=response.list[j];
+								
+								
+								for (var i in $scope.table2list) {
+									if($scope.table2list[i].sectionCode==data.sectionCode){
+										//scope.table2list[i].list.push(data);
+										if($scope.table2list[i].list.length==0){
+											var tempObj={"employeeName":"总计","labourCost":0.0,"workTime":0.0,"employeeCode":"总计"};
+											$scope.table2list[i].list.push(tempObj)
+										}
+										$scope.table2list[i].list.splice($scope.table2list[i].list.length-1, 0, data);
+										
+										$scope.table2list[i].list[$scope.table2list[i].list.length-1].labourCost=parseFloat($scope.table2list[i].list[$scope.table2list[i].list.length-1].labourCost)+parseFloat(data.labourCost);
+										$scope.table2list[i].list[$scope.table2list[i].list.length-1].workTime=parseFloat($scope.table2list[i].list[$scope.table2list[i].list.length-1].workTime)+parseFloat(data.workTime);
+										break;
+									}
+								}
+								
+							}
+						}else{
+							var waittingDlog = new ShowDlog();
+
+							waittingDlog.prompt({
+								icon:"warning",
+								msg:"没有可导入的人员!",
+								done:function(){
+									
+								},
+								t:1500
+							});
+						}
+						
+				   });
+				}
+		});
+		
+		
+		
+				
+			
+			
+		
+	
+				 
+			
+	};
+	
+	
+	$scope.doDeleteUser=function(index,obj,obj1){
+	
+		
+			/* 删除员工 */
+			new ShowDlog().confirm({
+				msg:"确定删除吗？",
+				ok:function(){
+					 //alert(ids);
+					 callNgFn({ctrlEl:$("body")[0],ngFn:function(scope){
+						 
+						   var labourCost=0;
+						   var workTime=0;
+						   for (var i in scope.table2list) {
+							  
+								if(scope.table2list[i].sectionCode==obj.sectionCode){
+									labourCost=scope.table2list[i].list[index].labourCost;
+									workTime=scope.table2list[i].list[index].workTime;
+									
+									scope.table2list[i].list.splice(index,1);
+									
+									scope.table2list[i].list[scope.table2list[i].list.length-1].labourCost=scope.table2list[i].list[scope.table2list[i].list.length-1].labourCost-labourCost;
+									scope.table2list[i].list[scope.table2list[i].list.length-1].workTime=scope.table2list[i].list[scope.table2list[i].list.length-1].workTime-workTime;
+									break;
+								}
+							}
+						   
+						    //scope.table2list[scope.table2list.length-1].list.total=scope.table2list[scope.table2list.length-1].list.total-labourCost;
+						    
+					}});
+				
+					// $scope.tab3List.dataList.push(data);
+					 
+				}
+			});
+	
+		};
+		
+		
+			
+		$scope.editPeople=function(item,index){
+			/* 选择员工 */
+	
+			new ShowDlog().showFrame("editUser.html?employeeName="+item.employeeName+"&univalent="+item.univalent+"&workTime="+item.workTime+"&labourCost="+item.labourCost+"&contractPropertyCode="+item.contractPropertyCode+"&employeeCode="+item.employeeCode
+					+"&jobName="+item.jobName+"&proNo="+item.proNo+"&salaryGrade="+item.salaryGrade+"&salaryLevel="+item.salaryLevel+"&sectionCode="+item.sectionCode+"&gradeFix="+item.gradeFix+"&propertyName="+item.propertyName, "修改员工", function(data){
+				if(data!=null){
+					
+					callNgFn({ctrlEl:$("body")[0],ngFn:function(scope){
+						 for (var i in scope.table2list) {
+								if(scope.table2list[i].sectionCode==item.sectionCode){
+									
+									var diffLab=data.labourCost-scope.table2list[i].list[index].labourCost;
+									var diffWorkTime=data.workTime-scope.table2list[i].list[index].workTime;
+									
+									scope.table2list[i].list[index]=data;
+									
+									
+									scope.table2list[i].list[scope.table2list[i].list.length-1].labourCost=parseFloat(scope.table2list[i].list[scope.table2list[i].list.length-1].labourCost)+parseFloat(diffLab);
+									scope.table2list[i].list[scope.table2list[i].list.length-1].workTime=parseFloat(scope.table2list[i].list[scope.table2list[i].list.length-1].workTime)+parseFloat(diffWorkTime);
+									
+									console.log(scope.table2list[i].list);
+									break;
+									
+								}
+						 }
+						 
+						 
+					}});
+				}
+			}, "dlog-edit1"); 
+		};
+	
+		
+		$scope.editUnit=function(item,index){
+			/* 修改部门 */
+			
+			
+			new ShowDlog().showFrame("editUnit.html?unitName="+item.unitName+"&univalent="+item.univalent+"&workTime="+item.workTime+"&labourCost="+item.labourCost+"&contractPropertyCode="+item.contractPropertyCode+"&unitCode="+item.unitCode
+					+"&jobName="+item.jobName+"&proNo="+item.proNo+"&salaryGrade="+item.salaryGrade+"&salaryLevel="+item.salaryLevel+"&sectionCode="+item.sectionCode+"&gradeFix="+item.gradeFix+"&propertyName="+item.propertyName+"&jobCode="+item.jobCode+"&gradeFix="+item.gradeFix, "修改员工", function(data){
+				if(data!=null){
+					
+					callNgFn({ctrlEl:$("body")[0],ngFn:function(scope){
+						 for (var i in scope.table2list) {
+								if(scope.table2list[i].sectionCode==item.sectionCode){
+									
+									var diffLab=data.labourCost-scope.table2list[i].list[index].labourCost;
+									var diffWorkTime=data.workTime-scope.table2list[i].list[index].workTime;
+									
+									scope.table2list[i].list[index]=data;
+									
+									
+									scope.table2list[i].list[scope.table2list[i].list.length-1].labourCost=parseFloat(scope.table2list[i].list[scope.table2list[i].list.length-1].labourCost)+parseFloat(diffLab);
+									scope.table2list[i].list[scope.table2list[i].list.length-1].workTime=parseFloat(scope.table2list[i].list[scope.table2list[i].list.length-1].workTime)+parseFloat(diffWorkTime);
+									
+									console.log(scope.table2list[i].list);
+									break;
+									
+								}
+						 }
+						 
+						 
+					}});
+				}
+			}, "dlog-edit1"); 
+		};
+		
+	$scope.loadTab3=function(){
+		$http.get(serviceBasePath+"eap/pmsServices/pm/pb/rollingGudget/getSectionLabourCost?companyCode="+companyCode+"&proNo="+proNo+"&budgetCode="+budgetCode+"&versionCode="+versionCode).success(function(response){
+			if(response.statusCode==200){
+				$scope.tab2List=response.data;
+				$scope.table2list=$scope.tab2List.list;
+				
+				
+			}
+			
+		});
+	}; 
+	
+	$scope.saveTab3=function(){
+		var itemDescs="";
+		var itemCosts="";
+		for(var i=0;i<$scope.tab3List.proCostList.length;i++){
+			var item = $scope.tab3List.proCostList[i];
+			if("其它合计" != item.itemName && "合计" != item.itemName && "人力资源成本" != item.itemName){
+				// 循环阶段
+				for(var j in $scope.tab3List.phaseList){
+					var it = $scope.tab3List.phaseList[j];
+					if(itemCosts.length>0){
+						itemCosts+=";";
+					}
+					itemCosts+=item.itemCode+","+it.phaseCode+","+item[it.phaseCode];
+				}
+			}
+			// 获取itemDesc
+			if("其它合计" != item.itemName && "合计" != item.itemName){
+				if(itemDescs.length>0){
+					itemDescs+=";";
+				}
+				itemDescs+=item.itemCode+","+item.itemDesc;
+			}
+		};
+		$http.post(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/insertProPhaseCost?companyCode="+companyCode+"&proNo="+proNo+"&itemCosts="+itemCosts+"&itemDescs="+itemDescs).success(function(response){
+			if(response.statusCode=="200"){
+				new ShowDlog().prompt({
+					icon:"success",
+					msg:"保存成功！",
+					done:function(){
+						$scope.loadTab3() 
+					},
+					t:1500
+				});
+			}
+		});
+		
+		
+	};
+
+	
+	
+	$scope.goBack=function(){
+		
+		new ShowDlog().confirm({
+			msg:"确定放弃本次操作吗？",
+			ok:function(){
+				history.go(-1);
+			}
+		});
+		
+	};
+	/* 表单验证 */
+	validator = $("#saveForm").validate({
+		onsubmit: false,
+		focusInvalid: false,
+		focusCleanup: true,
+		errorElement: "span",
+		ignore:".ignore",
+		invalidHandler: function(form, validator) {
+			var errors = validator.numberOfInvalids();
+			if (errors) {
+				
+			} 
+		}
+	});
+	/* 初始化视图 */
+	$(".title_tabs>li>a").each(function(){
+		var layId = $(this).attr("ui-id");
+		var $li = $(this).parent();
+		var idx = $(".title_tabs>li").index($li);
+		if(idx!=0){
+			$(layId).hide();
+			$(layId).attr("data-show", "0");
+		}else{
+			$(layId).attr("data-show", "1");
+		}
+		$(this).click(function(){
+			var _this=$(this)
+			$(".title_tabs>.selected").removeClass("selected");
+			_this.parent("li").addClass("selected");
+			var layId = _this.attr("ui-id");
+			$("div[data-show=1]").hide();
+			$("div[data-show=1]").attr("data-show", "0");
+			$(layId).show();
+			$(layId).attr("data-show", "1");
+		});
+	});/* 结束 */
+	
+	$scope.decim=function(a,b){
+		return decim(a,b);
+	};
+
+	$scope.fmoney=function(s,n){
+		
+		 if(s==undefined || s=="undefined"){
+			 return "";
+			 
+		 }else{
+			 if(!isNaN(s)){
+				 n = n > 0 && n <= 20 ? n : 2;
+		         s = parseFloat((s + '').replace(/[^\d\.-]/g, '')).toFixed(n) + '';
+		         var l = s.split('.') [0].split('').reverse(),
+		             r = s.split('.') [1];
+		         var  t = '';
+		         for (var i = 0; i < l.length; i++)
+		         {
+		             t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? ',' : '');
+		         }
+		         return t.split('').reverse().join('') + '.' + r;
+				}else{
+					  return s;
+				}
+		 }
+		 
+	};
+	
+});
+</script>
+</html>

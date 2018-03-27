@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 首页 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.ztree.core-3.5.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<link rel="stylesheet" href="../../css/zTreeStyle/zTreeStyle.css" type="text/css"/>
+<style type="text/css">
+body{padding:0;margin:0;background:#fff;font-size:12px;font-family:"微软雅黑";}
+.ztree *{font-size:12px;font-family:"微软雅黑";}
+.chooseBlank>a{display:block;padding:2px;font-size:12px; color:#666;}
+</style>
+</head>
+
+<body ng-app="areaList" ng-controller="areaListCtrl">
+	<div class="chooseBlank">
+		<a href="javascript:" ng-click="onChooseBlank()">(全部)</a>
+	</div>
+	<div id="treeDemo" class="ztree">
+	</div>
+	<script type="text/javascript">
+	var setting = {
+			data:{
+				key:{
+					name:"name"
+				},
+				simpleData:{
+					idKey:"id",
+					pIdKey:"pid",
+					rootPid:0
+				}
+			},
+			callback:{
+				onClick:function(){
+					var selectedNodes = orgZTree.getSelectedNodes();
+					window.frameElement.callback(selectedNodes[0]);
+					window.frameElement.close();
+				}
+			}
+		};
+	var orgZTree;
+	var ngScope;
+	var app = angular.module("areaList", []);
+	
+	app.controller("areaListCtrl", function($scope, $http){
+		/* init */
+		ngScope = $scope;
+		$scope.treeNodes=[];
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		$scope.userData = jQuery.parseJSON(userDataStr);
+		var ticket = $.cookie("pmsWeb_ticket");
+		
+		/* 加载数据 */
+		$.ajax({
+			url:serviceBasePath+"eap/pmsServices/pwsCommon/orgTree",
+			method:"GET",
+			cache:false,
+			data:{"ticket":ticket},
+			success:function(res){
+				if(res.statusCode==200){
+					$scope.treeNodes = res.data;
+					$scope.treeNodes.open=true;
+					orgZTree = $.fn.zTree.init($("#treeDemo"), setting, $scope.treeNodes);
+				}else if(res.statusCode==401){
+					window.parent.location.href="../login.html";
+				}else{
+					alert("服务器访问出错！");
+				}
+			},
+			error:function(){
+				alert("服务器访问失败！");
+			}
+		});
+		/* 选择空白 */
+		$scope.onChooseBlank=function(){
+			var obj=new Object();
+			obj.name="";
+			window.frameElement.callback(obj);
+			window.frameElement.close();
+		};
+		
+	});
+	</script>
+</body>
+</html>

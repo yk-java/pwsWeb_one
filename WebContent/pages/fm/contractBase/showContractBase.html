@@ -1,0 +1,256 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 合同管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">合同详情</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">合同属性</a>
+			
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+				<tr>
+					<th>合同编号</th>
+					<td><input type="text" name="contractNo" readonly="readonly" class="readonly" value="{{conTractObj.CONTRACT_NO}}" /></td>
+					<th>合同名称</th>
+					<td><input type="text" readonly="readonly" class="readonly" value="{{conTractObj.CONTRACT_NAME}}"  /></td>
+				</tr>
+				<tr>
+					<th>合同签订时间</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.CONTRACT_DATE}}"  />
+					</td>
+					<th>业务部门</th>
+					<td>
+						<input type="text" name="businessUnit" readonly="readonly" class="readonly" value="{{conTractObj.BUSINESS_UNIT}}" />
+					</td>
+				</tr>
+				<tr>
+					<th>合同和项目的关系类型</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.contractProjTypeName}}"  />
+					</td>
+					<th>合同类型</th>
+					<td>
+						<input type="text" name="contractType" readonly="readonly" class="readonly" value="{{conTractObj.CONTRACT_TYPE}}" />
+					</td>
+				</tr>
+				<tr>
+					<th>合同书面总价</th>
+					<td>
+						<input type="text" name="writtenPrice" readonly="readonly" class="readonly" value="{{conTractObj.WRITTEN_PRICE}}"/>
+					</td>
+					<th>合同设备单价</th>
+					<td>
+						<input type="text" name="deviceUnivalent" readonly="readonly" class="readonly" value="{{conTractObj.DEVICE_UNIVALENT}}"/>
+					</td>
+				</tr>
+				<tr>
+					<th>合同对应项目实际价值</th>
+					<td>
+						<input type="text" name="actualValue" readonly="readonly" class="readonly" value="{{conTractObj.ACTUAL_VALUE}}"/>
+					</td>
+					<th>合同书面总价是否含税</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.priceIsTaxName}}"/>
+					</td>
+				</tr>
+				<tr>
+					<th>合同税点</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.TAX_POINT}}" />
+					</td>
+					<th>地区</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.PROVINCE}}-{{conTractObj.CITY}}-{{conTractObj.DISTRICT}}"/>
+					</td>
+				</tr>
+				<tr>
+					<th>甲方单位</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.FP_UNIT}}">
+					</td>	
+					<th>合同确定甲方单位负责人</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.CONTACTOR}}">
+					 </td>
+				</tr>
+				<tr>
+					<th>乙方单位</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.SP_UNIT}}">
+					</td>	
+					<th>合同确定乙方单位负责人</th>
+					<td> 
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.SP_UNIT_CHARGER}}">
+					 </td>
+				</tr>
+				<tr>
+					<th>合同开票状态</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.billingStatusName}}">
+					</td>	
+					<th>合同预计开票时间</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.EXPECT_BILLING_TIME}}">
+					 </td>
+				</tr>
+				<tr>
+					<th>开票金额</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.INVOICE_AMOUNT}}" /><span style="color:#ccc">（元）</span>
+					</td>
+					<th>未开票金额</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.NON_INVOICE_AMOUT}}" /><span style="color:#ccc">（元）</span>
+					</td>
+				</tr>
+				<tr>
+					<th>合同回款状态</th>
+					<td>
+						<input type="text" name="paymentStatusName" readonly="readonly" class="readonly" value="{{conTractObj.paymentStatusName}}" />
+					</td>
+					<th>预计全部回款时间</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" value="{{conTractObj.EXPECT_PAYMENT_TIME}}">
+					</td>
+				</tr>					
+				<tr>
+					<th>备注</th>
+					<td colspan="3">
+						<textarea type="text" name="remarks" readonly="readonly" class="readonly" style="width:94%;height:80px">{{conTractObj.REMARKS}}</textarea>
+					</td>		
+				</tr>
+			</table>
+			
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">合同和项目的关系</a>
+		</div>
+		<div class="form_div" id="lay1">
+			<table>
+				<tr ng-repeat="item in relactionArr">
+					<th>项目类型</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" ng-model="item.proTypeName"/>
+					</td>
+					<th>项目名称</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" ng-model="item.proName"/>
+					</td>
+					<th>金额</th>
+					<td>
+						<input type="text" readonly="readonly" class="readonly" ng-model="item.price"/><span style="color:#ccc">（万元）</span>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+var validator;
+var ngScope;
+var cond_categoryCode="";
+var userData;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	var params = getUrlParams();
+	ticket = $.cookie("pmsWeb_ticket");
+	$scope.loadProject=function(rowid,contractNo){
+		$http.get(serviceBasePath+"eap/pmsServices/fm/contractBase/contractBase/get?rowid="
+			+rowid+"&ticket="+ticket+"&contractNo="+contractNo).success(function(response){
+			if(response.statusCode==200){
+				$scope.relactionArr= response.data.linklist;
+				$scope.conTractObj = response.data.obj;
+				if($scope.conTractObj.CONTRACT_PROJ_TYPE==1){
+					$scope.conTractObj.contractProjTypeName="一对一";
+				}else if($scope.conTractObj.CONTRACT_PROJ_TYPE==2){
+					$scope.conTractObj.contractProjTypeName="一对多";
+				}else if($scope.conTractObj.CONTRACT_PROJ_TYPE==3){
+					$scope.conTractObj.contractProjTypeName="多对一";
+				}else if($scope.conTractObj.CONTRACT_PROJ_TYPE==4){
+					$scope.conTractObj.contractProjTypeName="多对多";
+				}
+				
+				if($scope.conTractObj.PRICE_IS_IN_TAX==0){
+					$scope.conTractObj.priceIsTaxName="否";
+				}else if($scope.conTractObj.PRICE_IS_IN_TAX==1){
+					$scope.conTractObj.priceIsTaxName="是";
+				}
+				
+				if($scope.conTractObj.BILLING_STATUS==0){
+					$scope.conTractObj.billingStatusName="未开";
+				}else if($scope.conTractObj.BILLING_STATUS==1){
+					$scope.conTractObj.billingStatusName="已开";
+				}
+				if($scope.conTractObj.PAYMENT_STATUS==0){
+					$scope.conTractObj.paymentStatusName="未回款";
+				}else if($scope.conTractObj.PAYMENT_STATUS==1){
+					$scope.conTractObj.paymentStatusName="已回款";
+				}
+				
+			}
+		});
+	};
+	/* 初始加载 */
+	$scope.loadProject(params.rowid,params.contractNo);
+	
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		 window.history.back();
+	};
+	
+});
+
+</script>
+</body>
+</html>

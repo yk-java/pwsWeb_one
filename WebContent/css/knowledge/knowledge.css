@@ -1,0 +1,70 @@
+*{padding: 0;margin: 0;font-family: "microsoft yahei";font-size:12px;text-decoration:none;color:#000;}
+ul,li{list-style:none;}
+.ov{overflow:hidden;}
+.fl{float: left;}
+.fr{float: right;}
+.sea_warp{margin:0px 0 0 40px;padding-top:40px}
+.sea_warp h1{margin-top:10px;font-size:28px;text-align:center;}
+.sea_warp .sea_navbox{} 
+.sea_warp .sea_navbox .search_containter{width:530px}
+.sea_warp .sea_navbox .sea_navline{width:1px;background: #ccc;height:30px;}
+.sea_warp .sea_navbox li{cursor:pointer;border-radius:4px;padding:0 15px;}
+.sea_warp .sea_navbox .sea_no1{margin-left:10px;}
+.sea_warp .sea_navbox .sea_no1 li{font-size: 16px;float: left;line-height:30px;color:#4c4c4c} 
+.sea_warp .sea_navbox .sea_no2 li{font-size: 12px;line-height:35px;padding:0px 10px;float: left;color:#808080} 
+.sea_warp .sea_navbox .sea_no2 li:first-child{margin-left:10px}
+.sea_warp .sea_navbox .sea_no2 li.cur2{color:#3385ff}
+.sea_warp .sea_navbox .sea_no1 li.cur{background:#008ff5;color:#fff;}
+.sea_warp .sea_navbox .sea_inpwarp{position: relative;margin-top:8px;width:620px}
+.sea_warp .sea_navbox .sea_inpwarp input[type="text"]{border:1px solid #008FF5;width:450px;height:40px;text-indent:10px;}
+.sea_warp .sea_navbox .sea_inpwarp .sea_btn{cursor: pointer;font-size:16px;text-align: center;line-height:40px;display: block;width:80px;height: 40px;background: #3385ff;color: #fff;position: absolute;right:0px;top:0;}
+.sea_warp .sea_navbox .sea_list{margin:20px 0 10px 0}
+.sea_warp .sea_navbox .sea_list ul{margin-top:30px}
+.sea_warp .sea_navbox .sea_list p.sea_tip{border-bottom:1px solid #ccc;line-height:40px;color:#999999}
+.sea_warp .sea_navbox .sea_list p span{color:#ff5a00;padding:0 10px;}
+.sea_warp .sea_navbox .sea_list p.sea_title{font-size:16px;color:#3385ff;}
+.sea_warp .sea_navbox .sea_list .sea_con{padding-bottom:10px;border-bottom: 3px dotted #f2f2f2;margin-bottom:10px}
+.sea_warp .sea_navbox .sea_list .sea_con .seacon_detail{font-size:12px;margin:15px 0;overflow:hidden}
+.sea_warp .sea_navbox .sea_list .sea_con .seacon_detail span{float:right;color:#666666;margin-right:3%}
+.sea_warp .sea_navbox .sea_list .sea_con .seacon_detail .doc_sl{float:left;width:70%;color:#666666;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+
+/*知识库详情页*/
+.knowcon{width:80%;margin:0 auto;}
+.knowcon .knowcon_title{font-size: 24px;padding:30px 0;}
+.knowcon .knowcon_title span.fr{cursor:pointer;color:#7A7A7A;padding:5px 15px;background:#E6E5E5;border-radius:10px}
+.knowcon .knowcon_tip{margin-top:30px;}
+.knowcon .knowcon_tip li{line-height:20px;}
+.knowcon .knowcon_tip .knowcontip_udline{ width:60%;border-bottom:3px dotted #ccc;margin-top: 20px;}
+.knowcon .knowcon_word{margin-top:20px;}
+.knowcon .knowcon_word p{font-size:14px;}
+.knowcon .knowcon_word  .knowword_title{font-size:24px;text-align: center;}
+.knowcon .knowcon_word .child_title{font-size: 16px;color:#8c8c8c;line-height:50px;}
+.knowcon .knowcon_word .wordwarp_title{margin-top:30px;}
+.knowcon .knowcon_word .wordwarp_title p{text-align: center;line-height:30px;}
+.knowcon .knowcon_word .word_warp p{text-indent:30px;line-height:30px;margin-bottom:30px;}
+
+/*知识地图*/
+.map_warp{width:98%;margin:20px auto 0;border:1px solid #f7f7f7}
+.map_warp .warp_title{color: #008FF5;font-size:18px;margin-bottom:20px;line-height:40px;background:#f7f7f7;text-indent: 20px;}
+.mapwarp_con p{line-height:30px;border-bottom:2px solid #008FF5;font-weight:bold; text-indent:10px;}
+.mapwarp_con .mapwarp_model{margin-top:20px;padding: 0 20px;}
+.mapwarp_con .mapwarp_model ul li{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #f7f7f7;overflow: hidden}
+.mapwarp_con .mapwarp_model ul li .model_left{width:100px;float:left}
+.mapwarp_con .mapwarp_model ul li .model_right{float: left;width: 79%;}
+.mapwarp_con .mapwarp_model ul li .model_left span{padding:0 20px;border: 1px solid #e9f1f9;background: #f3f9ff;line-height:30px;display:inline-block;width: 90px;text-align:center}
+.mapwarp_con .mapwarp_model ul li .model_right span{line-height:30px}
+.mapwarp_con .mapwarp_model ul li .model_right span a{padding:0 10px;}
+.mapwarp_con .mapwarp_model ul li .model_right span a em{display:inline-block;width:20px;height:15px;text-align:center;background:#ccc;color:#fff;line-height:15px;border-radius:40%;margin-left:2px}
+.mapwarp_con .mapwarp_model ul li .model_right span:not(:last-child) a{border-right:1px solid #ccc}
+
+
+
+
+
+
+
+
+
+
+
+

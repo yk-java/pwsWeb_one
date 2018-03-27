@@ -1,0 +1,163 @@
+<!doctype html>
+<html ng-app="realPosition">
+<head>
+	<meta charset="UTF-8" />
+	<title> 表箱报竣工 </title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="js/jquery.cookie.js"></script>
+	<script src="js/angular.min.js"></script>
+	<script src="js/util.js"></script>
+	<script src="js/ng-base.js?a=1"></script>
+
+	<script type="text/javascript" src="js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="js/showDlog/showDlog-blue.css" />
+	<link rel="stylesheet" type="text/css" href="css/bxyw1.css"/>
+	<link rel="stylesheet" type="text/css" href="css/edit.css"/>
+	<script type="text/javascript" src="js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+	<link rel="stylesheet" type="text/css" href="js/DropDownList-1.2/DropDownList.css" />
+</head>
+<body ng-controller="realPositionCtrl">
+	<form id="saveForm" class="required-validate">
+	<header>
+		<div class="return"><img src="img/deviceAdd/return.png"/></div>
+		表箱报竣工
+	</header>
+	<section>
+		<ul class="cz_selpx ov" >
+			<li class="fl">筛选<img src="img/deviceAdd/down_icon.png"/></li>
+			<li class="fr">排序<img src="img/deviceAdd/down_icon.png"/></li>
+		</ul>
+		<div class="filter_sort" >
+			<ul class="filter" style="display: none;">
+				<li>
+					<div class="filter_con">
+						<div class="filter_search">
+							<div class="search_int" style="width:77%;">
+								<input type="text" name="search" id="search" placeholder="请输入你要搜索的内容" style="width:60%;margin-top:3px;" />
+								<a class="clear_search1" style="position: absolute; margin-left:-20px;" >x</a>
+								
+								<input type="text" name="reserveStatus" readonly="readonly" class="dropDownList" style="position: relative;width:90px;margin-top:3px;" placeholder="改造状态"  />
+							</div>
+							<span ng-click="doQuery()" style="width:20%;margin-left:3px;margin-top:-3px;height:25px;">搜索</span>
+						</div>
+					</div>
+				</li>
+			</ul>
+			<ul class="sort" style="display: none;">
+				<li><div class="sort_no">表箱地址排序<img src="img/deviceAdd/task_list_selete_icon.png" class="fr"/></div></li>
+				<li><div class="sort_no">地址位置远近<img src="img/deviceAdd/task_list_selete_icon.png" class="fr" style="display: none;"/></div></li>
+			</ul>
+		</div>
+	
+		<div class="con_list"  ng-repeat="item in deviceList" style="z-index: -9999">
+			<a href="javascript:" ng-click="toDetail(item)">
+				<p class="title">
+					<label>{{item.deviceObjName}}</label>
+					<img ng-if="item.reserveStatus==2" style="float: none" src="img/deviceAdd/bohui.png"/>
+				</p>
+			</a>
+		</div>
+		
+	</section>
+	<footer>
+		<p>
+			未完成表箱验收&nbsp;&nbsp;<span>{{deviceList.length}}</span>&nbsp;&nbsp;项
+		</p>
+	</footer>
+	</form>
+	
+	<script type="text/javascript">
+	var urlParams = getUrlParams();
+		var reseverOrgcode="";
+		var searchName="";
+		var reserveStatus="";
+		simpleController({
+			moduleName:"realPosition",
+			controllerName:"realPositionCtrl",
+			init:function($scope, $http){
+				
+				$scope.deviceList=[];
+				/* 加载属性信息 */
+				$scope.loadList=function(searchName){
+					var companyCode = $scope.userData.companyCode;
+					reseverOrgcode=$scope.userData.unitCode;
+					$scope.httpPost({
+						url:"eap/pmsServices/pe/baseMgr/remouldBatch/queryBatchDevice1?companyCode="+companyCode+"&reseverOrgcode="+reseverOrgcode+"&searchName="+searchName+"&reserveStatus="+reserveStatus,
+						data:{"mctCode":""},
+						success:function(response){
+							$scope.deviceList = response.list;
+						}
+					});
+				};
+				
+				$scope.doQuery=function(){
+					searchName=$("#search").val();
+					$scope.loadList(searchName);
+					$(".filter").hide();
+				};
+				
+				$scope.loadList(searchName);
+				
+				new DropDownList().init({
+					renderTo:"input[name=reserveStatus]",
+					mode:"list",
+					data:[{id:"", name:"（全部）"},{id:0, name:"未改造"},{id:2, name:"已改造被驳回"}],
+					textField:"name",
+					onSelected:function(item){
+						$scope.reserveStatus=item.id;
+						reserveStatus=item.id;
+						$("input[name=reserveStatus]").val(item.name);
+						
+					}
+				});
+
+				$scope.toDetail=function(item){
+					top.viewTo("pe/deviceDetail.html?deviceObjCode="+item.deviceObjCode+"&reserveProNo="+item.reserveProNo+
+							"&proNo="+item.proNo+"&mctCode="+item.mctCode+"&deviceObjName="+encodeURIComponent(item.deviceObjName));
+				};
+			}
+		});
+		
+		
+		// 
+		$(".clear_search1").click(function(){
+			$(".search_int input").val("");
+			$(".filter").hide();
+		})
+		$(".filter_no").each(function(){
+			$(this).click(function(){
+				$(this).find("img").attr("src","images/task_selete_icon.png")
+				$(this).siblings().find("img").attr("src","images/task_nonselete_icon.png")
+			})
+		});
+		$(".sort li").each(function(){
+			$(this).click(function(){
+				$(this).find("img").show();
+				$(this).siblings().find("img").hide();
+				$(".sort").hide();
+			})
+		});
+		var fsper = "true";
+		$(".cz_selpx li").click(function(){
+			if(fsper == "true"){
+				var n = $(this).index();
+				$(".filter_sort ul").eq(n).show().siblings().hide();
+				fsper = "false";
+			}else{
+				var n = $(this).index();
+				$(".filter_sort ul").eq(n).hide();
+				fsper = "true";
+			}
+		});
+		$(".return").click(function(){
+			if(urlParams.web==1){
+				top.history.back();
+			}else{
+				window.top.nativeLib.exitApp()
+			}
+		})
+		
+	</script>
+</body>
+</html>

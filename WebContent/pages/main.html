@@ -1,0 +1,379 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> G-Lens电网智能运维管控-云服务平台 </title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<link rel="stylesheet" type="text/css" href="../bootstrap-3.3.5-dist/css/bootstrap.min.css"/>
+<link rel="shortcut icon" href="../favicon2.png" type="image/x-icon" />
+<!-- <link rel="icon" sizes="any" mask href="//www.baidu.com/img/baidu.svg"> -->
+<script type="text/javascript" src="../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../angular-1.4.6/angular.min.js"></script>
+<script src="../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/config.js"></script>
+<script type="text/javascript" src="../js/respond.min.js"></script>
+<script type="text/javascript" src="../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<script type="text/javascript" src="../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../js/showDlog/showDlog-blue.css" />
+
+<link rel="stylesheet" type="text/css" href="../css/iconfont/iconfont.css" />
+
+<style type="text/css">
+body{margin:0px;padding:0px;font-size:12px;font-family:微软雅黑;}
+/* ------ Nav ------ */
+.left_part{border:solid 0px;}
+.left_part .nav_l_item_start, .navbar .left_part .nav_l_item_end{width:10px;height:50px;border:solid 0px;}
+.left_part .nav_l_item{padding:0 8px;height:50px;border:solid 0px;}
+/* left part > a */
+.left_part .nav_l_item a{padding:0 13px;margin:0;line-height:50px;width:100%;
+	text-align:center;color:#fff;font-size:14px;font-weight:bold;border:solid 0px;}
+.left_part .nav_l_item:hover{color:#fff;background:#005ccc;background-size: 100%;}
+.left_part .nav_l_item a:hover{background:#005ccc;}
+.left_part .nav_l_item a:visited{background:#005ccc;}
+.left_part .nav_l_item a:hover{background:#005ccc;}
+.left_part .nav_l_item a:focus{background:#005ccc;}
+.left_part .item_selected{color:#fff;background:#005ccc;}
+/* right part */
+.right_part{margin:0;background-size:cover;filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(	src='../img/main/header_nav_right1.png',	sizingMethod='scale');;border:solid 0px;}
+.right_part .nav_r_item_start, .nav_r_item_end{width:40px;height:50px;border:solid 0px;}
+.right_part .nav_r_item{height:50px;margin-left:0px;border:solid 0px}
+
+.nav_r_item .drop-down-list-tip .list-group a.list-item{font-size:14px;font-weight:normal;}
+.nav_r_item .drop-down-list-tip .list-group a.list-item:hover{font-size:14px;font-weight:normal;}
+
+/* right part > a */
+.right_part .nav_r_item a{padding:0;margin:20px 10px 0px 10px;line-height:14px;
+	color:#fff;font-size:14px;font-weight:bold;border:solid 0px;}
+.right_part .nav_r_item a:hover{color:#fff;font-weight:bold;background:none;}
+.right_part .nav_r_item a:visited{color:#fff;background:none;}
+.right_part .nav_r_item a:hover{background:none;}
+.right_part .nav_r_item a:visited{background:none}
+.right_part .nav_r_item a:hover{background:none}
+.right_part .nav_r_item a:focus{background:none}
+.main_layout{margin:0;padding:0;}
+/* ------ Left Menu ------ */
+.left_menu{position:fixed;top:0px;bottom:0px;left:0px;padding:0px 0px 0px 0px;border:solid 0px;}
+.left_menu .logo{height:80px;background:#2e77e6;padding-top:20px;text-align:center}
+.left_menu .left_navbar{position:absolute;top:80px;bottom:0;left:0;right:0;border-right:1px solid #f2f2f2}
+.left_menu .list-group .active{background:#3385FF;padding:18px 12px 18px 12px;}
+.left_menu .list-group .item_selected{background:#E5F0FF;}
+.left_menu .list-group .list-group-item{font-size:14px;border:none}
+.left_menu .list-group .group_title{background:#216FDC;font-size:14px;height:36px;color:#C3DCFE;border:0;border-top:solid 1px #528EE3;text-align:center;padding:6px 0;}
+.left_menu .list-group .list-group-item h5{font-weight:bold;}
+.left_menu .list-group .list-group-item:first-child{border-top-left-radius:0px;border-top-right-radius:0px;}
+.left_menu .list-group .list-group-item .badge{background:#ff6600;}
+.left_menu .list-group .list-group-item .menu_item_icon{float:right;}
+.left_menu .list-group .sec_menu_item{margin:0px;padding:0px;border:0px;}
+.left_menu .list-group .sec_menu_item .sec_menu_content{background:#e6e6e6;}
+.left_menu .list-group .sec_menu_item .sec_menu_content .iconfont{font-size:12px;}
+.left_menu .list-group .sec_menu_item .sec_menu_content a{font-size:12px;}
+.left_menu .list-group .sec_menu_item .sec_menu_content .panel-body{padding:0}
+
+/* ------ Main Area ------ */
+.main_area{position:fixed;top:0;right:0px;bottom:0px;padding:0px 0px 0px 0px;border:solid 0px;background:#fff;}
+.mainArea_nav{height:50px;background:#3385ff}
+/* breadcrumb */
+.main_area .breadcrumb{margin:0px;border-bottom:solid 1px #e6e6e6;border-radius:0px;background:#e6e6e6;color:#777;padding:0;height:30px;line-height:30px}
+.main_area .breadcrumb>strong{color:#777;}
+/* frame area */
+.main_area .frame_area{position:absolute;top:80px;right:0px;bottom:0px;left:0px;margin:0px;border:solid 0px;}
+.main_area .frame_area iframe{width:100%;height:100%;border:solid 0px;}
+
+.fold_btn{position:absolute;top:50px;left:0px;display:inline-block;height:30px;line-height:30px;}
+
+.dialog-resetPwd{width:600px;height:400px;}
+.dialog-msgShow{width:900px;height:600px}
+
+.chooseUser{width:1200px;height:600px;}
+.dialog-viewcyle{width:900px;height:500px;}
+#leftMenu *{color:#00542a}
+.navbar-brand{padding:9px 15px}
+.dlog-site-detail{width:1000px;height:600px;}
+.left_menu .list-group>div>a>.icon_jiahaojianhoa:before{content:"\e74c"}
+.left_menu .list-group>div>a.collapsed>.icon_jiahaojianhoa:before{content:"\e74b"}
+.left_menu .list-group>div>a{background:#2e77e6;color:#fff !important}
+.left_menu .list-group>div>a:hover{color:#fff !important}
+.left_menu .list-group>div>a:hover *{color:#fff !important}
+.left_menu .list-group>div>a *{color:#fff !important}
+.left_menu .list-group>div>a.collapsed{background:none;color:#00542a !important}
+.left_menu .list-group>div>a.collapsed *{color:#00542a !important}
+.list-group-item{border:none !important}
+</style>
+<link rel="stylesheet" type="text/css" href="../js/DropDownList-1.2/DropDownList.css"/>
+</head>
+
+<body  id="ng-app" ng-app="pmsWeb" ng-controller="mainCtrl">
+	<div class="container-fluid">
+		<div class="col-sm-2 left_menu">
+			 <div class="logo">
+			 	<img src="../img/logo/logo.png"/>
+			 </div>
+			  <div class="left_navbar">
+			 	<div class="list-group" id="leftMenu">
+					<!-- MENU ITEMS -->
+					<a ng-repeat-start="item in leftModules" ng-if="item.children.length==0" 
+						ng-click="selectLeftMdu(item)" ng-class="{'list-group-item':true, item_selected:item.isSelected}"
+						href="{{item.url}}" target="main_frame">
+						<span class="{{item.moduleIcon}}" style="color:#3385ff"></span>&nbsp;&nbsp;{{item.moduleName}}</a>
+					<!-- HAVE CHILDREN -->
+					<div ng-if="item.children.length>0" class="panel panel-default sec_menu_item" ng-repeat-end>
+						<a href="#item{{item.moduleCode}}" id="menu_{{item.moduleCode}}" ng-click="dropDownMenuContent(item)" class="list-group-item" data-toggle="collapse" data-parent="#leftMenu">
+							<span class="{{item.moduleIcon}}" style="color:#3385ff"></span>&nbsp;&nbsp;{{item.moduleName}} <span class="iconfont menu_item_icon icon_jiahaojianhoa"></span>
+						</a>
+						<div id="item{{item.moduleCode}}" class="collapse sec_menu_content">
+							<div class="panel-body">
+								<a ng-repeat="subItem in item.children" ng-click="selectLeftMdu(subItem)" 
+									ng-class="{'list-group-item':true, item_selected:subItem.isSelected}"
+									href="{{subItem.url}}" target="main_frame">
+									<span class="{{subItem.moduleIcon}}"></span>&nbsp;&nbsp;{{subItem.moduleName}}</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			 </div>
+		</div>
+		<div class="col-sm-10 main_area">
+			<div class="mainArea_nav">
+				<ul class="nav navbar-nav navbar-left left_part">
+					<li ng-repeat="item in fnModules" ng-class="{nav_l_item:true, item_selected:item.isSelected}">
+						<a href="javascript:" ng-click="selectModule(item)">{{item.moduleName}}</a>
+					</li>
+					<li class="nav_l_item_end">&nbsp;</li>
+				</ul>
+				<!--向右对齐-->
+				<ul class="nav navbar-nav navbar-right right_part">
+					<li class="nav_r_item_start">&nbsp;</li>
+					<li class="nav_r_item"><img src="../img/main/news.png" style="margin: 20px 10px 0 0 ;cursor:pointer;width: 20px;" ng-click="showNews()"></li>
+					<li class="nav_r_item"><a href="javascript:" id="userInfo"><span class="glyphicon glyphicon-user"></span> {{userData.employeeName}}({{userData.unitName}})</a></li>
+					<li class="nav_r_item"><a href="javascript:doLogout()" id="logout"><span class="glyphicon glyphicon-log-out"></span> 注销</a></li>
+					
+					<li class="nav_r_item_end" style="margin-top:15px;"><img onclick="quanping()" title="全屏" src="../img/quanpin.png" style="cursor: pointer;"></li>
+				</ul>
+			</div>
+			<ul class="breadcrumb">
+				<a class="fold_btn" href="javascript:onFold()" title="折叠/显示">
+					<img id="fold_img" src="../img/main/mianbaoxue.png" width="27px"/>
+				</a>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<li ng-repeat="item in position" style="margin-left:20px">
+					{{item.moduleName}}
+				</li>
+				<li class="active">
+					{{selectedLeftModule.moduleName}}
+				</li>
+			</ul>
+			<div class="frame_area">
+				<iframe id="main_frame" name="main_frame" src="welcome.html" frameborder=0></iframe>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var app = angular.module("pmsWeb", []);
+	app.controller("mainCtrl", function($scope, $http){
+		/* init */
+		$scope.userData = {};
+		$scope.fnModules = [];
+		$scope.leftModules = [];
+		
+		$scope.selectedModule={};
+		$scope.selectedLeftModule={};
+		$scope.position=[];
+		
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		$scope.userData = jQuery.parseJSON(userDataStr);
+		var ticket = $.cookie("pmsWeb_ticket");
+		/* load modules */
+		$http.get(serviceBasePath+"eap/pmsServices/loginService/moduleTree?account="
+			+encodeURIComponent($scope.userData.accountName)+"&ticket="+ticket).success(function(response) {/*encodeURIComponent(*/
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$scope.fnModules = response.list;
+			// init top menu and left menu
+ 			$scope.fnModules[0].isSelected=true;
+ 			$scope.selectedModule=$scope.fnModules[0];
+ 			$scope.leftModules=$scope.fnModules[0].children;
+ 			// init position
+ 			lazyCall('t1',function(){
+				$("#leftMenu a:eq(0)").click();
+			}, 200);
+ 			$scope.position = [{moduleName:"主页"}];
+		});
+		/* Top menu select event */
+		$scope.selectModule=function(module){
+			$scope.selectedModule.isSelected=false;
+			module.isSelected=true;
+			$scope.selectedModule=module;
+			
+			$scope.leftModules=module.children;
+			lazyCall('t1',function(){
+				$("#leftMenu a:eq(0)").click();
+				var href = $("#leftMenu a:eq(0)").attr("href");
+				if(href && href!="" && href!="javascript:" && href!="javascript:void(0)" && href.indexOf("#")==-1){
+					$("#main_frame").attr("src", href);
+				}
+			}, 100);
+
+		};
+		/* Left menu select event */
+		$scope.selectLeftMdu=function(module){
+			$scope.selectedLeftModule.isSelected=false;
+			module.isSelected=true;
+			$scope.selectedLeftModule=module;
+			/* Position */
+			$scope.position = getParentsArray($scope.fnModules, module.parentModuleCode);
+		};
+		$scope.dropDownMenuContent=function(item){
+			lazyCall('t2',function(){
+				var $thirdMenuItem = $("#menu_"+item.moduleCode).next().find("a:eq(0)");
+				if(!$thirdMenuItem.hasClass("item_selected")){
+					$thirdMenuItem.click();
+					var url = $thirdMenuItem.attr("href");
+					$("#main_frame").attr("src", url);
+				}
+			}, 200);
+		};
+		
+		$scope.showNews=function(){
+			new ShowDlog().showFrame("mainMsg/mainMsg.html", "消息", function(){
+				
+			},"dialog-msgShow");
+
+		};
+		
+		
+		$http.get(serviceBasePath+"eap/pmsServices/notice/pageList?status=1&accountCode="
+				+encodeURIComponent($scope.userData.accountCode)+"&ticket="+ticket).success(function(response) {/*encodeURIComponent(*/
+				if(response.statusCode!=200){
+					alert("请求服务器失败！");
+					return;
+				}
+				if(response.list && response.list.length>0){
+					$scope.showNews();
+				}
+				
+			});
+		
+		/* 初始化视图 */
+		new DropDownList().init({
+			mode:"tipList",
+			renderTo:"#userInfo",
+			data:[{id:1,name:"<span class='glyphicon glyphicon-info-sign'></span> 个人信息"},{id:2,name:"<span class='glyphicon glyphicon-lock'></span> 修改密码"}],
+			textField:"name",
+			height:"100px",
+			onSelected:function(res){
+				if(res.id==2){
+					// 修改密码
+// 					$("#main_frame").attr("src", "sys/resetPwd.html");
+					new ShowDlog().showFrame("sys/resetPwd.html", "修改密码", function(data){
+						if(data=="success"){
+							location.href="../login.html"
+						}
+					},"dialog-resetPwd");
+				}
+			},
+			css:{"width":100}
+		});
+	});
+	/* 获取所有父节点数据 */
+	function getParentsArray(treeData, parentModuleCode){
+		var parentsData = new Array();
+		var arrayData = new Array();
+		treeToArray(treeData, arrayData);
+		var temp = new Array();
+		findParents(arrayData, parentModuleCode, temp);
+		for(var i=temp.length-1; i>=0; i--){// 转正序
+			parentsData.push(temp[i]);
+		}
+		return parentsData;
+	}
+	/* 循环查找父节点直到底层parentModuleCode=="0" */
+	function findParents(arrayData, parentModuleCode, parentsData){
+		for(var i=0; i<arrayData.length; i++){
+			var module = arrayData[i];
+			if(module.moduleCode==parentModuleCode){
+				parentsData.push(module);
+				if(module.parentModuleCode!="0"){
+					findParents(arrayData, module.parentModuleCode, parentsData);
+				}
+			}
+		}
+	}
+	/* 树型数据转成数组型数据，方便搜索 */
+	function treeToArray(treeData, arrayData){
+		for(var i=0; i<treeData.length; i++){
+			var node = treeData[i];
+			arrayData.push(node);
+			if(node.children && node.children.length>0){
+				treeToArray(node.children, arrayData);
+			}
+		}
+	}
+	
+	var fold=0;
+	function onFold(){
+		if(fold==1){
+			$(".main_area").removeClass("col-sm-12").addClass("col-sm-10");
+			//$("#fold_img").attr("src", "../img/to_fold.png");
+			$(".left_menu").show();
+			fold=0;
+		}else{
+			$(".main_area").removeClass("col-sm-10").addClass("col-sm-12");
+			//$("#fold_img").attr("src", "../img/to_open.png");
+			$(".left_menu").hide();
+			fold=1;
+		}
+	}
+	
+	function doLogout(){
+		new ShowDlog().confirm({
+			icon:"custom",
+			iconHtml:"<img src='../img/info-icon.png' style='margin-left:30px;'/>",
+			msg:"请确认是否退出当前登录账号？",
+			ok:function(){
+				$.removeCookie("pmsWeb_ticket");
+				$.removeCookie("pmsWeb_user_data");
+				$.ajax({
+					url:serviceBasePath+"eap/pmsServices/loginService/logout",
+					success:function(){
+						location.href="../index.html";
+					}
+				});
+			},
+			cancel:function(){}
+		});
+	}
+function quanping(){
+		
+		var docElm = document.documentElement;
+		//W3C  
+		if (docElm.requestFullscreen) {  
+		    docElm.requestFullscreen();  
+		}
+		//FireFox  
+		else if (docElm.mozRequestFullScreen) {  
+		    docElm.mozRequestFullScreen();  
+		}
+		//Chrome等  
+		else if (docElm.webkitRequestFullScreen) {  
+		    docElm.webkitRequestFullScreen();  
+		}
+		//IE11
+		else if (elem.msRequestFullscreen) {
+		  elem.msRequestFullscreen();
+		}
+		
+	}
+</script>
+
+</html>

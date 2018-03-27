@@ -1,0 +1,24 @@
+*{margin: 0;padding: 0;font-family: "microsoft yahei";font-size: 14px;color:#333;}
+a{text-decoration: none;}
+ul,li{list-style:none;outline-style:none;}
+.jl_fl{float:left;}
+.jl_fr{float:right;}
+.jl_ov{overflow: hidden;}
+.jl_clear{clear:both}
+input[type="text"],input[type="password"]{text-indent: 10px;border-radius:5px;list-style: none;outline: none;height:30px;line-height:30px;}
+.jl_containter{width: 100%;}
+.jl_contion{width: 90%;margin: 0 auto;}
+.btn_loginexit{margin-left:10px;cursor: pointer;}
+.btn_loginexit:hover{color: #2AA5DF;}
+.jl_cirbtn{border-radius:20px;padding:5px 25px;display:inline-block;margin-right:20px;cursor:pointer}
+.jl_cirbtn.return{border:1px solid #2aa5e0;color:#2aa5e0}
+.jl_cirbtn.upload{background:#2aa5e0;color:#fff}
+.jl_cirbtn.upload img{margin-right:5px}
+.jl_mediawarp{overflow:hidden;margin-top:30px}
+.jl_media{float:left;margin-right:20px;width:130px;text-align:center;}
+.jl_media img{margin-bottom:20px;cursor:pointer}
+.jl_media label{display:block;text-align:center;width:109px;height:109px;}
+.jl_media label .fileNameLay{position:absolute;display:none;width:109px;height:109px;background:rgba(0,0,0,0.5);color:#fff;font-size:12px;}
+.con_center{text-align:center}
+.jl_lgbrn{padding: 8px 40px;}
+

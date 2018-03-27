@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title> </title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+	<script src="../../js/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/bxyw1.css"/>
+	<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+	<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="../../js/PageBar.js"></script>
+	<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css"/>
+	<script type="text/javascript" src="../../js/Calendar.js"></script>
+	<script type="text/javascript" src="../../js/config.js"></script>
+	<script type="text/javascript" src="../../js/util.js"></script>
+	<script type="text/javascript" src="../../js/ViewState.js"></script>
+	<script type="text/javascript" src="../../js/ng-base.js"></script>
+	<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+	<script type="text/javascript" src="../../js/eapJs/core/eap.core.js" ></script>
+	<script type="text/javascript" src="../../js/eapJs/plugins/eap.tip.js" ></script>
+	<script type="text/javascript" src="../../js/eapJs/plugins/eap.validate.js"></script>
+	<script type="text/javascript" src="../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/validate.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/edit.css"/>
+	
+	<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+	
+	<style>
+		header{position:fixed;z-index:10}
+		section{padding:60px 0 65px 0}
+		.sort li{text-align:center}
+		.fenye_warp span.fen_btn{padding: 8px 9px;line-height: normal;background: #ededed;color:#a7a7a7}
+		.fl{height:inherit}
+		.filter li .filter_no{width: 47%;}
+		.dblist_cons .martp5 span.do{display:inline-block;width:23%;text-align:center}
+		.mr_20{margin-top:20px}
+		.more_filter{text-align:center;color:#02a2ff}
+		.disnone{display:none}
+		#date{width:200px;height:30px;display: inline-block;border:1px solid #ccc;background:none;line-height:30px;text-indent:5px}
+		.dblist_cons .martp5 span.do{width:45%}
+		.setJudging{width:90%;min-height:400px}
+		.dlog-showPic{width:90%;min-height:500px}
+		/* add */
+		.tabUl{overflow:hidden;background:#f5f5f5}
+		.tabUl li{float:left;width:20%;text-align:center;line-height:40px;color:#717171}
+		.cur{border-bottom:2px solid #1ca3fd}
+		.tabDetail{padding:20px}
+		.imgWacth{overflow:hidden}
+		.imgWacth li{width:31%;margin-right:2%;float:left;margin-bottom:20px}
+		.imgWacth li label{text-align:center;display:block;width:100%;font-size:10px}
+		.eidtdiv {
+			text-align: center;
+			padding: 5px 0;
+			position: absolute;
+			font-family: '微软雅黑';
+			font-size: 12px;
+			height: 22px;
+			width: 60px;
+			filter: alpha(Opacity = 80);
+			-moz-opacity: 0.5;
+			opacity: 0.5;
+			background-color: black;
+		}
+		.eidtdiv a {
+			color: #fff;
+			cursor: pointer;
+		}
+		#dblist{background:#fff}
+		.shejiImg{overflow:hidden}
+		.shejiImg li{float:left;padding:8px 10px;margin-right:10px}
+		.shejiImgDetail{padding:20px}
+		.shejiImgDetail ul li label{display:block;text-align:center}
+		table, table td, table th{border:1px solid #ccc;padding:10px 5px}
+	</style>
+</head>
+<body id="dblist" ng-app="userMgr" ng-controller="userMgrCtrl">
+	<header>
+		<div class="return"><img src="../../../img/return.png"/></div>
+		创业东路001号井
+	</header>
+	<section>
+		<table width="100%" border="1" cellspacing="0" cellpadding="0" >
+				<tr>
+					<td>项目名称：</td>
+					<td colspan="3">110kV彩虹变10kV西环线</td>
+				</tr>
+				<tr>
+					<td>本次内容：</td>
+					<td>地下管线测绘</td>
+					<td>自检日期：</td>
+					<td>2015.12.20</td>
+				</tr>
+				<tr>
+					<td colspan="4">
+						<p>自检检查记录及意见：110kV彩虹变电站10kV西环线023开关出线拓扑点电缆终端头-10kV西环线主线001#杆电缆终端头，回路长580.00米，电缆型号：ZRYJV22-3*300。
+							  线路经过9个工井。
+						</p>
+						<p>剖面图：</p>
+						<img src="../../img/HK5R~O9WH6W0}72~$3A5I0Q.png" width="100%"/>
+						<p>单线图：</p>
+						<img src="../../img/8TB7KCAW(8[S@L5W[}2DHFP.png" width="100%"/>
+						<p>轨迹图：</p>
+						<img src="../../img/dasdasd.png" width="100%"/>
+						
+						<p>电缆井坐标</p>
+						<table style="margin-bottom:20px">
+							<tr>
+								<td colspan="3">自检前坐标</td>
+								<td>误差长度(米)</td>
+							</tr>
+							<tr>
+								<td>X</td>
+								<td>Y</td>
+								<td>电缆井名称</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>119.02922099 </td>
+								<td>36.73998288</td>
+								<td>10kV西环线主线001#杆</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>119.02905281 </td>
+								<td>36.74016419</td>
+								<td>创业路东001</td>
+								<td></td>
+							</tr>
+						</table>
+						<table>
+							<tr>
+								<td colspan="3">自检后坐标</td>
+								<td>误差长度(米)</td>
+							</tr>
+							<tr>
+								<td>X</td>
+								<td>Y</td>
+								<td>电缆井名称</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>119.02922099 </td>
+								<td>36.73998288</td>
+								<td>10kV西环线主线001#杆</td>
+								<td>0.2325 </td>
+							</tr>
+							<tr>
+								<td>119.02905181 </td>
+								<td>36.74016019</td>
+								<td>创业路东001</td>
+								<td>0.3797</td>
+							</tr>
+						</table>
+						<div style="margin:20px 0">
+							<p>坐标精度满足误差范围。</p>
+							<p style="margin:20px 0 0 0">
+								<span>自检人：尹玄玄  </span>
+								<span style="float:right"> 日期：2015.12.20  </span>
+							</p>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="4">
+						<div style="margin:0 0 20px 0">
+							<p>改正检查记录：</p>
+							<p>无</p>
+							<p style="margin:20px 0 0 0">
+								<span>改正人：史红玉  </span>
+								<span style="float:right"> 日期：2015.12.20  </span>
+							</p>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="4">
+						<div style="margin:0 0 20px 0">
+							<p>审核人检查记录及意见：</p>
+							<p>无</p>
+							<p style="margin:20px 0 0 0">
+								<span>审核人：王玙玲  </span>
+								<span style="float:right"> 日期：2015.12.20  </span>
+							</p>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="4">
+						<div style="margin:0 0 20px 0">
+							<p>整改措施：</p>
+							<p>无</p>
+							<p style="margin:20px 0 0 0">
+								<span>整改人：   </span>
+								<span style="float:right"> 日期：</span>
+							</p>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="4">
+						<div style="margin:0 0 20px 0">
+							<p>审核人复查意见：</p>
+							<p></p>
+							<p style="margin:20px 0 0 0">
+								<span>整改人：   </span>
+								<span style="float:right"> 日期：</span>
+							</p>
+						</div>
+					</td>
+				</tr>
+			</table>
+	</section>
+	<script type="text/javascript">
+	var app = angular.module("userMgr", []);
+	app.controller("userMgrCtrl", function($scope, $http){
+		/* init */
+		/* ngScope = $scope;
+		var urlParams = getUrlParams();
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		var viewstate = new ViewState();
+		var userData = jQuery.parseJSON(userDataStr); */
+	
+	});
+	$(".return").click(function(){
+		//window.history.back()
+		 top.viewBack();
+});	
+	</script>
+</body>
+</html>

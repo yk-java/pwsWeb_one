@@ -1,0 +1,245 @@
+<!DOCTYPE HTML>
+<html ng-app="moduleName">
+<head>
+<title> 设备管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../../js/time.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../css/list.css" />
+
+<style type="text/css">
+.dialog-images{width:1000px;height:600px;}
+.dialog-update{width:800px;height:400px;}
+.title_div2{border:solid 0px red;background:#4CA9FF;padding:8px 6px 8px 6px;}
+.title_div2 .condLayer1{display:block;border:solid 0px;margin:6px;}
+.title_div2 .condLayer2{border:solid 0px green;margin:6px;}
+.title_div2 .condLayer1 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:0 4px;padding:0 4px;font-family:微软雅黑;}
+.title_div2 .condLayer2 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:0 4px;padding:0 4px;background-color:#DAEDFF;font-family:微软雅黑;}
+.title_div2 .btn{display:inline-block;height:30px;line-height:30px;margin:0 4px;padding:0 15px 0 15px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; border-radius:4px;}
+.title_div2 .blue{background:#3385FF;color:#fff;}
+.title_div2 .blue:hover{background:#186CE7;}
+.title_div2 .pink{background:#ED7798;color:#fff;}
+.title_div2 .pink:hover{background:#E54673;}
+</style>
+</head>
+
+<body ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" id="category" class="dropDownList" style="width:180px;" placeholder="请选择项目分类"/>
+				<input type="text" id="proName" class="dropDownList" style="width:180px;" placeholder="请选择项目"/>
+				<input type="text" id="mct" class="dropDownList" style="width:180px;" placeholder="请选择总控表"/>
+				<input type="text" id="date" class="dateComponent" onclick="new Calendar().show(this)" placeholder="请选择日期"/>
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th>序号</th>
+				<th>人员姓名</th>
+				<th>操作时间</th>
+				<th>操作类型</th>
+				<th>影响记录数</th>
+				<th>客户端类型</th>
+				<th>操作描述</th>
+				<th>备注</th>
+			  </tr>
+			  <tr class="tr2">
+				<td align="center">1</td>
+				<td align="center">张三</td>
+				<td align="center">2016-10-5</td>
+ 				<td align="center"></td>
+				<td align="center">1</td>
+				<td align="center"></td>
+				<td align="center"></td>
+				<td align="center"></td>
+			  </tr>
+			   <tr class="tr2">
+				<td align="center">1</td>
+				<td align="center">张三</td>
+				<td align="center">2016-10-5</td>
+ 				<td align="center"></td>
+				<td align="center">1</td>
+				<td align="center"></td>
+				<td align="center"></td>
+				<td align="center"></td>
+			  </tr>
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		
+		$scope.theadData={};
+		$scope.dataList={};
+		$scope.cond_category="";
+		$scope.cond_categoryName="";
+		$scope.cond_proNo="";
+		$scope.cond_proName="";
+		$scope.cond_mct="";
+		$scope.cond_mctName="";
+		$scope.cond_searchName="";
+		
+		var urlParams = getUrlParams();
+		propertyChooseCopy(urlParams, $scope, ["cond_category","cond_categoryName", "cond_proNo","cond_proName", "cond_mct","cond_mctName", "cond_searchName"]);
+		if(urlParams.cond_categoryName && urlParams.cond_categoryName.length>0){
+			$("#category").val(urlParams.cond_categoryName);
+		}
+		if(urlParams.cond_proName && urlParams.cond_proName.length>0){
+			$("#proName").val(urlParams.cond_proName);
+		}
+		if(urlParams.cond_mctName && urlParams.cond_mctName.length>0){
+			$("#mct").val(urlParams.cond_mctName);
+		}
+		if(urlParams.cond_searchName && urlParams.cond_searchName.length>0){
+			$("input[name=searchName]").val(urlParams.cond_searchName);
+		}
+		if(urlParams.cond_currentPage && urlParams.cond_currentPage.length>0){
+			$scope.currentPage=urlParams.cond_currentPage;
+		}
+		
+		
+		window.onkeyup=function(e){
+			if(e.keyCode==13){
+				$scope.doQuery();
+			}
+		};
+		/* 项目分类 */
+		new DropDownList().init({
+			mode:"page",
+			renderTo:"#category",
+			url:"../../../component/projectType.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$scope.cond_category=result.categoryCode;
+				$("#category").val(result.categoryName);
+				$scope.cond_categoryName=result.categoryName;
+				proNameList.setConfig("url", "../../../component/projectList.html?categoryCode="+result.categoryCode+"&ticket="+$scope.ticket);
+			}
+		});
+		/* 项目列表 */
+		var proNameList = new DropDownList();
+		proNameList.init({
+			mode:"page",
+			renderTo:"#proName",
+			url:"../../../component/projectList.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$scope.cond_proNo=result.proNo;
+				$("#proName").val(result.proName);
+				$scope.cond_proName=result.proName;
+				mctList.setConfig("url", "../../../component/mctType.html?proNo="+$scope.cond_proNo);
+			}
+		});
+		
+		/* 项目总控表*/
+		var mctList = new DropDownList();
+		mctList.init({
+			renderTo:"#mct",
+			url:"../../../component/mctType.html?proNo="+$scope.cond_proNo,
+			onSelected:function(item){
+				$scope.cond_mct=item.mctCode;
+				$("#mct").val(item.mctName);
+				$scope.cond_mctName=item.mctName;
+				//if($scope.cond_mct!=null && $scope.cond_mct.length>0){
+					$scope.loadTheader($scope.cond_mct);
+					$scope.doQuery();
+				//}else{
+				//	callNgFn({ctrlEl:$("body")[0], ngFn:function(scope){
+				//		scope.theadData.searchFields = [];
+				//	}});
+				//}
+			}
+		});
+		
+		
+		/* 数据加载 */
+		$scope.loadData=function(mctCode, condStr, searchName){
+			var paramsData={"companyCode":$scope.userData.companyCode, 
+					"proNo":$scope.cond_proNo,
+					"attrJson":condStr, "searchName":searchName};
+			if(mctCode){
+				paramsData["mctCode"]=mctCode;
+			}else{
+				paramsData["deviceTypeCode"]="01";
+			}
+			$scope.httpExecute({
+				method:"post",
+				url:"eap/pmsServices/om/deviceMgr/device/mctDeviceList",
+				data:paramsData,
+				success:function(response){
+					$scope.dataList = response.list;
+				},
+				showPageInfo:true,
+				pageChange:function(pageNum){
+					$scope.doQuery();
+				}
+			});
+		};
+	
+		
+	
+		/* 查询 */
+		$scope.doQuery=function(mode){
+			var cond={};
+			$("input[group=cond]").each(function(){
+				var $cond = $(this);
+				var key = $cond.attr("id");
+				var val = $cond.val();
+				cond[key]=val;
+			});
+			$scope.cond_condStr=JSON.stringify(cond);
+			$scope.cond_searchName=$("input[name=searchName]").val();
+			if($scope.theadData.searchFields){
+				var vars="";
+				for(var i=0; i<$scope.theadData.searchFields.length; i++){
+					var searchField = $scope.theadData.searchFields[i];
+					if(searchField.dtype==1){
+						if(vars && vars.length>0){
+							vars+=",";
+						}
+						vars+=searchField.ename;
+					}
+				}
+				$scope.cond_searchName=vars+";"+$scope.cond_searchName;
+			}
+			//if($scope.cond_mct && $scope.cond_mct.length>0){
+				if(mode && mode=="export"){
+					$scope.exportData($scope.cond_mct, $scope.cond_condStr, $scope.cond_searchName);
+				}else{
+					$scope.loadData($scope.cond_mct, $scope.cond_condStr, $scope.cond_searchName);
+				}
+			//}
+		};
+		
+	}
+});
+</script>
+</body>
+</html>

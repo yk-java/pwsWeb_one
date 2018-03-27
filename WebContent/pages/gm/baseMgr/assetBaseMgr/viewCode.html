@@ -1,0 +1,179 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>查看二维码</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../js/JsBarcode.all.min.js"></script>
+
+
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+
+
+<style type="text/css">
+	body{
+		margin:0px;
+		padding:0px;
+		font-size:12px;
+		font-family:"微软雅黑";
+		overflow: hidden;
+	}
+	
+	a{color:#4D4D4D;text-decoration: none;}
+	
+	.form_border
+	{
+		border:1px solid #EDEDED;
+		margin: 20px;
+	}
+	.form_code{
+		margin-bottom: 5px;
+		margin-top:5px;
+		text-align: center;
+	}
+	.form_content{
+		font-size:12px;
+		font-family:"微软雅黑";
+		margin-bottom: 10px;
+	}
+	
+	.form_content table
+	{
+		width: 90%;
+		margin: 0 auto;
+	}
+	
+	.form_content table tr
+	{
+		height: 30px;
+	}
+	
+	.form_logo
+	{
+		width: 95%;
+		margin: 0 auto;
+		border-top: 1px solid #EDEDED;
+		padding: 5px;
+		text-align: center;
+	}
+	
+	.form_logo img
+	{
+		width: 30%;
+		height: auto;
+		display: inline-block;
+		margin-left: 10px;
+	}
+</style>
+</head>
+
+<body ng-app="projectType" ng-controller="userMgrCtrl">
+<form id="saveForm" class="required-validate">
+	<div class="form_border">
+		<div class="form_code">
+			<img id="barcode" class="barcode" src="" style="height: 120px;width: 100%"/>
+		</div>
+		<div class="form_content">
+			<table>
+				<tr>
+					<td width="20%">资产编号：</td>
+					<td width="30%">{{projectInfo.assetCode}}</td>
+					<td width="20%">资产名称：</td>
+					<td width="30%">{{projectInfo.assetName}}</td>
+				</tr>
+				<tr>
+					<td width="20%">资产品牌：</td>
+					<td width="30%">{{projectInfo.brand}}</td>
+					<td width="20%">资产型号：</td>
+					<td width="30%">{{projectInfo.modelNo}}</td>
+				</tr>
+			</table>
+		</div>
+		<div class="form_logo">
+			<img class="imgcode" src="../../../../img/logo.png" />
+		</div>
+	</div>
+	<!-- <div class="form_bottom" style="text-align:center;border: none;">
+		<a href="javascript:" onclick="printCode()" class="title_print" style="margin-left: 150px;">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;打印
+		</a>
+		<a href="javascript:" onclick="onCancel()" class="title_cancel">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+		</a>
+	</div> -->
+</form>
+
+</body>
+<script>
+
+	function onCancel(){
+		parent.$dlog.close();
+	}
+	
+	function printCode(){
+	}
+	
+	var ngScope;
+	var app = angular.module("projectType", []);
+	app.controller("userMgrCtrl", function($scope, $http){
+		ngScope = $scope;
+		
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		$scope.userData = jQuery.parseJSON(userDataStr);
+		var ticket = $.cookie("pmsWeb_ticket");
+		
+		var params = getUrlParams();
+		
+		var assetCode = "";
+		if(params.assetCode){
+			assetCode = params.assetCode; 
+			
+		}
+		
+		
+		/* 数据加载 */
+	$scope.loadProject=function(assetCode){
+		$http.get(serviceBasePath+"eap/pmsServices/materielMg/assetMg/asset/get?assetCode="
+			+assetCode+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../../login.html";
+				return;
+			}
+			
+			console.log(response.data);
+			$scope.projectInfo = response.data;
+			 var barcode = document.getElementById('barcode');
+			 var  str = response.data.assetCode;
+			   options = {
+			       format:"CODE128",
+			       displayValue:true,
+			       fontSize:14,
+			       height:60,
+			       lineColor:"#000"
+			   };
+			   JsBarcode(barcode, str, options);//原生
+		});
+	};
+	
+	/* 初始加载 */
+	$scope.loadProject(params.assetCode);
+	
+	});
+</script>
+
+</html>

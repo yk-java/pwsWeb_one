@@ -1,0 +1,223 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 项目管理——日常管理——资产管理——资产申请 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../../js/SimpleDateFormat.js"></script>
+
+
+<script type="text/javascript" src="../../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">资产转借变更</label> 
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+		</div>
+<!-- 		<div class="tabs"> -->
+<!-- 			<a href="#lay1" class="tab selected">项目属性</a> -->
+<!-- 			<a href="#lay2" class="tab">市场属性</a> -->
+<!-- 		</div> -->
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+				<tr>
+					<th>项目名称</th>
+					<td width="300">
+						<input type="hidden" name="rowid" value="{{data.rowid}}"/><!-- 单位 -->
+						<input type="hidden" name="loanUnitCode" value="{{data.loanUnitCode}}"/><!-- 单位 -->
+						<input type="hidden" name="loanUnitName" value="{{data.loanUnitName}}"/><!-- 单位名称 -->
+						<input type="hidden" name="loanProNo" value="{{data.loanProNo}}"/><!-- 项目编号 -->
+						<input type="text" name="loanProName" value="{{data.loanProName}}" class="readonly" readonly="readonly"/><!-- 选择项目名称 -->
+					</td>
+					<th>原借用人</th><!-- 选择 -->
+					<td width="300">
+						<input type="hidden" name="loanEmployeecode" value="{{data.loanEmployeecode}}"/>
+						<input type="text" name="loanEmployeename" value="{{data.loanEmployeename}}" class="readonly" readonly="readonly" maxlength="32"/>
+					</td>
+				</tr>
+				<tr>
+					<th>借用时间</th>
+					<td>
+						<input type="text" name="rentDate" class="readonly" readonly="readonly" value="{{data.rentDate}}"/>
+					</td>
+					<th>借用天数</th>
+					<td><input type="text" name="days" class="readonly" readonly="readonly" value="{{data.days}}"/></td>
+				</tr>
+				<tr>
+					
+					<th>备注说明</th>
+					<td colspan="3">
+						<textarea cols="82" rows="3" class="readonly" readonly="readonly">{{data.remarks}}</textarea>
+					</td>
+				</tr>
+				<tr>
+					<th>转借人</th>
+					<td colspan="3">
+						<input type="hidden" name="changeLoanEmployeecode"/>
+						<input type="text" name="changeLoanEmployeename" class="required dropDownList" maxlength="32"/>
+					</td>
+				</tr>
+			</table>
+			
+		</div>
+
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;提交
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+var validator;
+var ngScope;
+var userData;
+
+var params_proNo="",params_proName="",params_assetCode="";
+simpleController({
+	moduleName:"userMgr",
+	controllerName:"userMgrCtrl", 
+	init:function($scope, $http){
+		/* init */
+		ngScope = $scope;
+		$scope.curUnit={};
+		$scope.userList=[];
+		
+		$scope.data={};
+		
+		var urlParams = getUrlParams();
+		ticket = $scope.ticket;
+		var fmt = new SimpleDateFormat({formatString:"yyyy-MM-dd"});
+		//$("input[name=rentDate]").val(fmt.format(new Date()));
+		$("input[name=estimateReturnDate]").val(fmt.format(new Date(new Date().getTime()+1000*60*60*24*30)));
+		
+		/* 表单验证 */
+		validator = $("#saveForm").validate({
+			onsubmit: false,
+			focusInvalid: false,
+			focusCleanup: true,
+			errorElement: "span",
+			ignore:".ignore",
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {
+				} 
+			}
+		});
+		
+		
+		/* 加载数据 */
+		$scope.loadData=function(){
+			$scope.httpGet({
+						url:"eap/pmsServices/pm/everydayMgr/assetsMgr/gmAssetRent/get?rowid="+urlParams.rowid,
+						success:function(resp){
+							$scope.data = resp.data;
+							
+							var rentDate = $scope.data.rentDate;
+							var rentDate_d = new SimpleDateFormat({formatString:"yyyy-MM-dd"}).parse(rentDate);
+							var now = new Date();
+							var time = now.getTime() - rentDate_d.getTime();
+							var days = time/1000/3600/24;
+							$scope.data.days=parseInt(days);
+							
+							/* 项目下成员列表 */
+							new DropDownList().init({
+								renderTo:"input[name=changeLoanEmployeename]",
+								url:"../../../component/chooseEmployeeInProject.html?proNo="+$scope.data.loanProNo+"&ticket="+ticket,
+								height:"200px",
+								onSelected:function(result){
+									var code = result[0].employeeCode;
+									var name = result[0].employeeName;
+									$("input[name=changeLoanEmployeename]").val(name);
+									$("input[name=changeLoanEmployeecode]").val(code);
+									$("input[name=changeLoanEmployeename]").focus();
+								}
+							});
+						}
+			});
+		};
+		
+		/* 保存 */
+		$scope.onSave = function(){
+			//{"rowid":rowid, "changeLoanEmployeecode":changeLoanEmployeecode, "changeLoanEmployeename":changeLoanEmployeename}
+			var formData = $("#saveForm").serialize();
+			if($("#saveForm").valid()){
+				$.ajax({
+					url:serviceBasePath+"eap/pmsServices/pm/everydayMgr/assetsMgr/gmAssetRent/rentChange",
+					cache:false,
+					method:"POST",
+					data:formData,
+					success:function(res){
+						if(res.statusCode==200){
+							new ShowDlog().prompt({msg:"转借成功！",
+								done:function(){
+									parent.$dlog.data="SUCCESS";
+									parent.$dlog.close();
+								},
+								t:1500
+							});
+						}else{
+							//
+						}
+					},
+					error:function(){
+						
+					}
+				});
+			}else{
+	// 			new ShowDlog().prompt({
+	// 				icon:"warning",
+	// 				msg:"表单填写异常，请检查修正!",
+	// 				done:function(){
+						
+	// 				},
+	// 				t:2500
+	// 			});
+			}
+		};
+		
+		/* 取消 */
+		$scope.onCancel = function(){
+			parent.$dlog.close();
+		};
+		
+		$scope.loadData();
+	}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+*{padding: 0;margin: 0;font-family:"microsoft yahei";font-size: 14px;color:#666666}
+body{background: #f5f5f5;}
+ul,li{list-style: none;}
+a{text-decoration: none;}
+.ov{overflow: hidden;}
+.fl{float:left;}
+.fr{float:right;}
+header{ width: 100%;height:60px;background: #02a2ff;text-align: center;line-height: 60px;position: relative;font-size: 20px;color: #fff;}
+header .return img{width:13px;}
+header .newadd img{width:24px;}
+header .return{position: absolute;left:10px;top:8px;width: 23px;height: 41px;}
+header .newadd{position: absolute;right:10px;top:9px;width: 32px;height: 32px;}
+.cz_selpx{border-bottom:1px solid #02a2ff;background: #fff;}
+.cz_selpx li{width:50%;line-height:50px;cursor:pointer;text-align:center;}
+.cz_selpx li.fl{background:url(../images/sxbg.png) no-repeat center right;}
+.cz_selpx li img{margin-left: 10px;}
+.con_list{background: #fff;margin-top: 10px;padding:10px;}
+.con_list .title{background: url(../images/task_icon.png) no-repeat center left;padding-left:30px;color:#02a2ff;font-size: 18px;}
+.con_list .title img{float: right;margin-top: 2px;}
+.con_list .con_mes{margin-top: 20px;margin-left: 30px;}
+.con_list .con_mes span img{width:15px;margin-right: 10px;}
+.con_list .con_mes span.fl{width: 60%;}
+.con_list .con_mes span.fr{width: 40%;}
+.con_list .con_status{margin-left: 30px;margin-top: 20px;}
+.con_list .con_status a{display: inline-block;width: 14px;height: 14px;background: #999999;border-radius:50%;margin-right: 10px;}
+.con_list .con_status a.finish{background: #02a2ff;}
+.con_list .con_status a.chaoqi{background: #ff3600;}
+.con_list .con_status a.common{background: #97ff02;}
+.con_list .con_status span{margin-right: 20px;}
+footer{background: #fff;position: fixed;bottom: 0;width: 100%; border-top:1px solid #02a2ff ;}
+footer p{text-align:center;margin: 20px auto; width: 90%;}
+footer p img{margin-top: 5px;}
+footer p span{color:#02a2ff;font-size: 18px;}
+.filter li{background: #fff;border-bottom: 1px solid #ccc;height:40px;line-height: 40px;}
+.filter li .filter_con{width:90%;margin: 0 auto;}
+.filter li .tspan{margin-right:20px;}
+.filter li img.fl{width: 20px;height: 20px;margin: 10px 5px 0 0;}
+.filter li .filter_no{margin-right:8px;}
+.sort li{height:40px;line-height: 40px;background: #fff;}
+.sort li .sort_no{width:90%;margin: 0 auto;}
+.sort li .sort_no img{margin-top: 10px;}
+.sort li:hover{background: #ccc;}
+/*任务详情*/
+.tast_warp{width: 100%;}
+.tast_warp .title_con{background: #fff;}
+.tast_warp .title_con .titlep{line-height:50px;font-size: 18px;width: 90%;margin: 10px auto 0;}
+.tast_warp .base_warp{background: #fff;}
+.b_bline{border-bottom: 1px solid #02a2ff;}
+.tast_warp .base_msg{width:90%;margin: 0 auto;}
+.tast_warp .base_msg p{margin-bottom:15px;}
+.tast_warp .base_msg p span{display: inline-block;width: 5px;height:5px;border-radius:50%;background:#02a2ff;margin-right: 10px;}
+.tast_warp .base_msg p a{font-size: 16px;color: #000;margin-left: 10px;}
+.tast_warp .on_off{text-align: center;padding:5px 0;cursor: pointer;}
+.tast_nav{background: #fff;margin-top: 10px;}
+.tast_nav ul li{width:49%;text-align: center;line-height:40px;cursor: pointer;border-bottom:1px solid #ccc}
+.tast_nav ul li.active{border-bottom:1px solid #02a2ff}
+.gz_con .sel_gz{background: #fff;}
+.gz_con .sel_gz span{display: inline-block;width:49%;}
+.gz_con .sel_gz span.frist{background:url(../images/sxbg.png) no-repeat center right;}
+.gz_con .sel_gz span select{width:99%;border: #fff;line-height: 40px;height: 40px;text-indent:2%;}
+.gz_con .sel_gz span input{width: 99%;line-height: 40px;height: 40px;text-indent:2%;border: none;}
+.gz_con .gz_decon textarea{width: 100%;height: 100px;text-indent:2%;border: none;margin-top: 5px;}
+.bor_top{border-top: 1px solid #ccc;}
+.up_load{ width: 90%;margin:30px auto 20px;cursor: pointer;}
+.up_load a{display: block;width: 100%;background: #02a2ff;color: #fff;text-align: center;line-height: 40px;}
+.gz_con .sel_gz .tip{width: 100%;text-indent: 2%;}
+.gz_con .sel_gz .tip input{width:85%}
+.update_ing{background: #fff;padding: 20px;margin-top: 10px;}
+.update_ing img{margin-right: 10px;}
+
+/*新增表箱*/
+.form_list{background: #fff;margin-top: 10px;padding:20px 0;}
+.form_list .detail_con{margin: 10px auto 10px; width:90%;}
+.form_list .detail_con input,.form_list .detail_con select{text-indent:2%;border:none;width:55%;height:30px;line-height:30px;border:1px solid #f5f5f5;}
+.form_list .detail_con label{display:inline-block; width:25%;text-align:right;line-height:30px;color:#02a2ff;}
+
+
+/*表箱验收详情*/
+#bxys_details .tast_nav .fl{width:50%;}
+.mr10{margin-left:10px;}
+#bxys_details .bxys_warp{background:#fff;}
+#bxys_details .bxys_warp p.titlep{line-height:50px;font-size:18px;width:90%;margin:0 auto;}
+#bxys_details .bxys_no1{background:#fff;padding:10px 0;margin-top:10px;}
+#bxys_details .bxys_no1 .bxys_wma1{width:95%;margin:15px auto 15px;}
+#bxys_details .bxys_no1 .bxys_wma2{width:95%;margin:15px auto 15px;}
+#bxys_details .bxys_no1 .bxys_wma2 .fl{width:50%;}
+#bxys_details .bxys_no1 .bxys_wma2 span,#bxys_details .bxys_no1 .bxys_wma1 span{color:#02a2ff;}
+
+/*信息采集*/
+.bxys_wma1 span.mesadd{display: inline-block;width:30%;text-align: right;}
+.bxys_wma1 img{width: 17px;margin:0 0 0 3%;}
+.bxys_wma1 input{width:50%;height:30px;line-height:30px;text-indent:5px;}
+.disn{display:none;}
+.yes{width: 12px;}
+
+
+.timesel{background: url(../images/task_time_icon.png) no-repeat right center; background-size: 10%;}
+
+.cha{background:url(../img/deviceAdd/t_cha2.png) no-repeat right center;}
+
+
+
+
+
+
+
+
+
+

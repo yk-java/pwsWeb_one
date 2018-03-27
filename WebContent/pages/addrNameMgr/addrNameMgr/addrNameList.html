@@ -1,0 +1,157 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>地名目录</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	
+</style>
+</head>
+
+<body>
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">地名目录</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<div class="tabs">
+			<a href="#lay1" class="tab selected">地名目录列表</a>
+			
+		</div>
+		<div class="table_div">
+			<table class="table" width="60%" cellspacing="0" cellpadding="0" style="margin:20px auto;min-width:600px">
+			    <tbody>
+			    	<tr class="tr1">
+						<th width="2%"><div align="center">序号</div></th>
+						<th width="25%"><div align="center">地名代码</div></th>
+						<th width="15%"><div align="center">标准地名</div></th>
+						<th width="15%"><div align="center">类别名称</div></th>
+					</tr>
+			        <tr class="tr2">
+			            <td align="center">1</td>
+			            <td align="center">42082199921410000000</td>
+			            <td align="center">黄台村名居委会</td>
+			            <td align="center">村名居委会</td>
+			        </tr>
+			        <tr class="tr2">
+			            <td align="center">2</td>
+			            <td align="center">42082110022100000001</td>
+			            <td align="center">金色家园</td>
+			            <td align="center">城镇居民点</td>
+			        </tr>
+			        <tr class="tr2">
+			            <td align="center">3</td>
+			            <td align="center">42082111022200000019</td>
+			            <td align="center">纸厂湾</td>
+			            <td align="center">农村居民点</td>
+			        </tr>
+			        <tr class="tr2">
+			            <td align="center">4</td>
+			            <td align="center">42082110023220000001</td>
+			            <td align="center">京山汽车中心客运站</td>
+			            <td align="center">长途汽车站</td>
+			        </tr>
+			        <tr class="tr2">
+			            <td align="center">5</td>
+			            <td align="center">42082111423220000000</td>
+			            <td align="center">雁门口客运站</td>
+			            <td align="center">长途汽车站</td>
+			        </tr>
+			        <tr class="tr2">
+			            <td align="center">6</td>
+			            <td align="center">42082110023320000000</td>
+			            <td align="center">京山火车站</td>
+			            <td align="center">火车站</td>
+			        </tr>
+			        <tr class="tr2">
+			            <td align="center">7</td>
+			            <td align="center">42082110023610000004</td>
+			            <td align="center">莲山河二号侨</td>
+			            <td align="center">桥梁</td>
+			        </tr>
+			        <tr class="tr2">
+			            <td align="center">8</td>
+			            <td align="center">42082110026230000003</td>
+			            <td align="center">惠婷水库</td>
+			            <td align="center">水库</td>
+			        </tr>
+			        <tr class="tr2">
+			            <td align="center">9</td>
+			            <td align="center">42082110025110000002</td>
+			            <td align="center">小焕岭</td>
+			            <td align="center">事件纪念地</td>
+			        </tr>
+			        <tr class="tr2">
+			            <td align="center">10</td>
+			            <td align="center">42082111025110000000</td>
+			            <td align="center">张文秋故居</td>
+			            <td align="center">人物纪念地</td>
+			        </tr>
+			          <tr class="tr2">
+			            <td align="center">11</td>
+			            <td align="center">42082110025200000000</td>
+			            <td align="center">文峰公园</td>
+			            <td align="center">公园</td>
+			        </tr>
+			          <tr class="tr2">
+			            <td align="center">12</td>
+			            <td align="center">42082199925200000000</td>
+			            <td align="center">湖北虎爪山森林公园</td>
+			            <td align="center">公园</td>
+			        </tr>
+			          <tr class="tr2">
+			            <td align="center">13</td>
+			            <td align="center">42082110825300000000</td>
+			            <td align="center">绿林山风景区</td>
+			            <td align="center">风景区</td>
+			        </tr>
+			          <tr class="tr2">
+			            <td align="center">14</td>
+			            <td align="center">42082110026310000000</td>
+			            <td align="center">人民广场</td>
+			            <td align="center">广场</td>
+			        </tr>
+			          <tr class="tr2">
+			            <td align="center">15</td>
+			            <td align="center">42082110027100000001</td>
+			            <td align="center">京山县交通运输局</td>
+			            <td align="center">党政机关</td>
+			        </tr>
+			          <tr class="tr2">
+			            <td align="center">16</td>
+			            <td align="center">42082110026100000001</td>
+			            <td align="center">玉丰国际大酒店</td>
+			            <td align="center">房屋</td>
+			        </tr>
+			        
+			    </tbody>
+			</table>
+		</div>
+	</div>
+</div>
+</body>
+</html>

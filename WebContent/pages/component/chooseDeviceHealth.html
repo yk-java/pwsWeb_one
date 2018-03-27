@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 首页 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<style type="text/css">
+body{background:#fff;margin:0;padding:0;}
+.projectList{margin:0px;padding:0;}
+.projectList>li{margin:0px;}
+.projectList>li>a{display:block;padding:4px;line-height:26px;font-size:12px;font-family:微软雅黑;color:#666;text-decoration:none;}
+.projectList>li>a:hover{background:#3470CC;color:#fff;cursor:default;}
+</style>
+</head>
+
+<body ng-app="projectList" ng-controller="projectListCtrl">
+	<ul class="projectList">
+		<li ng-if="required!='true'">
+			<a href="javascript:" ng-click="onChooseBlank()">(全部)</a>
+		</li>
+		<li ng-repeat="item in projectList">
+			<a href="javascript:" ng-click="onChoose(item)">{{item.healthName}}</a>
+		</li>
+	</ul>
+	<script type="text/javascript">
+	var ngScope;
+	var app = angular.module("projectList", []);
+	app.controller("projectListCtrl", function($scope, $http){
+		/* init */
+		ngScope = $scope;
+		$scope.projectList=[];
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		$scope.userData = jQuery.parseJSON(userDataStr);
+		var ticket = $.cookie("pmsWeb_ticket");
+		
+		var params = getUrlParams();
+		
+		var proNo = "";
+		if(params.proNo){
+			proNo = params.proNo; 
+		}
+		$scope.required = params.required;
+		var accountCode="";
+		/* 根据角色判断是否传accountCode */
+		if($scope.userData.roleCode=="004"){
+			accountCode=$scope.userData.accountCode;
+		}
+		
+		/* 加载数据 */
+		$http.get(serviceBasePath+"eap/pmsServices/pm/taskMgr/deviceHealth/listAll?proNo="+proNo+"&companyCode="+$scope.userData.companyCode+"&ticket="+ticket).success(function(res){
+			if(res.statusCode==200){
+				$scope.projectList = res.list;
+			}else if(res.statusCode==401){
+				window.parent.location.href="../login.html";
+			}
+		});
+
+		/* 选择 */
+		$scope.onChoose=function(obj){
+			window.frameElement.callback(obj);
+			window.frameElement.close();
+		};
+		/* 选择空白 */
+		$scope.onChooseBlank=function(){
+			var obj=new Object();
+			obj.healthName="";
+			obj.healthCode="";
+			window.frameElement.callback(obj);
+			window.frameElement.close();
+		};
+		
+	});
+	</script>
+</body>
+</html>

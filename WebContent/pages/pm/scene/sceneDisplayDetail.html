@@ -1,0 +1,358 @@
+<!DOCTYPE HTML>
+<html ng-app="realPosition">
+<head>
+<title>实时监控 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=PL4wfqVofjrMVz7FMaPs8Dts"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/common.css" />
+<style type="text/css">
+	body{
+		margin:0px;
+		padding:0px;
+		font-size:12px;
+		font-family:"微软雅黑";
+	}
+	a{color:#4D4D4D;text-decoration: none;}
+
+	.list{position: absolute;left:13px;right:13px;top:13px;bottom:10px;border:solid 0px;}
+	.list .list_left{position: absolute;left:10px;top:0px;bottom:0px;width:390px;}
+	.list .list_left .left_title{width:100%;height:130px;background:#297BE6;}
+	.list .list_left .left_title > input{margin:20px 6px 0 6px;}
+	.list .list_left .left_title .search_div{width:60px;height:38px;background:#1A4F93;color:#fff;line-height:40px;text-align:center;float:left;margin-left:10px;margin-top:20px;font-size:14px;font-weight: bold;}
+	.list .list_left .left_content{position: absolute;left:0px;right:0px;top:130px;bottom:0px;border-bottom:solid 1px #B2D1FF;}
+	.list .list_left .left_content .content_table{width:100%;top:0px;bottom:45px;}
+	.list .map_div{position: absolute;left:410px;top:0px;bottom:0px;right:0px;border:solid 1px #cccccc;}
+
+	.table,.table td,.table th{border:1px solid #EDEDED;border-collapse:collapse;}
+	.tr1{height:40px;background:#D9E9FF;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;font-weight:normal;}
+	.tr2{height:40px;background:#fff;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.tr2:hover{background:#F5F5F5;}
+	.tr3{height:40px;background:#F5F5F5;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.tr3:hover{background:#F5F5F5;}
+	.tr4{height:40px;background:#EFD397;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.operationImg{cursor: pointer;}
+
+	.paging_div{bottom:10px;width:390px;height:22px;;margin:0 auto;border:solid 0px;color:#4D4D4D;text-align:center;margin-top:10px;}
+	.dropDownList{background-image:url(../../../img/drop_down_list.png);background-repeat: no-repeat;background-position:right;cursor:pointer;}
+
+	#page_bar .page_btn_prev{display:inline-black;border:solid 1px #3385FF;background:#3385FF;color:#fff;margin:0 4px;padding:2px 5px 2px 5px;}
+	#page_bar .page_btn_next{display:inline-black;border:solid 1px #3385FF;background:#3385FF;color:#fff;margin:0 4px;padding:2px 5px 2px 5px;}
+	#page_bar .page_btn{display:inline-black;border:solid 1px #3385FF;margin:0 4px;padding:2px 5px 2px 5px;}
+	#page_bar .selected{font-weight:bold;border:solid 1px #666;background:#666;color:#fff;}
+
+.dlog-showPic{width:1000px;height:500px;}
+	
+	.table td{cursor:pointer;}
+</style>
+</head>
+
+<body ng-controller="realPositionCtrl" storagekey="realPosition">
+	
+	<div class="list">
+		<div class="list_left">
+			<div class="left_title" style="height: 75px;">
+				<div style="float: left;height: 75px;">
+					<span  style="color:#FFFFFF; display: block;font-family: 微软雅黑;font-size: 20px;text-align: center;line-height: 75px;margin-left: 50px;">人数：{{dots}}</span>
+				</div>
+				<input type="button" class="btn" value="全屏" ng-click="doQuery()" style="float: right;margin-right: 50px;margin-top: 22px;">
+			</div>
+			<div class="left_content" style="top: 75px;overflow-y:auto;">
+				
+				<div class="content_table">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+					   <tr class="tr1">
+						<th><div align="center">序号</div></th>
+						<th><div align="center">姓名</div></th>
+					  </tr>
+					  <tr class="tr2" ng-repeat="item in infoList" >
+						<td><div align="center">{{$index+1}}</div></th>
+						<td><div align="center">{{item.WORKER_NAME}}</div></td>
+					  </tr>
+					 </table>
+				</div>
+
+				<div id="page_bar" class="paging_div">
+				</div>
+			</div>
+		</div>
+		<div class="map_div" id="allmap">
+			
+		</div>
+	</div>
+<script type="text/javascript">
+
+var weekday=new Array(7)
+weekday[0]="星期天"
+weekday[1]="星期一"
+weekday[2]="星期二"
+weekday[3]="星期三"
+weekday[4]="星期四"
+weekday[5]="星期五"
+weekday[6]="星期六"
+
+var proNo="";
+var cardNo="";
+var startTime="";
+var mpoints=[];
+var pts=[];
+var spotCode="";
+
+var lng="";
+var lat="";
+	// 百度地图API功能
+	var map = new BMap.Map("allmap");    // 创建Map实例
+	map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
+	map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+	var markergg = null;
+    
+    var heatmapOverlay=null;
+    
+	
+    var userData, ticket;
+    $(document).ready(function(){
+    	var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		userData = jQuery.parseJSON(userDataStr);
+		ticket = $.cookie("pmsWeb_ticket");
+    });
+    
+    
+    function refreshPosition(accountCode){
+	    $.ajax({
+	    	url:serviceBasePath+"eap/pmsServices/commuteMgr/monitor/rtMonitor"+
+	    		"?accountCode="+accountCode+"&ticket="+ticket,
+	    	cache:false,
+	    	method:"GET",
+	    	success:function(res){
+	    		if(res.statusCode!=200){
+					alert("请求服务器失败！");
+					return;
+				}
+				if(res.data){
+					// 标点
+					var marker = new BMap.Marker(new BMap.Point(res.data.x, res.data.y));
+	    			map.addOverlay(marker);
+	    		} 
+	    	},
+	    	error:function(){
+	    		alert("请求服务器失败！");
+	    	}
+	    });
+    }
+ 
+    function setViewPort(points){
+		var minLng=999,minLat=999,maxLng=0,maxLat=0;
+		for (var i = 0; i < points.length; i++) {
+			var p = points[i];
+			var lng = p.lng;
+			var lat = p.lat;
+			if(lng<minLng){
+				minLng=lng;
+			}
+			if(lat<minLat){
+				minLat=lat;
+			}
+			if(lng>maxLng){
+				maxLng=lng;
+			}
+			if(lat>maxLat){
+				maxLat=lat;
+			}
+		}
+		var pts = [new BMap.Point(minLng,minLat),new BMap.Point(maxLng,minLat),new BMap.Point(maxLng,maxLat),new BMap.Point(minLng,maxLat)];
+		map.setViewport(pts);
+	}
+
+   function  addBookMarkers(points,id)
+   {
+		for(var i=0;i<points.length;i++)
+		{
+			// 标点
+			var obj=points[i];
+			if(obj.id==id)
+			{
+				var myIcon = new BMap.Icon("../../../img/greeIcon.png", new BMap.Size(50, 50));
+				var marker = new BMap.Marker(new BMap.Point(obj.lng, obj.lat),{icon:myIcon});
+				marker.setTop(true);
+  				map.addOverlay(marker);
+			}
+			else
+			{
+				//var myIcon = new BMap.Icon("../../../img/redIcon.png", new BMap.Size(50, 50));
+				var marker = new BMap.Marker(new BMap.Point(obj.lng, obj.lat));
+  				map.addOverlay(marker);
+			}
+			  
+			
+		}
+   	
+   }
+var cond_categoryCode="", cond_proNo="",cond_searchName="";
+var ngScope;
+var mpoints=[];
+var app = angular.module("realPosition", []);
+app.controller("realPositionCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.userList=[];
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	$scope.urlParams=getUrlParams();
+		
+	proNo=$scope.urlParams.proNo;
+	
+	spotCode=$scope.urlParams.spotCode;
+	
+	startTime=$scope.urlParams.startTime;
+	
+	lng=$scope.urlParams.lng;
+	
+	lat=$scope.urlParams.lat;
+	
+	
+	var viewstate = new ViewState();
+	
+	$scope.selectedUser=function(item){
+		if(item.x && item.y){
+			map.setCenter(new BMap.Point(item.x, item.y));  // 初始化地图,设置中心点坐标和地图级别
+			if(markergg != null){
+				map.removeOverlay(markergg);
+			}
+			markergg = new BMap.Marker(new BMap.Point(item.x, item.y));
+		    map.addOverlay(markergg);
+		}
+	};
+	
+	
+	$scope.showAll=function(users){
+		map.clearOverlays();
+		var pts=[];
+		for(var i=0;i<users.length;i++){
+			var item=users[i];
+			if(item.x && item.y){
+				//map.setCenter(new BMap.Point(item.x, item.y));  // 初始化地图,设置中心点坐标和地图级别
+				var p=new BMap.Point(item.x, item.y);
+				pts.push(p);
+				markergg = new BMap.Marker(p);
+			    map.addOverlay(markergg);
+			    var opts = {position : p,
+			    		  offset   : new BMap.Size(10, -36)
+			    		};
+	    		var label = new BMap.Label(item.employeeName+"<br/>"+item.rpTimeStr, opts);  // 创建文本标注对象
+	    			label.setStyle({
+	    				 color : "#000",
+	    				 fontSize : "12px",
+	    				 height : "44px",
+	    				 lineHeight : "20px",
+						 backgroundColor:"#ffffcc",
+	    				 fontFamily:"微软雅黑"
+	    			 });
+	    		map.addOverlay(label); 
+			}
+		}
+		if(pts.length>0){
+			setViewPort(pts);
+		}
+	};
+	
+	$scope.doQuery=function(){
+		map.clearOverlays();
+		//addBookMarkers(mpoints,-1);
+		//setViewPort(mpoints);
+			setViewPort(mpoints);
+			heatmapOverlay = new BMapLib.HeatmapOverlay({ "radius": 20 });
+			map.addOverlay(heatmapOverlay);
+			heatmapOverlay.setDataSet({ data: mpoints, max: 100 });
+			var line = new BMap.Polyline(pts);
+			line.setStrokeColor("red");
+			map.addOverlay(line);
+	};
+	
+	
+	/* 加载数据 */
+	$scope.loadData=function(){
+		$http.get(serviceBasePath+"eap/pmsServices/pm/sceneMonitoring/listHis?proNo="+proNo+"&spotCode="+spotCode+"&ticket="+ticket).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$scope.infoList = response.list;
+			$scope.dots=response.list.length;
+		});
+		
+		$http.get(serviceBasePath+"eap/pmsServices/pm/sceneMonitoring/listHeatHis?proNo="+proNo+"&spotCode="+spotCode+"&startTime="+startTime+"&ticket="+ticket).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			//$scope.heatInfoList = response.list;
+			for(var i=0;i<response.list.length;i++)
+			{
+			    var obj=response.list[i];
+	   			mpoints.push({'lng':obj.LONGITUDE,'lat':obj.LATITUDE,'count':100});
+	   			pts.push(new BMap.Point(obj.LONGITUDE, obj.LATITUDE));
+	   			
+			}
+			
+			setViewPort(mpoints);
+			heatmapOverlay = new BMapLib.HeatmapOverlay({ "radius": 20 });
+			map.addOverlay(heatmapOverlay);
+			console.log(mpoints);
+			heatmapOverlay.setDataSet({ data: mpoints, max: 100 });
+			//var points=[];
+			
+			var line = new BMap.Polyline(pts);
+			line.setStrokeColor("red");
+			map.addOverlay(line);
+			
+			
+			//================
+			if(mpoints.length==0)
+			{
+				var point = new BMap.Point(lng,lat);
+           		map.centerAndZoom(point,15);
+			}	
+			
+			//heatmapOverlay.setDataSet({ data: points, max: 100 });
+		});
+	};
+	
+	
+	$scope.doLocation=function(item)
+	{
+		map.clearOverlays();
+		addBookMarkers(mpoints,item.ROWID);
+		map.setCenter(new BMap.Point(item.LONGITUDE, item.LATITUDE));  // 初始化地图,设置中心点坐标和地图级别
+	}
+	
+	$scope.loadData();	
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 帐户管理 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css"/>
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/ng-base.js"></script>
+
+<script type="text/javascript" src="../../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.chooseUser{width:1000px;height:500px;}
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">新增设备属性</label>
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+				<tr>
+					<th>设备类型</th>
+					<td>
+						<input type="hidden" name="companyCode"/>
+						<input type="hidden" name="deviceTypeCode"/>
+						<input type="text" name="deviceTypeName" class="required dropDownList" maxlength="32"/>
+					</td>
+					<th></th>
+					<td>
+					</td>
+				</tr>
+<!-- 				<tr> -->
+<!-- 					<th>项目分类</th> -->
+<!-- 					<td> -->
+<!-- 						<input type="hidden" name="categoryCode"/> -->
+<!-- 						<input type="text" name="categoryName" class="required dropDownList" maxlength="32"/> -->
+<!-- 					</td> -->
+<!-- 					<th>项目编号</th> -->
+<!-- 					<td> -->
+<!-- 						<input type="hidden" name="proNo"/> -->
+<!-- 						<input type="text" name="proName" class="required dropDownList" maxlength="32"/> -->
+<!-- 					</td> -->
+<!-- 				</tr> -->
+				<tr>
+					<th>中文字段</th>
+					<td>
+						<input type="text" name="cname" class="required" maxlength="32"/>
+					</td>
+					<th>英文字段</th>
+					<td>
+						<input type="text" name="ename" class="required" maxlength="32"/>
+					</td>
+				</tr>
+				<tr>
+					<th>数据类型</th>
+					<td>
+						<input type="hidden" name="dtype"/>
+						<input type="text" name="dtypeName" class="required dropDownList" maxlength="32"/>
+					</td>
+					<th>是否主键</th>
+					<td>
+						<label><input type="radio" name="isPk" value="1"/>是</label>&nbsp;&nbsp;
+						<label><input type="radio" name="isPk" value="0"/>否</label>
+					</td>
+				</tr>
+				<tr ng-if="dtype==4">
+					<th>枚举源</th>
+					<td colspan="3">
+						<label><input type="radio" name="enumSource" value="1"/>数据串</label>&nbsp;&nbsp;
+						<label><input type="radio" name="enumSource" value="2"/>数据地址</label>
+					</td>
+				</tr>
+				<tr ng-if="dtype==4">
+					<th>枚举值</th>
+					<td colspan="3">
+						<textarea name="enumValue" placeholder="格式为：值1,值2,值3" cols="80" rows="4"></textarea>
+					</td>
+				</tr>
+				<tr ng-if="dtype==5">
+					<th>计算脚本</th>
+					<td colspan="3">
+						<textarea name="enumValue" placeholder="(function(item){      })(item)" cols="80" rows="4"></textarea>
+					</td>
+				</tr>
+				<tr ng-if="dtype==6">
+					<th>子对象类型</th>
+					<td colspan="3">
+						<input type="text" id="subDeviceType" name="remarks" class="dropDownList" placeholder="请选择设备类型"/>
+						<input type="hidden" id="subDeviceTypeCode" name="enumValue"/>
+					</td>
+				</tr>
+				<tr ng-if="dtype==8">
+					<th>数组元素类型</th>
+					<td colspan="3">
+						<input type="text" id="subDeviceType" name="remarks" class="dropDownList" placeholder="请选择设备类型"/>
+						<input type="hidden" id="subDeviceTypeCode" name="enumValue"/>
+					</td>
+				</tr>
+				<tr ng-if="dtype==9">
+					<th>依赖字段</th>
+					<td colspan="3">
+						<textarea name="enumValue" placeholder="依赖字段的英文名称" cols="80" rows="4"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<th>列显示</th>
+					<td>
+						<label><input type="radio" name="dimList" value="1"/>是</label>&nbsp;&nbsp;
+						<label><input type="radio" name="dimList" value="0"/>否</label>
+					</td>
+					<th>搜索</th>
+					<td>
+						<label><input type="radio" name="dimSearch" value="1"/>是</label>&nbsp;&nbsp;
+						<label><input type="radio" name="dimSearch" value="0"/>否</label>
+					</td>
+				</tr>
+				<tr>
+					<th>地图渲染</th>
+					<td>
+						<label><input type="radio" name="dimMaprender" value="1"/>是</label>&nbsp;&nbsp;
+						<label><input type="radio" name="dimMaprender" value="0"/>否</label>
+					</td>
+					<th>排序</th>
+					<td>
+						<label><input type="radio" name="dimOrder" value="1"/>是</label>&nbsp;&nbsp;
+						<label><input type="radio" name="dimOrder" value="0"/>否</label>
+					</td>
+				</tr>
+				<tr>
+					<th>是否必填</th>
+					<td>
+						<label><input type="radio" name="isNotNull" value="1"/>是</label>&nbsp;&nbsp;
+						<label><input type="radio" name="isNotNull" value="0"/>否</label>
+					</td>
+					<th>是否业务编号</th>
+					<td>
+						<label><input type="radio" name="isFeature" value="1"/>是</label>&nbsp;&nbsp;
+						<label><input type="radio" name="isFeature" value="0"/>否</label>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		$scope.dtype=0;
+		
+		var urlParams = getUrlParams();
+		/* 项目分类 */
+		new DropDownList().init({
+			mode:"page",
+			renderTo:"input[name=categoryName]",
+			url:"../../../component/projectType.html?required=true",
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=categoryCode]").val(result.categoryCode);
+				$("input[name=categoryName]").val(result.categoryName);
+				$("input[name=categoryName]").focus();
+				proNameList.setConfig("url", "../../../component/projectList.html?required=true&categoryCode="+result.categoryCode);
+			}
+		});
+		/* 项目名称 */
+		var proNameList = new DropDownList();
+		proNameList.init({
+			mode:"page",
+			renderTo:"input[name=proName]",
+			url:"../../../component/projectList.html?required=true",
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=proNo]").val(result.proNo);
+				$("input[name=proName]").val(result.proName);
+				$("input[name=proName]").focus();
+			}
+		});
+		/* 设备类型 */
+		new DropDownList().init({
+			renderTo:"input[name=deviceTypeName]",
+			url:"../../../component/chooseDeviceType.html?required=true&",
+			onSelected:function(item){
+				$("input[name=deviceTypeCode]").val(item.deviceTypeCode);
+				$("input[name=deviceTypeName]").val(item.deviceTypeName);
+				$("input[name=deviceTypeName]").focus();
+			}
+		});
+		
+		/* 数据类型 */
+		new DropDownList().init({
+			renderTo:"input[name=dtypeName]",
+			mode:"list",
+			data:[{id:1, name:"文本"},{id:2, name:"数字"},{id:3, name:"日期"},{id:4, name:"枚举"},{id:5, name:"计算"},{id:6, name:"对象"},{id:8, name:"数组"},{id:9, name:"依赖"}],
+			textField:"name",
+			onSelected:function(item){
+				$("input[name=dtype]").val(item.id);
+				$("input[name=dtypeName]").val(item.name);
+				$("input[name=dtypeName]").focus();
+				callNgFn({ctrlEl:$("body")[0], ngFn:function(scope){
+					scope.dtype=item.id;
+				}});
+				if(item.id==6 || item.id==8){// 对象类型&数组元素类型
+					lazyCall("t1", function(){
+						/* 设备类型 */
+						new DropDownList().init({
+							renderTo:"#subDeviceType",
+							url:"../../../component/chooseDeviceType.html",
+							onSelected:function(item){
+								$("#subDeviceTypeCode").val(item.deviceTypeCode);
+								$("#subDeviceType").val(item.deviceTypeName);
+							}
+						});
+					}, 10);
+				}
+				
+			}
+		});
+		
+		
+		/* 表单验证 */
+		validator = $("#saveForm").validate({
+			onsubmit: false,
+			focusInvalid: false,
+			focusCleanup: true,
+			errorElement: "span",
+			ignore:".ignore",
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {
+					
+				} 
+			}
+		});
+		
+		/* 保存 */
+		$scope.onSave=function(){
+			$("input[name=companyCode]").val($scope.userData.companyCode);
+			var params = serializeArrayToMap($("#saveForm").serializeArray());
+			if($("#saveForm").valid()){
+				this.httpPost({
+					url:"eap/pmsServices/pm/taskMgr/device/add",
+					data:params,
+					success:function(response){
+						new ShowDlog().prompt({
+							icon:"success",
+							msg:"保存成功！",
+							done:function(){
+								hrefTo({
+									url:"deviceAttrFieldMgr.html",
+									data:urlParams
+								});
+							},
+							t:1500
+						});
+						
+					}
+				});
+			}
+		};
+		
+		/* 取消 */
+		$scope.onCancel=function(){
+			hrefTo({
+				url:"deviceAttrFieldMgr.html",
+				data:urlParams
+			});
+		};
+	
+	}
+});
+</script>
+</body>
+</html>

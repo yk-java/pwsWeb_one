@@ -1,0 +1,186 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 时间表 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<!-- <script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script> -->
+<!-- <link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css"/> -->
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.chooseUser{width:1000px;height:500px;}
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">新增项目时间</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+				<tr>
+					<th>项目分类</th>
+					<td>
+						<input type="text" id="projectType" class="dropDownList"/>
+					</td>
+					<th>项目</th>
+					<td>
+						<input type="hidden" name="companyCode"/>
+						<input type="hidden" name="proNo"/>
+						<input type="text" id="projectList" class="required dropDownList" maxlength="32"/>
+					</td>
+				</tr>
+				<tr>
+					<th>签到时间</th>
+					<td>
+						<input type="text" name="checkinTime" class="required"/><span class="field_comment">(时间格式：HH:mm，例：07:30)</span>
+					</td>
+					<th>签退时间</th>
+					<td>
+						<input type="text" name="checkoutTime" class="required"/><span class="field_comment">(时间格式：HH:mm，例：17:30)</span>
+					</td>
+				</tr>
+				<tr>
+					<th>提前签到允许时间</th>
+					<td>
+						<input type="text" name="checkinExMinites" class="required"/><span class="field_comment">(分钟)</span>
+					</td>
+					<th>延后签退允许时间</th>
+					<td>
+						<input type="text" name="checkoutExMinites" class="required"/><span class="field_comment">(分钟)</span>
+					</td>
+				</tr>
+				<tr>
+					<th>标准上报点数</th>
+					<td>
+						<input type="text" name="checkPointTotal" class="required"/>
+					</td>
+				</tr>
+				
+			</table>
+		</div>
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		
+		var urlParams = getUrlParams();
+		
+		/* 项目类型 */
+		new DropDownList().init({
+			mode:"page",
+			renderTo:"#projectType",
+			url:"../../component/projectType.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$("#projectType").val(result.categoryName);
+				var cond_categoryCode = result.categoryCode;//alert(cond_categoryCode);
+				/* 联动 */
+				projectList.setConfig("url", "../../component/projectList.html?categoryCode="+cond_categoryCode+"&ticket="+$scope.ticket);
+				
+			}
+		});
+		/* 项目列表*/
+		var projectList = new DropDownList();
+		projectList.init({
+			mode:"page",
+			renderTo:"#projectList",
+			url:"../../component/projectList.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$("#projectList").val(result.proName);
+				$("input[name=proNo]").val(result.proNo);
+			}
+		}); 
+		
+		/* 表单验证 */
+		validator = $("#saveForm").validate({
+			onsubmit: false,
+			focusInvalid: false,
+			focusCleanup: true,
+			errorElement: "span",
+			ignore:".ignore",
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {
+					
+				} 
+			}
+		});
+		
+		/* 保存 */
+		$scope.onSave=function(){
+			$("input[name=companyCode]").val($scope.userData.companyCode);
+			var params = serializeArrayToMap($("#saveForm").serializeArray());
+			if($("#saveForm").valid()){
+				this.httpPost({
+					url:"eap/pmsServices/commuteMgr/setting/add",
+					data:params,
+					success:function(response){
+						new ShowDlog().prompt({
+							icon:"success",
+							msg:"保存成功！",
+							done:function(){
+								hrefTo({
+									url:"timeTable.html",
+									data:urlParams
+								});
+							},
+							t:1500
+						});
+						
+					}
+				});
+			}
+		};
+		
+		/* 取消 */
+		$scope.onCancel=function(){
+			hrefTo({
+				url:"timeTable.html",
+				data:urlParams
+			});
+		};
+		
+	}
+});
+</script>
+</body>
+</html>

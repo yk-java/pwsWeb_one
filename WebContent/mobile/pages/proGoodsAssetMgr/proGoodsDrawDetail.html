@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" ng-app="moduleName">
+<head>
+	<meta charset="UTF-8" />
+	<title>物品领用详情</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+		<link rel="stylesheet" type="text/css" href="../../css/bxyw1.css"/>
+	<script src="../../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="../../js/PageBar.js"></script>
+	<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css"/>
+	<script type="text/javascript" src="../../js/Calendar.js"></script>
+	<script type="text/javascript" src="../../js/config.js"></script>
+	<script type="text/javascript" src="../../js/util.js"></script>
+	<script type="text/javascript" src="../../js/ViewState.js"></script>
+	<script type="text/javascript" src="../../js/ng-base.js"></script>
+	<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+	<script type="text/javascript" src="../../js/eapJs/core/eap.core.js" ></script>
+	<script type="text/javascript" src="../../js/eapJs/plugins/eap.tip.js" ></script>
+	<script type="text/javascript" src="../../js/eapJs/plugins/eap.validate.js"></script>
+	<script type="text/javascript" src="../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/validate.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/edit.css"/>
+	<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+	<script src="../../../js/echarts-all.js"></script>
+	<style type="text/css">
+		header{position:absolute;top:0;right:0;left:0;height:60px;}
+		section{position:absolute;top:60px;right:0;bottom:0;left:0;overflow:auto;}
+		.filter_no1{margin-right:8px;}
+		.goodsAssetDetail{position:relative}
+		.detailStatus{position:absolute;right:5%;top:0;}
+		.detailList li{padding:15px 0;border-bottom:1px dashed #ccc}
+		.detailList li.assetTitle{color:#02a2ff;font-size:18px;font-weight: bold;}
+	</style>
+</head>
+<body ng-controller="controllerName">
+	<header>
+		<div class="return" ng-click="exit()"><img src="../../img/return.png"/></div>
+		物品领用详情
+	</header>
+	<section id="list">
+		<div class="con_list goodsAssetDetail">
+			<img src="../../img/goods5.png" class="detailStatus" ng-if="dataList.FLOW_STATUS==2"/>
+			<img src="../../img/good1.png" class="detailStatus" ng-if="dataList.FLOW_STATUS==3"/>
+			<img src="../../img/good2.png" class="detailStatus" ng-if="dataList.FLOW_STATUS==1"/>
+			<ul class="detailList">
+				<li class="assetTitle">{{dataList.MATERIAL_NAME}}</li>
+				<li>领用时间：{{dataList.SYS_CREATE_TIME}}</li>
+				<li>数量：{{dataList.USE_COUNT}}</li>
+				<li>分类：{{dataList.ASSET_TYPE_NAME}}</li>
+				<li>类型：{{dataList.ASSET_CLASS_NAME}}</li>
+				<li>用途：{{dataList.USE_DESC}}</li>
+				<li>使用人：{{dataList.LOAN_EMPLOYEENAME}}</li>
+				<li>项目组：{{dataList.LOAN_PRO_NAME}}</li>
+				<li>备注：{{dataList.REMARKS}}</li>
+			</ul>
+		</div>
+	</section>
+	<script type="text/javascript">
+	 	var ngScope;
+		simpleController({
+			init:function($scope, $http){
+				ngScope=$scope;
+				var urlParams = getUrlParams();
+				$scope.httpGet({
+					url:"eap/pmsServices/materielMg/assetMg/material/getDetail",
+					data:{"flowCode":urlParams.flowCode},
+					success:function(res){
+						$scope.dataList = res.data[0];
+					}
+				});
+				$scope.exit=function(){
+					top.viewBack();
+				};
+			}
+		}); 
+	</script>
+</body>
+</html>

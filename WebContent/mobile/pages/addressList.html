@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<script type="text/javascript" src="../js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="../js/placeholder.js"></script>
+	<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../js/config.js"></script>
+	<link rel="stylesheet" type="text/css" href="../css/iconfont/iconfont.css"/>
+	<script type="text/javascript" src="../angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="../js/util.js"></script>
+	<link rel="stylesheet" type="text/css" href="../css/bxyw1.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/mainindex.css"/>
+	<title>消息</title>
+</head>
+<style>
+	.fll{float:left}
+	header{position:fixed;top:0;height: initial;}
+	section#adrrList{padding-top:140px;}
+	.list_search{padding:10px 0;background:#f5f5f5}
+	.list_search p{width:90%;margin:0 auto}
+	.list_search p input{width:100%;background:#fff;border-radius: 40px;border:none;text-indent:20px;list-style: none;outline: none;height:40px;line-height:40px}
+	.list_dl dt,.list_dl dd{line-height:40px;background:#fff;text-indent:10px;border-bottom:1px solid #f1f1f1}
+	.list_dl dt{color:#02a3fe;font-size:16px;text-indent:6px;margin-top:5px}
+	.list_dl dd{overflow:hidden}
+	.list_dl dd span.name{float:left;display:inline-block;width:40%}
+	.list_dl dd img{float:right;width: 18px;display: block;margin:6px 10px 0 0;}
+	.dapart_name{color:#999}
+</style>
+<body ng-app="pmsWeb" ng-controller="mainCtrl">
+<header>
+	<div class="return"><img src="../../img/return.png"/></div>
+	通讯录
+	<div class="list_search">
+		<p><input type="text" placeholder="请输入关键字"  ng-model="keywords" ng-change="onChange()"></p>
+	</div>
+</header>
+<section id="adrrList">
+	<dl class="list_dl" ng-repeat="item in mesList track by $index">
+		<dt ng-if="$index!=0 && item.code!=mesList[$index-1].code">{{item.code}}</dt>
+		<dd><span class="name">{{item.name}}</span><span class="dapart_name">{{item.unitname}}</span>
+			<a href="tel:{{item.phone}}"><img ng-if="item.phone!=''" src="../img/mail_list_phone_icon.png"/></a>
+			<a href="tel:{{item.phone}}"><img ng-if="item.phone==''" src="../img/mail_list_phone_icon1.png"/></a>
+		</dd>	
+	</dl>
+	
+	<div >
+		<div class="code" style="margin-top:10px;"></div>
+		
+		<div></div>
+	</div>
+	
+	
+</section>
+<script>
+var app = angular.module("pmsWeb", []);
+app.controller("mainCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	var urlParams = getUrlParams();
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		noLogin(location.href);
+		return;
+	}
+	$scope.mesList="";
+	var userData = jQuery.parseJSON(userDataStr);
+	var companyCode=userData.companyCode;
+	$scope.mesList=[];
+	$scope.initDatas="";
+	$http.get(serviceBasePath+"eap/pmsServices/opsAppService/getMailList?companyCode="+companyCode).success(function(response){
+		if(response.statusCode==200){
+			
+			$scope.mesList= response.list;
+			$scope.initDatas=$scope.mesList;
+		}
+	});
+	
+	
+	$scope.keywords="";
+	
+	$scope.onChange=function(){
+		
+		 $scope.mesList=[]; 
+		 
+		for(var i=0;i<$scope.initDatas.length;i++){
+			
+			if(	new RegExp(".*"+$scope.keywords+".*").test($scope.initDatas[i].name) || 	new RegExp(".*"+$scope.keywords+".*").test($scope.initDatas[i].unitname)){
+				$scope.mesList.push($scope.initDatas[i]);
+			}
+		}
+	}	
+	
+});
+
+	$(".return").click(function(){
+		window.history.back();
+	})
+</script>
+</body>
+</html>

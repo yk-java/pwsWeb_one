@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>项目版本比较</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css"/>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<style type="text/css">
+	.dlog-edit{width:500px;height:350px}
+	.table, .table td, .table th{padding-left:0}
+	.tableIntd, .tableIntd td, .tableIntd th {border:none;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl"  storagekey="fm.proCount.proCounListMgr">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<div class="query_div" ng-click="showChooseVersion()">
+					选择版本
+				</div>
+				<div class="query_div" ng-click="fh()">
+					返回
+				</div>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+			   <tr class="tr1">
+				<th width="25%"><div align="center"></div></th>
+				<th width="25%"><div align="center">阶段</div></th>
+				<th width="25%"><div align="center">{{v1}}</div></th>
+				<th width="25%"><div align="center">{{v2}}</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in data1List track by $index " ng-init="outerIndex = $index" ng-if="$index>2">
+				<td rowspan="parseCount"><div align="center">{{item.itemName}}</div></td>
+				<td rowspan="parseCount" colspan="3" style="border:none">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table tableIntd">
+						<tr class="tr2" ng-repeat="it in newArr">
+							<td width="33%" style="border-bottom:1px solid #ccc"><div align="center">{{it.name}}</div></td>
+							<td width="33%" style="border-left:1px solid #ccc;border-bottom:1px solid #ccc"><div align="center">{{item[it.code]}}</div></td>
+							<td width="33%" style="border-left:1px solid #ccc;border-bottom:1px solid #ccc"><div align="center">{{data2List[outerIndex][it.code]}}</div></td>
+						</tr>
+					</table>
+				</td>
+			  </tr>
+			  <tr class="tr2">
+				<td style="border-top:none"><div align="center">合同金额</div></td>
+				<td style="border-top:none"><div align="center"></div></td>
+				<td style="border-top:none"><div align="center">{{dataList.data1.contractValue}}</div></td>
+				<td style="border-top:none"><div align="center">{{dataList.data2.contractValue}}</div></td>
+			  </tr>
+			  
+			  
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		noLogin(location.href);
+		return;
+	}
+	var urlParams = getUrlParams();
+	console.log(urlParams);
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	var companyCode=userData.companyCode;
+	var versions="";
+	var budgetEstimateCode=urlParams.budgetEstimateCode;
+	var proNo=urlParams.proNo;
+	var versionCode=urlParams.versionCode;
+	$scope.v1="";
+	$scope.v2="";
+	$scope.showChooseVersion=function(){
+		new ShowDlog().showFrame("proVersionCompareChooseVersion.html?proNo="+urlParams.proNo, "选择版本", function(data){
+			if(data.resultCode||data.resultCode=="SUCCESS"){
+				//console.log(data);
+				versions=data.str;
+				$scope.v1=data.v1;
+				$scope.v2=data.v2;
+				$scope.getData();
+			}
+		}, "dlog-edit");
+	};
+	$scope.showChooseVersion();
+	$scope.phaseCount=0;
+	$scope.newArr=[];
+	$scope.getData=function(){
+		new ShowDlog().prompt({
+			icon:"waitting",
+			msg:"正在查询...",
+			done:function(){},
+			t:60*1000
+		});
+		$http.get(serviceBasePath+"eap/pmsServices/pm/pb/budgetEstimate/proBudgetContrast?proNo="+urlParams.proNo+"&companyCode="+companyCode+"&budgetEstimateCode="+budgetEstimateCode+"&versionCode="+versionCode+"&versions="+versions).success(function(response){
+	          if(response.statusCode==200){
+	              $scope.dataList=response.data;
+	              $scope.data1List=$scope.dataList.data1.list;
+	              $scope.data2List=$scope.dataList.data2.list;
+	              var tempObj={};
+	              if($scope.dataList.data1.phaseCount>=$scope.dataList.data2.phaseCount){
+	            	  $scope.phaseCount=$scope.dataList.data1.phaseCount;
+	            	  tempObj=$scope.dataList.data1.list[0];
+	              }else{
+	            	  $scope.phaseCount=$scope.dataList.data2.phaseCount;
+	            	  tempObj=$scope.dataList.data2.list[0];
+	              }
+	              $dlog.close();
+	              for(var i=0;i<$scope.phaseCount;i++){
+	            	  var obj={}
+	            	  var tempstr="c"+i;
+	            	  //obj.name=tempObj.tempstr;
+	            	  obj.code=tempstr;
+		  			  $scope.newArr.push(obj);
+	              }
+	              
+	              for(var i=0;i<$scope.newArr.length;i++){
+	            	  var obj=$scope.newArr[i];
+	            	
+	            	  obj.name=tempObj[obj.code];
+	              }
+	              
+	              
+	             // console.log( $scope.newArr);
+	          }
+	      });
+	}
+	
+	$scope.fh=function(){
+		window.history.back();
+	};
+});
+</script>
+</body>
+</html>

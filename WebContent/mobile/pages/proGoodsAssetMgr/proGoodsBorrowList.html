@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en" ng-app="moduleName">
+<head>
+	<meta charset="UTF-8" />
+	<title>物品借用</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+		<link rel="stylesheet" type="text/css" href="../../css/bxyw1.css"/>
+	<script src="../../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="../../js/PageBar.js"></script>
+	<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css"/>
+	<script type="text/javascript" src="../../js/Calendar.js"></script>
+	<script type="text/javascript" src="../../js/config.js"></script>
+	<script type="text/javascript" src="../../js/util.js"></script>
+	<script type="text/javascript" src="../../js/ViewState.js"></script>
+	<script type="text/javascript" src="../../js/ng-base.js"></script>
+	<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+	<script type="text/javascript" src="../../js/eapJs/core/eap.core.js" ></script>
+	<script type="text/javascript" src="../../js/eapJs/plugins/eap.tip.js" ></script>
+	<script type="text/javascript" src="../../js/eapJs/plugins/eap.validate.js"></script>
+	<script type="text/javascript" src="../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/validate.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/edit.css"/>
+	<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+	<script src="../../../js/echarts-all.js"></script>
+	<style type="text/css">
+		header{position:absolute;top:0;right:0;left:0;height:60px;}
+		section{position:absolute;top:60px;right:0;bottom:0;left:0;overflow:auto;}
+		.filter_no1{margin-right:8px;}
+		.con_list{background:none}
+		.goodsGet_list{padding:10px;margin-top:10px;background:#fff}
+		.goodsGet_list p{border-bottom: 1px solid #eee;line-height: 40px;position:relative}
+		.goodsGet_list p span.goodTitle{color: #02a2ff;font-size:16px;font-weight:bold;}
+		.goodsGet_list span{margin-left:12px;font-weight:normal}
+		.goodsGet_list a{float: right;padding:3px 10px;line-height: normal;margin: 10px -10px 0 0;background: #56bf00;color:#fff;}
+		.goodsGet_list a.wait_arrow{background: #e6b800;}
+		.goodsGet_list a.no_arrow{background: #e66100;}
+		.goodsGet_list em.btn{padding:3px 8px;border:1px solid #02a2ff;color:#02a2ff;font-style: normal;line-height: normal;border-radius: 5px;position:absolute;right:10px;top:7px}
+		.goodsGet_tip{margin-top:10px}
+		.goodsGet_list a.have_return{background:#ccc}
+	</style>
+</head>
+<body ng-controller="controllerName">
+	<header>
+		<div class="return"><img src="../../img/return.png"/></div>
+		物品借用
+		<img src="../../img/add_box_icon.png" width="20px" onclick="addGoods()" style="position:absolute;right:15px;top:22px">
+	</header>
+	<section id="list">
+		<ul class="cz_selpx ov" >
+			<li class="fl" style="height:50px;line-height:50px;width:100%">筛选<img src="../../img/down_icon.png"/></li>
+		</ul>
+		<div class="filter_sort">
+			<ul class="filter"  style="display: none;">
+				<li class="ov" style="height:38px">
+					<div class="filter_con">
+						<div class="fl ov">
+							<div class="fl ov filter_no1"><img src="../../img/task_selete_icon.png" data-type="" class="fl"/><div class="fl">全部</div></div>
+							<div class="fl ov filter_no1"><img src="../../img/task_nonselete_icon.png" data-type="1" class="fl"/><div class="fl">未审核</div></div>
+							<div class="fl ov filter_no1"><img src="../../img/task_nonselete_icon.png" data-type="2" class="fl"/><div class="fl">已审核</div></div>
+							<div class="fl ov filter_no1"><img src="../../img/task_nonselete_icon.png" data-type="3" class="fl"/><div class="fl">被驳回</div></div>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="con_list" style="padding:0">
+			<div class="goodsGet_list" ng-repeat="item in dataList">
+				<p><span class="goodTitle" ng-click="toSeeDetail(item)">{{item.MATERIAL_NAME}}</span><span>{{item.SYS_CREATE_TIME}}</span>
+					<em  ng-if="item.FLOW_STATUS==2" class="btn returnBtn" ng-click="returnGoods(item)">归还</em>
+					<a ng-if="item.FLOW_STATUS==3" class="no_arrow">被驳回</a>
+					<a ng-if="item.FLOW_STATUS==1" class="wait_arrow">待批准</a>
+					<a ng-if="item.FLOW_STATUS==4">归还中</a>
+					<a ng-if="item.FLOW_STATUS==5" class="have_return">已归还</a>
+				</p>
+				<div>
+					<div class="goodsGet_tip">
+						<span>数量：{{item.USE_COUNT}}</span>
+						<span>分类：{{item.ASSET_CLASS_NAME}}</span>
+						<span>使用人：{{item.LOAN_EMPLOYEENAME}}</span>
+					</div>
+					<div class="goodsGet_tip">
+						<span>项目组：{{item.LOAN_PRO_NAME}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<script type="text/javascript">
+		
+		var flowStatus="";
+	 	var ngScope;
+		simpleController({
+			init:function($scope, $http){
+				ngScope=$scope;
+				$scope.dataList=[];
+				$scope.taskCount={};
+				var urlParams = getUrlParams();
+				$scope.loadDataList=function(flowStatus){
+					$scope.httpGet({
+						url:"eap/pmsServices/materielMg/assetMg/material/getJieyongList",
+						data:{"flowStatus":flowStatus,"loanEmployeeCode":$scope.userData.employeeCode},
+						success:function(res){
+							
+							$scope.dataList = res.list;
+							
+						}
+					});
+				};
+				lazyCall("t1",function(){
+					$scope.loadDataList(flowStatus);
+				},100);
+				$scope.toSeeDetail=function(item){
+					var data={};
+					data.flowCode=item.FLOW_CODE;
+					top.viewTo("proGoodsAssetMgr/proGoodsDrawDetail.html",data);			
+				};
+				$scope.returnGoods=function(item){
+					var data={};
+					data.flowCode=item.FLOW_CODE;
+					top.viewTo("proGoodsAssetMgr/proGoodsRuturnDetail.html",data);		
+				};
+				
+			}
+		}); 
+		$(".return").click(function(){
+			top.viewBack();
+		});	
+		/* 查询条件 */
+		$(".filter_no1").each(function(){
+			$(this).click(function(){
+				var selected = $(this).find("img").attr("data-selected");
+				if(selected=="selected"){
+					// unselect
+					unselectEle($(this));
+				}else{
+					// select
+					selectEle($(this));
+				}
+				// I
+				flowStatus=$(this).find("img").attr("data-type");
+				var data_type = $(".filter_no1").find("img[data-selected=selected]").attr("data-type");
+				typeChange(data_type);
+				ngScope.loadDataList(flowStatus);
+			})
+		});
+		function addGoods(){
+			top.viewTo("proGoodsAssetMgr/proGoodsBorrowAdd.html");
+		}
+		function unselectEle($el){
+			$el.find("img").attr("src","../../img/task_nonselete_icon.png");
+			$el.find("img").attr("data-selected", "");
+		}
+		function selectEle($el){
+			$el.find("img").attr("src","../../img/task_selete_icon.png");
+			$el.siblings().find("img").attr("src","../../img/task_nonselete_icon.png");
+			$el.find("img").attr("data-selected", "selected");
+			$el.siblings().find("img").attr("data-selected", "");
+		}
+		var timeType=null;
+		function typeChange(type){
+			timeType = type;
+		}
+	
+		$(".clear_search").click(function(){
+			$(".search_int input").val("");
+		});
+		
+		/* 搜索 */
+		$("#btn-search").click(function(){
+			var searchName = $("#search").val();
+			if(!timeType)
+				timeType="";
+	//			alert(searchName+", "+ timeType+", "+ sortType);
+		});
+		/* 排序 */
+		var sortType=1;
+		$(".sort li").each(function(){
+			$(this).click(function(){
+				$(this).find("img").show();
+				$(this).siblings().find("img").hide();
+				sortType = $(this).attr("data-sort");
+				sortTypeChange(sortType);
+			})
+		});
+		function sortTypeChange(sortType){
+			//
+		}
+		/* 互斥Tab页 */
+		$(".cz_selpx li").click(function(){
+			var n = $(this).index();
+			var tab = $(".filter_sort ul").eq(n);
+			if(tab.attr("is_show")=="true"){
+				tab.hide();
+				tab.attr("is_show", "false");
+			}else{
+				tab.show().siblings().hide();
+				tab.attr("is_show", "true");
+				$(".filter_sort ul").each(function(){
+					var ulIndex = $(this).index();
+					if(n!=ulIndex){
+						$(this).hide();
+						$(this).attr("is_show", "false");
+					}
+				});
+			}
+		});
+	</script>
+</body>
+</html>

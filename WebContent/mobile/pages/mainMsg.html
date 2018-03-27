@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<script type="text/javascript" src="../js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="../js/placeholder.js"></script>
+	<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../js/config.js"></script>
+	<link rel="stylesheet" type="text/css" href="../css/iconfont/iconfont.css"/>
+	<script type="text/javascript" src="../angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="../js/util.js"></script>
+	<link rel="stylesheet" type="text/css" href="../css/bxyw1.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/mainindex.css"/>
+	<title>消息</title>
+</head>
+<style>
+	.fll{float:left}
+	section.tabwarp{padding-top: 20px;}
+</style>
+<body style="background:#fff" ng-app="pmsWeb" ng-controller="mainCtrl">
+<header>
+	消息
+</header>
+<section class="tabwarp">
+	<ul ng-if="mesList.length!=0">
+		<li ng-repeat="item in mesList">
+			<a href="msgDetail.html?rowid={{item.rowid}}" target="_top">
+				<span class="circle"></span><span class="title">{{item.TITLE}}</span>
+				<p ng-if="item.status==1">{{item.PUBLISH_DATE}} <img src="../img/have_read.png"/></p>
+				<p ng-if="item.status==0">{{item.PUBLISH_DATE}} <img src="../img/non_read.png"/></p>
+			</a>
+		</li>
+	</ul>
+	<div ng-if="mesList.length==0 || mesList.length==undefined " style="margin-top: 112px;text-align: center;">
+		<img src="../img/non_data.png" width="100px"/>
+		<p style="color:#6e6e6e">您当前没有消息</p>
+		<p style="color:#6e6e6e">一有消息我们会通知您</p>
+	</div>
+</section>
+<script>
+var app = angular.module("pmsWeb", []);
+app.controller("mainCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	var urlParams = getUrlParams();
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	var accountCode=userData.accountCode;
+	$scope.getMesList=function(status){
+		$scope.mesList="";
+		$http.get(serviceBasePath+"eap/pmsServices/appNotice/list?status="+status+"&accountCode="+accountCode).success(function(response){
+			if(response.statusCode==200){
+				
+				$scope.mesList= response.data;
+			}
+		});
+	};
+	
+	$scope.getMesList(1);
+	
+});
+
+	$(".tab_ctrl li").click(function(){
+		$(this).addClass("act").siblings().removeClass("act")
+		var n=$(this).index();
+		$(".tabwarp").eq(n).show().siblings(".tabwarp").hide();
+	})
+</script>
+</body>
+</html>

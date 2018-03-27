@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 人员管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+
+<script type="text/javascript" src="../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+
+<script type="text/javascript" src="../../js/pdfobject.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/ng-base.js"></script>
+<link rel="stylesheet" type="text/css" href="../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/edit.css"/>
+<style type="text/css">
+	.pdfobject-container { height: 650px;}
+.pdfobject {}
+
+
+.fileName{width:90%;font-size:16px;font-family:'微软雅黑';margin:0 auto; text-align: left;height:60px;padding-top:20px;}
+
+.bot{width:90%;font-size:16px;font-family:'微软雅黑';margin:0 auto; text-align: right;height:60px;padding-top:20px;}
+
+#pdf{width:90%;margin:0 auto;}
+
+.btndown{background-image: url("../../img/bnt.png");border:0px;width:100px;height:30px;color:#fff;border-radius:25px;}
+.btnback{background-image: url("../../img/juxing.png");border:0px;width:70px;height:30px;color:#3385FF;border-radius:25px;}
+</style>
+</head>
+
+<body ng-app="mdu" ng-controller="ctrl">
+
+<div class="list">
+	<div class="list_content" style="background:#E6E6E6;text-align:center">
+		<div class="fileName">
+		
+		</div>
+		
+		<div id="pdf" style="display:none">
+			
+		</div>
+		<div id="img" style="height:650px;display:none">
+			<img id="imgid"/>
+		</div>
+		<div id="vid" style="height:650px;display:nones">
+			<video id="videoid" controls="controls" autoplay="autoplay" width="100%"></video >
+		</div>
+		<div class="bot">
+			<input type="button" class="btndown" value=" 下载文件 " ng-click="download()" /> &nbsp;&nbsp;
+			<input type="button" class="btnback" value=" 返回 " ng-click="onCancel()"  /> 
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+
+
+var selectedUnitCode="";
+var validator;
+var userData;
+
+var ngScope;
+var app = angular.module("mdu", []);
+app.controller("ctrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	
+	$scope.projectInfo={};
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	var params = getUrlParams();
+	//alert(reVisitid)
+	var fileCode=params.fileCode;
+	var fileType=params.fileType;
+	if(fileType=="png" || fileType=="jpg" || fileType=="jpeg" || fileType=="gif"){
+		$("#img").show();
+		$("#pdf").hide();
+		$("#vid").hide();
+		var filePathn = filePath+"?fileCode="+params.dlurl+"&attachment=0";
+		$("#imgid").attr("src",filePathn);
+	}else if(fileType=="mp4" || fileType=="rmvb" || fileType=="avi"){
+		var filePathv = filePath+"?fileCode="+params.dlurl+"&attachment=0";
+		 $("#img").hide();
+		 $("#pdf").hide();
+		 $("#vid").show();
+		 $("#videoid").attr("src",filePathv);
+	}else{
+		 PDFObject.embed(filePath+"?fileCode="+params.dlurl+"&attachment=0", "#pdf");
+		 $("#img").hide();
+		 $("#pdf").show();
+		 $("#vid").hide();
+	}
+   	 
+	 
+	//PDFObject.embed(filePath+"?fileCode="+reVisitid+"&attachment=0", "#pdf");
+	
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		history.go(-1);
+		
+	/* 	hrefTo({
+			url:"projectFile1.html",
+			data:getUrlParams()
+		});
+ */
+		//location.href="projectMgr.html";
+	};
+	
+	$scope.download=function(){
+		
+		/* $scope.httpGet({
+			url:"eap/pmsServices/km/kmbase/kmbase/insertDownStudy?employeeCode="+userData.employeeCode+"&fileUrl="+params.fileUrl+"&fileCode="+params.fileCode,
+			success:function(res){
+				
+				 
+			}
+		}); */
+		
+		$http.get(serviceBasePath+"eap/pmsServices/km/kmbase/kmbase/insertDownStudy?employeeCode="+userData.employeeCode+"&fileUrl="+params.fileUrl+"&fileCode="+params.fileCode).success(function(response){
+		});
+		
+		
+		location.href=filePath+"?fileCode="+params.fileUrl+"&attachment=1";
+	};
+	
+});
+</script>
+</body>
+</html>

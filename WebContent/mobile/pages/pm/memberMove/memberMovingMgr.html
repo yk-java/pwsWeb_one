@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>人员调动进度</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+	<script src="../../../js/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../../css/bxyw1.css"/>
+	<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+	<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="../../../js/PageBar.js"></script>
+	<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css"/>
+	<script type="text/javascript" src="../../../js/Calendar.js"></script>
+	<script type="text/javascript" src="../../../js/config.js"></script>
+	<script type="text/javascript" src="../../../js/util.js"></script>
+	<script type="text/javascript" src="../../../js/ViewState.js"></script>
+	<script type="text/javascript" src="../../../js/ng-base.js"></script>
+	<script type="text/javascript" src="../../../../js/SimpleDateFormat.js"></script>
+	<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+	<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+	<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+	<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+	<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+	
+	<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+	
+	<style>
+		header{position:fixed;z-index:10}
+		section{padding:60px 0 65px 0}
+		.sort li{text-align:center}
+		.fenye_warp span.fen_btn{padding: 8px 9px;line-height: normal;background: #ededed;color:#a7a7a7}
+		.fl{height:inherit}
+		.filter li .filter_no{width: 47%;}
+		.dblist_cons .martp5 span.do{display:inline-block;width:23%;text-align:center}
+		.mr_20{margin-top:20px}
+		.more_filter{text-align:center;color:#02a2ff}
+		.disnone{display:none}
+		#date{width:200px;height:30px;display: inline-block;border:1px solid #ccc;background:none;line-height:30px;text-indent:5px}
+		.dblist_cons .martp5 span.do{width:45%}
+		.setJudging{width:90%;min-height:400px}
+		.dlog-showPic{width:90%;min-height:500px}
+	</style>
+</head>
+<body id="dblist" ng-app="userMgr" ng-controller="userMgrCtrl">
+	<header>
+		<div class="return"><img src="../../../../img/return.png"/></div>
+		人员调动处理
+	</header>
+	<section>
+		<ul class="cz_selpx ov" >
+			<li class="fl" style="width:100%">筛选<img src="../../../img/down_icon.png"/></li>
+		</ul>
+		<div class="filter_sort">
+			<ul class="filter sor_fil"  style="display: none;">
+				<li class="ov">
+					<div class="filter_con">
+						<div class="filter_search">
+							<div class="search_int">
+								<input type="text" name="search" id="search" viewstate="search" placeholder="姓名搜索"/>
+								<a class="clear_search">x</a>
+							</div>
+							<span ng-click="doQuery()">搜索</span>
+						</div>
+					</div>
+				</li>
+				<li style="height:auto;">
+					<div class="filter_con">
+						<span class="fl tspan">项目类型</span>
+						<div class="fl" style="width:100%">
+							<input type="hidden" viewstate="categoryCode">
+							<input type="hidden" viewstate="categoryName">
+							<div class="fl filter_no" onclick="filter(this)" ng-repeat="item in projectType" ng-click="selectCategory(item.categoryCode,item.categoryName)">
+							   <img src="../../../img/task_nonselete_icon.png" class="fl"/>
+							   <div class="fl">{{item.categoryName}}</div>
+							</div>
+							<div style="clear:both"></div>
+						</div>
+						<div style="clear:both"></div>
+					</div>
+				</li>
+				<li style="height:auto;">
+					<div class="filter_con">
+						<span class="fl tspan">项目名称</span>
+						<div class="fl" style="width:100%">
+							<input type="hidden" viewstate="proNo">
+							<input type="hidden" viewstate="proName">
+							<div class="fl filter_no" onclick="filter(this)" ng-if="item.proName.length>8" style="width:100%" ng-repeat="item in projectList" ng-click="selectPro(item.proNo,item.proName)">
+							   <img src="../../../img/task_nonselete_icon.png" class="fl"/>
+							   <div class="fl">{{item.proName}}</div>
+							</div>
+							<div class="fl filter_no" onclick="filter(this)" ng-if="item.proName.length<8"  ng-repeat="item in projectList" ng-click="selectPro(item.proNo,item.proName)">
+							   <img src="../../../img/task_nonselete_icon.png" class="fl"/>
+							   <div class="fl">{{item.proName}}</div>
+							</div>
+							<div style="clear:both"></div>
+						</div>
+						<div style="clear:both"></div>
+					</div>
+				</li>
+				<li class="more_filter">
+					<div class="filter_con">
+						<span class="fl tspan">开始日期</span><input type="date" id="fromDate" placeholder="请选择开始时间"/>
+					</div>
+				</li>
+				<li class="more_filter">
+					<div class="filter_con">
+						<span class="fl tspan">结束日期</span><input type="date" id="toDate" placeholder="请选择结束时间"/>
+					</div>
+				</li>
+				<li class="ov" style="height:auto;line-height:normal">
+					<a href="#" class="filterbtn fl" ng-click="doQuery()" >确定</a>
+					<a href="#" class="filterclose fr" ng-click="quxido()">重置</a>
+				</li>
+			</ul>
+		</div>
+		<div id="warp_id">
+			
+			<div class="con_list" ng-repeat="data in datalist1">
+				<div class="title1">
+					{{data.FILE_NO}}	
+				</div>
+				<div class="dblist_cons">
+					<div class="martp5"><span>员工：{{data.EMPLOYEENAME}}</span></div>
+					<div class="martp5"><span>调动前：{{data.PRO_NAME1}}</span></div>
+					<div class="martp5"><span>调动后：{{data.PRO_NAME2}}</span></div>
+					<div class="martp5">
+						<span ng-if="data.MOVE_TYPE==1" align="center">性质：项目-项目</span>
+						<span ng-if="data.MOVE_TYPE==2" align="center">性质：项目-部门</span>
+						<span ng-if="data.MOVE_TYPE==3" align="center">性质：部门-项目</span>
+						<span ng-if="data.MOVE_TYPE==4" align="center">性质：部门-部门</span>
+						<span align="center" ng-if="data.PROC_STATUS==1" style="margin-left:30px">状态：人员调动 </span>
+						<span align="center" ng-if="data.PROC_STATUS==2" style="margin-left:30px">状态：资产调动发起 </span>
+						<span align="center" ng-if="data.PROC_STATUS==3" style="margin-left:30px">状态：资产调动确认 </span>
+						<span align="center" ng-if="data.PROC_STATUS==4" style="margin-left:30px">状态：宿舍调动发起</span>
+						<span align="center" ng-if="data.PROC_STATUS==5" style="margin-left:30px">状态：宿舍调动确认</span>
+						<span align="center" ng-if="data.PROC_STATUS==6" style="margin-left:30px">状态：人员调动完毕</span>
+					</div>
+					<div class="martp5 mr_20">
+						<span class="do" style="width:100%"><img src="../../../img/daichuli.png" title="查看图片 " ng-click="showMoving(data)"></span>
+					</div>
+				</div>				
+			</div>
+			
+		</div>
+	</section>
+	<footer>
+		<p>
+			共查询到日志&nbsp;&nbsp;<span>{{datalist1.length}}</span>&nbsp;&nbsp;项
+		</p>
+	</footer>
+	<script type="text/javascript">
+	var app = angular.module("userMgr", []);
+	app.controller("userMgrCtrl", function($scope, $http){
+		/* init */
+		ngScope = $scope;
+		$scope.projectType=[];
+		$scope.curUnit={};
+		$scope.projectList=[];
+		$scope.mctlistArr ="";
+
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			location.href="../../../pages/login.html";
+			return;
+		}
+		
+		var viewstate = new ViewState();
+		var params = getUrlParams();
+		var userData = jQuery.parseJSON(userDataStr);
+		var companyCode = userData.companyCode;
+		var employeecode = "";
+		var proStatus="";
+		var mb_mctCode="";
+		var employeeName="";
+		var mb_proNo="";
+		var fromDate="";
+		var toDate="";
+		var ticket = $.cookie("pmsWeb_ticket");
+		var accountCode="";
+		$scope.mctlistArr ="";
+		$scope.totalPage="";
+		var enamearr=[];
+		var currentPage=1;
+		$scope.totalRecord=0;
+		/*根据角色判断是否传accountCode */
+		if(userData.roleCode=="004"){
+			accountCode=userData.accountCode;
+		}
+		if(userData.roleCode=="R20161107150600707427"){
+			employeecode =userData.employeeCode;
+		}
+		var employeeCode =userData.employeeCode;
+		var myDate = new Date();
+		fromDate=myDate.getFullYear()+"-"+(myDate.getMonth()+1)+"-01";
+		toDate=getFirstAndLastMonthDay(myDate.getFullYear(),myDate.getMonth()+1);
+		$("#toDate").val(toDate);
+		$("#fromDate").val(fromDate);
+		/* 获取项目类型  */
+		$http.get(serviceBasePath+"eap/pmsServices/pwsCommon/categorys?accountCode="+accountCode+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==200){
+				$scope.projectType= response.list;
+			}else if(response.statusCode==401){
+				location.href="../../../pages/login.html";
+			}else{
+			}
+		});
+		$scope.cond_categoryName=""
+		var cond_categoryCode="";
+		$scope.selectCategory=function(categoryCode,categoryName){
+			$scope.cond_categoryName=categoryName;
+			cond_categoryCode=categoryCode;
+			$("input[viewstate=categoryCode]").val(categoryCode);
+			$("input[viewstate=categoryName]").val(categoryName);
+			$scope.loadproName(accountCode,categoryCode,companyCode,proStatus,employeecode);
+		}
+		
+		/* 获取项目名称  */
+		$scope.loadproName=function(accountCode,categoryCode,companyCode,proStatus,employeecode){
+			$http.get(serviceBasePath+"eap/pmsServices/pwsCommon/activePro?accountCode="+accountCode+"&categoryCode="+categoryCode+"&companyCode="+companyCode+"&proStatus="+proStatus+"&employeecode="+employeecode+"&ticket="+ticket).success(function(res){
+				$scope.projectList = res.list;
+			});
+		}	
+		
+		$scope.cond_proName="";
+		$scope.selectPro=function(proNo,proName){
+			mb_proNo=proNo;
+			$scope.cond_proName=proName;
+			$("input[viewstate=proNo]").val(proNo);
+			$("input[viewstate=proName]").val(proName);
+			
+		}
+	
+		
+		/* 数据加载 */
+	 	$scope.loadData=function(employeeName,mb_proNo,fromDate,toDate){
+	 		new ShowDlog().prompt({
+	 			icon:"waitting",
+	 			msg:"正在加载...",
+	 			done:function(){},
+	 			t:600000
+	 		}); 	 
+			
+			$http.get(serviceBasePath+"eap/pmsServices/memberMove/getListByCode?proNo1="+mb_proNo+"&fromDate="+fromDate+"&toDate="+toDate+"&currentPage="+currentPage+"&employeeName="+employeeName+"&employeeCode="+employeeCode+"&ticket="+ticket).success(function(res){
+				if(res.statusCode==200){
+					$dlog.close();
+					$scope.datalist1 = res.list;
+					$scope.datares=res;
+				}else if(res.statusCode==401){
+					window.parent.location.href="../../../pages/login.html";
+				}else if(res.statusCode==404){
+					$scope.datalist1=[];
+				}
+			})
+		}; 
+		
+
+		$scope.loadData(employeeName,mb_proNo,fromDate,toDate);
+		
+		$scope.doQuery=function(){
+			toDate = $("#toDate").val();
+			fromDate = $("#fromDate").val();
+			employeeName=$("#search").val();
+			$("#warp_id").show();
+			$(".cz_selpx li").each(function(){
+				var n = $(this).index();
+				$(".filter_sort .sor_fil").eq(n).hide();
+				$(this).attr("isopen", "");
+			});
+			$scope.loadData(employeeName,mb_proNo,fromDate,toDate);
+			$(".filter").hide();
+		};
+		
+
+		$scope.quxido=function(){
+			window.location.reload();
+		};
+		$scope.showMoving=function(item){
+			location.href="memberMovingDetail.html?moveCode="+item.MOVE_CODE+"&moveType="+item.MOVE_TYPE+"&validDate="+item.VALID_DATE+"&employeecode="+item.EMPLOYEECODE+"&employeename="+item.EMPLOYEENAME+"&proName1="+item.PRO_NAME1+"&proName2="+item.PRO_NAME2+"&jobName1="+item.jobName1+"&jobName2="+item.jobName2;
+		};
+		$(".return").click(function(){
+			if(params.web==1){
+				window.history.back() 
+			}else{
+				window.top.exitApp();
+			}
+			
+		});
+		
+		
+	})
+	
+	
+		$(".clear_search").click(function(){
+		
+			$(".search_int input").val("");
+		});
+		
+		function filter(obj){
+			$(obj).find("img").attr("src","../../../img/task_selete_icon.png");
+			$(obj).siblings().find("img").attr("src","../../../img/task_nonselete_icon.png");
+		}
+				
+		$(".cz_selpx li").click(function(){
+			var isopen = $(this).attr("isopen");
+			if(isopen != "1"){
+				var n = $(this).index();
+				$(".filter_sort .sor_fil").eq(n).show().siblings().hide();
+				$(this).attr("isopen", "1");
+				$(this).siblings().attr("isopen", "");
+				if(n==0){
+					$("#warp_id").hide();
+				}else{
+					$("#warp_id").show();
+				}
+			}else{
+				var n = $(this).index();
+				$(".filter_sort .sor_fil").eq(n).hide();
+				$(this).attr("isopen", "");
+				if(n==0){
+					$("#warp_id").show();
+				}else{
+					$("#warp_id").show();
+				}
+			}
+		});
+		
+	
+		function getFirstAndLastMonthDay( year, month){    
+            var   firstdate = year + '-' + month + '-01';  
+            var  day = new Date(year,month,0);   
+            var lastdate = year + '-' + month + '-' + day.getDate();//获取当月最后一天日期    
+			//给文本控件赋值。同下  
+            return lastdate;  
+		}
+			
+	</script>
+</body>
+</html>

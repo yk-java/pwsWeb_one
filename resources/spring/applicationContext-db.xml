@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+		<!-- proxool数据源配置 -->
+	<bean id="dataSource" class="com.glens.eap.platform.core.datasource.EAPDataSource">
+	    <property name="alias" value="mysqlProxool"/>  
+	    <property name="driver" value="${jdbc.driverClassName}"/>  
+	    <property name="driverUrl" value="${jdbc.url}"/>  
+	    <property name="user" value="${jdbc.username}"/>  
+	    <property name="password" value="${jdbc.password}"/> 
+		<!-- 最大活动时间(超过此时间线程将被kill,默认为5分钟) -->
+		<property name="maximumActiveTime" value="${maximumActiveTime}" />
+		<!-- 最少保持的空闲连接数 （默认2个） -->
+		<property name="prototypeCount" value="${prototypeCount}" />
+		<!-- 允许最小连接数 -->
+		<property name="minimumConnectionCount" value="${minimumConnectionCount}" />
+		<!-- 允许最大连接数,超过了这个连接，再有请求时，就排在队列中等候 -->
+		<property name="maximumConnectionCount" value="${maximumConnectionCount}" />
+		<!-- 测试的语句 -->
+		<property name="houseKeepingTestSql" value="${houseKeepingTestSql}"/>
+		<!-- 在使用之前使用连接 -->
+		<property name="testBeforeUse" value="${testBeforeUse}"/>
+		<property name="houseKeepingSleepTime" value="${houseKeepingSleepTime}"/>
+		<!-- 是否打印执行的SQL，true打印，false不打印 -->
+		<property name="trace" value="${trace}">
+		
+		</property>
+		<property name="verbose" value="${verbose}">
+			
+		</property>
+	</bean>
+	
+	<!-- 配置mybitasSqlSessionFactoryBean -->
+	<bean id="sqlSessionFactory"  class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+	</bean>
+
+	<!--置事务管理器	-->
+	 <bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- 配置公共dao -->
+	<bean id="commonDao" class="com.glens.eap.platform.framework.dao.impl.EAPCommonDao">
+		<constructor-arg ref="sqlSessionFactory"/>
+	</bean>
+	
+	<!-- 配置公共service -->
+	<bean id="commomService" class="com.glens.eap.platform.framework.service.impl.EAPCommonService">
+		<property name="dao" ref="commonDao"/>
+	</bean>
+
+	<!-- 使用annotation注解方式配置事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager" mode="proxy" proxy-target-class="true"/>
+
+</beans>

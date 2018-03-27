@@ -1,0 +1,278 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>等级设置 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+body{overflow:hidden;}
+.form_bottom{float:right;}
+.form_bottom .title_save{float:right;}
+.form_bottom .title_cancel{float:right;}
+#saveForm input{text-indent:10px}
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table style="width:100%;">
+				<tr>
+					<th>是否是年薪</th>
+					<td>
+						<input type="radio" value="1" name="isYearlySalary" ><label>是</label>
+						<input type="radio" value="0" name="isYearlySalary" ><label>否</label>
+					</td>
+				</tr>
+				<tr>
+					<th>选择等级</th>
+					<td>
+						<input type="text" name="salaryGradeName" placeholder="请选择等级" style="width:250px;" class="dropDownList">
+						<input type="hidden" name="salaryGrade">
+					</td>
+				</tr>
+				<tr>
+					<th>选择档次</th>
+					<td>
+						<input type="hidden" name="companyCode">
+						<input type="hidden" name="employeeCode">
+						<input type="text" name="salaryLevelName" placeholder="请选择档次" class="dropDownList" style="width:250px;">
+						<input type="hidden" name="salaryLevel">
+					</td>
+				</tr>
+				<tr>
+					<th>实际薪酬</th>
+					<td>
+						<input type="text" name="realSalary" placeholder="请输入薪酬" style="width:250px;" class="number">
+						<input type="hidden" name="gradeSalary">
+					</td>
+				</tr>
+				
+			</table>
+		</div>
+		
+		<div class="form_bottom" style="width:100%;float:right;">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+$("input[name=isYearlySalary][value='0']").click();
+simpleController({
+	init:function($scope, $http){
+		$scope.valObj={};
+		
+		// 参数
+		var urlParams = getUrlParams();
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			window.noLogin(location.href);
+			return;
+		}
+		var userData = jQuery.parseJSON(userDataStr);
+		$("input[name='companyCode']").val(userData.companyCode);
+		$("input[name='employeeCode']").val(urlParams.peopleCode);
+		
+		/* 获取部门薪酬体系信息 */
+		$scope.unitInComeList={};
+		var frameworkCode="";
+		var salaryGradeNamePrefix="";
+		$scope.salaryGradeArr=[];
+		$scope.salaryLevelArr=[];
+		$scope.salaryLevelObj={};
+		$scope.salaryGradeObj={};
+		$scope.httpGet({
+			url:"eap/pmsServices/hrm/salMgr/salaryFramwork/unitEnableSalaryFramwork",
+			data:{"companyCode":$scope.userData.companyCode,"unitCode":urlParams.unitCodeforMacth},
+			success:function(res){
+				if(res.statusCode==200){
+					$scope.unitInComeList=res.data;
+					frameworkCode=res.data.frameworkCode;
+					
+					var tempSalaryLevelObj={"id":'',"name":"请选择"};
+					$scope.salaryLevelArr.push(tempSalaryLevelObj);
+					for(var i=$scope.unitInComeList.salaryGradeStart;i<=$scope.unitInComeList.salaryGrade;i++){
+						$scope.salaryLevelObj={"id":i,"name":i+"档"};
+						$scope.salaryLevelArr.push($scope.salaryLevelObj);
+					}
+					
+					var tempsalaryGradeArr={"id":'',"name":"请选择"};
+					$scope.salaryGradeArr.push(tempsalaryGradeArr);
+					for(var i=1;i<=$scope.unitInComeList.salaryLevel;i++){
+						$scope.salaryGradeObj={"id":i,"name":$scope.unitInComeList.salaryGradeNamePrefix+i};
+						$scope.salaryGradeArr.push($scope.salaryGradeObj);
+					}
+				}
+			}
+		});
+		
+		/* 选择档次 */
+		new DropDownList().init({
+			renderTo:"input[name=salaryLevelName]",
+			mode:"list",
+			height:"110px",
+			data:$scope.salaryLevelArr,
+			textField:"name",
+			onSelected:function(item){
+				$("input[name=salaryLevel]").val(item.id);
+				$("input[name=salaryLevelName]").val(item.name);
+				$scope.salary();
+			}
+		});
+		/* 选择档次 */
+		new DropDownList().init({
+			renderTo:"input[name=salaryGradeName]",
+			mode:"list",
+			height:"110px",
+			data:$scope.salaryGradeArr,
+			textField:"name",
+			onSelected:function(item){
+				$("input[name=salaryGradeName]").val(item.name);
+				$("input[name=salaryGrade]").val(item.id);
+				$scope.salary();
+			}
+		});
+		
+		$scope.salary=function(){
+			var salaryLevel= $("input[name=salaryLevel]").val();
+			var salaryGrade= $("input[name=salaryGrade]").val();
+			$scope.httpGet({
+				url:"eap/pmsServices/hrm/salMgr/salaryFramwork/getStandSalary",
+				data:{"companyCode":$scope.userData.companyCode,"unitCode":urlParams.unitCodeforMacth,"frameworkCode":frameworkCode,"salaryLevel":salaryLevel,"salaryGrade":salaryGrade},
+				success:function(res){
+					if(res.statusCode==200){
+						$("input[name=gradeSalary]").val(res.data.STANDARD_SALARY);
+					}
+				}
+			});
+			
+			
+			
+			
+		}
+		
+		/* 表单验证 */
+		validator = $("#saveForm").validate({
+			onsubmit: false,
+			focusInvalid: false,
+			focusCleanup: true,
+			errorElement: "span",
+			ignore:".ignore",
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {
+					
+				} 
+			}
+		});
+		$scope.onSave=function(){
+			
+			var t1=$("input[name=salaryLevel]").val();//档次
+			var t2=$("input[name=salaryGrade]").val();//等级
+			var t3=$("input[name=realSalary]").val();//实际薪酬
+			var waittingDlog = new ShowDlog();
+
+			
+			
+			if(t3==""){
+				
+				if(t2=="" && t1==""){
+					waittingDlog.prompt({
+						icon:"warning",
+						msg:"请选择等级档次或填写实际薪酬",
+						done:function(){
+							
+						},
+						t:1500
+					})
+					return false;
+				}
+				
+				if(t2==""){
+					waittingDlog.prompt({
+						icon:"warning",
+						msg:"请您选择等级",
+						done:function(){
+							
+						},
+						t:1500
+					})
+					return false;
+				}
+				
+				if(t1==""){
+					waittingDlog.prompt({
+						icon:"warning",
+						msg:"请您选择档次",
+						done:function(){
+							
+						},
+						t:1500
+					})
+					
+					return false;
+				}
+			}
+			
+			
+			
+			if(!$("#saveForm").valid())
+				return;
+			var formData = serializeArrayToMap($("#saveForm").serializeArray());
+			$scope.httpPost({
+				url:"eap/pmsServices/hrm/salMgr/salaryFramwork/updateEmployeeSalaryGrade",
+				data:formData,
+				success:function(res){
+					if(res.statusCode==200){
+						new ShowDlog().prompt({
+							icon:"success",
+							msg:"保存成功！",
+							done:function(){
+								parent.$dlog.data="SUCCESS";
+								parent.$dlog.close();
+							},
+							t:1500
+						});
+					}
+				}
+			});
+		};
+		
+		$scope.onCancel=function(){
+			parent.$dlog.close();
+		};
+	}
+});
+</script>
+</body>
+</html>

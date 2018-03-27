@@ -1,0 +1,345 @@
+<!DOCTYPE HTML>
+<html  ng-app="mapPosition">
+<head>
+<title> 线路定位 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=PL4wfqVofjrMVz7FMaPs8Dts"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script> 
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/common.css"/>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+ 
+<style type="text/css">
+	body{
+		margin:0px;
+		padding:0px;
+		font-size:12px;
+		font-family:"微软雅黑";
+	}
+	.list .map_div{height:100%;border:solid 1px #cccccc;}
+ </style>
+</head>
+
+<body  ng-controller="mapPositionCtrl" >
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">线路定位</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			 <a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;返回
+			</a>
+		</div>
+		<div class="map_div" id="allmap">
+			
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+  addComplexInfoWindow=function(map,marker,info) {	
+			var sContent = "<table style='border-collapse:collapse;padding-left:4px'>";
+			for(var item in info){
+				sContent +="<tr><td width='100' style='color:#4CA9FF;font-weight:bold'>"+item+"</td><td>"+info[item]+"</td> </tr>";
+			}					
+			sContent +="</table>";
+			//var marker = new BMap.Marker(map.getCenter());
+			var infoWindow = new BMap.InfoWindow(sContent); //创建信息窗口对象
+			map.addOverlay(marker);
+			marker.addEventListener("click", function() {
+				// 调用了marker对象的openInfoWindow方法
+				this.openInfoWindow(infoWindow); 
+			});   
+}
+simpleController({
+	moduleName:"mapPosition",
+	controllerName:"mapPositionCtrl",
+	init:function($scope, $http){
+		var params = getUrlParams();
+		 var userData, ticket;
+ 
+    	var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		userData = jQuery.parseJSON(userDataStr);
+		
+		ticket = $.cookie("pmsWeb_ticket");
+ 
+ 
+		var deviceInfo=[];
+		var polylines=[];
+	    var pointArr =[];
+	    
+	    var map= new BMap.Map("allmap");    // 创建Map实例
+
+		//map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
+		map.addControl(new BMap.MapTypeControl({
+		mapTypes:[
+            BMAP_NORMAL_MAP,
+            BMAP_HYBRID_MAP
+        ]}));
+	    map.enableScrollWheelZoom();                 //启用滚轮放大缩小
+ 
+	    map.centerAndZoom(userData.regionName,15); 
+	    
+	    getDeviceIndex=function(deviceId){
+	    	var result=-1;
+	    	for(var idx in deviceInfo){
+	    		var item=deviceInfo[idx];
+	    		if(item.deviceId==deviceId){
+	    			result= item.idx;
+	    		 	break;
+	    		}
+	    	}
+	    	return result;
+	    }
+		
+		/* 数据加载 */
+		loadXld=function(){ 
+			$http.get(serviceBasePath+"eap/pmsServices/cj/base/cjXld/queryCjXldList?xlCollectId="
+				+params.collectId+"&ticket="+ticket).success(function(response){
+				if(response.statusCode==401){
+					alert("用户凭据过期！请重新登录！");
+					window.top.location.href="../../../login.html";
+					return;
+				}
+				if(response.statusCode!=200){
+					alert("请求服务器失败！");
+					return;
+				}  
+				processData(response.list);
+				var data=[ 
+{ 
+"XLINTERID":"1000000017528",
+"fromId":"1000000029914",
+"fromAmname":"中1#庄04",
+"fromJd":118.732810000,
+"fromWd":32.246088000,
+"fromType":2,
+"fromTypeName":"杆塔",
+"toId":"14001126110754",
+"toAmname":"中1#庄05",
+"toJd":118.732730000,
+"toWd":32.246104000,
+"toType":2,
+"toTypeName":"杆塔"
+},
+{ 
+"XLINTERID":"1000000017528",
+"fromId":"14000217507481",
+"fromAmname":"中山#1线30",
+"fromJd":118.737921000,
+"fromWd":32.249067000,
+"fromType":2,
+"fromTypeName":"杆塔",
+"toId":"14000722922060",
+"toAmname":"中山#1线31",
+"toJd":118.737819000,
+"toWd":32.249178000,
+"toType":2,
+"toTypeName":"杆塔"
+},
+{ 
+"XLINTERID":"1000000017528",
+"fromId":"1000007455655",
+"fromAmname":"中1#南15",
+"fromJd":118.721538000,
+"fromWd":32.245485000,
+"fromType":2,
+"fromTypeName":"杆塔",
+"toId":"1000000030481",
+"toAmname":"中1#南14",
+"toJd":118.721793000,
+"toWd":32.245024000,
+"toType":2,
+"toTypeName":"杆塔"
+},
+{ 
+"XLINTERID":"1000000017528",
+"fromId":"14001165606238",
+"fromAmname":"中#1疏10",
+"fromJd":118.733972000,
+"fromWd":32.247251000,
+"fromType":2,
+"fromTypeName":"杆塔",
+"toId":"14001165606242",
+"toAmname":"中#1疏11",
+"toJd":118.733648000,
+"toWd":32.247523000,
+"toType":2,
+"toTypeName":"杆塔"
+},
+{ 
+"XLINTERID":"1000000017528",
+"fromId":"14001165606238",
+"fromAmname":"中#1疏10",
+"fromJd":118.733972000,
+"fromWd":32.247251000,
+"fromType":2,
+"fromTypeName":"杆塔",
+"toId":"14001165606234",
+"toAmname":"中#1疏09",
+"toJd":118.734196000,
+"toWd":32.247084000,
+"toType":2,
+"toTypeName":"杆塔"
+}];
+/*
+,
+{ 
+"XLINTERID":"1000000017528",
+"fromId":"14000209895353",
+"fromAmname":"中#1疏08",
+"fromJd":118.734229000,
+"fromWd":32.247049000,
+"fromType":2,
+"fromTypeName":"杆塔",
+"toId":"14001165606234",
+"toAmname":"中#1疏09",
+"toJd":118.734196000,
+"toWd":32.247084000,
+"toType":2,
+"toTypeName":"杆塔"
+},
+{ 
+"XLINTERID":"1000000017528",
+"fromId":"14000217507477",
+"fromAmname":"中山#1线29",
+"fromJd":118.738224000,
+"fromWd":32.248739000,
+"fromType":2,
+"fromTypeName":"杆塔",
+"toId":"14000217507481",
+"toAmname":"中山#1线30",
+"toJd":118.737921000,
+"toWd":32.249067000,
+"toType":2,
+"toTypeName":"杆塔"
+},
+{ 
+"XLINTERID":"1000000017528",
+"fromId":"14000893327844",
+"fromAmname":"中山1#线34#",
+"fromJd":118.736926000,
+"fromWd":32.250336000,
+"fromType":2,
+"fromTypeName":"杆塔",
+"toId":"14000217507493",
+"toAmname":"中山#1线33",
+"toJd":118.737311000,
+"toWd":32.249746000,
+"toType":2,
+"toTypeName":"杆塔"
+},
+{ 
+"XLINTERID":"1000000017528",
+"fromId":"14000217507473",
+"fromAmname":"中山#1线28",
+"fromJd":118.738626000,
+"fromWd":32.248311000,
+"fromType":2,
+"fromTypeName":"杆塔",
+"toId":"14000217507469",
+"toAmname":"中山#1线27",
+"toJd":118.738839000,
+"toWd":32.248060000,
+"toType":2,
+"toTypeName":"杆塔"
+},
+{ 
+"XLINTERID":"1000000017528",
+"fromId":"14000217507473",
+"fromAmname":"中山#1线28",
+"fromJd":118.738626000,
+"fromWd":32.248311000,
+"fromType":2,
+"fromTypeName":"杆塔",
+"toId":"14000217507477",
+"toAmname":"中山#1线29",
+"toJd":118.738224000,
+"toWd":32.248739000,
+"toType":2,
+"toTypeName":"杆塔"
+}
+*/
+				processData(data);
+			});
+		};
+		
+		// 数据处理
+	 	processData=function(dataList){
+	 			var deviceIdx=0;
+				for(var idx in dataList){
+					var item=dataList[idx];
+					if(item.fromJd>0 && item.toJd>0){
+						var fromDeviceIdx=getDeviceIndex(item.fromId);	
+						var ggPoint;					
+						if(fromDeviceIdx==-1){
+							deviceInfo.push({deviceId:item.fromId,idx:deviceIdx,jd:item.fromJd,wd:item.fromWd,amname:item.fromAmname,typeName:item.fromTypeName});
+							ggPoint = new BMap.Point(item.fromJd, item.fromWd);	   
+							pointArr.push(ggPoint);	
+							fromDeviceIdx=deviceIdx;						
+							deviceIdx++;
+						}
+						var toDeviceIdx=getDeviceIndex(item.toId);						
+						if(toDeviceIdx==-1){
+							deviceInfo.push({deviceId:item.toId,idx:deviceIdx,jd:item.toJd,wd:item.toWd,amname:item.toAmname,typeName:item.toTypeName});
+							ggPoint = new BMap.Point(item.toJd, item.toWd);	   
+							pointArr.push(ggPoint);	
+							toDeviceIdx=deviceIdx;						
+							deviceIdx++;
+						}
+						polylines.push({fromIdx:fromDeviceIdx,toIdx:toDeviceIdx});
+					}					
+				} 
+				if(pointArr.length>0){
+					var convertor = new BMap.Convertor();
+        			convertor.translate(pointArr, 1, 5, drawXld); 
+				}
+	 	}
+	 	
+	 	//数据绘制
+		drawXld=function(data){	 
+	      if(data.status === 0) {
+	      	for(var idx in polylines){	  
+				var item=polylines[idx];    	
+	      		var polyline = new BMap.Polyline([
+		 			data.points[item.fromIdx],data.points[item.toIdx]
+				], {strokeColor:"blue", strokeWeight:4, strokeOpacity:.8}); 
+					map.addOverlay(polyline);   //增加折线 
+	      	}
+			for(var idx in deviceInfo){
+			   var item=deviceInfo[idx];    	
+	      	   var marker = new BMap.Marker(data.points[idx]);	         
+	           addComplexInfoWindow(map,marker,{"设备名称":item.amname,"设备类型":item.typeName,"经度":item.jd,"纬度":item.wd});
+	      	}
+	      } 
+		}
+		
+	 	loadXld();  	  
+  		$scope.onCancel=function(){
+			 history.go(-1); 
+		};
+	}
+});
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>文档检索</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+
+	.warning{background:red;color:#fff;}
+	.week{width:50px;}
+	.bgcolor{background:yellow}
+	
+	.switch_btn_group{border:solid 1px #3385FF;min-height:30px;float:left;border-radius:15px; position:absolute;right:20px;top:0px;}
+	.switch_btn_group a{display:inline-block;float:left;background:#fff;color:#3385FF;text-decoration:none;font-size:13px;
+		line-height:30px;text-align:center;margin:0 1px 0 0;min-width:60px;}
+	.switch_btn_group a.selected{background:#3385FF;color:#fff;}
+	.switch_btn_group a:first-of-type{border-top-left-radius:15px;border-bottom-left-radius:15px;}
+	.switch_btn_group a:last-of-type{border-top-right-radius:15px;border-bottom-right-radius:15px;margin:0;}
+	.dialog-invoice{width:1000px;height:600px;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" class="dropDownProjectType" placeholder="请选择项目类别"/>
+				<input type="text" style="width:206px;" class="dropDownTree dropDownList" placeholder="请选择项目"/>
+			
+			
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+			   <tr class="tr1">
+				<th rowspan="2"><div align="center">序号</div></th>
+				<th rowspan="2"><div align="center">项目名称</div></th>
+				<th rowspan="2"><div align="center">项目编号</div></th>
+				<th rowspan="2"><div align="center">负责人</div></th>
+				<th rowspan="2"><div align="center">总工作量</div></th>
+				<th rowspan="2"><div align="center">项目阶段</div></th>
+				<th rowspan="2"><div align="center">项目状态</div></th>
+				<th colspan="6"><div align="center">商务文档</div></th>
+				<th colspan="6"><div align="center">项目文档</div></th>
+			  </tr>
+			   <tr class="tr1">
+				<th><div align="center">项目立项</div></th>
+				<th><div align="center">项目投标</div></th>
+				<th><div align="center">项目合同</div></th>
+				<th><div align="center">项目工作量</div></th>
+				<th><div align="center">项目结算</div></th>
+				<th><div align="center">项目决算</div></th>
+				<th><div align="center">作业规范</div></th>
+				<th><div align="center">考核办法</div></th>
+				<th><div align="center">质量标准</div></th>
+				<th><div align="center">检查方法</div></th>
+				<th><div align="center">项目计划书</div></th>
+				<th><div align="center">样板产品</div></th>
+			  </tr>
+			  
+			  <tr class="tr2" ng-repeat="item in dailyList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.pro_name}}</div></td>
+				<td><div align="center">{{item.proNo}}</div></td>
+				<td><div align="center">{{item.proManager}}</div></td>
+				<td><div align="center">{{item.totalWorkload}}</div></td>
+				<td>
+					<div align="center" ng-if="item.proPhase==1">前期</div>
+					<div align="center" ng-if="item.proPhase==2">中期</div>
+					<div align="center" ng-if="item.proPhase==3">后期</div>
+				</td>
+				<td>
+					<div align="center" ng-if="item.proStatus==1">登记</div>
+					<div align="center" ng-if="item.proStatus==2">激活</div>
+					<div align="center" ng-if="item.proStatus==3">关闭</div>
+				</td>
+				<td><div align="center"><a style="color: blue" href="" ng-click="showProDocs(3,0,item)">{{toStr(item.t1)}}</a></div></td>
+				<td><div align="center"><a style="color: blue" href="" ng-click="showProDocs(4,0,item)">{{toStr(item.t2)}}</a></div></td>
+				<td><div align="center"><a style="color: blue" href="" ng-click="showProDocs(5,0,item)">{{toStr(item.t3)}}</a></div></td>
+				<td><div align="center"><a style="color: blue" href="" ng-click="showProDocs(6,0,item)">{{toStr(item.t4)}}</a></div></td>
+				<td><div align="center"><a style="color: blue" href="" ng-click="showProDocs(7,0,item)">{{toStr(item.t5)}}</a></div></td>
+				<td><div align="center"><a style="color: blue" href="" ng-click="showProDocs(8,0,item)">{{toStr(item.t6)}}</a></div></td>
+				<td><div align="center"><a style="color: blue" href="" ng-click="showProDocs(15,1,item)">{{toStr(item.t7)}}</a></div></td>
+				<td><div align="center"><a style="color: blue" href="" ng-click="showProDocs(18,1,item)">{{toStr(item.t8)}}</a></div></td>
+				<td><div align="center"><a style="color: blue" href="" ng-click="showProDocs(19,1,item)">{{toStr(item.t9)}}</a></div></td>
+				<td><div align="center"><a style="color: blue" href="" ng-click="showProDocs(20,1,item)">{{toStr(item.t10)}}</a></div></td>
+				<td><div align="center"><a style="color: blue" href="" ng-click="showProDocs(21,1,item)">{{toStr(item.t11)}}</a></div></td>
+				<td><div align="center"><a style="color: blue" href="" ng-click="showProDocs(22,1,item)">{{toStr(item.t12)}}</a></div></td>
+			  </tr>
+			  
+			</table>
+		</div>
+
+	
+		
+	</div>
+</div>
+<script type="text/javascript">
+var cond_proStatus="2";
+var cond_categoryCode="";
+var proNo="";
+var docTypelibCode="";//文档类型
+var proName="";//项目
+
+var fromDate="";
+var toDate=""; 
+var price1;
+var price2;
+var contractNo="";
+
+var _currentPage=1;
+var ngScope;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.dailyList=[];
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	
+	//fromDate=getMonthStartDate();
+	//toDate=getMonthEndDate();
+	
+	//$("input[name=fromDate]").val(fromDate);
+	//$("input[name=toDate]").val(toDate);
+	
+	
+	var params = getUrlParams();
+	
+	//proNo,fromDate,toDate,price1,price2,contractNo
+	if(params){
+		if(params.proNo){
+			proNo=params.proNo;
+		}
+		
+		if(params.proName){
+			proName=params.proName;
+			$(".dropDownTree").val(proName);
+		}
+		if(params.fromDate){
+			fromDate=params.fromDate;
+			$("input[name=fromDate]").val(fromDate);
+		}
+		if(params.toDate){
+			toDate=params.toDate;
+			$("input[name=toDate]").val(toDate);
+		}
+		if(params.price1){
+			price1=params.price1;
+			//alert(price1!=undefined)
+			if(price1!="undefined"){
+				$("input[name=price1]").val(price1);
+			}
+		}
+		if(params.price2){
+			price2=params.price2;
+			if(price2!="undefined"){
+				$("input[name=price2]").val(price2);
+			}
+			
+		}
+		if(params.contractNo){
+			contractNo=params.contractNo;
+			$("input[name=contractNo]").val(contractNo);
+		}
+	}
+	
+	ticket = $.cookie("pmsWeb_ticket");
+	/* 项目类型 */
+	new DropDownList().init({
+		renderTo:".dropDownProjectType",
+		url:"../../component/projectType.html?required=false&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownProjectType").val(result.categoryName);
+			cond_categoryCode = result.categoryCode;
+			
+			//$scope.loadDailyList(cond_categoryCode,proNo,cond_proStatus);
+			
+			
+			/* 联动 */
+			projectList.setConfig("url", "../../component/allProjectList.html?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&required=false&ticket="+ticket);
+			
+		}
+	});
+	$(".switch_btn_group>a").each(function(){
+		$(this).click(function(){
+			$(this).addClass("selected");
+			$(this).siblings().removeClass("selected");
+			cond_proStatus = $(this).attr("datatype");
+			projectList.setConfig("url", "../../component/allProjectList.html?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&ticket="+ticket);
+			$scope.doQuery();
+		});
+		
+	});
+	/* 项目列表 */
+	var projectList = new DropDownList();
+	projectList.init({
+		renderTo:".dropDownTree",
+		url:"../../component/allProjectList.html?categoryCode="+cond_categoryCode+"&proStatus="+cond_proStatus+"&required=false&ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$(".dropDownTree").val(result.proName);
+			proNo=result.proNo;
+			proName=result.proName;
+			$scope.loadDailyList(cond_categoryCode,proNo,cond_proStatus);
+		}
+	});
+	
+	$scope.showProDocs=function(code,status,item){
+		
+		var docClass="";
+		var docTypelibCode="";
+		if(status==0){
+			docClass=code;
+		}else if(status==1){
+			docTypelibCode=code;
+		}
+
+		
+		new ShowDlog().showFrame("dialogProjectFile.html?proNo="+item.proNo+"&docClass="+docClass+"&docTypelibCode="+docTypelibCode, "查看文档", function(){
+			
+			
+		},"dialog-invoice");
+		
+		
+		
+		
+		/* $http.get(serviceBasePath+"eap/pmsServices/pm/projDoc/list?docClass="+docClass+"&proStatus=2&proNo="+proNo+"&docTypelibCode="+docTypelibCode+"&ticket="+ticket+"&currentPage="+currentPage).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$scope.dailyList = response.list;
+			
+ 			createPageBar(response.totalPage, response.currentPage,response.totalRecord);
+ 			
+		}); */
+	};
+	
+	
+	
+	$scope.loadDailyList=function(cond_categoryCode,proNo){//alert(unitCode);
+	
+	
+		$http.get(serviceBasePath+"eap/pmsServices/pm/projDoc/proDocStatistict?proNo="+proNo+"&proStatus="+cond_proStatus+"&categoryCode="+cond_categoryCode).success(function(response){
+			
+			if(response.statusCode!=200){
+				//alert("请求服务器失败！");
+				return;
+			}
+			$scope.dailyList = response.list;
+ 			//createPageBar(response.totalPage, response.currentPage);
+		});
+	};
+	
+	$scope.doQuery=function(){
+		//fromDate=$("input[name=fromDate]").val();
+		//toDate=$("input[name=toDate]").val();
+		//contractNo=$("input[name=contractNo]").val();
+			
+	//	price1=$("input[name=price1]").val();
+		//price2=$("input[name=price2]").val();
+		$scope.loadDailyList(cond_categoryCode,proNo,cond_proStatus);
+	};
+	
+	
+	$scope.toStr=function(val){
+		if(val==0){
+			return "-";
+		}else{
+			return val;
+		}
+		
+	};
+
+
+	
+	
+	
+	
+	/* 初始查询 */
+	//$scope.loadDailyList(cond_categoryCode,proNo,cond_proStatus);
+	
+	
+});
+</script>
+</body>
+</html>

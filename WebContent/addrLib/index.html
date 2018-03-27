@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>地名地址公共服务</title>
+	<script type="text/javascript" src="../js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="../js/util.js"></script>
+	<script type="text/javascript" src="../js/config.js"></script>
+	
+	<link rel="stylesheet" type="text/css" href="css/main.css"/>
+	<link rel="stylesheet" type="text/css" href="css/index.css"/>
+	<link rel="stylesheet" href="css/webrep.css" />
+	<link rel="shortcut icon" href="images/addressservice.png" type="image/x-icon"/>
+	<script src="js/webrep.js" type="text/javascript"></script>
+</head>
+<body>
+	<div class="header">
+		<div class="jl_ov logo jl_fl">
+			<img src="images/mz.png" class="jl_fl"/>
+			<div class="jl_fl">
+				<p class="dept_name">镇江民政</p>
+			</div>
+			<div class="sys_name jl_fl">
+				<p>地名地址公共服务</p>
+				<span>Public Address Service System</span>
+			</div>
+		</div>
+		<div class="jl_fr right_warp">
+			<div class="search jl_ov">
+				<div class="jl_fr" style="line-height: 33px;">
+<!-- 					欢迎您：张三 <span class="btn_loginexit">退出</span> -->
+				</div>
+			</div>
+			<div class="nav">
+				<ul>
+					<li><a href="index.html">首页</a></li>
+					<li class="active addrnamecheck">
+						<a href="#">地名审核</a>
+						<ul class="second_nav" style="display:none">
+							<li><a href="addrNameCheck.html">地名审核</a></li>
+							<li><a href="coreSearch.html">验证码查询</a></li>
+						</ul>
+					</li>
+					<li><a href="publicSearch.html" target="_blank">公共查询</a></li>
+					<li><a href="javascript:">政策法规</a></li>
+					<li><a href="javascript:">通知公告</a></li>
+					<li style="clear:both"></li>
+				</ul>
+			</div>
+		</div>
+		<div style="clear:both"></div>
+	</div>
+	<!--header结束-->
+	<!--banner-->
+	<div class="banner">
+		<div class="banner_warp jl_ov">
+			<div class="banner_login jl_fr">
+				<ul class="login_btn jl_ov">
+					<li class="active">普通用户登录</li>
+					<li>管理用户登录</li>
+				</ul>
+				<div class="login_form">
+					<ul>
+						<li>
+							<label>用户名</label>
+							<input type="text" name="uname1" />
+						</li>
+						<li style="margin-bottom:0">
+							<label>密&nbsp;&nbsp;&nbsp;&nbsp;码</label>
+							<input type="password" name="upass1" />
+						</li>
+						<li style="margin-bottom:0">
+							<a href="register.html" class="jl_fr" style="line-height:40px;font-size:12px;color:#999;margin-right:30px">建设单位注册</a>
+							<div style="clear:right"></div>
+						</li>
+						<li style="text-align: center;">
+							<a class="login" href="javascript:">登录</a>
+						</li>
+					</ul>
+					<ul style="display:none;">
+						<li>
+							<label>用户名</label>
+							<input type="text" name="uname" />
+						</li>
+						<li>
+							<label>密&nbsp;&nbsp;&nbsp;&nbsp;码</label>
+							<input type="password" name="upass" />
+						</li>
+						<li style="text-align: center;">
+							<a href="javascript:doLogin()">登录</a>
+						</li>
+						<li>
+						</li>
+					</ul>
+				</div>
+				<div class="error_msg"></div>
+			</div>
+		</div>
+	</div>
+	<!--首页内容展示区域-->
+	<div class="jl_ov warp_no1">
+		<div class="jl_fl warp_mo1">
+			<div class="web_report" style="height: 225px;">
+				<div class="no1_title"><span>网站公示</span></div>
+				<div id="banner">
+				    <div id="banner_bg"></div>
+					
+				 	<ul>
+				    	<li class="on">1</li>
+				    	<li>2</li>
+				    	<li>3</li>
+				    	<li>4</li>
+				  	</ul>
+					 <div id="banner_list"> 
+					  	<a href="#" target="_blank"><img src="images/5832ae3c7c634.png" /></a> 
+					    <a href="#" target="_blank"><img src="images/5832ae91d6ee6.png" /></a> 
+					    <a href="#" target="_blank"><img src="images/5832aef54b00b.png" /></a> 
+					    <a href="#" target="_blank"><img src="images/5832af45a58da.png" /></a> 
+					</div>
+				</div>
+			</div>
+			<div class="web_report">
+				<div class="no1_title"><span>百问解答</span><img src="images/more.png" class="jl_fr"/></div>
+				<ul>
+					<li><span>普查用图有哪些保密管理要求？</span><a>11-25</a></li>
+					<li><span>地名标准化有哪些主要内容？</span><a>11-17</a></li>
+					<li><span>地名普查成果转化利用主要包括哪些方面？</span><a>11-07</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="jl_fr warp_mo2">
+			<div class="warp_detail jl_fl">
+				<p>通知公告<img src="images/more.png" class="jl_fr"/></p>
+				<ul>
+					<li><img src="images/new.png" class="new_log"/><span>关于印发《第二次镇江地名普查多媒体信息采集规范》的通知 </span><a>11-25</a></li>
+					<li><span>关于开展“寻找镇江最美地名故事”网络征集活动有关事宜的通知 </span><a>10-21</a></li>
+					<li><span>关于开展第二次镇江地名普查督查工作的通知 </span><a>08-31</a></li>
+					<li><span>关于印发《第二次镇江地名普查档案管理办法》的通知</span><a>07-11</a></li>
+				</ul>
+			</div>			
+			<div class="warp_detail jl_fl" style="margin-right:0;">
+				<p>政策法规<img src="images/more.png" class="jl_fr"/></p>
+				<ul>
+					<li><span>镇江民政局地名办出台街路巷地名标志设置规范</span><a>11-21</a></li>
+					<li><span>镇江民政局地名办召开地名普查工作进展情况汇报交流会</span><a>11-14</a></li>
+					<li><span>镇江地名普查业务培训会圆满完成</span><a>08-31</a></li>
+					<li><span>镇江民政局地名办扎实推进地名文化属性信息采集工作</span><a>07-11</a></li>
+				</ul>
+			</div>		
+			<div class="warp_detail jl_fl">
+				<p>规范资料<img src="images/more.png" class="jl_fr"/></p>
+				<ul>
+					<li><span>第二次全国地名普查多媒体信息采集规范</span><a>07-01</a></li>
+					<li><span>《第二次全国地名普查质量评价体系》</span><a>07-01</a></li>
+					<li><span>《地名文献编纂》专题--谢前明 </span><a>07-01</a></li>
+					<li><span>区划地名图的编制与出版-芦仲进</span><a>06-11</a></li>
+					<li><span>《地名文献编纂》专题--谢前明 </span><a>07-01</a></li>
+				</ul>
+			</div>		
+			<div class="warp_detail jl_fl" style="margin-right:0;">
+				<p>友情链接<img src="images/more.png" class="jl_fr"/></p>
+				<ul>
+					<li>中华人民共和国民政部网站</li>
+					<li>中国行政区划网</li>
+					<li>第二次全国地名普查信息报送整理系统</li>
+					<li>地名普查微视频（微电影）征集活动</li>
+					<li>全国行政区划信息查询平台</li>
+				</ul>
+			</div>		
+		</div>
+	</div>
+	<div class="foot">
+		<p style="line-height:40px;">Copyright  2016-2018 Pwcloud.com. All Rights Reserved. 镇江地址库管理平台 版权所有</p>
+		<p><img src="images/footer_logo.png"/>苏公网安备 11010802010000    苏ICP备11010000号  苏ICP证150000号</p>
+	</div>
+</body>
+<script type="text/javascript">
+$(".login_btn>li").click(function(){
+	var index = $(this).index();
+	$(this).addClass("active");
+	$(this).siblings().removeClass("active");
+	var $cont = $(".login_form>ul:eq("+index+")");
+	$cont.siblings().hide();
+	$cont.show();
+	
+});
+window.onkeyup=function(e){
+	if(e.keyCode==13){
+		doLogin();
+	}
+};
+function doLogin(){
+	var $uname = $("input[name=uname]");
+	var $upass = $("input[name=upass]");
+	
+	var $error_msg = $(".error_msg");
+	var icon = "<span class=\"glyphicon glyphicon-exclamation-sign\"></span> ";
+	// check
+	if(!$uname.val() || $uname.val().length==0){
+		var msg="请输入用户名！";
+		$error_msg.html(icon+msg);
+		$uname.focus();
+		return false;
+	}
+	if(!$upass.val() || $upass.val().length==0){
+		var msg="请输入密码！";
+		$error_msg.html(icon+msg);
+		$upass.focus();
+		return false;
+	}
+	// login
+	$.ajax({
+		url:serviceBasePath+"eap/pmsServices/loginService",
+		method:"GET",
+		data:{"userName":$uname.val(),"psw":$upass.val()},
+		cache:false,
+		success:function(res){
+			if(!res){
+				msg="服务器无响应信息！";
+				$error_msg.html(icon+msg);
+				return;
+			}
+			if(res.statusCode=="200"){
+				// 200
+				var ticket = res.ticket;
+				$.cookie("pmsWeb_ticket", ticket, {"path":"/"});
+				$.cookie("pmsWeb_user_data", JSON.stringify(res.data), {"path":"/"});
+				//$.cookie("pmsWeb_ticket", ticket, {"path":"/pmsWeb/pages"});
+				//$.cookie("pmsWeb_user_data", JSON.stringify(res.data), {"path":"/pmsWeb/pages"});
+				location.href="../pages/main.html?ticket="+ticket;
+			}else{
+				msg="用户名或密码错误！";
+				$error_msg.html(icon+msg);
+			}
+		},
+		error:function(){
+			var msg = "服务器访问失败";
+			$error_msg.html(icon+msg);
+		}
+	});
+}
+</script>
+<script>
+	$(".addrnamecheck").mouseenter(function(){
+		$(".second_nav").show();
+	});
+	$(".addrnamecheck").mouseleave(function(){
+		$(".second_nav").hide();
+	});
+</script>
+</html>

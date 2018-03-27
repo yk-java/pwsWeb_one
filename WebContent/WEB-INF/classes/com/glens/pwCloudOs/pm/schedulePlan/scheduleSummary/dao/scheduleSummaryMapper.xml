@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.pm.schedulePlan.scheduleSummary.dao.scheduleSummaryMapper" >
+	
+	<select id="getScheduleSummary" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select p1.*
+		from (select a.COMPANY_CODE companyCode,a.PRO_NO proNo,a.PRO_CODE proCode,a.PRO_NAME proName,a.TOTAL_WORKLOAD totalWorkload,a.PRO_MANAGER proManager,a.UNIT_WORKLOAD unit,
+			sum(b.CLONE_PLAN_WORDLOAD) clonePlanWordload,sum(b.CLONE_PLAN_IW_WORDLOAD) clonePlanIwProgress,
+			sum(b.CLONE_PLAN_OW_WORDLOAD) clonePlanOwPorgress,
+			ROUND(sum(b.ACTUAL_IW_WORDLOAD),2) actualIwWordload,
+			ROUND(sum(b.ACTUAL_OW_WORDLOAD),2) actualOwWordload,
+			ROUND(SUM(b.DAY_ACCUMULATIVE_WORDLOAD),2) dayAccWordload,
+			sum(b.REMAIN_IW_WORDLOAD) remainIwWordload,sum(b.REMAIN_OW_WORDLOAD) remainOwWordload,
+			ROUND(sum(b.work_Hours), 2) as workHours,
+			FORMAT(sum(b.DAY_ACCUMULATIVE_PROGRESS),2) dayAccmulativeProgress,FORMAT(sum(b.DAY_ACCUMULATIVE_PROGRESS)/sum(b.CLONE_PLAN_WORDLOAD),2) dayAccmulativeWordload,
+			FORMAT((datediff(str_to_date(#{toDate},'%Y-%m-%d'),a.S_DATE)/datediff(a.E_DATE,a.S_DATE))*100,2) timeSchedule,count(b.rowid) dayWordloadCount,
+			MAX(b.ALL_WORK_HOURS) allWorkHours,
+			MAX(b.ALL_ACCUMULATIVE_WORDLOAD) allAccWordload,
+			ROUND(MAX(b.ALL_ACCUMULATIVE_PROGRESS)*100,2) allAccProgress
+			from pm_base a
+			left join pm_day_wordload b on a.COMPANY_CODE=b.COMPANY_CODE and a.PRO_NO=b.PRO_NO and b.REPORT_DATE &lt;=#{toDate} and b.REPORT_DATE &gt;=#{fromDate}
+			where 1=1
+			<if test="proNo != null and proNo != ''">
+				and a.PRO_NO=#{proNo}
+			</if>
+			<if test="proStatus != null and proStatus != ''">
+				and a.PRO_STATUS=#{proStatus}
+			</if>
+			<if test="accountCode != null and accountCode != ''">
+				and a.ACCOUNT_CODE=#{accountCode}
+			</if>
+			<if test="deptCode != null and deptCode != ''">
+			and a.MANAGE_DEPT=#{deptCode}
+			</if>
+			<if test="searchName!=null and searchName!=''">
+				and (a.PRO_NO like concat('%',#{searchName},'%') or a.PRO_NAME like concat('%',#{searchName},'%') or a.PRO_MANAGER like concat('%',#{searchName},'%'))
+			</if>
+			group by a.COMPANY_CODE,a.PRO_NO,a.PRO_NAME,a.TOTAL_WORKLOAD,a.PRO_MANAGER) p1
+	</select>
+</mapper>

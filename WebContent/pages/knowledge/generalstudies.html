@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 设备属性管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../bootstrap-3.3.5-dist/css/bootstrap.min.css"/>
+<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.windstagball.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css" />
+
+<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript" src="../../js/time.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+
+<style type="text/css">
+	.list{overflow: hidden;border: solid 1px #f7f7f7;}
+	.list .list_content{top:60px;width:98%;margin: 0 auto;}
+	.table, .table td, .table th{border:1px solid #f7f7f7;}
+	.list .list_content .title_div.hot_title{background:none !important;border:1px solid #f7f7f7;}
+	.list .list_content .title_div{line-height:40px;background: #f7f7f7;text-indent: 20px;color: #008FF5;font-size: 16px;border:none}
+	.list_title{position: absolute;left: 0;top: 0;line-height: 40px;background: #f7f7f7;width: 100%;text-indent: 20px;color: #008FF5;font-size: 18px;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<p class="list_title">·&nbsp;&nbsp;学习记录</p>
+	<div class="list_content">
+		<div class="title_div">
+			综合学习
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr>
+				<th><div align="center">序号</div></th>
+				<th><div align="center">分类</div></th>
+				<th><div align="center">目录</div></th>
+				<th><div align="center">总文档篇数</div></th>
+				<th><div align="center">当月更新篇数</div></th>
+				<th><div align="center">个人阅读总篇数</div></th>
+				<th><div align="center">个人当月阅读篇数</div></th>
+				<th><div align="center">总阅读次数</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in userList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.catalogName1}}</div></td>
+				<td><div align="center">{{item.catalogName}}</div></td>
+				<td><div align="center">{{item.totalNum}}</div></td>
+				<td><div align="center">{{item.curMonth}}</div></td>
+				<td><div align="center">{{item.perRead}}</div></td>
+				<td><div align="center">{{item.curPerRead}}</div></td>
+				<td><div align="center">{{item.totalRead}}</div></td>
+			  </tr>
+			</table>
+			
+		</div>
+		
+		<div class="title_div">
+			项目培训学习记录
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr>
+				<th><div align="center">序号</div></th>
+				<th><div align="center">文章名称</div></th>
+				<th><div align="center">作者</div></th>
+				<th><div align="center">阅读时间</div></th>
+				<th><div align="center">阅读次数</div></th>
+				<th><div align="center">总阅读次数</div></th>
+			  </tr>
+			  <tr>
+				<td><div align="center">1</div></td>
+				<td><div align="center">关于项目技能的培训</div></td>
+				<td><div align="center">张三</div></td>
+				<td><div align="center">2015-6-2</div></td>
+				<td><div align="center">2</div></td>
+				<td><div align="center">12</div></td>
+			  </tr>
+			  <tr>
+				<td><div align="center">1</div></td>
+				<td><div align="center">关于项目需求分析的培训</div></td>
+				<td><div align="center">李四</div></td>
+				<td><div align="center">2015-6-2</div></td>
+				<td><div align="center">10</div></td>
+				<td><div align="center">12</div></td>
+			  </tr>
+			  <tr>
+				<td><div align="center">1</div></td>
+				<td><div align="center">关于项目业务数据相关的培训</div></td>
+				<td><div align="center">小马哥</div></td>
+				<td><div align="center">2015-6-2</div></td>
+				<td><div align="center">10</div></td>
+				<td><div align="center">12</div></td>
+			  </tr>
+			</table>
+			
+		</div>
+	</div>
+</div>
+<script>
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	
+	companyCode=userData.companyCode;
+	employeeCode=userData.employeeCode;
+	var fromDate = getMonthStartDate();
+	var toDate = getMonthEndDate();
+
+	$http.get(serviceBasePath+"eap/pmsServices/km/kmbase/kmbase/getPersonRead?companyCode="
+			+companyCode+"&employeeCode="+employeeCode+"&fromDate="+fromDate+"&toDate="+toDate).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$scope.userList=response.list;
+		});
+	
+	
+});
+
+</script>
+</body>
+</html>

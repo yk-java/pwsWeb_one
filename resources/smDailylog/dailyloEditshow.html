@@ -1,0 +1,214 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 设备健康状况 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css"/>
+<script type="text/javascript" src="../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/ng-base.js"></script>
+
+<script type="text/javascript" src="../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/edit.css"/>
+
+<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.chooseUser{width:1000px;height:500px;}
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">新增项目工作日志</label>
+			</div>
+			<img src="../../img/list_Header2-.png">
+		</div>
+		<form id="saveForm" class="required-validate">
+			<div class="form_div" id="lay1">
+				 <table>
+					<tr>
+						<th>项目名称</th>
+						<td>
+							<input type="text" name="wiPro" class="required dropDownList" />
+						</td>
+						<th>工作项执行情况</th>
+						<td>
+							<input type="text" name="wiPlan" class="dropDownList required" placeholder="请输入工作项执行情况"/>
+						</td>
+					</tr>
+					<tr>
+						<th>工作项描述</th>
+						<td colspan="3">
+							<textarea class="required"  style="width:99%;height:50px" placeholder="请输入工作项描述" name="wiRecord"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<th>工作项执行成果</th>
+						<td colspan="3">
+							<textarea class="required"  style="width:99%;height:50px" placeholder="请输入工作项执行成果" name="wiResult"></textarea>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="form_bottom">
+				<a href="javascript:" ng-click="onSave()" class="title_save">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+				</a>
+				<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+				</a>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+
+simpleController({
+	init:function($scope, $http){
+		ngScope = $scope;
+		new DropDownList().init({
+			renderTo:"input[name=wiPlan]",
+			mode:"list",
+			data:[{id:1, name:"已完成"},{id:2, name:"完成并提交"},{id:2, name:"持续进行"},{id:2, name:"整理"},{id:2, name:"暂未完成"}],
+			textField:"name",
+			onSelected:function(item){
+				
+				$("input[name=wiPlan]").val(item.name);
+			}
+		});
+		
+		var params=getUrlParams();
+		
+		//console.log(params);
+		
+		if(params.wiPro){
+			$("input[name=wiPro]").val(params.wiPro);
+		}
+		
+		if(params.wiPlan){
+			$("input[name=wiPlan]").val(params.wiPlan);
+		}
+		
+		if(params.wiRecord){
+			$("textarea[name=wiRecord]").val(params.wiRecord);
+		}
+		
+		if(params.wiResult){
+			$("textarea[name=wiResult]").val(params.wiResult);
+		}
+		
+		var inx=params.inx;
+
+		
+		/* 项目名称 */
+		var proNameList = new DropDownList();
+		proNameList.init({
+			mode:"page",
+			renderTo:"input[name=wiPro]",
+			url:"../component/projectList.html?required=true",
+			height:"200px",
+			onSelected:function(result){
+				$("input[name=wiPro]").val(result.proName);
+				$("input[name=wiPro]").focus();
+			
+			}
+		});
+		
+		
+		/* 表单验证 */
+		validator = $("#saveForm").validate({
+			onsubmit: false,
+			focusInvalid: false,
+			focusCleanup: true,
+			errorElement: "span",
+			ignore:".ignore",
+			invalidHandler: function(form, validator) {
+				var errors = validator.numberOfInvalids();
+				if (errors) {
+					
+				} 
+			}
+		});
+		
+	
+		var paramsarr=[];
+		
+		
+		/* 保存 */
+		$scope.onSave=function(){
+			if($("#saveForm").valid()){
+			 var params = serializeArrayToMap($("#saveForm").serializeArray());
+				
+			 	if(localStorage.paramstr){
+			 		
+				    var str = localStorage.paramstr;
+				   
+				   /// str[params.inx]=params;
+				 	paramsarr = JSON.parse(str);
+				 	
+				 	
+				 	paramsarr[inx]=params;
+					//paramsarr.push(params);
+					
+					
+					
+					
+					var paramstr = JSON.stringify(paramsarr);
+					
+				
+					
+					localStorage.paramstr =paramstr;
+					
+					
+			 	
+			 	}
+				parent.$dlog.close();
+			}
+		
+			 	
+		};
+		
+		
+		$scope.sub=function(content){
+			if(content==undefined){
+				return "";
+			}
+		    if(content.length>20){
+		    	var str=content.substring(0,20);
+		    	return str;
+		    }else{
+		    	return content;
+		    }
+			
+		};
+
+		
+		
+		/* 取消 */
+		$scope.onCancel=function(){
+			parent.$dlog.close();
+		}; 
+	
+	}
+});
+</script>
+</body>
+</html>

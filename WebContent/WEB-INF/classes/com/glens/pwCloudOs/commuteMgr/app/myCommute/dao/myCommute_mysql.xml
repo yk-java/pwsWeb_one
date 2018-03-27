@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="myCommute">
+
+ <select id="getLastCommuteConfig" parameterType="java.lang.String" resultType="java.util.HashMap">
+    select COMPANY_CODE companyCode,DATE_FORMAT(CHECKIN_TIME,'%H:%i:%S') checkinTime,
+    DATE_FORMAT(CHECKOUT_TIME,'%H:%i:%S') checkoutTime, CHECK_POINT_TOTAL checkPointTotal
+	from cp_commute_config
+	where COMPANY_CODE=#{companyCode} and SYS_PROCESS_FLAG='1'
+	order by COMMUTE_SETTIME desc 
+	limit 0,1
+ </select>
+ 
+ <select id="getMyCommuteCheckByDate" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+ 	select DATE_FORMAT(CHECKIN_TIME,'%Y-%m-%d %H:%i:%S') checkinTime,DATE_FORMAT(CHECKOUT_TIME,'%Y-%m-%d %H:%i:%S') checkoutTime
+	from cp_commute_check
+	where DATE_FORMAT(SYS_CREATE_TIME,'%Y-%m-%d')=#{date} and account_code=#{accountCode}
+ </select>
+ 
+ <select id="getMyRestDate" parameterType="java.util.HashMap" resultType="java.lang.String">
+ 	select DATE_FORMAT(DAY,'%Y-%m-%d') from pf_dayoffs_config 
+	where SYS_PROCESS_FLAG='1' AND COMPANY_CODE=#{companyCode} AND UNIT_CODE=#{unitCode} 
+	AND ACCOUNT_CODE=#{accountCode}
+	<if test="year != null">
+		and YEAR = #{year}
+	</if>
+	<if test="month != null">
+		and MONTH = #{month}
+	</if>
+ </select>
+ 
+</mapper>

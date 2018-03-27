@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.pm.prjMgr.processMgr.dao.ProcessMgrMapper" >
+	<select id="selectToDoList" parameterType="map" resultType="com.glens.pwCloudOs.pm.prjMgr.processMgr.vo.ProcessVo">
+		<!-- 
+			 显示类型（1：租用、2：退租，3：维修）、内容、申请人、部门、项目组、申请时间、识别类型（1：资产借用、2：资产归还、3：资产维修、4：床位租用、5：床位退租）,表ID
+		-->
+		select bt.* 
+		from 
+		(
+			<!--  资产 -->
+			select 
+			(case when t.rent_status=0 then 1 
+			when t.rent_status=3 then 2 else 0 end) as viewtype,
+			(case when t.rent_status=0 then '租用' 
+			when t.rent_status=3 then '退租' else '' end) as viewtypeName,
+			t.REMARKS as content,
+			t.LOAN_EMPLOYEENAME as proposer,
+			t.LOAN_UNIT_NAME as unitName,
+			t.LOAN_PRO_NO as proNo,
+			t.LOAN_PRO_NAME as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			(case when t.rent_status=0 then 1 
+			when t.rent_status=3 then 2 else 0 end) as `type`,
+			t.rowid as rowid
+			from gm_asset_rent t 
+			where FLOW_STATUS = 1
+			
+			union all
+			
+			<!-- 维修 -->
+			select 
+			3 as viewtype,
+			'维修' as viewtypeName,
+			t.REPAIR_REASON as content,
+			t.LOAN_EMPLOYEENAME as proposer,
+			t.LOAN_UNIT_NAME as unitName,
+			t.LOAN_PRO_NO as proNo,
+			t.LOAN_PRO_NAME as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			3 as `type`,
+			t.rowid as rowid
+			from gm_asset_repair t 
+			where FLOW_STATUS=1
+			
+			union all
+			
+			<!-- 床位 -->
+			select 
+			(case when t.rent_status=0 then 1 
+			when t.rent_status=3 then 2 else 0 end) as viewtype,
+			(case when t.rent_status=0 then '租用' 
+			when t.rent_status=3 then '退租' else '' end) as viewtypeName,
+			t.remarks as content,
+			t.EMPLOYEENAME as proposer,
+			t4.unit_name as unitName,
+			t2.pro_no as proNo,
+			t2.pro_name as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			(case when t.rent_status=0 then 4 
+			when t.rent_status=3 then 5 else 0 end) as `type`,
+			t.rowid as rowid
+			from gm_bm_bedrent t 
+			left join pm_base t2 on t2.pro_no=t.pro_no 
+			left join md_employee t3 on t3.employeecode=t.employeecode
+			left join md_org_unit t4 on t4.unit_code = t3.unit_code
+			where FLOW_STATUS = 1
+			
+		
+		) bt  INNER JOIN  pm_base   d  on bt.proNo=d.PRO_NO
+		where 1=1
+		<if test="viewtype!=null and viewtype!=''">
+		and viewtype = #{viewtype}
+		</if>
+		<if test="proNo!=null and proNo!=''">
+		and proNo = #{proNo}
+		</if>
+		<if test="deptCode != null and deptCode != ''">
+		and d.MANAGE_DEPT=#{deptCode}
+    	</if>
+		order by proName, submitTime
+	</select>
+	
+	<select id="queryForCount1" parameterType="map" resultType="int">
+		select count(*) 
+		from 
+		(
+			<!-- 资产 -->
+			select 
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 then 2 else 0 end) as viewtype,
+			(case when t.rent_status=1 then '租用' 
+			when t.rent_status=2 then '退租' else '' end) as viewtypeName,
+			t.REMARKS as content,
+			t.LOAN_EMPLOYEENAME as proposer,
+			t.LOAN_UNIT_NAME as unitName,
+			t.LOAN_PRO_NO as proNo,
+			t.LOAN_PRO_NAME as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 then 2 else 0 end) as `type`,
+			t.rowid as rowid
+			from gm_asset_rent t 
+			where FLOW_STATUS = 4
+			
+			union all
+			
+			<!-- 维修 -->
+			select 
+			3 as viewtype,
+			'维修' as viewtypeName,
+			t.REPAIR_REASON as content,
+			t.LOAN_EMPLOYEENAME as proposer,
+			t.LOAN_UNIT_NAME as unitName,
+			t.LOAN_PRO_NO as proNo,
+			t.LOAN_PRO_NAME as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			3 as `type`,
+			t.rowid as rowid
+			from gm_asset_repair t 
+			where FLOW_STATUS=4
+			
+			union all
+			
+			<!-- 床位 -->
+			select 
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 then 2 else 0 end) as viewtype,
+			(case when t.rent_status=1 then '租用' 
+			when t.rent_status=2 then '退租' else '' end) as viewtypeName,
+			t.remarks as content,
+			t.EMPLOYEENAME as proposer,
+			t4.unit_name as unitName,
+			t2.pro_no as proNo,
+			t2.pro_name as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			(case when t.rent_status=1 then 4 
+			when t.rent_status=2 then 5 else 0 end) as `type`,
+			t.rowid as rowid
+			from gm_bm_bedrent t 
+			left join pm_base t2 on t2.pro_no=t.pro_no 
+			left join md_employee t3 on t3.employeecode=t.employeecode
+			left join md_org_unit t4 on t4.unit_code = t3.unit_code
+			where FLOW_STATUS = 4
+			
+		) bt INNER JOIN  pm_base   d  on bt.proNo=d.PRO_NO
+		where 1=1
+		<if test="viewtype!=null and viewtype!=''">
+		and viewtype = #{viewtype}
+		</if>
+		<if test="proNo!=null and proNo!=''">
+		and proNo = #{proNo}
+		</if>
+		<if test="deptCode != null and deptCode != ''">
+			and d.MANAGE_DEPT=#{deptCode}
+	    </if>
+		order by proName, submitTime
+	</select>
+	
+	<select id="selectDoneList" parameterType="map" resultType="com.glens.pwCloudOs.pm.prjMgr.processMgr.vo.ProcessVo">
+		<!-- 
+			类型（1：租用、2：退租，3：维修）、内容、申请人、部门、项目组、申请时间、识别类型（1：资产借用、2：资产归还、3：资产维修、4：床位租用、5：床位退租）、表ID 
+		-->
+		select bt.* 
+		from 
+		(
+			<!-- 资产 -->
+			select 
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 then 2 else 0 end) as viewtype,
+			(case when t.rent_status=1 then '租用' 
+			when t.rent_status=2 then '退租' else '' end) as viewtypeName,
+			t.REMARKS as content,
+			t.LOAN_EMPLOYEENAME as proposer,
+			t.LOAN_UNIT_NAME as unitName,
+			t.LOAN_PRO_NO as proNo,
+			t.LOAN_PRO_NAME as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 then 2 else 0 end) as `type`,
+			t.rowid as rowid
+			from gm_asset_rent t 
+			where FLOW_STATUS = 4
+			
+			union all
+			
+			<!-- 维修 -->
+			select 
+			3 as viewtype,
+			'维修' as viewtypeName,
+			t.REPAIR_REASON as content,
+			t.LOAN_EMPLOYEENAME as proposer,
+			t.LOAN_UNIT_NAME as unitName,
+			t.LOAN_PRO_NO as proNo,
+			t.LOAN_PRO_NAME as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			3 as `type`,
+			t.rowid as rowid
+			from gm_asset_repair t 
+			where FLOW_STATUS=4
+			
+			union all
+			
+			<!-- 床位 -->
+			select 
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 then 2 else 0 end) as viewtype,
+			(case when t.rent_status=1 then '租用' 
+			when t.rent_status=2 then '退租' else '' end) as viewtypeName,
+			t.remarks as content,
+			t.EMPLOYEENAME as proposer,
+			t4.unit_name as unitName,
+			t2.pro_no as proNo,
+			t2.pro_name as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			(case when t.rent_status=1 then 4 
+			when t.rent_status=2 then 5 else 0 end) as `type`,
+			t.rowid as rowid
+			from gm_bm_bedrent t 
+			left join pm_base t2 on t2.pro_no=t.pro_no 
+			left join md_employee t3 on t3.employeecode=t.employeecode
+			left join md_org_unit t4 on t4.unit_code = t3.unit_code
+			where FLOW_STATUS = 4
+			
+		) bt INNER JOIN  pm_base   d  on bt.proNo=d.PRO_NO
+		where 1=1
+		<if test="viewtype!=null and viewtype!=''">
+		and viewtype = #{viewtype}
+		</if>
+		<if test="proNo!=null and proNo!=''">
+		and proNo = #{proNo}
+		</if>
+		<if test="deptCode != null and deptCode != ''">
+		and d.MANAGE_DEPT=#{deptCode}
+	    </if>
+		order by proName, submitTime
+		
+		limit #{firstResult},#{maxResult}
+		
+	</select>
+	<select id="queryForCount" parameterType="map" resultType="int">
+		select count(*) 
+		from 
+		(
+			<!--  资产 -->
+			select 
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 or t.rent_status=3  then 2 else 0 end) as viewtype,
+			(case when t.rent_status=1 then '租用' 
+			when t.rent_status=2 or t.rent_status=3  then '退租' else '' end) as viewtypeName,
+			t.REMARKS as content,
+			t.LOAN_EMPLOYEENAME as proposer,
+			t.LOAN_UNIT_NAME as unitName,
+			t.LOAN_PRO_NO as proNo,
+			t.LOAN_PRO_NAME as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 or t.rent_status=3  then 2 else 0 end) as `type`,
+			t.rowid as rowid
+			from gm_asset_rent t 
+			where FLOW_STATUS = 2  or t.RENT_STATUS = 3
+			
+			union all
+			
+			<!-- 维修 -->
+			select 
+			3 as viewtype,
+			'维修' as viewtypeName,
+			t.REPAIR_REASON as content,
+			t.LOAN_EMPLOYEENAME as proposer,
+			t.LOAN_UNIT_NAME as unitName,
+			t.LOAN_PRO_NO as proNo,
+			t.LOAN_PRO_NAME as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			3 as `type`,
+			t.rowid as rowid
+			from gm_asset_repair t 
+			where FLOW_STATUS=2
+			
+			union all
+			
+			<!-- 床位 -->
+			select 
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 or t.rent_status=3 then 2 else 0 end) as viewtype,
+			(case when t.rent_status=1 then '租用' 
+			when t.rent_status=2 or t.rent_status=3 then '退租' else '' end) as viewtypeName,
+			t.remarks as content,
+			t.EMPLOYEENAME as proposer,
+			t4.unit_name as unitName,
+			t2.pro_no as proNo,
+			t2.pro_name as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			(case when t.rent_status=1 then 4 
+			when t.rent_status=2 or t.rent_status=3 then 5 else 0 end) as `type`,
+			t.rowid as rowid
+			from gm_bm_bedrent t 
+			left join pm_base t2 on t2.pro_no=t.pro_no 
+			left join md_employee t3 on t3.employeecode=t.employeecode
+			left join md_org_unit t4 on t4.unit_code = t3.unit_code
+			where FLOW_STATUS = 2 or t.RENT_STATUS = 3
+			
+		) bt INNER JOIN  pm_base   d  on bt.proNo=d.PRO_NO
+		where 1=1
+		<if test="viewtype!=null and viewtype!=''">
+		and viewtype = #{viewtype}
+		</if>
+		<if test="proNo!=null and proNo!=''">
+		and proNo = #{proNo}
+		</if>
+		<if test="deptCode != null and deptCode != ''">
+		and d.MANAGE_DEPT=#{deptCode}
+	    </if>
+		order by proName, submitTime
+	</select>
+	<select id="selectXzToDoList" parameterType="map" resultType="com.glens.pwCloudOs.pm.prjMgr.processMgr.vo.ProcessVo">
+		<!-- 
+			 显示类型（1：租用、2：退租，3：维修）、内容、申请人、部门、项目组、申请时间、识别类型（1：资产借用、2：资产归还、3：资产维修、4：床位租用、5：床位退租）,表ID
+		-->
+		select bt.* 
+		from 
+		(
+			<!--  资产 -->
+			select 
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 or t.rent_status=3  then 2 else 0 end) as viewtype,
+			(case when t.rent_status=1 then '租用' 
+			when t.rent_status=2 or t.rent_status=3  then '退租' else '' end) as viewtypeName,
+			t.REMARKS as content,
+			t.LOAN_EMPLOYEENAME as proposer,
+			t.LOAN_UNIT_NAME as unitName,
+			t.LOAN_PRO_NO as proNo,
+			t.LOAN_PRO_NAME as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 or t.rent_status=3  then 2 else 0 end) as `type`,
+			t.rowid as rowid
+			from gm_asset_rent t 
+			where FLOW_STATUS = 2  or t.RENT_STATUS = 3
+			
+			union all
+			
+			<!-- 维修 -->
+			select 
+			3 as viewtype,
+			'维修' as viewtypeName,
+			t.REPAIR_REASON as content,
+			t.LOAN_EMPLOYEENAME as proposer,
+			t.LOAN_UNIT_NAME as unitName,
+			t.LOAN_PRO_NO as proNo,
+			t.LOAN_PRO_NAME as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			3 as `type`,
+			t.rowid as rowid
+			from gm_asset_repair t 
+			where FLOW_STATUS=2
+			
+			union all
+			
+			<!-- 床位 -->
+			select 
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 or t.rent_status=3 then 2 else 0 end) as viewtype,
+			(case when t.rent_status=1 then '租用' 
+			when t.rent_status=2 or t.rent_status=3 then '退租' else '' end) as viewtypeName,
+			t.remarks as content,
+			t.EMPLOYEENAME as proposer,
+			t4.unit_name as unitName,
+			t2.pro_no as proNo,
+			t2.pro_name as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			(case when t.rent_status=1 then 4 
+			when t.rent_status=2 or t.rent_status=3 then 5 else 0 end) as `type`,
+			t.rowid as rowid
+			from gm_bm_bedrent t 
+			left join pm_base t2 on t2.pro_no=t.pro_no 
+			left join md_employee t3 on t3.employeecode=t.employeecode
+			left join md_org_unit t4 on t4.unit_code = t3.unit_code
+			where FLOW_STATUS = 2 or t.RENT_STATUS = 3
+			
+		) bt INNER JOIN  pm_base   d  on bt.proNo=d.PRO_NO
+		where 1=1
+		<if test="viewtype!=null and viewtype!=''">
+		and viewtype = #{viewtype}
+		</if>
+		<if test="proNo!=null and proNo!=''">
+		and proNo = #{proNo}
+		</if>
+		<if test="deptCode != null and deptCode != ''">
+		and d.MANAGE_DEPT=#{deptCode}
+	    </if>
+		order by proName, submitTime
+		
+		limit #{firstResult},#{maxResult}
+	</select>
+	<select id="selectXzDoneList" parameterType="map" resultType="com.glens.pwCloudOs.pm.prjMgr.processMgr.vo.ProcessVo">
+		<!-- 
+			类型（1：租用、2：退租，3：维修）、内容、申请人、部门、项目组、申请时间、识别类型（1：资产借用、2：资产归还、3：资产维修、4：床位租用、5：床位退租）、表ID 
+		-->
+		select bt.* 
+		from 
+		(
+			<!-- 资产 -->
+			select 
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 then 2 else 0 end) as viewtype,
+			(case when t.rent_status=1 then '租用' 
+			when t.rent_status=2 then '退租' else '' end) as viewtypeName,
+			t.REMARKS as content,
+			t.LOAN_EMPLOYEENAME as proposer,
+			t.LOAN_UNIT_NAME as unitName,
+			t.LOAN_PRO_NO as proNo,
+			t.LOAN_PRO_NAME as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 then 2 else 0 end) as `type`,
+			t.rowid as rowid
+			from gm_asset_rent t 
+			where FLOW_STATUS = 4
+			
+			union all
+			
+			<!-- 维修 -->
+			select 
+			3 as viewtype,
+			'维修' as viewtypeName,
+			t.REPAIR_REASON as content,
+			t.LOAN_EMPLOYEENAME as proposer,
+			t.LOAN_UNIT_NAME as unitName,
+			t.LOAN_PRO_NO as proNo,
+			t.LOAN_PRO_NAME as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			3 as `type`,
+			t.rowid as rowid
+			from gm_asset_repair t 
+			where FLOW_STATUS=4
+			
+			union all
+			
+			<!-- 床位 -->
+			select 
+			(case when t.rent_status=1 then 1 
+			when t.rent_status=2 then 2 else 0 end) as viewtype,
+			(case when t.rent_status=1 then '租用' 
+			when t.rent_status=2 then '退租' else '' end) as viewtypeName,
+			t.remarks as content,
+			t.EMPLOYEENAME as proposer,
+			t4.unit_name as unitName,
+			t2.pro_no as proNo,
+			t2.pro_name as proName,
+			t.SYS_CREATE_TIME as submitTime,
+			(case when t.rent_status=1 then 4 
+			when t.rent_status=2 then 5 else 0 end) as `type`,
+			t.rowid as rowid
+			from gm_bm_bedrent t 
+			left join pm_base t2 on t2.pro_no=t.pro_no 
+			left join md_employee t3 on t3.employeecode=t.employeecode
+			left join md_org_unit t4 on t4.unit_code = t3.unit_code
+			where FLOW_STATUS = 4
+			
+		) bt INNER JOIN  pm_base   d  on bt.proNo=d.PRO_NO
+		where 1=1
+		<if test="viewtype!=null and viewtype!=''">
+		and viewtype = #{viewtype}
+		</if>
+		<if test="proNo!=null and proNo!=''">
+		and proNo = #{proNo}
+		</if>
+		<if test="deptCode != null and deptCode != ''">
+		and d.MANAGE_DEPT=#{deptCode}
+	    </if>
+		
+		order by proName, submitTime
+	</select>
+</mapper>

@@ -1,0 +1,83 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>人资部</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+	<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="../../js/PageBar.js"></script>
+	<script type="text/javascript" src="../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/DropDownList-1.2/DropDownList.css"/>
+	<script type="text/javascript" src="../../js/Calendar.js"></script>
+	<script type="text/javascript" src="../../js/config.js"></script>
+	<script type="text/javascript" src="../../js/util.js"></script>
+	<script type="text/javascript" src="../../js/ng-base.js"></script>
+	<script type="text/javascript" src="../../js/eapJs/core/eap.core.js" ></script>
+	<script type="text/javascript" src="../../js/eapJs/plugins/eap.tip.js" ></script>
+	<script type="text/javascript" src="../../js/eapJs/plugins/eap.validate.js"></script>
+	<script type="text/javascript" src="../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/validate.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/edit.css"/>
+	<script type="text/javascript" src="../../js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/showDlog/showDlog-blue.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/mobile_main.css" />
+</head>
+
+<body ng-app="pmsWeb" ng-controller="knowLedgeCtrl">
+	<div class="header">
+		<div class="page_title">
+			<a class="return"><img src="../../img/return.png"/></a>
+			{{urlParams.catalogName}}
+		</div>
+	</div>
+	<div class="sear_list klbase_list">
+		<ul>
+			<li ng-repeat="item in filetList">
+				<a href="javascript:0" ng-click="showdetail(item.rowid)">
+					<h3><span>·</span>{{item.fileTitle}}</h3>
+					<p>所属目录分类：{{item.catalogName}}</p>
+					<img class="next_page" src="../../img/next_page.png"/>
+				</a>
+			</li>
+		</ul>
+		<img id="zwsj" src="../../img/temporarily_no_data.png" width="30%" style="margin:50px auto 0;display:none"/> 
+	</div>
+	<div class="footer">
+		<p>文件数量：{{filetList.length}}</p>
+	</div>
+<script>
+var app = angular.module("pmsWeb", []);
+app.controller("knowLedgeCtrl", function($scope, $http){
+	var urlParams = getUrlParams();
+	$scope.urlParams=urlParams;
+	var ticket = $.cookie("pmsWeb_ticket");
+	var catalogCode = urlParams.catalogCode;
+	$scope.filetList={};
+	$http.get(serviceBasePath+"eap/pmsServices/kmbaseService/queryKmBaseList?catalogCode="+catalogCode+"&ticket="+ticket).success(function(response) {/*encodeURIComponent(*/
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$scope.filetList=response.list;
+			if($scope.filetList.length==0){
+				$("#zwsj").css("display","block");
+			}else{
+				$("#zwsj").css("display","none");
+			}
+		});
+	
+	$scope.showdetail = function(rowid){
+		location.href="klDetail.html?rowid="+rowid;
+	}
+})	
+
+
+	$(".return").click(function(){
+		window.history.back();
+	});
+</script>
+</body>
+</html>

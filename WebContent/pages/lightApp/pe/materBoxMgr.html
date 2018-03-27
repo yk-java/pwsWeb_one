@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>Document</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="js/jquery.cookie.js"></script>
+	<script src="js/angular.min.js"></script>
+	<script src="js/util.js"></script>
+	<script src="js/ng-base.js"></script>
+
+	<script type="text/javascript" src="js/showDlog/showDlog.js"></script>
+	<link rel="stylesheet" type="text/css" href="js/showDlog/showDlog-blue.css" />
+
+	<link rel="stylesheet" type="text/css" href="css/bxyw.css"/>
+	<style type="text/css">
+		header{position:absolute;top:0;right:0;left:0;height:60px;}
+		section{position:absolute;top:60px;right:0;bottom:60px;left:0;overflow:auto;}
+		footer{position:absolute;right:0;bottom:0;left:0;height:60px;}
+		.filter_no1{margin-right:8px;}
+	</style>
+</head>
+<body ng-app="moduleName" ng-controller="controllerName">
+	<header>
+		<div class="return" ng-click="exit()"><img src="images/return.png"/></div>
+		表箱运维
+	</header>
+	<section>
+		<ul class="cz_selpx ov" >
+			<li class="fl">筛选<img src="images/down_icon.png"/></li>
+			<li class="fr">排序<img src="images/down_icon.png"/></li>
+		</ul>
+		<div class="filter_sort">
+			<ul class="filter"  style="display: none;">
+				<li class="ov">
+					<div class="filter_con">
+						<span class="fl tspan"></span>
+						<div class="fl ov">
+							<div class="fl ov filter_no1"><img src="images/task_nonselete_icon.png" data-type="2" class="fl"/><div class="fl">超期</div></div>
+							<div class="fl ov filter_no1"><img src="images/task_nonselete_icon.png" data-type="1" class="fl"/><div class="fl">预警</div></div>
+							<div class="fl ov filter_no1"><img src="images/task_nonselete_icon.png" data-type="0" class="fl"/><div class="fl">时间范围内</div></div>
+						</div>
+					</div>
+				</li>
+				<li class="ov">
+					<div class="filter_con">
+						<div class="filter_search">
+							<div class="search_int">
+								<input type="text" name="search" id="search" placeholder="输入终端地址或用户地址"/>
+								<a class="clear_search">x</a>
+							</div>
+							<span id="btn-search">搜索</span>
+						</div>
+					</div>
+				</li>
+			</ul>
+			<ul class="sort" style="display: none;">
+				<li data-sort="1"><div class="sort_no">最近派单时间<img src="images/task_list_selete_icon.png" class="fr"/></div></li>
+				<li data-sort="2"><div class="sort_no">终端地址排序<img src="images/task_list_selete_icon.png" class="fr" style="display: none;"/></div></li>
+<!-- 				<li><div class="sort_no">用户地址排序<img src="images/task_list_selete_icon.png" class="fr" style="display: none;"/></div></li> -->
+<!-- 				<li><div class="sort_no">地址位置远近<img src="images/task_list_selete_icon.png" class="fr" style="display: none;"/></div></li> -->
+			</ul>
+		</div>
+		<div ng-repeat="item in dataList" class="con_list">
+			<a href="javascript:" ng-click="toSee(item)">
+				<div class="title">
+					<!--<span class="stle chaoqi"></span>-->
+					{{item.TERMINAL_ID}} {{item.FAULT_TYPE}}
+					<span class="cbgz_count">{{item.total}}</span>
+					<p class="zdgz_address">终端位置：{{item.TERMINAL_LOC}}</p>
+				</div>
+			</a>
+		</div>
+		<!--
+		<div class="con_list">
+			<a href="电表列表.html">
+				<div class="title1"><span class="stle common"></span>5-3519-3573_抄表故障<span class="cbgz_count">20</span> <img src="images/Safari-Forward_right_icon.png"/></div>
+				<p class="zdgz_address"><span class="stle"></span>宁南玉兰山庄05跃层2单元301号</p>
+			</a>
+		</div>
+		<div class="con_list">
+			<a href="终端故障.html">
+				<div class="title1"><span class="stle sos"></span>5-3519-3573_终端故障 <img src="images/Safari-Forward_right_icon.png"/></div>
+				<p class="zdgz_address"><span class="stle"></span>宁南玉兰山庄05跃层2单元302号</p>
+				<!--<div class="con_mes ov">
+					<span class="fl"><img src="images/oclock_11.png"/>2015.12.3/2016.3.3</span>
+					<span class="fr"><img src="images/task_date_icon.png"/>一天15个小时</span>
+				</div>
+				<div class="con_status">
+					<span><a class="finish"></a>已完成</span>
+					<span><a class="common"></a>正常</span>
+				</div>-->
+	<!--	</a>
+		</div>-->
+	</section>
+	<footer>
+		<div class="fot_wap ov">
+			<div class="fl"><span class="stle chaoqi"></span>超期:{{taskCount.outtimeCnt}}</div>
+			<div class="fl"><span class="stle sos"></span>预警:{{taskCount.warningCnt}}</div>
+			<div class="fl"><span class="stle common"></span>时间范围内:{{taskCount.normalCnt}}</div>
+		</div>
+	</footer>
+	<script type="text/javascript">
+		/* 查询条件 */
+		$(".filter_no").each(function(){
+			$(this).click(function(){
+				var selected = $(this).find("img").attr("data-selected");
+				if(selected=="selected"){
+					// unselect
+					unselectEle($(this));
+				}else{
+					// select
+					selectEle($(this));
+				}
+				// I
+				var data_type = $(".filter_no").find("img[data-selected=selected]").attr("data-type");
+				typeChange(data_type);
+			})
+		});
+		
+		function unselectEle($el){
+			$el.find("img").attr("src","images/task_nonselete_icon.png");
+			$el.find("img").attr("data-selected", "");
+		}
+		function selectEle($el){
+			$el.find("img").attr("src","images/task_selete_icon.png");
+			$el.siblings().find("img").attr("src","images/task_nonselete_icon.png");
+			$el.find("img").attr("data-selected", "selected");
+			$el.siblings().find("img").attr("data-selected", "");
+		}
+		var timeType=null;
+		function typeChange(type){
+			timeType = type;
+		}
+	
+		$(".clear_search").click(function(){
+			$(".search_int input").val("");
+		});
+		
+		/* 搜索 */
+		$("#btn-search").click(function(){
+			var searchName = $("#search").val();
+			if(!timeType)
+				timeType="";
+// 			alert(searchName+", "+ timeType+", "+ sortType);
+			ngScope.loadDataList(timeType, sortType, searchName);
+		});
+		/* 排序 */
+		var sortType=1;
+		$(".sort li").each(function(){
+			$(this).click(function(){
+				$(this).find("img").show();
+				$(this).siblings().find("img").hide();
+				sortType = $(this).attr("data-sort");
+				sortTypeChange(sortType);
+			})
+		});
+		function sortTypeChange(sortType){
+			//
+		}
+		/* 互斥Tab页 */
+		$(".cz_selpx li").click(function(){
+			var n = $(this).index();
+			var tab = $(".filter_sort ul").eq(n);
+			if(tab.attr("is_show")=="true"){
+				tab.hide();
+				tab.attr("is_show", "false");
+			}else{
+				tab.show().siblings().hide();
+				tab.attr("is_show", "true");
+				$(".filter_sort ul").each(function(){
+					var ulIndex = $(this).index();
+					if(n!=ulIndex){
+						$(this).hide();
+						$(this).attr("is_show", "false");
+					}
+				});
+			}
+		});
+		
+		var ngScope;
+		simpleController({
+			init:function($scope, $http){
+				ngScope=$scope;
+				$scope.dataList=[];
+				$scope.taskCount={};
+				var urlParams = getUrlParams();
+				$scope.loadDataList=function(type, sort, searchName){
+					$scope.httpGet({
+						url:"eap/pmsServices/pm/taskMgr/task/userTaskList",
+						data:{"employeeCode":$scope.userData.employeeCode,
+							"type":type, "sort":sort, "searchName":searchName},
+						success:function(res){
+							$scope.dataList = res.list;
+						}
+					});
+
+					$scope.httpGet({
+						url:"eap/pmsServices/pm/taskMgr/task/findTaskCount",
+						data:{"employeeCode":$scope.userData.employeeCode,
+							"type":type, "searchName":searchName},
+						success:function(res){
+							$scope.taskCount=res.data;
+						}
+					});
+				};
+
+				$scope.toSee=function(item){
+					if(item.total>1){
+						top.viewTo(
+							"pe/materList.html",
+							{"terminalId":item.TERMINAL_ID,
+								"faultType":item.FAULT_TYPE}
+						);						
+					}else{
+						top.viewTo(
+							"pe/terminalFault.html",
+							{"terminalId":item.TERMINAL_ID,
+								"faultType":item.FAULT_TYPE}
+						);		
+					}
+				};
+
+				$scope.exit=function(){
+					if(urlParams.web==1){
+						top.history.back();
+					}else{
+						top.nativeLib.exitApp();
+					}
+					
+				};
+				
+				$scope.loadDataList("", 1, "");
+			}
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 首页 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/Hz2Pinyin.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<style type="text/css">
+body{background:#fff;margin:0;padding:0;}
+.projectList{margin:0px;padding:0;}
+.projectList>li{margin:0px;}
+.projectList>li>a{display:block;padding:4px;line-height:26px;font-size:12px;font-family:微软雅黑;color:#666;text-decoration:none;}
+.projectList>li>a:hover{background:#3470CC;color:#fff;cursor:default;}
+</style>
+</head>
+
+<body ng-app="projectList" ng-controller="projectListCtrl">
+	<ul class="projectList">
+		<li ng-if="required!='true'">
+			<a href="javascript:" ng-click="onChooseBlank()">(全部)</a>
+		</li>
+		<li ng-repeat="item in projectList">
+			<a href="javascript:"  title="{{item.code}}">
+				<input ng-checked="ischeck(item)" type="checkbox" name="pro" ng-click="onChoose(item)" value="{{item.code}}" dataname="{{item.name}}"/>
+				{{item.name}}
+			</a>
+		</li>
+	</ul>
+	<script type="text/javascript">
+	var ngScope;
+	var app = angular.module("projectList", []);
+	app.controller("projectListCtrl", function($scope, $http){
+		/* init */
+		ngScope = $scope;
+		$scope.projectList=[];
+		var userDataStr = $.cookie("pmsWeb_user_data");
+		if(!userDataStr){
+			
+			noLogin(location.href);
+			return;
+		}
+		$scope.userData = jQuery.parseJSON(userDataStr);
+		var ticket = $.cookie("pmsWeb_ticket");
+		
+		var params = getUrlParams();
+		
+		var categoryCode = "";
+		if(params.categoryCode){
+			categoryCode = params.categoryCode; 
+		}
+		$scope.required = params.required;
+		
+		var accountCode="";
+		/* 根据角色判断是否传accountCode */
+		if($scope.userData.roleCode=="004"){
+			accountCode=$scope.userData.accountCode;
+		}
+		
+		$scope.projectList=[{code:"1",name:"内业组员",isck:0},
+		    		      {code:"2",name:"内业班长",isck:0},
+		    		      {code:"3",name:"外业主管",isck:1},
+		    		      {code:"4",name:"外业班长",isck:1},
+		    		      {code:"5",name:"外业组员",isck:1},
+		    		      {code:"7",name:"内业主管",isck:0},
+		    		      {code:"8",name:"项目经理",isck:1},
+		    		      {code:"9",name:"项目主管",isck:1},
+		    		      {code:"26",name:"项目班长",isck:1}];
+		/* 选择 */
+		$scope.onChoose=function(obj){
+			window.frameElement.callback(obj);
+			window.frameElement.close();
+		};
+		
+		$scope.ischeck=function(obj){
+			
+			if(obj.isck==1){
+				return true;
+			}else{
+				return false;
+			}
+		};
+		var selectedItems=[];
+		/* 选择 */
+		$scope.onChoose=function(obj){
+			selectedItems=[];
+			$("input[name=pro]").each(function(){
+				if($(this)[0].checked){
+					var code = $(this).val();
+					var name = $(this).attr("dataname");
+					var item={};
+					item.code=code;
+					item.name=name;
+					selectedItems.push(item);
+				}
+			});
+			window.frameElement.callback(selectedItems);
+		};
+		
+		/* 选择空白 */
+		$scope.onChooseBlank=function(){
+			var obj=new Object();
+			obj.name="";
+			obj.code="";
+			window.frameElement.callback(obj);
+			window.frameElement.close();
+		};
+		
+	});
+	</script>
+</body>
+</html>

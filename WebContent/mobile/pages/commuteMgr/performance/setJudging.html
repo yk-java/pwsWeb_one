@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html ng-app="daily">
+<head>
+<title> 通勤绩效-二次判定</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css" />
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<style type="text/css">
+.dlog-showPic{width:300px;height:500px;}
+.list .list_content .title_div .title_left{background:none;color:#4CA9FF}
+</style>
+</head>
+
+<body>
+
+<div class="list" ng-controller="dailyCtrl">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label>&nbsp;&nbsp;轨迹异常判定</label>
+			</div>
+		</div>
+		
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1">
+			<table>
+			   <tr>
+				<th><div align="center">判定</div></th>
+				<td>
+					<input type="text" name="judgingName" class="dropDownList"  style="width:100%;text-indent:5px;"/>
+					<input type="hidden" name="judgingCode" class="dropDownList"/>
+				</td>
+			   </tr>
+			   <tr>
+				<th><div align="center">判定<br/>说明</div></th>
+				<td>
+					<textarea name="judgingDescr" rows="6" style="width:100%;text-indent:5px;"></textarea>
+				</td>
+			  </tr>
+			</table>
+		</div>
+		
+		<div class="form_bottom">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+		
+	</div>
+</div>
+<script type="text/javascript">
+
+var cond_categoryCode="",cond_proNo="",cond_date="",cond_searchName="";
+var ngScope;
+var selectedUnitCode;
+var app = angular.module("daily", []);
+app.controller("dailyCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.dailyList=[];
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	var urlParams = getUrlParams();
+	new DropDownList().init({
+		renderTo:"input[name=judgingName]",
+		url:"../../../../pages/component/commuteJudgingList.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$("input[name=judgingCode]").val(result.judgingCode);
+			$("input[name=judgingName]").val(result.judgingName);
+		}
+	});
+	
+	$scope.onSave=function(){
+		 var paramsObj = urlParams;
+		 paramsObj.cfCheckinTime=null;
+		 paramsObj.cfCheckoutTime=null;
+		 paramsObj.checkinTime=null;
+		 paramsObj.checkoutTime=null;
+		 paramsObj.judgingCode = $("input[name=judgingCode]").val();
+		 paramsObj.judgingName = $("input[name=judgingName]").val();
+		 paramsObj.judgingDescr = $("textarea[name=judgingDescr]").val();
+		 $http({
+			  method: "post",
+			  url: serviceBasePath+"eap/pmsServices/commuteMgr/performance/digitalSignage/judging",
+			  params: paramsObj
+			}).success(function(resp){
+				if(resp.statusCode=200){
+					parent.$dlog.data="SUCCESS";
+					parent.$dlog.close();
+				}else{
+					parent.$dlog.data="FAIL";
+					parent.$dlog.close();
+				}
+			});
+	};
+	
+	$scope.onCancel=function(){
+		parent.$dlog.data="CANCEL";
+		parent.$dlog.close();
+	};
+	
+});
+</script>
+</body>
+</html>

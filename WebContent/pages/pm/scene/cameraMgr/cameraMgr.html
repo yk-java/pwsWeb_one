@@ -1,0 +1,187 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>摄像头管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../../js/ViewState.js"></script>
+<script type="text/javascript" src="../../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../js/showDlog/showDlog-blue.css" />
+<script type="text/javascript" src="../../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../../js/config.js"></script>
+<script type="text/javascript" src="../../../../js/util.js"></script>
+<script type="text/javascript" src="../../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../../js/ng-base.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../css/list.css" />
+
+
+<style type="text/css">
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+	.dialog-add{width:500px;height:350px;}
+</style>
+</head>
+
+<body ng-app="moduleName" ng-controller="controllerName" storagekey="pm.scene.sceneMonitoring">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" name="DEVICE_NAME" style="width:200px;" placeholder="请输入设备名称"/>
+				<input type="text" id="status" class="dropDownList" placeholder="状态" style="width:200px;margin-right:2px;">
+				<div class="query_div" ng-click="doQuery()">
+					查询
+				</div>
+				&nbsp;&nbsp;
+			</div>
+			<img src="../../../../img/list_Header2-.png">
+			<div class="title_add" ng-click="toAdd()">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新增
+			</div>
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">设备序列号</div></th>
+				<th><div align="center">设备名称</div></th>
+				<th><div align="center">设备通道号</div></th>
+				<th><div align="center">资产编号</div></th>
+				<th><div align="center">购置日期</div></th>
+				<th><div align="center">工地名称</div></th>
+				<th><div align="center">状态</div></th>
+				<th><div align="center">操作</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in dataList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.DEVICE_NO}}</div></td>
+				<td><div align="center">{{item.DEVICE_NAME}}</div></td>
+				<td><div align="center">{{item.DEVICE_CHANNEL}}</div></td>
+				<td><div align="center">{{item.ASSET_CODE}}</div></td>
+				<td><div align="center">{{item.BUY_DATE}}</div></td>
+				<td><div align="center">{{item.SPOT_NAME}}</div></td>
+				<td ng-if="item.STATUS==1" style="background:red;color:#fff">
+					<div align="center">未使用</div>
+				</td>
+				<td ng-if="item.STATUS==2" style="background:orange;color:#fff">
+					<div align="center">已使用</div>
+				</td>
+				<td>
+					<div align="center">
+						<img ng-click="doUpdate(item)" class="operationImg" src="../../../../img/list_item_modify-icon.png" title="修改">
+			    		<img class="operationImg" ng-click="doDelete(item)" src="../../../../img/list_delete-icon.png" title="删除">
+		    		</div>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		/* init */
+		$scope.dataList=[];
+		var cardNo=$("input[name=cardNo]").val();
+		/* 加载数据 */
+		$scope.loadData=function(DEVICE_NAME,status){
+			$scope.httpGet({
+				url:"eap/pmsServices/pm/camera/list",// TODO
+				data:{"deviceName":DEVICE_NAME,"status":status},
+				success:function(res){
+					$scope.dataList = res.list;
+				},
+				pageChange:function(pageNum){
+					$scope.loadData();
+				},
+				error:function(res){
+					
+				}
+			});
+		};
+		var DEVICE_NAME="";
+		$scope.doQuery=function(){
+			DEVICE_NAME=$("input[name=DEVICE_NAME]").val();
+			$scope.loadData(DEVICE_NAME,$scope.status);
+		};
+		
+
+		$scope.status="";
+		new DropDownList().init({
+			renderTo:"#status",
+			mode:"list",
+			data:[{id:"", name:"全部"},{id:1, name:"未使用"},{id:2, name:"已使用"}],
+			textField:"name",
+			onSelected:function(item){
+				$("#status").val(item.name);
+				$scope.status=item.id;
+				$scope.loadData(DEVICE_NAME,$scope.status);
+			}
+		});
+
+
+		
+		
+		/* 项目显示 */
+		$scope.toAdd=function(item){
+			new ShowDlog().showFrame("cameraAdd.html", "摄像头新增", function(data){
+				if(data=="SUCCESS"){
+					$scope.doQuery();		
+				}
+			}, "dialog-add");
+		};
+		
+		/* 删除 */
+		$scope.doDelete=function(item){
+			console.log(item)
+			new ShowDlog().confirm({
+				msg:"确定删除吗？",
+				ok:function(){
+					$scope.httpPost({
+						url:"eap/pmsServices/pm/camera/delete",
+						data:{"rowid":item.rowid},
+						success:function(res){
+							if(res.statusCode==200){
+								new ShowDlog().prompt({
+									icon:"success",
+									msg:"删除成功！",
+									done:function(){
+										$scope.doQuery();
+									},
+									t:1500
+								});
+							}
+						}
+					});
+				}
+			});
+
+		};
+		$scope.doUpdate=function(item){
+			new ShowDlog().showFrame("cameraEdit.html?rowid="+item.rowid, "摄像头修改", function(data){
+				if(data=="SUCCESS"){
+					$scope.doQuery();		
+				}
+			}, "dialog-add");
+		}
+		
+		
+		/* 初始查询 */
+		$scope.doQuery();
+	}
+});
+</script>
+</body>
+</html>

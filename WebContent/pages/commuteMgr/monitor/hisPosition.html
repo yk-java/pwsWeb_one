@@ -1,0 +1,624 @@
+<!DOCTYPE HTML>
+<html ng-app="hisPosition">
+<head>
+<title>轨迹回放之地图视图 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script src="../../../js/jquery.js"></script>
+<script src="../../../js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=PL4wfqVofjrMVz7FMaPs8Dts"></script>
+
+
+<script type="text/javascript" src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" href="../../../css/jquery-ui.min.css">
+<link rel="stylesheet" type="text/css" href="../../../css/common.css" />
+
+<style type="text/css">
+	body{
+		margin:0px;
+		padding:0px;
+		font-size:12px;
+		font-family:"微软雅黑";
+	}
+	a{color:#4D4D4D;text-decoration: none;}
+
+	.list{position: absolute;left:13px;right:13px;top:13px;bottom:10px;border:solid 0px;}
+	.list .list_left{position: absolute;left:10px;top:0px;bottom:0px;width:390px;}
+	.list .list_left .left_title{width:100%;height:80px;background:#297BE6;}
+	.list .list_left .left_title>div{padding:20px 6px 6px 6px;}
+	.list .list_left .left_title>div>input{margin:6px 6px;}
+	.list .list_left .left_title .search_div{width:60px;height:40px;background:#1A4F93;color:#fff;line-height:40px;text-align:center;float:left;margin-left:10px;margin-top:20px;font-size:14px;font-weight: bold;}
+	.list .list_left .left_content{position: absolute;left:0px;right:0px;top:80px;bottom:0px;border-bottom:solid 1px #B2D1FF;}
+	.list .list_left .left_content .content_table{width:100%;top:0px;bottom:45px;}
+	.list .map_div{position: absolute;left:410px;top:0px;bottom:0px;right:0px;border:solid 1px #cccccc;}
+
+	.table,.table td,.table th{border:1px solid #EDEDED;border-collapse:collapse;}
+	.tr1{height:40px;background:#D9E9FF;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;font-weight:normal;}
+	.tr2{height:40px;background:#fff;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.tr2:hover{background:#F5F5F5;}
+	.tr3{height:40px;background:#FFCE7F;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.tr3:hover{background:#F5F5F5;}
+	.tr4{height:40px;background:#EFD397;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;}
+	.operationImg{cursor: pointer;}
+
+	.paging_div{bottom:10px;width:390px;height:22px;;margin:0 auto;border:solid 0px;color:#4D4D4D;text-align:center;margin-top:10px;}
+	.dropDownList{background-image:url(../../../img/drop_down_list.png);background-repeat: no-repeat;background-position:right;cursor:pointer;}
+	.dateComponent{height:30px;background-image:url(../../../img/icon-calendar.png);background-repeat: no-repeat;background-position:right;cursor:pointer;border:solid 1px #ccc;}
+
+	#page_bar .page_btn_prev{display:inline-black;border:solid 1px #3385FF;background:#3385FF;color:#fff;margin:0 4px;padding:2px 5px 2px 5px;}
+	#page_bar .page_btn_next{display:inline-black;border:solid 1px #3385FF;background:#3385FF;color:#fff;margin:0 4px;padding:2px 5px 2px 5px;}
+	#page_bar .page_btn{display:inline-black;border:solid 1px #3385FF;margin:0 4px;padding:2px 5px 2px 5px;}
+	#page_bar .selected{font-weight:bold;border:solid 1px #666;background:#666;color:#fff;}
+
+
+
+.userinfo{width:300px;}
+.userinfo .title{background:#fff;border:solid 1px #ccc;border-left:solid 3px #3385FF;vertical-align:middle;}
+.userinfo .title label{display:inline-block;width:250px;line-height:30px;margin-left:10px;color:#3385FF;font-family:微软雅黑;}
+.userinfo .title a{display:inline-block;}
+.userinfo .title img{vertical-align:middle;}
+.userinfo .table{background:rgba(256,256,256,0.9);border:solid 0px #ccc;margin-top:-1px;}
+.userinfo .table table{border-collapse:collapse;border:solid 1px #ccc;width:100%;}
+.userinfo .table table td{border:solid 1px #ccc;text-align:center;padding:10px;}
+.userinfo .table table td span{display:block;color:#3385FF;font-size:14px;font-weight:bold;font-family:微软雅黑;}
+.userinfo .table table td span font.unit{color:#888;font-size:10px;font-weight:normal;font-family:微软雅黑;}
+.userinfo .table table td label{display:block;color:#888;font-family:微软雅黑;}
+
+.message{width:100%;height:70px;background:rgba(256,256,256,0.9);border-top:solid 1px #FF5A02;position: absolute;top:0px;border-bottom:solid 1px #ccc;padding-bottom:3px;}
+.time{height:100%;width:160px;text-align: center;border-right:1px #eee solid;position: absolute;left:0px;}
+.time input{font-family: '微软雅黑';margin-top:5px;}
+.employeename{position:absolute;left:20px;text-align:center;}
+.employeename label{color:#ff6600;font-weight:bold;}
+.content1{height:100%;width:400px;text-align: center;border-right:1px #eee solid;float:left;position: absolute;left:150px;}
+.slider{height:100%;width:230px;text-align: center;border-right:1px #eee solid;float:left;text-align: center;position: absolute;left:550px;}
+.hot{text-align: center;width:150px;position: absolute;left:870px;}
+.dlog-showPic{width:1000px;height:500px;}
+</style>
+</head>
+
+<body ng-controller="hisPositionCtrl" storagekey="hisPosition">
+	
+	<div class="list">
+		<div class="list_left">
+			<div class="left_title" style="height:190px;">
+				<div>
+					<input type="text" style="width:180px;" id="projectList" viewstate="proName" class="txt dropDownList" placeholder="请选择项目"/>
+					<input type="hidden" viewstate="proNo"/>
+					<input type="text" style="width:150px;" name="jobName" viewstate="jobName" class="txt dropDownList" placeholder="请选择职务"/>
+					<input type="hidden" name="jobCode" viewstate="jobCode"/>
+					<input type="text" style="width:180px;" id="date" viewstate="date" class="txt dateComponent" onclick="new Calendar().show(this)" value='' onchange="dateChange()"  placeholder="请选择日期" />
+					<input type="text" name="searchName" viewstate="searchName" style="width:150px;" class="txt" placeholder="姓名搜索"/>
+					<input type="button" class="btn" value="查询" ng-click="doQuery()">
+					<label style="font-size:14px;color:#fff;"><input id='heartinput' style="width:20px;" onclick='showhot()' type="checkbox" value='1' onclick='openHeatmap()' />热力图</span>
+				</div>
+			</div>
+			
+			<div class="left_content" style="top:170px;">
+				<div class="content_table">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+					   <tr class="tr1">
+						<th><div align="center">序号</div></th>
+						<th><div align="center">员工姓名</div></th>
+<!-- 						<th><div align="center">员工工号</div></th> -->
+						<th><div align="center">组织/部门</div></th>
+						<th><div align="center">轨迹</div></th>
+						<th><div align="center">照片</div></th>
+					  </tr>
+					  <tr class="tr2" ng-repeat="item in userList">
+						<td><div align="center">{{$index+1}}</div></th>
+						<td><div align="center">{{item.employeeName}}</div></td>
+<!-- 						<td><div align="center">{{item.jobNo}}</div></td> -->
+						<td><div align="center" title="{{item.proName}}">{{strCut(item.proName, 8)}}</div></td>
+						<td>
+							<div align="center">
+								<a href="javascript:" ng-if="item.hasHis==1" style="color:#3385FF" ng-click="toShow(item)">查看</a>
+							</div>
+						</td>
+						<td align="center">
+						
+							<div ng-if="item.isPciture==1" align="center">
+								<img class="operationImg" src="../../../img/viewimg.png" ng-click="showPic(item)" title="查看图片 "/>
+							</div>
+							<div ng-if="item.isPciture==0" align="center">
+								-
+							</div>
+						</td>
+					  </tr>
+					 </table>
+					 
+				</div>
+
+				<div id="page_bar" class="paging_div">
+				</div>
+			</div>
+		</div>
+		<div class="map_div" id="allmap" >
+			
+			
+			 
+		</div>
+	</div>
+<script type="text/javascript">
+
+var cond_categoryCode="", cond_proNo="",cond_accountCode="",cond_date="",cond_searchName="";
+    
+    
+    var datalength=0;//是否有数据
+    
+	var heart=[];
+	var ischeck=0;
+	var map = new BMap.Map("allmap");    
+	var myIcon = new BMap.Icon("../../../img/map/position.png", new BMap.Size(19,25));
+	var marker = new BMap.Marker(new BMap.Point(0,0),{icon:myIcon});  
+	
+	map.enableScrollWheelZoom(true);
+	
+	var heatmapOverlay=null;
+	
+    function showhot(){
+	   var ishow=$("input[type='checkbox']").is(':checked');
+	   if(heatmapOverlay==null){
+	  	  heatmapOverlay = new BMapLib.HeatmapOverlay({"radius":20});
+	  	  map.addOverlay(heatmapOverlay);
+	   }
+	  
+	   
+	//heatmapOverlay.setDataSet({data:heart,max:100});
+	   if(ishow){
+	   		ischeck=1;
+		  	if(heart.length>0){
+			    if(!isSupportCanvas()){
+			    	alert("热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~");
+			    } 
+				heatmapOverlay.setDataSet({data:heart,max:100});
+		        heatmapOverlay.show();
+	        }
+        }else{
+        	 ischeck=0;
+        	 heatmapOverlay.hide();
+        }
+    }
+	
+	
+    function setGradient(){
+     	var gradient = {};
+     	var colors = document.querySelectorAll("input[type='color']");
+     	
+     	colors = [].slice.call(colors,0.2);
+     	colors.forEach(function(ele){
+			gradient[ele.getAttribute("data-key")] = ele.value; 
+     	});
+        heatmapOverlay.setOptions({"gradient":gradient});
+    }
+     function isSupportCanvas(){
+        var elem = document.createElement('canvas');
+        return !!(elem.getContext && elem.getContext('2d'));
+    } 
+
+
+
+	var line=null;
+	var userCtrl = null;
+	
+	/* 用户信息控件 */
+	function UserInfoControl(userInfo){
+	  this.defaultAnchor = BMAP_ANCHOR_TOP_LEFT;
+	  this.defaultOffset = new BMap.Size(0, 0);
+	  this.userInfo=userInfo;
+	}
+	
+	UserInfoControl.prototype = new BMap.Control();
+	UserInfoControl.prototype.initialize = function(map){
+	
+		var epname="";
+		if(this.userInfo.employeename){
+			epname=this.userInfo.employeename;
+		}
+		var up=0;
+		if(this.userInfo.checkPointCount){
+			up=this.userInfo.checkPointCount;
+		}
+		var work=0;
+		if(this.userInfo.commuteStatus){
+			work=this.userInfo.commuteStatus;
+		}
+		var intime="—";
+		if(this.userInfo.checkinTime){
+			intime=this.userInfo.checkinTime;
+		}
+	    var outtime="—";
+	    if(this.userInfo.checkoutTime){
+	    	outtime=this.userInfo.checkoutTime;
+	    }
+	   
+		
+		var html="<div class=\"message\">"
++"			 	  <div class=\"employeename\">"
++"			 	 	 <br/>"
++"			 	  	 <b>"+epname+"</b>"
++"			 	  	 <br>"
++"			 	  	 <label>"+cond_date+"</label>"
++"			 	  </div>"
++"			 	   <table class=\"content1\">"
++"			 	  	 <tr >"
++"						<td>上报<br />点数</td>"
++"						<td><span style=\"color:#FF5A02\">"+up+"</span><br />(点)</td>"
++"						<td>外业<br />里程</td>"
++"						<td><span style=\"color:#FF5A02\">"+((!isNaN(parseFloat(this.userInfo.distance)))?(parseFloat(this.userInfo.distance)).toFixed(1):0)+"</span><br />(公里)</td>"
++"						<td>工作<br />总量</td>"
++"						<td><span style=\"color:#FF5A02\">"+work+"</span></td>"
++"			 	  	 </tr>"
++"			 	  	 <tr>"
++"						<td style=\"border-top:1px #eee solid\">签到<br />时间</td>"
++"						<td style=\"border-top:1px #eee solid\"><span style=\"color:orange\">"+intime+"</span></td>"
++"						<td style=\"border-top:1px #eee solid\">签退<br />时间</td>"
++"						<td style=\"border-top:1px #eee solid\"><span style=\"color:orange\">"+outtime+"</span></td>"
++"						<td style=\"border-top:1px #eee solid\">工作<br />时长</td>"
++"						<td style=\"border-top:1px #eee solid\"><span style=\"color:orange\">"+(this.userInfo.worktime?this.userInfo.worktime:0)+"</span><br />(小时)</td>"
++"			 	  	 </tr>"
++"			 	  </table>"
++"			 	  <div class=\"slider\">"
++"					  <input type=\"text\" id=\"amount\" style=\"border:0; color:#f6931f; font-weight:bold;width:30px;text-align: center;margin-top:5px;\">"
++"					  <label for=\"amount\">[时间:<span id='time'>00:00:00</span>]</label>"
++"			 	  	  <div id=\"slider-range-max\" style=\"width:90%;margin-top:10px;margin-left:4%\"></div>"
++"			 	  	  <p style=\"margin-top:8px;\"><span id='minv' style='float:left;margin-left:3px;'></span>播放<span id='maxv' style='float:right;margin-right:5px;'></span></p>"
++"			 	  </div>"
++"			 </div>";
+		
+
+	  var div = $(html)[0];
+	  div.style.cursor = "pointer";
+	  div.onclick = function(e){
+		
+	  }
+	  map.getContainer().appendChild(div);
+	  return div;
+	}
+	userCtrl = new UserInfoControl({});
+				map.addControl(userCtrl);
+	
+ 
+	function setViewPort(points){
+		var minLng=999,minLat=999,maxLng=0,maxLat=0;
+		for (var i = 0; i < points.length; i++) {
+			var p = points[i];
+			var lng = p.lng;
+			var lat = p.lat;
+			if(lng<minLng){
+				minLng=lng;
+			}
+			if(lat<minLat){
+				minLat=lat;
+			}
+			if(lng>maxLng){
+				maxLng=lng;
+			}
+			if(lat>maxLat){
+				maxLat=lat;
+			}
+		}
+		var pts = [new BMap.Point(minLng,minLat),new BMap.Point(maxLng,minLat),new BMap.Point(maxLng,maxLat),new BMap.Point(minLng,maxLat)];
+		map.setViewport(pts);
+	}
+	
+	
+//时间改变事件
+function dateChange(){
+	cond_date=$("#date").val();
+	ngScope.loadUsers(cond_proNo, 1, cond_searchName, cond_date);
+	ngScope.loadTrack(cond_accountCode, cond_date);
+}
+
+var ngScope;
+
+var lineShow=[];
+
+var app = angular.module("hisPosition", []);
+app.controller("hisPositionCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.userList=[];
+	$scope.userInfo={};
+	$scope.showObj={x:'10',y:'0'};
+	cond_date=new SimpleDateFormat({formatString:"yyyy-MM-dd"}).format(new Date());
+	$("#date").val(cond_date);
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	map.centerAndZoom(new BMap.Point(userData.x, userData.y),12);
+	
+	var viewstate = new ViewState();
+	
+	new DropDownList().init({
+		renderTo:"#projectList",
+		url:"../../component/projectList.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$("input[viewstate=proNo]").val(result.proNo);
+			$("#projectList").val(result.proName);
+			viewstate.collect();
+			ngScope.loadUsers(1);
+		}
+	});
+	
+	new DropDownList().init({
+		renderTo:"input[name=jobName]",
+		data:[{code:"",name:"全部"},
+		      {code:"1",name:"内业组员"},
+		      {code:"2",name:"内业班长"},
+		      {code:"3",name:"外业主管"},
+		      {code:"4",name:"外业班长"},
+		      {code:"5",name:"外业组员"},
+		      {code:"7",name:"内业主管"},
+		      {code:"8",name:"项目经理"},
+		      {code:"9",name:"项目主管"},
+		      {code:"26",name:"项目班长"}],
+		textField:"name",
+		onSelected:function(result){
+			$("input[name=jobCode]").val(result.code);
+			$("input[name=jobName]").val(result.name);
+		}
+	});
+	
+	//滑动条
+	$scope.initsliderbar=function(ma){
+		$("#minv").html("0");
+		$("#maxv").html(ma);
+		$( "#slider-range-max" ).slider({
+		      range: "max",
+		      min: 0,
+		      max: ma,
+		      value: 0,
+		      slide: function( event, ui ) {
+		        	$( "#amount" ).val( ui.value );
+		        	$scope.showObj=lineShow[ui.value];
+		        	
+		        	var temptime=$scope.showObj.rpTime;
+		        	temptime=temptime.substring(10);
+		        	$("#time").html(temptime);
+		        	
+		        	map.addOverlay(marker);
+		        	var point = new BMap.Point($scope.showObj.x,$scope.showObj.y);
+					marker.setPosition(point);
+					var label = new BMap.Label($scope.showObj.rpTime,{offset:new BMap.Size(20,-10)});
+					marker.setLabel(label);
+		      }
+		    });
+	};
+	
+	$scope.loadUsers=function(currentPage){
+		$http.get(serviceBasePath+"eap/pmsServices/commuteMgr/monitor/outdoorWorkers?companyCode="
+				+userData.companyCode+
+				"&curDate="+viewstate.get("date")+
+				"&proNo="+viewstate.get("proNo")+"&currentPage="+currentPage+"&employeeName="+viewstate.get("searchName")+"&jobCode="+viewstate.get("jobCode")+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				new parent.ShowDlog().prompt({
+					icon:"warning",
+					msg:"登录过期！请重新登录！",
+					done:function(){
+						window.noLogin(location.href);
+					},
+					t:1500
+				});
+				return;
+			}
+			if(response.statusCode==200){
+				$scope.userList = response.list;
+				$scope.createPageBar(response.totalPage, response.currentPage,response.totalRecord);
+			}else{
+				$scope.userList = [];
+				$scope.createPageBar(1, 1);
+			}
+			
+		});
+	};
+	$scope.loadUsers(1);
+	$scope.strCut=function(str, len){
+		if(str.length>len){
+			str = str.substring(0, len);
+			str+="...";
+		}
+		return str;
+	};
+	$scope.createPageBar=function(totalPage, curPage,totalRecord){
+		new PageBar().init({
+			renderTo:"#page_bar",
+			totalPage:totalPage,
+			curPage:curPage,
+			totalRecord: totalRecord,
+			btnCount:2,
+			showPageInfo:true,
+			prevPageText:"上一页",
+			nextPageText:"下一页",
+			onPage:function(pageNum){
+				ngScope.loadUsers( pageNum);
+			}
+		});
+	};
+	$scope.toShow=function(item){
+		cond_accountCode=item.accountCode;
+		viewstate.collect();
+		$scope.loadTrack();
+		
+	};
+	
+	$scope.showPic=function(item){
+		var date=$("#date").val();
+		new ShowDlog().showFrame("../performance/imags.html?accountCode="+item.accountCode+"&date="+date, "查看图片", function(){}, "dlog-showPic");
+	};
+	
+	$scope.loadTrack=function(accountCode, date){
+		var accountCode=cond_accountCode;
+		var date = viewstate.get("date");
+		if(!accountCode || !date){
+			return;
+		}
+		$http.get(serviceBasePath+"eap/pmsServices/commuteMgr/performance/statistic/findCommute?accountCode="
+				+accountCode+"&date="
+				+date+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				new parent.ShowDlog().prompt({
+					icon:"warning",
+					msg:"登录过期！请重新登录！",
+					done:function(){
+						window.noLogin(location.href);
+					},
+					t:1500
+				});
+				return;
+			}
+			if(response.statusCode==200){
+				$scope.userInfo=response.data;
+				if(userCtrl){
+					map.removeControl(userCtrl);
+				}
+				userCtrl = new UserInfoControl($scope.userInfo);
+				
+				
+				map.addControl(userCtrl);
+				$scope.initsliderbar(response.data.checkPointCount);
+				
+				if(datalength==1&&ischeck==1){
+					ischeck==1;
+					$("#heartinput").attr('checked', true);
+				}else{
+					ischeck=0;
+					$("#heartinput").attr('checked', false);
+				}
+			}
+		});
+		
+		
+		
+		$http.get(serviceBasePath+"eap/pmsServices/commuteMgr/monitor/track?accountCode="
+				+accountCode+"&date="
+			+date+"&ticket="+ticket).success(function(response){
+			//$scope.showObj={x:'0',y:'0'};
+			
+			map.removeOverlay(marker);
+			if(response.statusCode==401){
+				new parent.ShowDlog().prompt({
+					icon:"warning",
+					msg:"登录过期！请重新登录！",
+					done:function(){
+						window.noLogin(location.href);
+					},
+					t:1500
+				});
+				return;
+			}
+			if(response.statusCode==200){
+				var pts=[]; 
+				if(heatmapOverlay==null){
+			  	  heatmapOverlay = new BMapLib.HeatmapOverlay({"radius":20});
+			  	  map.addOverlay(heatmapOverlay);
+			   }
+				if(response.list.length>0){
+					lineShow=response.list;
+					$scope.showObj=lineShow[0];
+					
+					heart=[];
+					
+					//heart=response.list;
+					for(var i=0;i<response.list.length;i++){
+						var p = response.list[i];
+						var ptss={"lng":p.x,"lat":p.y,"count":p.stayTime};
+						heart.push(ptss);
+					}
+					heatmapOverlay.setDataSet({data:heart,max:100});
+				}else{
+					heatmapOverlay.hide();
+					map.removeOverlay(line);
+					
+				}
+				//alert($scope.showObj.x)
+				for(var i=0; i<response.list.length; i++){
+					var p = response.list[i];
+					//if(p.x=='4.9E-324' || p.y=='4.9E-324')continue;
+					pts.push(new BMap.Point(p.x, p.y));
+					//lineShow.push(new BMap.Point(p.x, p.y));
+				}
+				if(pts.length>0){
+					datalength=1;
+					$("#heartinput").removeAttr('disabled');
+					if(line){
+						map.removeOverlay(line);
+					}
+					line = new BMap.Polyline(pts);
+					line.setStrokeColor("red");
+					map.addOverlay(line);
+					var lastPoint = pts[pts.length-1];
+					//map.setCenter(lastPoint);
+					setViewPort(pts);
+				}else{
+					//heatmapOverlay.setDataSet({data:[],max:100});
+					
+					datalength=0;
+					
+					//$("#heartinput").attr("disabled","disabled");
+					//
+					new parent.ShowDlog().prompt({
+						icon:"warning",
+						msg:"暂无记录！",
+						done:function(){
+							
+							//$("#heartinput").attr('checked',false);
+							$("#heartinput").attr('disabled', 'disabled');
+						},
+						t:1500
+					});
+					return;
+				}
+			}else{
+				datalength=0;
+				
+				//$("#heartinput").attr('disabled', 'disabled');
+				new parent.ShowDlog().prompt({
+					icon:"warning",
+					msg:"暂无记录！",
+					done:function(){
+						//$("#heartinput").attr('checked',false);
+						$("#heartinput").attr('disabled', 'disabled');
+					},
+					t:1500
+				});
+				return;
+			}
+			
+		});
+		
+		
+		
+	};
+	$scope.doQuery=function(){
+		viewstate.collect();
+		$scope.loadUsers(1);
+		$scope.loadTrack();
+	};
+	window.onkeyup=function(e){
+		if(e.keyCode==13){
+			$scope.doQuery();
+		}
+	};
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>薪酬管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<style type="text/css">
+	.title_tabs{list-style-type:none;padding:0;margin:0;height:39px;}
+	.title_tabs li{position:relative;padding:0;margin:0;border:solid 0px;float:left;height:39px;background:#E1E1E1;}
+	.title_tabs li>a{display:block;line-height:39px;border:solid 0px;padding:0 70px 0 50px;margin-right:-14px;
+		background:url(../../../img/list_Header2-gray.png) right no-repeat;color:#666;font-size:14px;font-weight:bold;}
+	.title_tabs li.selected{background:#4CA9FF;z-index:9;}
+	.title_tabs li.selected>a{background:url(../../../img/list_Header2-.png) right no-repeat;color:#fff;font-size:14px;font-weight:bold;}
+	.dlog-edit{width:500px;height:420px;}
+	.list .list_content .title_div{border-bottom: solid 3px #4CA9FF;}
+	.list .list_content .title_div .title_left{background:none;color:#333;}
+	.list .list_content .title_div span{color:#333;float:left}
+	.excSave{margin-left:80px;border:1px solid #ed7798;color:#ed7798 !important;border-radius:15px;padding:5px 20px;cursor:pointer;line-height:normal;margin-top: 5px;}
+	.excSave:hover{background:#f7bacb;color:#fff}
+	.title_back{width: 70px;margin:5px 100px 0 0;float:right;display:inline-block;height: 28px;line-height: 28px;text-align: center;color: #2D7CF0;cursor: pointer;border:1px solid #2D7CF0;text-align:center;border-radius:17px}
+	.title_back:hover{border-bottom:2px solid #2D7CF0}
+	.config_msg{padding:10px 0 10px 16px ;overflow:hidden}
+	.config_msg .config_tip{width:450px;float:left}
+	.config_msg .config_tip span{display:inline-block;width:100px;text-align:right;margin-right:20px}
+	.config_msg .config_tip a{display:inline-block;background:#eee;width:250px;line-height:30px;border:1px solid #ccc;text-indent:15px}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+<div class="list">
+	<div class="list_content">
+		<div style="line-height:40px;border-bottom: solid 3px #4CA9FF;margin-bottom:15px">
+			<span style="color:#4CA9FF;font-size:16px">体系配置信息</span>
+			<span class="title_back" ng-click="goBack()">
+				返回
+			</span>
+		</div>
+		<div class="config_msg">
+			<div class="config_tip">
+				<span>部门</span><a>{{userList.unitName}}</a>
+			</div>
+			<div class="config_tip">
+				<span>标题</span><a>{{userList.title}}</a>
+			</div>
+		</div>
+		<div class="config_msg">
+			<div class="config_tip">
+				<span>开始时间</span><a>{{userList.validStartTime}}</a>
+			</div>
+			<div class="config_tip">
+				<span>结束时间</span><a>{{userList.validEndTime}}</a>
+			</div>
+		</div>
+		<div class="config_msg">
+			<div class="config_tip">
+				<span>薪酬等级</span><a>{{userList.salaryGrade}}</a>
+			</div>
+			<div class="config_tip">
+				<span>薪酬档次</span><a>{{userList.salaryLevel}}</a>
+			</div>
+		</div>
+		<div class="config_msg">
+			<div class="config_tip">
+				<span>等级名称前缀</span><a>{{userList.salaryGradeNamePrefix}}</a>
+			</div>
+			<div class="config_tip">
+				<span>等级起始索引</span><a>{{userList.salaryGradeStart}}</a>
+			</div>
+		</div>
+		<div class="config_msg">
+			<span style="display:inline-block;width:100px;text-align:right;margin-right:20px">备注</span>
+			<a style="display:inline-block;width:700px;background:#eee;line-height:20px;height:80px;border:1px solid #ccc;text-indent:15px">{{userList.remarks}}</a>
+		</div>
+		<div style="line-height:40px;border-bottom: solid 3px #4CA9FF;">
+			<span style="color:#4CA9FF;font-size:16px">体系详细内容</span>
+		</div>
+		<div class="table_div">
+			<form id="saveForm">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+				  <tr class="tr1">
+					<td width="100px"><div align="center">薪酬等级  \ 档次</div></td>
+					<td ng-repeat="item in salaryLevelArr">
+						<div align="center" >{{$index+1}}档</div>
+					</td>
+				  </tr>
+				  <tr class="tr2" ng-repeat="obj in salaryGradeArr">
+					<td><div align="center">{{obj}}</div></td>
+					<td ng-repeat="it in salaryLevelArr"><div align="center">
+						{{salarySetting[obj][it]}}
+					</td>
+				  </tr>
+				</table>
+			</form>
+		</div>
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+var ngScope;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		window.noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	var companyCode=userData.companyCode;
+	
+	ticket = $.cookie("pmsWeb_ticket");
+	var urlParams = getUrlParams();
+	$scope.title=urlParams.title;
+	$scope.unitName=urlParams.unitName;
+	var salaryGradeNamePrefix="";
+	var salaryGradeStart="";
+	var salaryGrade="";
+	var salaryLevel="";
+	$scope.salaryGradeArr=[];
+	$scope.salaryLevelArr=[];
+	var salarySetting={};
+	$scope.salarySetting={};
+	$scope.getData=function(){
+		$http.get(serviceBasePath+"eap/pmsServices/hrm/salMgr/salaryFramwork/salaryFramworkDetail?companyCode="+companyCode+"&unitCode="+urlParams.unitCode+"&frameworkCode="+urlParams.frameworkCode).success(function(response){
+			if(response.statusCode==200){
+				$scope.userList=response.data;
+				salarySetting=$scope.userList.salarySetting;
+				$scope.salarySetting=salarySetting;
+				salaryGradeNamePrefix=$scope.userList.salaryGradeNamePrefix;
+				salaryGradeStart=$scope.userList.salaryGradeStart;
+				salaryGrade=$scope.userList.salaryGrade;
+				salaryLevel=$scope.userList.salaryLevel;
+				for(var i=salaryGrade;i>=salaryGradeStart;i--){
+					$scope.salaryGradeArr.push(salaryGradeNamePrefix+i);
+				}
+				for(var i=1;i<=salaryLevel;i++){
+					$scope.salaryLevelArr.push("D"+i);
+				}
+			}
+		});
+	};
+	$scope.getData();
+	$scope.goBack=function(){
+		window.history.back();
+	};
+});
+</script>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>地名地址公共服务</title>
+	<script type="text/javascript" src="../js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../angular-1.4.6/angular.min.js"></script>
+	<script type="text/javascript" src="../js/util.js"></script>
+	<script type="text/javascript" src="../js/config.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/main.css"/>
+	<link rel="stylesheet" type="text/css" href="css/index.css"/>
+	<link rel="stylesheet" href="css/webrep.css" />
+	<link rel="stylesheet" href="css/register.css" />
+	<link rel="shortcut icon" href="images/addressservice.png" type="image/x-icon"/>
+	<script src="js/webrep.js" type="text/javascript"></script>
+</head>
+<body>
+	<div class="header">
+		<div class="jl_ov logo jl_fl">
+			<img src="images/mz.png" class="jl_fl"/>
+			<div class="jl_fl">
+				<p class="dept_name">镇江民政</p>
+			</div>
+			<div class="sys_name jl_fl">
+				<p>地名地址公共服务</p>
+				<span>Public Address Service System</span>
+			</div>
+		</div>
+		<div class="jl_fr right_warp">
+			<div class="search jl_ov">
+				<div class="jl_fr" style="line-height: 33px;">
+<!-- 					欢迎您：张三 <span class="btn_loginexit">退出</span> -->
+				</div>
+			</div>
+			<div class="nav">
+				<ul>
+					<li><a href="index.html">首页</a></li>
+					<li class="active addrnamecheck">
+						<a href="#">地名审核</a>
+						<ul class="second_nav" style="display:none">
+							<li><a href="addrNameCheck.html">地名审核</a></li>
+							<li><a href="coreSearch.html">验证码查询</a></li>
+						</ul>
+					</li>
+					<li><a href="publicSearch.html" target="_blank">公共查询</a></li>
+					<li><a href="javascript:">政策法规</a></li>
+					<li><a href="javascript:">通知公告</a></li>
+					<li style="clear:both"></li>
+				</ul>
+			</div>
+		</div>
+		<div style="clear:both"></div>
+	</div>
+	<div class="hr_bottom"></div>
+	<!--header结束-->
+	<!--首页内容展示区域-->
+	<div class="warp_no1 resigter_warp addrNameCheck_warp">
+		<div class="check_warp">
+			<img src="images/arrowicon.png"/>
+			<div class="complete_tip">
+				<h3>您的申请材料已经提交成功!</h3>
+				<h4 style="font-size:18px;color:#f00;line-height:50px;">提示：请记下申请单号，用于查询处理进度！</h4>
+				<span style="font-size:18px;font-weight:bold;color:#000;line-height:80px;">申请单号：<span id="formCode" style="font-size:24px;"></span></span>
+				<div>我们会在2个工作日内对材料进行核查，请注意查询!</div>
+			</div>
+		</div>
+		<div class="res_btn con_center">
+			<a class="jl_cirbtn upload jl_lgbrn" href="index.html">确定</a>
+		</div>
+		
+		
+		
+	</div>
+	<script>
+		$(document).ready(function(){
+			var urlParams = getUrlParams();
+			$("#formCode").text(urlParams.formCode);
+		});
+		$(".addrnamecheck").mouseenter(function(){
+			$(".second_nav").show();
+		});
+		$(".addrnamecheck").mouseleave(function(){
+			$(".second_nav").hide();
+		});
+		$(".return").click(function(){
+			window.history.back()
+		})
+	</script>
+</body>
+</html>

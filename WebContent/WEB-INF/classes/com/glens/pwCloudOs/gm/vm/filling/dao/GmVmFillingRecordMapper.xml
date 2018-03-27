@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.gm.vm.filling.dao.GmVmFillingRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.gm.vm.filling.vo.GmVmFillingRecord" >
+    <id column="ROWID" property="rowid" jdbcType="BIGINT" />
+    <result column="COMPANY_CODE" property="companyCode" jdbcType="VARCHAR" />
+    <result column="USE_TYPE" property="useType" jdbcType="INTEGER" />
+    <result column="PRO_NO" property="proNo" jdbcType="VARCHAR" />
+    <result column="DEPT_NO" property="deptNo" jdbcType="VARCHAR" />
+    <result column="PAY_TYPE" property="payType" jdbcType="INTEGER" />
+    <result column="CARD_NO" property="cardNo" jdbcType="VARCHAR" />
+    <result column="PLATE_NO" property="plateNo" jdbcType="VARCHAR" />
+    <result column="AMOUNT" property="amount" jdbcType="REAL" />
+    <result column="PLACE" property="place" jdbcType="VARCHAR" />
+    <result column="VEHICLE_USER" property="vehicleUser" jdbcType="VARCHAR" />
+    <result column="FILLING_TIME" property="fillingTime" jdbcType="TIMESTAMP" />
+    <result column="REMARKS" property="remarks" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="CHECK_TIME" property="checkTime" jdbcType="TIMESTAMP" />
+    <result column="CHECK_RESULT" property="checkResult" jdbcType="INTEGER" />
+    <result column="CHECK_DESCR" property="checkDescr" jdbcType="VARCHAR" />
+    <result column="PICS" property="pics" jdbcType="VARCHAR" />
+    
+    <result column="PRO_NAME" property="proName" jdbcType="VARCHAR" />
+    <result column="DEPT_NAME" property="deptName" jdbcType="VARCHAR" />
+    <result column="VEHICLE_USER_NAME" property="vehicleUserName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ROWID, COMPANY_CODE, USE_TYPE, PRO_NO, DEPT_NO, PAY_TYPE, CARD_NO, PLATE_NO, AMOUNT, 
+    PLACE, VEHICLE_USER, date_format(FILLING_TIME, '%Y-%m-%d') as FILLING_TIME, REMARKS, CREATE_TIME,
+    date_format(CHECK_TIME, '%Y-%m-%d') as CHECK_TIME, CHECK_RESULT, CHECK_DESCR, PICS
+  </sql>
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    	t1.ROWID, t1.COMPANY_CODE, t1.USE_TYPE, t1.PRO_NO, t1.DEPT_NO, 
+    	t1.PAY_TYPE, t1.CARD_NO, t1.PLATE_NO, t1.AMOUNT, 
+    	t1.PLACE, t1.VEHICLE_USER, date_format(t1.FILLING_TIME, '%Y-%m-%d') as FILLING_TIME, 
+    	t1.REMARKS, t1.CREATE_TIME,
+    	date_format(t1.CHECK_TIME, '%Y-%m-%d') as CHECK_TIME, t1.CHECK_RESULT, t1.CHECK_DESCR, t1.PICS,
+    	t2.pro_name,
+    	t3.unit_name as dept_name,
+    	t4.employeename as vehicle_user_name
+    from gm_vm_filling_record t1
+    left join pm_base t2 on t1.pro_no=t2.pro_no
+    left join md_org_unit t3 on t1.dept_no=t3.UNIT_CODE
+    left join md_employee t4 on t1.vehicle_user=t4.employeecode
+    where t1.ROWID = #{rowid,jdbcType=BIGINT}
+  </select>
+  <select id="selectByCardNoDateUser" resultMap="BaseResultMap" parameterType="com.glens.pwCloudOs.gm.vm.filling.vo.GmVmFillingRecord" >
+    select 
+    <include refid="Base_Column_List" />
+    from gm_vm_filling_record
+    where CARD_NO = #{cardNo,jdbcType=VARCHAR}
+    and date_format(FILLING_TIME, '%Y-%m-%d') = #{fillingTime,jdbcType=VARCHAR}
+    and VEHICLE_USER = #{vehicleUser,jdbcType=VARCHAR}
+  </select>
+  <select id="selectUncheckList" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from gm_vm_filling_record
+    where CHECK_RESULT IS NULL OR CHECK_RESULT &lt;&gt; 1
+  </select>
+  <select id="queryForCount" resultType="int" parameterType="map" >
+    select 
+    	count(*)
+    from gm_vm_filling_record
+    where 1=1
+    <if test="companyCode != null and companyCode != ''">
+    	and COMPANY_CODE = #{companyCode,jdbcType=VARCHAR}
+    </if>
+    <if test="useType != null and useType != ''">
+    	and USE_TYPE = #{useType, jdbcType=VARCHAR}
+    </if>
+    <if test="proNo != null and proNo != ''">
+    	and PRO_NO = #{proNo, jdbcType=VARCHAR}
+    </if>
+    <if test="deptNo != null and deptNo != ''">
+    	and DEPT_NO = #{deptNo, jdbcType=VARCHAR}
+    </if>
+    <if test="payType != null and payType != ''">
+    	and PAY_TYPE = #{payType, jdbcType=VARCHAR}
+    </if>
+    <if test="cardNo != null and cardNo != ''">
+    	and CARD_NO = #{cardNo, jdbcType=VARCHAR}
+    </if>
+    <if test="plateNo != null and plateNo != ''">
+    	and PLATE_NO = #{plateNo, jdbcType=VARCHAR}
+    </if>
+    <if test="vehicleUser != null and vehicleUser != ''">
+    	and VEHICLE_USER = #{vehicleUser, jdbcType=VARCHAR}
+    </if>
+    <if test="startTime != null and startTime != ''">
+    	and FILLING_TIME &gt;= #{startTime, jdbcType=VARCHAR}
+    </if>
+    <if test="endTime != null and endTime != ''">
+    	and FILLING_TIME &lt;= #{endTime, jdbcType=VARCHAR}
+    </if>
+    <if test="checkResult != null">
+    	and CHECK_RESULT = #{checkResult, jdbcType=INTEGER}
+    </if>
+  </select>
+  <select id="queryForPage" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    	t1.ROWID, t1.COMPANY_CODE, t1.USE_TYPE, t1.PRO_NO, t1.DEPT_NO, 
+    	t1.PAY_TYPE, t1.CARD_NO, t1.PLATE_NO, t1.AMOUNT, 
+    	t1.PLACE, t1.VEHICLE_USER, date_format(t1.FILLING_TIME, '%Y-%m-%d') as FILLING_TIME, 
+    	t1.REMARKS, t1.CREATE_TIME,
+    	date_format(t1.CHECK_TIME, '%Y-%m-%d') as CHECK_TIME, t1.CHECK_RESULT, t1.CHECK_DESCR, t1.PICS,
+    	t2.pro_name,
+    	t3.unit_name as dept_name,
+    	t4.employeename as vehicle_user_name
+    from gm_vm_filling_record t1
+    left join pm_base t2 on t1.pro_no=t2.pro_no
+    left join md_org_unit t3 on t1.dept_no=t3.UNIT_CODE
+    left join md_employee t4 on t1.vehicle_user=t4.employeecode
+    where 1=1
+    <if test="companyCode != null and companyCode != ''">
+    	and t1.COMPANY_CODE = #{companyCode,jdbcType=VARCHAR}
+    </if>
+    <if test="useType != null and useType != ''">
+    	and t1.USE_TYPE = #{useType, jdbcType=VARCHAR}
+    </if>
+    <if test="proNo != null and proNo != ''">
+    	and t1.PRO_NO = #{proNo, jdbcType=VARCHAR}
+    </if>
+    <if test="deptNo != null and deptNo != ''">
+    	and t1.DEPT_NO = #{deptNo, jdbcType=VARCHAR}
+    </if>
+    <if test="payType != null and payType != ''">
+    	and t1.PAY_TYPE = #{payType, jdbcType=VARCHAR}
+    </if>
+    <if test="cardNo != null and cardNo != ''">
+    	and t1.CARD_NO = #{cardNo, jdbcType=VARCHAR}
+    </if>
+    <if test="plateNo != null and plateNo != ''">
+    	and t1.PLATE_NO = #{plateNo, jdbcType=VARCHAR}
+    </if>
+    <if test="vehicleUser != null and vehicleUser != ''">
+    	and t1.VEHICLE_USER = #{vehicleUser, jdbcType=VARCHAR}
+    </if>
+    <if test="startTime != null and startTime != ''">
+    	and t1.FILLING_TIME &gt;= #{startTime, jdbcType=VARCHAR}
+    </if>
+    <if test="endTime != null and endTime != ''">
+    	and t1.FILLING_TIME &lt;= #{endTime, jdbcType=VARCHAR}
+    </if>
+    <if test="checkResult != null">
+    	and t1.CHECK_RESULT = #{checkResult, jdbcType=INTEGER}
+    </if>
+    order by t1.filling_time desc
+    limit #{firstResult},#{maxResult}
+  </select>
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from gm_vm_filling_record
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.glens.pwCloudOs.gm.vm.filling.vo.GmVmFillingRecord" >
+    insert into gm_vm_filling_record (COMPANY_CODE, USE_TYPE, 
+      PRO_NO, DEPT_NO, PAY_TYPE, 
+      CARD_NO, PLATE_NO, AMOUNT, 
+      PLACE, VEHICLE_USER, FILLING_TIME, 
+      REMARKS, CREATE_TIME, PICS )
+    values (#{companyCode,jdbcType=VARCHAR}, #{useType,jdbcType=INTEGER}, 
+      #{proNo,jdbcType=VARCHAR}, #{deptNo,jdbcType=VARCHAR}, #{payType,jdbcType=INTEGER}, 
+      #{cardNo,jdbcType=VARCHAR}, #{plateNo,jdbcType=VARCHAR}, #{amount,jdbcType=REAL}, 
+      #{place,jdbcType=VARCHAR}, #{vehicleUser,jdbcType=VARCHAR}, #{fillingTime,jdbcType=TIMESTAMP}, 
+      #{remarks,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{pics,jdbcType=VARCHAR})
+  </insert>
+  <update id="update" parameterType="com.glens.pwCloudOs.gm.vm.filling.vo.GmVmFillingRecord" >
+    update gm_vm_filling_record
+    <set >
+      <if test="useType != null and useType != 0" >
+        USE_TYPE = #{useType,jdbcType=INTEGER},
+      </if>
+      <if test="proNo != null and proNo != ''" >
+        PRO_NO = #{proNo,jdbcType=VARCHAR},
+      </if>
+      <if test="deptNo != null and deptNo != ''" >
+        DEPT_NO = #{deptNo,jdbcType=VARCHAR},
+      </if>
+      <if test="payType != null and payType != 0" >
+        PAY_TYPE = #{payType,jdbcType=INTEGER},
+      </if>
+      <if test="cardNo != null and cardNo != ''" >
+        CARD_NO = #{cardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="plateNo != null and plateNo != ''" >
+        PLATE_NO = #{plateNo,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null and amount != 0" >
+        AMOUNT = #{amount,jdbcType=REAL},
+      </if>
+      <if test="place != null and place != ''" >
+        PLACE = #{place,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleUser != null and vehicleUser != ''" >
+        VEHICLE_USER = #{vehicleUser,jdbcType=VARCHAR},
+      </if>
+      <if test="fillingTime != null and fillingTime != ''" >
+        FILLING_TIME = #{fillingTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remarks != null and remarks != ''" >
+        REMARKS = #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="pics != null and pics != ''" >
+        PICS = #{pics,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </update>
+  <update id="updateCheckState" parameterType="com.glens.pwCloudOs.gm.vm.filling.vo.GmVmFillingRecord" >
+    update gm_vm_filling_record
+    <set >
+    	CHECK_TIME = now(),
+      <if test="checkResult != null and checkResult != 0" >
+        CHECK_RESULT = #{checkResult,jdbcType=INTEGER},
+      </if>
+      <if test="checkDescr != null and checkDescr != ''" >
+        CHECK_DESCR = #{checkDescr,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </update>
+</mapper>

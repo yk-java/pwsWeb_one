@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html ng-app="moduleName">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<title> 问卷统计 </title>
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+<style type="text/css">
+.dialog-send{width:1000px;height:600px;}
+
+.title_div2{border:solid 0px red;background:#4CA9FF;padding:8px 6px 8px 6px;}
+.title_div2 .condLayer1{display:block;border:solid 0px;margin:6px;}
+.title_div2 .condLayer2{border:solid 0px green;margin:0 6px;}
+.title_div2 .condLayer1 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:0 4px;padding:0 4px;font-family:微软雅黑;border-radius:3px;}
+.title_div2 .condLayer2 input{height:28px;line-height:28px;border:solid 1px #f4f4f4;color:#666;margin:6px 4px;padding:0 4px;background-color:#DAEDFF;font-family:微软雅黑;border-radius:3px;}
+.title_div2 .btn{display:inline-block;height:30px;line-height:30px;margin:0 4px;padding:0 15px 0 15px;background:#f4f4f4;color:#666;font-weight:bold;cursor:pointer;border:solid 1px #89C6FF; 
+border-radius:4px;}
+.title_div2 .blue{background:#3385FF;color:#fff;}
+.title_div2 .blue:hover{background:#186CE7;}
+.title_div2 .pink{background:#ED7798;color:#fff;}
+.title_div2 .pink:hover{background:#E54673;}
+</style>
+
+</head>
+<body ng-controller="controllerName" storagekey="questionnire.questionnireMgr.questionnireMgr">
+<div class="list">
+	<div class="list_content">
+		<div class="title_div2">
+			<div class="condLayer1">
+				<input type="text" viewstate="searchName" style="width:180px;" placeholder="搜索"/>
+				<input type="text" viewstate="typeName" class="dropDownList" style="width:180px;" placeholder="请选问卷类型"/>
+				<input type="hidden" viewstate="type"/>
+				<div class="btn blue" ng-click="doQuery()">
+					查询
+				</div>
+			</div>
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+			    <th><input type="checkbox" name="ck_all"/></th>
+				<th>序号</th>
+				<th>问卷名称</th>
+				<th>问卷类型</th>
+				<th>调查启止时间</th>
+				<th>创建时间</th>
+				<th>创建人</th>
+				<th>下发数量</th>
+				<th>提交数量</th>
+				<th>操作</th>
+			  </tr>
+			  <tr ng-repeat="item in dataList" class="tr2">
+				<td align="center"><input type="checkbox" name="ck_item" value="{{item.deviceObjCode}}"/></td>
+				<td align="center">{{$index+1}}</td>
+				<td>{{item.title}}</td>
+				<td align="center">
+					<label ng-if="item.type==1">问卷</label>
+					<label ng-if="item.type==2">测评</label>
+					<label ng-if="item.type==3">试卷</label>
+				</td>
+				<td align="center">{{item.enabledBeginTime+' 至 '+item.enabledEndTime}}</td>
+				<td align="center">{{item.sysCreateTime}}</td>
+				<td align="center">{{item.employeeName}}</td>
+				<td align="center">{{item.sendedCnt}}</td>
+				<td align="center">{{item.answerSheetCnt}}</td>
+				<td align="center" width="180">
+			    	<img class="operationImg" ng-click="doStatistic(item)" src="../../../img/statistic.png" title="统计分析">
+				</td>
+			  </tr>
+			</table>
+			<div ng-if="!dataList || dataList.length==0" style="border:solid 1px #ccc;padding:10px 0;margin-top:-1px;">
+		  	<span style="color:#ff6600;">&nbsp;&nbsp;暂无数据</span>
+		  	</div>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		$scope.dataList=[];
+		var viewState = new ViewState();
+		
+		new DropDownList().init({
+			renderTo:"input[viewstate=typeName]",
+			data:[{id:"",name:"(全部)"}, {id:1,name:"问卷"}, {id:2,name:"测评"}, {id:3,name:"试卷"}],
+			textField:"name",
+			onSelected:function(item){
+				$("input[viewstate=typeName]").val(item.name);
+				$("input[viewstate=type]").val(item.id);
+			}
+		});
+		
+		/* 初始（查询） */
+		$scope.doQuery=function(){
+			$scope.loadData();
+		};
+		/* 加载数据 */
+		$scope.loadData=function(){
+			viewState.collect();
+			new ShowDlog().prompt({
+				icon:"waitting",
+				msg:"正在查询...",
+				done:function(){},
+				t:20*60*1000
+			});
+			$scope.httpExecute({
+				url:"eap/pmsServices/questionnireStatistic/list",
+				method:"GET",
+				data:{searchName:viewState.get("searchName"), status:1, type:viewState.get("type")},
+				success:function(res){
+					$dlog.close();
+					if(res.statusCode==200){
+						$scope.dataList = res.list;
+					}
+				},
+				pageChange:function(pageNum){
+					$scope.doQuery();
+				},
+				error:function(){
+					$dlog.close();
+					new ShowDlog().prompt({
+						msg:"网络异常！",
+						done:function(){},
+						t:1500
+					});
+				}
+			});
+		};
+		
+		/* 问卷统计 */
+		$scope.doStatistic=function(item){
+			hrefTo({url:"questionnireBaseStatistic.html", data:item});
+		};
+		$scope.doQuery();
+	}
+});
+</script>
+</body>
+</html>

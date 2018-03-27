@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.pm.schedulePlan.worklist.dao.PmWorkListMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.pm.schedulePlan.worklist.vo.PmWorkList" >
+    <id column="ROWID" property="rowid" jdbcType="BIGINT" />
+    <result column="PRO_NO" property="proNo" jdbcType="VARCHAR" />
+    <result column="WORK_DATE" property="workDate" jdbcType="DATE" />
+    <result column="WORKER" property="worker" jdbcType="VARCHAR" />
+    <result column="WORK_TYPE" property="workType" jdbcType="VARCHAR" />
+    <result column="WORKLOAD" property="workload" jdbcType="REAL" />
+    <result column="WORK_DESCR" property="workDescr" jdbcType="VARCHAR" />
+    <result column="MARKER" property="marker" jdbcType="VARCHAR" />
+    <result column="QUALITY_CHECK_USER" property="qualityCheckUser" jdbcType="VARCHAR" />
+    <result column="QUALITY_CHECK_USER_JOB_NO" property="qualityCheckUserJobNo" jdbcType="VARCHAR" />
+    <result column="QUALITY_CHECK_DATE" property="qualityCheckDate" jdbcType="DATE" />
+    <result column="IS_FAULT" property="isFault" jdbcType="INTEGER" />
+    <result column="FAULT_DESCR" property="faultDescr" jdbcType="VARCHAR" />
+    <result column="SYS_CREATE_TIME" property="sysCreateTime" jdbcType="TIMESTAMP" />
+    <result column="SYS_UPDATE_TIME" property="sysUpdateTime" jdbcType="TIMESTAMP" />
+    
+    <result column="PRO_NAME" property="proName" jdbcType="VARCHAR" />
+    <result column="WORKER_NAME" property="workerName" jdbcType="VARCHAR" />
+    <result column="WORK_TYPE_NAME" property="workTypeName" jdbcType="VARCHAR" />
+    <result column="QUALITY_CHECK_USER_NAME" property="qualityCheckUserName" jdbcType="VARCHAR" />
+    <result column="WORK_TYPE_UNIT" property="workTypeUnit" jdbcType="VARCHAR" />
+    <result column="CATEGORY_NAME" property="categoryName" jdbcType="VARCHAR" />
+    
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ROWID, PRO_NO, WORK_DATE, WORKER, WORK_TYPE, WORKLOAD, WORK_DESCR, MARKER, QUALITY_CHECK_USER, 
+    QUALITY_CHECK_DATE, IS_FAULT, FAULT_DESCR, SYS_CREATE_TIME, SYS_UPDATE_TIME
+  </sql>
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+	    t1.ROWID, t1.PRO_NO, t1.WORK_DATE, t1.WORKER, t1.WORK_TYPE, t1.WORKLOAD, t1.WORK_DESCR, t1.MARKER, t1.QUALITY_CHECK_USER, 
+	    t1.QUALITY_CHECK_DATE, t1.IS_FAULT, t1.FAULT_DESCR, t1.SYS_CREATE_TIME, t1.SYS_UPDATE_TIME,
+    	t2.pro_name as PRO_NAME,
+    	t3.employeename as WORKER_NAME,
+    	t4.employeename as QUALITY_CHECK_USER_NAME,
+    	t5.kpi_name as work_type_name
+    from pm_work_list t1
+    left join pm_base t2 on t1.pro_no = t2.pro_no
+    left join md_employee t3 on t1.worker = t3.employeecode
+    left join md_employee t4 on t1.quality_check_user = t4.employeecode
+    left join pm_pro_kpi t5 on t1.work_type = t5.kpi_code and t1.pro_no = t5.pro_no
+    where t1.ROWID = #{rowid,jdbcType=BIGINT}
+  </select>
+  <select id="queryForCount" resultType="int" parameterType="map" >
+    select 
+	    count(*)
+    from pm_work_list t1
+    left join pm_base t2 on t1.pro_no = t2.pro_no
+    left join md_employee t3 on t1.worker = t3.employeecode
+    left join md_employee t4 on t1.quality_check_user = t4.employeecode
+    where 1=1 
+    <if test="proNo != null and proNo != ''">
+    and t1.PRO_NO = #{proNo,jdbcType=VARCHAR}
+    </if>
+    <if test="startTime != null and startTime != ''">
+    and t1.WORK_DATE &gt;= #{startTime,jdbcType=VARCHAR}
+    </if>
+    <if test="endTime != null and endTime != ''">
+    and t1.WORK_DATE &lt;= #{endTime,jdbcType=VARCHAR}
+    </if>
+    <if test="worker != null and worker != ''">
+    and t1.WORKER = #{worker,jdbcType=VARCHAR}
+    </if>
+    <if test="isFault != null and isFault != -1">
+    and t1.IS_FAULT = #{isFault,jdbcType=INTEGER}
+    </if>
+  </select>
+  <select id="queryForPage" resultMap="BaseResultMap" parameterType="map" >
+    select 
+	    t1.ROWID, t1.PRO_NO, t1.WORK_DATE, t1.WORKER, t1.WORK_TYPE, t1.WORKLOAD, t1.WORK_DESCR, t1.MARKER, t1.QUALITY_CHECK_USER, 
+	    t1.QUALITY_CHECK_DATE, t1.IS_FAULT, t1.FAULT_DESCR, t1.SYS_CREATE_TIME, t1.SYS_UPDATE_TIME,
+    	t2.pro_name as PRO_NAME,
+    	t3.employeename as WORKER_NAME,
+    	t4.employeename as QUALITY_CHECK_USER_NAME,
+    	t5.kpi_name as work_type_name
+    from pm_work_list t1
+    left join pm_base t2 on t1.pro_no = t2.pro_no
+    left join md_employee t3 on t1.worker = t3.employeecode
+    left join md_employee t4 on t1.quality_check_user = t4.employeecode
+    left join pm_pro_kpi t5 on t1.work_type = t5.kpi_code and t1.pro_no = t5.pro_no
+    where 1=1 
+    <if test="proNo != null and proNo != ''">
+    and t1.PRO_NO = #{proNo,jdbcType=VARCHAR}
+    </if>
+    <if test="startTime != null and startTime != ''">
+    and t1.WORK_DATE &gt;= #{startTime,jdbcType=VARCHAR}
+    </if>
+    <if test="endTime != null and endTime != ''">
+    and t1.WORK_DATE &lt;= #{endTime,jdbcType=VARCHAR}
+    </if>
+    <if test="worker != null and worker != ''">
+    and t1.WORKER = #{worker,jdbcType=VARCHAR}
+    </if>
+    <if test="isFault != null and isFault != -1">
+    and t1.IS_FAULT = #{isFault,jdbcType=INTEGER}
+    </if>
+    limit #{firstResult},#{maxResult} 
+  </select>
+  <select id="queryForList" resultMap="BaseResultMap" parameterType="map" >
+    select 
+	    t1.ROWID, t1.PRO_NO, t1.WORK_DATE, t1.WORKER, t1.WORK_TYPE, t1.WORKLOAD, t1.WORK_DESCR, t1.MARKER, t1.QUALITY_CHECK_USER, 
+	    t1.QUALITY_CHECK_DATE, t1.IS_FAULT, t1.FAULT_DESCR, t1.SYS_CREATE_TIME, t1.SYS_UPDATE_TIME,
+    	t2.pro_name as PRO_NAME,
+    	t3.employeename as WORKER_NAME,
+    	t4.employeename as QUALITY_CHECK_USER_NAME,
+    	t5.kpi_name as work_type_name
+    from pm_work_list t1
+    left join pm_base t2 on t1.pro_no = t2.pro_no
+    left join md_employee t3 on t1.worker = t3.employeecode
+    left join md_employee t4 on t1.quality_check_user = t4.employeecode
+    left join pm_pro_kpi t5 on t1.work_type = t5.kpi_code and t1.pro_no = t5.pro_no
+    where 1=1 
+    <if test="proNo != null and proNo != ''">
+    and t1.PRO_NO = #{proNo,jdbcType=VARCHAR}
+    </if>
+    <if test="startTime != null and startTime != ''">
+    and t1.WORK_DATE &gt;= #{startTime,jdbcType=VARCHAR}
+    </if>
+    <if test="endTime != null and endTime != ''">
+    and t1.WORK_DATE &lt;= #{endTime,jdbcType=VARCHAR}
+    </if>
+    <if test="worker != null and worker != ''">
+    and t1.WORKER = #{worker,jdbcType=VARCHAR}
+    </if>
+    <if test="isFault != null and isFault != -1">
+    and t1.IS_FAULT = #{isFault,jdbcType=INTEGER}
+    </if>
+  </select>
+  <select id="queryByWorkerAndDate" resultMap="BaseResultMap" parameterType="map" >
+    select 
+	    t1.ROWID, t1.PRO_NO, t1.WORK_DATE, t1.WORKER, t1.WORK_TYPE, t1.WORKLOAD, t1.WORK_DESCR, t1.MARKER, t1.QUALITY_CHECK_USER, 
+	    t1.QUALITY_CHECK_DATE, t1.IS_FAULT, t1.FAULT_DESCR, t1.SYS_CREATE_TIME, t1.SYS_UPDATE_TIME,
+    	t2.pro_name as PRO_NAME,
+    	t3.employeename as WORKER_NAME,
+    	t4.employeename as QUALITY_CHECK_USER_NAME,
+    	t4.job_no as QUALITY_CHECK_USER_JOB_NO,
+    	t5.kpi_name as work_type_name,
+    	t5.kpi_unit as work_type_unit,
+    	t6.category_name
+    from pm_work_list t1
+    left join pm_base t2 on t1.pro_no = t2.pro_no
+    left join md_employee t3 on t1.worker = t3.employeecode
+    left join md_employee t4 on t1.quality_check_user = t4.employeecode
+    left join pm_pro_kpi t5 on t1.work_type = t5.kpi_code and t1.pro_no = t5.pro_no
+    left join pm_category t6 on t2.category_code = t6.category_code
+    where 
+    t1.PRO_NO = #{proNo, jdbcType=VARCHAR} 
+    and t1.WORK_DATE = #{workDate,jdbcType=VARCHAR}
+    and t1.WORKER = #{worker,jdbcType=VARCHAR}
+  </select>
+  <select id="projectDayWorkHours" resultType="float" parameterType="map">
+	SELECT ROUND(SUM(work_hours), 2) FROM pm_work_hours WHERE pro_no=#{proNo,jdbcType=VARCHAR} AND work_date=#{workDate,jdbcType=VARCHAR}
+<!--   	SELECT ROUND(SUM(t1.workload*(8/t2.standard_hours)), 2)  -->
+<!--   	FROM  -->
+<!-- 		(SELECT * FROM pm_work_list WHERE pro_no=#{proNo,jdbcType=VARCHAR} AND work_date=#{workDate,jdbcType=VARCHAR}) t1 -->
+<!-- 		JOIN (SELECT pro_no, kpi_code, standard_hours FROM pm_plan_kpi WHERE plan_no=-1 AND pro_no=#{proNo,jdbcType=VARCHAR}) t2 -->
+<!-- 		ON t1.work_type = t2.kpi_code -->
+  </select>
+  <select id="kpiDayWorkload" resultType="map" parameterType="map">
+	SELECT 
+		t2.kpi_type AS ioType,  
+		t1.work_type AS kpiCode, 
+		SUM(t1.workload) AS kpiWorkload,
+		t2. KPI_WEIGHT AS kpiWeight,
+		t2.STANDARD AS standard
+	FROM pm_work_list t1
+	JOIN pm_pro_kpi t2 ON t1.work_type = t2.kpi_code
+  	WHERE t1.pro_no=#{proNo} AND t1.work_date=#{workDate} 
+	GROUP BY work_type
+  </select>
+  <select id="inOutPerCntAndDescr" resultType="map" parameterType="map">
+  	
+	SELECT 1 AS ioType, COUNT(worker) AS perCnt, GROUP_CONCAT(work_descr) AS workDescr FROM (
+		SELECT worker, GROUP_CONCAT(CONCAT(work_descr, '(', workload, kpi_unit, ')')) AS work_descr FROM 
+		(SELECT t1.worker, t1.work_descr, t1.workload, t3.kpi_unit  
+		FROM pm_work_list t1
+		JOIN pm_base t2 ON t1.pro_no = t2.pro_no
+		join pm_pro_kpi t3 on t1.work_type = t3.kpi_code and t1.pro_no = t3.pro_no
+		WHERE t1.pro_no=#{proNo,jdbcType=VARCHAR} AND t1.work_date=#{workDate,jdbcType=VARCHAR}
+			AND t3.kpi_type = 1 AND t3.is_per_cnt != 1) tt1
+		GROUP BY worker
+	) ttt1
+	
+	UNION
+	
+	SELECT 2 AS ioType, COUNT(worker) AS perCnt, GROUP_CONCAT(work_descr) AS workDescr FROM (
+		SELECT worker, GROUP_CONCAT(CONCAT(work_descr, '(', workload, kpi_unit, ')')) AS work_descr FROM 
+		(SELECT t1.worker, t1.work_descr, t1.workload, t3.kpi_unit  
+		FROM pm_work_list t1
+		JOIN pm_base t2 ON t1.pro_no = t2.pro_no
+		join pm_pro_kpi t3 on t1.work_type = t3.kpi_code and t1.pro_no = t3.pro_no
+		WHERE t1.pro_no=#{proNo,jdbcType=VARCHAR} AND t1.work_date=#{workDate,jdbcType=VARCHAR}
+			AND t3.kpi_type = 2 AND t3.is_per_cnt != 1) tt1
+		GROUP BY worker
+	) ttt1
+  	
+  </select>
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from pm_work_list
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByWorkerAndDate" parameterType="map" >
+    delete from pm_work_list
+    where WORKER = #{worker,jdbcType=VARCHAR}
+    and WORK_DATE = #{workDate,jdbcType=DATE}
+    and PRO_NO = #{proNo, jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.glens.pwCloudOs.pm.schedulePlan.worklist.vo.PmWorkList" >
+    insert into pm_work_list (PRO_NO, WORK_DATE, 
+      WORKER, WORK_TYPE, WORKLOAD, 
+      WORK_DESCR, MARKER, QUALITY_CHECK_USER, 
+      QUALITY_CHECK_DATE, IS_FAULT, FAULT_DESCR, 
+      SYS_CREATE_TIME, SYS_UPDATE_TIME)
+    values (#{proNo,jdbcType=VARCHAR}, #{workDate,jdbcType=DATE}, 
+      #{worker,jdbcType=VARCHAR}, #{workType,jdbcType=VARCHAR}, #{workload,jdbcType=REAL}, 
+      #{workDescr,jdbcType=VARCHAR}, #{marker,jdbcType=VARCHAR}, #{qualityCheckUser,jdbcType=VARCHAR}, 
+      #{qualityCheckDate,jdbcType=DATE}, #{isFault,jdbcType=INTEGER}, #{faultDescr,jdbcType=VARCHAR}, 
+      now(), null)
+  </insert>
+  <insert id="batchInsert" parameterType="list" >
+    insert into pm_work_list (PRO_NO, WORK_DATE, 
+      WORKER, WORK_TYPE, WORKLOAD, 
+      WORK_DESCR, MARKER, QUALITY_CHECK_USER, 
+      QUALITY_CHECK_DATE, IS_FAULT, FAULT_DESCR, 
+      SYS_CREATE_TIME, SYS_UPDATE_TIME)
+    values 
+    <foreach collection="list" item="item" separator=",">
+    (#{item.proNo,jdbcType=VARCHAR}, #{item.workDate,jdbcType=DATE}, 
+      #{item.worker,jdbcType=VARCHAR}, #{item.workType,jdbcType=VARCHAR}, #{item.workload,jdbcType=REAL}, 
+      #{item.workDescr,jdbcType=VARCHAR}, #{item.marker,jdbcType=VARCHAR}, #{item.qualityCheckUser,jdbcType=VARCHAR}, 
+      #{item.qualityCheckDate,jdbcType=DATE}, #{item.isFault,jdbcType=INTEGER}, #{item.faultDescr,jdbcType=VARCHAR}, 
+      now(), null)
+    </foreach>
+  </insert>
+  <update id="update" parameterType="com.glens.pwCloudOs.pm.schedulePlan.worklist.vo.PmWorkList" >
+    update pm_work_list
+    <set >
+      <if test="proNo != null and proNo != ''" >
+        PRO_NO = #{proNo,jdbcType=VARCHAR},
+      </if>
+      <if test="workDate != null and workDate != ''" >
+        WORK_DATE = #{workDate,jdbcType=DATE},
+      </if>
+      <if test="worker != null and worker != ''" >
+        WORKER = #{worker,jdbcType=VARCHAR},
+      </if>
+      <if test="workType != null and workType != '' " >
+        WORK_TYPE = #{workType,jdbcType=VARCHAR},
+      </if>
+      <if test="workload != null" >
+        WORKLOAD = #{workload,jdbcType=REAL},
+      </if>
+      <if test="workDescr != null" >
+        WORK_DESCR = #{workDescr,jdbcType=VARCHAR},
+      </if>
+      <if test="marker != null" >
+        MARKER = #{marker,jdbcType=VARCHAR},
+      </if>
+      <if test="qualityCheckUser != null and qualityCheckUser != ''" >
+        QUALITY_CHECK_USER = #{qualityCheckUser,jdbcType=VARCHAR},
+      </if>
+      <if test="qualityCheckDate != null and qualityCheckDate != ''" >
+        QUALITY_CHECK_DATE = #{qualityCheckDate,jdbcType=DATE},
+      </if>
+      <if test="isFault != null" >
+        IS_FAULT = #{isFault,jdbcType=INTEGER},
+      </if>
+      <if test="faultDescr != null" >
+        FAULT_DESCR = #{faultDescr,jdbcType=VARCHAR},
+      </if>
+        SYS_UPDATE_TIME = now(),
+    </set>
+    where ROWID = #{rowid,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -1,0 +1,204 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 人员工时</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+<style type="text/css">
+.good{background:url(../../../img/good.png) no-repeat top right;}
+.low{background:url(../../../img/bad.png) no-repeat top right;}
+
+	.switch_btn_group{border:solid 1px #3385FF;min-height:30px;float:left;border-radius:15px; position:absolute;right:20px;top:0px;}
+	.switch_btn_group a{display:inline-block;float:left;background:#fff;color:#3385FF;text-decoration:none;font-size:13px;
+		line-height:30px;text-align:center;margin:0 1px 0 0;min-width:60px;}
+	.switch_btn_group a.selected{background:#3385FF;color:#fff;}
+	.switch_btn_group a:first-of-type{border-top-left-radius:15px;border-bottom-left-radius:15px;}
+	.switch_btn_group a:last-of-type{border-top-right-radius:15px;border-bottom-right-radius:15px;margin:0;}
+	
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list" style="top:0;right:0">
+	<div class="list_content">
+		<div class="title_div" style="padding:13px 0 0 0;background:#fff;position:fixed;z-index:100">
+			<div style="position:absolute;width:100%;">
+				<div style="float:left;overflow:hidden">
+					<div class="title_left">
+						<input type="text" class="dropDownProjectType" placeholder="项目类别"/>
+						<input type="text" style="width:206px;" class="dropDownTree dropDownList" placeholder="项目"/>
+						<input type="text" id="beginDate" class="select_2 dropDownList dateComponent" onclick="new Calendar().show(this)" placeholder="请选择启始日期"/>
+						<input type="text" id="endDate" class="select_2 dropDownList dateComponent" onclick="new Calendar().show(this)" placeholder="请选择结束日期"/>
+						<input type="text" style="width:200px;" name="searchName" id="searchName" class="" placeholder="项目名、编号、负责人、工号、姓名"/>
+						<div class="query_div" ng-click="doQuery()">
+							查询
+						</div>
+						<div class="query_div" ng-click="doExport()">
+							导出
+						</div>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+					</div>
+					<img src="../../../img/list_Header2-.png" style="margin-top:3px">
+					
+				</div>
+<!-- 				<div class="switch_btn_group"> -->
+<!-- 					<a href="#" datatype="2" class="selected">已激活</a> -->
+<!-- 					<a href="#" datatype="3">已关闭</a> -->
+<!-- 				</div> -->
+			</div>
+		</div>
+		
+		<div class="table_div" style="position:relative;top:55px;">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table" id="dataTable">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+					<th><div align="center">项目名称</div></th>
+					<th><div align="center">项目编号</div></th>
+					<th><div align="center">作业人</div></th>
+					<th><div align="center">工号</div></th>
+					<th><div align="center">岗位</div></th>
+					<th><div align="center">作业工时</div></th>
+					<th><div align="center">出勤工时</div></th>
+					<th><div align="center">超出工时</div></th>
+					<th><div align="center">带薪工时</div></th>
+					<th><div align="center">绩效系数</div></th>
+					<th><div align="center">调节工时</div></th>
+					<th><div align="center">异地补贴（天）</div></th>
+					<th><div align="center">异地补贴金额（元）</div></th>
+					<th><div align="center">餐补（天）</div></th>
+					<th><div align="center">餐补金额（元）</div></th>
+					<th><div align="center">带薪工时明细</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in dataList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.proName}}</div></td>
+				<td><div align="center">{{item.proCode}}</div></td>
+				<td><div align="center">{{item.workerName}}</div></td>
+				<td><div align="center">{{item.jobNo}}</div></td>
+				<td><div align="center">{{item.jobName}}</div></td>
+				<td><div align="center">{{item.workHours}}</div></td>
+				<td><div align="center">{{item.attendanceHours}}</div></td>
+				<td><div align="center">{{item.moreHours}}</div></td>
+				<td><div align="center">{{item.paidHours}}</div></td>
+				<td><div align="center">{{item.pfmCoefficient}}</div></td>
+				<td><div align="center">{{item.regulativeHours}}</div></td>
+				<td><div align="center">{{item.hasNotLocal}}</div></td>
+				<td><div align="center">{{item.hasNotLocalAmount}}</div></td>
+				<td><div align="center">{{item.hasMeal}}</div></td>
+				<td><div align="center">{{item.hasMealAmount}}</div></td>
+				<td>
+					<div align="center" ng-repeat="descrItem in toArr(item.paidDescr)" style="margin:2px 0;">{{descrItem}}</div>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+var cond_proNo="";
+simpleController({
+	moduleName:"userMgr",
+	controllerName:"userMgrCtrl",
+	init:function($scope, $http){
+		/* init */
+		$scope.dataList=[];
+		
+		var now = new Date();
+		var year=now.getFullYear();
+		var month=now.getMonth()+1;
+		var beginDay=1;
+		var endDay=getMonthDays(year, month);
+		
+		cond_fromDate=year+"-"+numFormat(month,2)+"-"+numFormat(beginDay,2);
+		cond_toDate=year+"-"+numFormat(month,2)+"-"+numFormat(endDay,2);
+		
+		$("#beginDate").val(cond_fromDate);
+		$("#endDate").val(cond_toDate);
+		
+		/* 项目类型 */
+		new DropDownList().init({
+			renderTo:".dropDownProjectType",
+			url:"../../component/projectType.html?ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$(".dropDownProjectType").val(result.categoryName);
+				var cond_categoryCode = result.categoryCode;
+				/* 联动 */
+				proList.setConfig("url", "../../component/projectList.html?categoryCode="+cond_categoryCode+"&proStatus=&ticket="+$scope.ticket);
+			}
+		});
+		
+		/* 项目列表 */
+		var proList = new DropDownList();
+		proList.init({
+			renderTo:".dropDownTree",
+			url:"../../component/projectList.html?&ticket="+$scope.ticket,
+			height:"200px",
+			onSelected:function(result){
+				$(".dropDownTree").val(result.proName);
+				cond_proNo=result.proNo;
+			}
+		});
+		
+		
+		$scope.loadData=function(proNo, fromDate, toDate, searchName){
+			$scope.httpGet({
+				url:"eap/pmsServices/pm/schedulePlan/workHours/workHoursStatistics",
+				data:{proNo:proNo, startTime:fromDate, endTime:toDate, worker:searchName},
+				success:function(response){
+					if(response.statusCode!=200){
+						response.list=[];
+					}
+					$scope.dataList = response.list;
+				}
+			});
+		};
+		
+		$scope.doQuery=function(){
+			var cond_fromDate = $("#beginDate").val();
+			var cond_toDate = $("#endDate").val();
+			var searchName = $("#searchName").val();
+			if(!searchName){
+				searchName="";
+			}
+			$scope.loadData(cond_proNo, cond_fromDate, cond_toDate, searchName);
+		};
+		
+		$scope.doExport=function(){
+			//excelExport("dataTable");
+			var cond_fromDate = $("#beginDate").val();
+			var cond_toDate = $("#endDate").val();
+			var searchName = $("#searchName").val();
+			if(!searchName){
+				searchName="";
+			}
+			hrefTo({url:serviceBasePath+"eap/pmsServices/pm/schedulePlan/workHours/workHoursStatisticsExport", data:{proNo:cond_proNo, startTime:cond_fromDate, endTime:cond_toDate, worker:searchName}});
+		};
+		
+		$scope.doQuery();
+		$scope.toArr=function(str){
+			if(str){
+				return str.split(",");
+			}
+			return [];
+		};
+	}
+});
+</script>
+</body>
+</html>

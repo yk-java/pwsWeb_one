@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.transmission.tower.dao.towerDaoMapper" >
+  
+  <select id="getVoltageLevel" parameterType="map" resultType="map">
+  	select VOLTAGELEVEL from G_LINE_SD GROUP BY VOLTAGELEVEL
+  </select>
+  
+  <select id="getLines" parameterType="map" resultType="map">
+  	select INTERID,AMNAME,VOLTAGELEVEL from  G_LINE_SD where 1=1
+  	<if test="voltageLevel!=null and voltageLevel!=null!='' ">
+			AND VOLTAGELEVEL=#{voltageLevel}
+	</if>
+	<if test="searchName!=null and searchName !=''">
+			and AMNAME like "%"#{searchName}"%" 
+	</if>
+  	
+  </select>
+  
+   <select id="getTowers" parameterType="map" resultType="map">
+   
+  	<!-- SELECT a.*,b.* FROM G_XLGH_SD a
+	left JOIN G_POLE_SD b on a.GTINTERID=b.INTERID
+	WHERE a.XLINTERID=#{xlinteRid} -->
+	select DISTINCT l.INTERID XLINTERID,l.AMNAME,l.VOLTAGELEVEL,p.*,g.GH from G_XLGH_SD g
+		join G_LINE_SD l on l.INTERID=g.XLINTERID
+		join G_POLE_SD p on p.INTERID=g.GTINTERID
+		where 1=1 
+		
+		<if test="xlinteRid!=null and xlinteRid!=null!='' ">
+			AND g.XLINTERID=#{xlinteRid}
+		</if>
+		<if test="searchName!=null and searchName !=''">
+			and (l.AMNAME like "%"#{searchName}"%" or l.VOLTAGELEVEL like "%"#{searchName}"%" or g.GH like "%"#{searchName}"%" )
+		</if>
+  	
+  </select>
+  
+  <select id="getTowerDetail" parameterType="map" resultType="map">
+  		SELECT DISTINCT l.INTERID XLINTERID,l.AMNAME,l.VOLTAGELEVEL,p.*,d.GH FROM G_POLE_SD p
+		join G_XLGH_SD d on p.INTERID=d.GTINTERID
+		join G_LINE_SD l on l.INTERID=d.XLINTERID
+		where  p.INTERID=#{inteRid}
+  </select>
+  
+  <select id="getPics" parameterType="map" resultType="map">
+  		SELECT * FROM INS_DEVICE_PIC where DEVICE_CODE=#{inteRid}
+  </select>
+  
+  <select id="getDianYa" parameterType="map" resultType="map">
+  		select VOLTAGELEVEL from G_LINE_SD GROUP BY VOLTAGELEVEL
+  </select>
+  
+  
+  <select id="getTowerslist" parameterType="map" resultType="map">
+  		select DISTINCT l.INTERID XLINTERID,l.AMNAME,l.VOLTAGELEVEL,g.GH,p.* from G_XLGH_SD g
+		join G_LINE_SD l on l.INTERID=g.XLINTERID
+		join G_POLE_SD p on p.INTERID=g.GTINTERID
+		where 1=1
+		<if test="voltageLevel!=null and voltageLevel!=null!='' ">
+			and  l.VOLTAGELEVEL=#{voltageLevel} 
+		</if>
+		<if test="xlinteRid!=null and xlinteRid!=null!='' ">
+			AND g.XLINTERID=#{xlinteRid}
+		</if>
+		<if test="searchName!=null and searchName !=''">
+			and (l.AMNAME like "%"#{searchName}"%" or l.VOLTAGELEVEL like "%"#{searchName}"%" or g.GH like "%"#{searchName}"%" )
+		</if>
+		LIMIT 0,100
+  </select>
+   
+   
+   <insert id="addTower" parameterType="map">
+   		insert into T_MAIN_DEFECT(COMPANY_CODE,DEFECT_CODE,DEFECT_CLASS,DEFECT_SOURCE,DEFECT_CATEGORY,DEFECT_REASON,DEFECT_CONTENT,DEFECT_CONTENT_DESCRIPTION,FIND_PERSON_ID,FIND_DATE,LONGITUDE,
+		LATITUDE,STATE,DEFECT_LOCATION,DEFECT_CAUSE,PROPOSAL_ELIM_SCHEME,DEFECT_PIC1,DEFECT_PIC2,DEFECT_PIC3,SYS_CREATE_TIME,SYS_PROCESS_FLAG)
+		VALUES(#{companyCode},#{defectCode},#{defectClass},#{defectSource},#{defectCategory},#{defectReason},#{defectContent},#{defectContentDesc},#{findPersonId},#{findDate},#{longitude},#{latitude},0,#{defectLocation},#{defectCause},#{proposalElimScheme},#{defectPic1},#{defectPic2},#{defectPic3},NOW(),'1')
+   </insert>
+  
+  <insert id="addDeviceRange" parameterType="map">
+  		insert into T_SYS_PMS_DEVICE_RANGE_REL(INSPECTION_RESULT_ID,CIRCUIT_CODE,CIRCUIT_NAME,VOLTAGE_CLASS,START_DEVICE_TYPE,START_DEVICE_CODE,START_DEVICE_NAME,SYS_CREATE_TIME,SYS_PROCESS_FLAG)
+		VALUES(#{defectCode},#{xlinteRid},#{xlName},#{voltageLevel},'10001',#{inteRid},#{gtName},NOW(),'1');
+ </insert>
+ 
+ <select id="getDefectList" parameterType="map" resultType="map">
+ 	select d.DEFECT_CODE,d.DEFECT_CLASS,d.DEFECT_SOURCE,d.DEFECT_CATEGORY,d.DEFECT_REASON,d.DEFECT_CONTENT,d.DEFECT_CONTENT_DESCRIPTION,d.FIND_PERSON_ID,
+ 	IFNULL(DATE_FORMAT(d.FIND_DATE,'%Y-%m-%d'),'') FIND_DATE,
+	d.LONGITUDE,d.LATITUDE,d.STATE,d.DEFECT_LOCATION,d.DEFECT_CAUSE,d.PROPOSAL_ELIM_SCHEME,d.DEFECT_PIC1,d.DEFECT_PIC2,d.DEFECT_PIC3,r.CIRCUIT_NAME,
+	r.CIRCUIT_CODE,r.VOLTAGE_CLASS,r.START_DEVICE_CODE,r.START_DEVICE_NAME,r.START_DEVICE_TYPE,m.EMPLOYEENAME,d.CLEAR_PIC1,d.CLEAR_PIC2,d.CLEAR_PIC3,d.REMARKS,d.ELIMINATION_DESCRIPTION
+	from  T_MAIN_DEFECT d
+	left JOIN T_SYS_PMS_DEVICE_RANGE_REL r on r.INSPECTION_RESULT_ID=d.DEFECT_CODE
+	left JOIN md_employee m on m.EMPLOYEECODE=d.FIND_PERSON_ID
+	where 1=1 
+	<if test="state!=null and state!='' ">
+		and d.STATE=#{state}
+	</if>
+	<if test="defectClass!=null and defectClass!='' ">
+		and d.DEFECT_CLASS=#{defectClass}
+	</if>
+	ORDER BY d.FIND_DATE desc
+	LIMIT 0,100
+ </select>
+ 
+ <update id="checkDefect" parameterType="map">
+ 	update T_MAIN_DEFECT set STATE=#{state},REMARKS=#{remarks} where DEFECT_CODE=#{defectCode}
+ </update>
+  
+  
+   <select id="getPassList" parameterType="map" resultType="map">
+ 	select d.DEFECT_CODE,d.DEFECT_CLASS,d.DEFECT_SOURCE,d.DEFECT_CATEGORY,d.DEFECT_REASON,d.DEFECT_CONTENT,d.DEFECT_CONTENT_DESCRIPTION,d.FIND_PERSON_ID,
+ 	IFNULL(DATE_FORMAT(d.FIND_DATE,'%Y-%m-%d'),'') FIND_DATE,
+	d.LONGITUDE,d.LATITUDE,d.STATE,d.DEFECT_LOCATION,d.DEFECT_CAUSE,d.PROPOSAL_ELIM_SCHEME,d.DEFECT_PIC1,d.DEFECT_PIC2,d.DEFECT_PIC3,r.CIRCUIT_NAME,
+	r.CIRCUIT_CODE,r.VOLTAGE_CLASS,r.START_DEVICE_CODE,r.START_DEVICE_TYPE
+	from  T_MAIN_DEFECT d
+	left JOIN T_SYS_PMS_DEVICE_RANGE_REL r on r.INSPECTION_RESULT_ID=d.DEFECT_CODE
+	where 1=1 and d.STATE=1
+	ORDER BY d.FIND_DATE desc
+	LIMIT 0,100
+  </select>
+ 
+ <update id="workOutDefect" parameterType="map">
+ 	update T_MAIN_DEFECT set STATE=2,ELIMINATION_DESCRIPTION=#{eliminationDes},CLEAR_PIC1=#{clearPic1},CLEAR_PIC2=#{clearPic2},CLEAR_PIC3=#{clearPic3} where DEFECT_CODE=#{defectCode}
+ </update>
+ 
+ 
+  <select id="getAreaList" parameterType="map" resultType="map">
+  		select DISTINCT l.INTERID XLINTERID,l.AMNAME,l.VOLTAGELEVEL,g.GH,p.* from G_XLGH_SD g
+		join G_LINE_SD l on l.INTERID=g.XLINTERID
+		join G_POLE_SD p on p.INTERID=g.GTINTERID
+		where 1=1 and p.JD_JZ &gt;=#{minx} and p.JD_JZ &lt;=#{maxx} and p.WD_JZ&gt;=#{miny} and p.WD_JZ&lt;=#{maxy}
+  </select>
+  
+  <insert id="addPic" parameterType="map">
+  	INSERT into INS_DEVICE_PIC(LINE_CODE,LINE_NAME,DEVICE_CODE,DEVICE_NAME,PIC_CODE,SYS_CREATE_TIME,SYS_PROCESS_FLAG)
+	VALUES(#{xlinteRid},#{xlName},#{inteRid},#{gtName},#{picCode},NOW(),'1')
+  </insert>
+  
+  <select id="getTeam1" resultType="map">
+  		select TEAM1  from import_hidden_trouble GROUP BY TEAM1 
+  </select>
+  <select id="getTeam2" resultType="map">
+  		select TEAM2  from import_hidden_trouble GROUP BY TEAM2
+  </select>
+</mapper>

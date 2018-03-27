@@ -1,0 +1,167 @@
+<!DOCTYPE HTML>
+<html ng-app="statistic">
+<head>
+<title> 统计查询</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+
+<style type="text/css">
+/* 	body{ */
+/* 		margin:0px; */
+/* 		padding:0px; */
+/* 		font-size:12px; */
+/* 		font-family:"微软雅黑"; */
+/* 	} */
+/* 	a{color:#4D4D4D;text-decoration: none;} */
+/* 	.table,.table td,.table th{border:1px solid #EDEDED;border-collapse:collapse;} */
+/* 	.tr1{height:40px;background:#D9E9FF;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;font-weight:normal;} */
+/* 	.tr2{height:40px;background:#fff;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;} */
+/* 	.tr2:hover{background:#F5F5F5;} */
+/* 	.tr3{height:40px;background:#F5F5F5;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;} */
+/* 	.tr3:hover{background:#F5F5F5;} */
+/* 	.tr4{height:40px;background:#EFD397;font-family: 微软雅黑;color:#4D4D4D;font-size:12px;} */
+/* 	.operationImg{width:32px;height:32px;cursor: pointer;margin-right:14px;} */
+	
+/* 	.list{position: absolute;left:13px;right:13px;top:13px;bottom:10px;border:solid 0px;} */
+/* 	.list .list_content{position: absolute;left:0px;right:0px;top:0px;bottom:0px;border:solid 0px;} */
+/* 	.list .list_content .title_div{width:100%;height:39px;border-bottom:solid 3px #4CA9FF;} */
+/* 	.list .list_content .title_div .title_left{width:700px;height:39px;background:#4CA9FF;line-height:42px;color:#fff;font-size:14px;font-weight: bold;float:left;} */
+/* 	.list .list_content .title_div .title_left > select{width:250px;height:30px;border:solid 0px;margin-left:20px;color:#4D4D4D;float:left;margin-top:6px;} */
+/* 	.list .list_content .title_div .title_left > input{width:200px;height:30px;border:solid 0px;margin-left:20px;color:#666;float:left;margin-top:5px;padding-left:4px;} */
+/* 	.list .list_content .title_div .title_left .query_div{width:60px;height:30px;float:left;margin-left:20px;margin-top:7px;line-height:30px;text-align:center;color:#fff;background:#3385FF;cursor: pointer;} */
+/* 	.list .list_content .title_div > img{float:left;margin-top:1px;} */
+/* 	.list .list_content .title_div .title_add{float:left;width:70px;height:28px;background: url(../../img/bnt_newly-added.png) repeat;line-height:28px;text-align:center;margin-left:30px;margin-top:5px;color:#fff;cursor: pointer;} */
+/* 	.list .list_content .table_div{left:0px;right:0px;margin-bottom:32px;top:42px;border:solid 0px;} */
+/* 	.list .list_bottom{left:0px;right:0px;bottom:0px;height:22px;border:solid 0px;color:#4D4D4D;} */
+/* 	.list .list_bottom .paging_div{width:500px;height:22px;;margin:0 auto;border:solid 0px;} */
+/* 	.list .list_bottom .paging_div .page_div{width:58px;height:22px;border:solid 1px #E5F1FF;line-height:22px;text-align:center;float:left;cursor: pointer;} */
+/* 	.list .list_bottom .paging_div .page_div_1{width:auto;height:22px;line-height:22px;text-align:center;margin-left:30px;margin-right:30px;float:left;} */
+/* 	.list .list_bottom .paging_div .page_div_1 > a:hover{font-size:12px;color:#0078D7;text-decoration:underline;} */
+/* 	.list .list_bottom .paging_div .page_div_1 .page_a1{margin-left:10px;} */
+/* 	.list .list_bottom .paging_div .page_div_1 .page_a1:hover{font-size:12px;color:#0078D7;text-decoration:underline;} */
+/* 	.list .list_bottom .paging_div .page_div_1 .page_a2{margin-left:10px;font-size:14px;color:#0078D7;text-decoration:underline;} */
+/* 	.list .list_bottom .paging_div .page_div_1 .page_a2:hover{font-size:14px;color:#0078D7;text-decoration:underline;} */
+/* 	#page_bar .page_btn{display:inline-black;margin:0 4px;} */
+/* 	#page_bar .selected{font-weight:bold;} */
+/* 	.dropDownList{background-image:url(../../img/open--icon.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;} */
+</style>
+</head>
+
+<body ng-controller="statistic">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<input type="text" name="beginTime" placeholder="请选择启始日期" onclick="new Calendar().show(this)" class="dateComponent"/>
+				<input type="text" name="endTime" placeholder="请选择结束日期" onclick="new Calendar().show(this)" class="dateComponent"/>
+				<div class="query_div" onclick="doQuery()">
+					查询
+				</div>
+			</div>
+			<img src="../../img/list_Header2-.png">
+			<div class="title_add">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新增
+			</div>
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th width="5%"><div align="center">序号</div></th>
+				<th width="15%"><div align="center">上报时间</div></th>
+				<th width="10%"><div align="center">情报类型</div></th>
+				<th width="10%"><div align="center">紧急程度</div></th>
+				<th width="20%"><div align="center">上传照片</div></th>
+				<th width="15%"><div align="center">员工姓名</div></th>
+				<th width="15%"><div align="center">组织机构名称</div></th>
+				<th  width="10%"><div align="center">操作</div></th>
+			  </tr>
+			  <tr ng-repeat="item in infoList" class="tr2">
+				<td><div align="center">{{$index+1}}</div></th>
+				<td width="10%"><div align="center">{{item.rpTime}}</div></td>
+				<td width="10%"><div align="center">{{item.intelligenceTypeName}}</div></td>
+				<td width="10%"><div align="center">{{item.intelligenceUrgencyTypeName}}
+<!-- 				<img class="operationImg" src="../../img/list_item_abnormal.png"> -->
+				</div></td>
+				<td width="10%"><div align="center">
+					<img class="operationImg" src="http://192.168.1.226:8080/fileServer/eap/fileService/file/download?fileCode={{item.img1}}">
+					<img class="operationImg" src="http://192.168.1.226:8080/fileServer/eap/fileService/file/download?fileCode={{item.img2}}">
+					<img class="operationImg" src="http://192.168.1.226:8080/fileServer/eap/fileService/file/download?fileCode={{item.img3}}">
+				</div></td>
+				<td width="15%"><div align="center">{{item.employeeName}}</div></td>
+				<td width="15%"><div align="center">{{item.unitName}}</div></td>
+				<td>
+					<div align="center">
+			    		<label style="color:#33B4FF;">查看详情</label>
+			  		</div>
+				</td>
+			  </tr>
+			  
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+function createPageBar(totalPage, curPage,totalRecord){
+	new PageBar().init({
+		renderTo:"#page_bar",
+		totalPage:totalPage,
+		curPage:curPage,
+		totalRecord: totalRecord,
+		showPageInfo:true,
+		prevPageText:"上一页",
+		nextPageText:"下一页",
+		onPage:function(pageNum){
+			ngScope.loadStatistic(userData.companyCode, userData.unitCode, "", "", pageNum);
+		}
+	});
+}
+function doQuery(){
+	ngScope.loadStatistic(userData.companyCode, userData.unitCode, "", "", 1);
+}
+var ngScope;
+var userData;
+var app = angular.module("statistic", []);
+app.controller("statistic", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.infoList=[];
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	$scope.loadStatistic=function(companyCode, unitCode, fromTime, toTime, pageNum){
+		$http.get(serviceBasePath+"eap/pmsServices/information/reportStatistic/static?companyCode="+companyCode+
+			"&unitCode="+unitCode+"&fromTime=&toTime=&currentPage="+pageNum+"&searchName=&ticket="+ticket).success(function(response){
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			}
+			$scope.infoList = response.list;
+			createPageBar(response.currentPage,response.totalPage,response.totalRecord);
+		});
+	};
+	
+	$scope.loadStatistic(userData.companyCode, userData.unitCode, "", "", 1);
+	
+});
+</script>
+</body>
+</html>

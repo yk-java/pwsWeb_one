@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.pm.pmStatsAn.pmsLowVolSaMapper">
+	
+	<select id="getActivePro" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select PRO_NO proNo,PRO_NAME proName,CATEGORY_CODE categoryCode from PM_BASE 
+		where COMPANY_CODE=#{companyCode} and SYS_PROCESS_FLAG='1' and PRO_STATUS=2
+		<if test="accountCode != null and accountCode !=''">
+		and ACCOUNT_CODE=#{accountCode}
+		</if>
+		<if test="categoryCode != null and categoryCode != ''">
+		and CATEGORY_CODE=#{categoryCode}
+		</if>
+	</select>
+	
+	<select id="getProList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		
+		SELECT a.PRO_NO proNo,a.PRO_NAME proName,a.DEMAND_STAFF demandStaff,PRO_MANAGER proManager
+		FROM pm_base a
+		WHERE a.COMPANY_CODE=#{companyCode} AND FIND_IN_SET(a.PRO_NO,#{proNo})
+		
+	</select>
+	
+</mapper>

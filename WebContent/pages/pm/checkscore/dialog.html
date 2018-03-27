@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 项目考核得分 </title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+
+<style type="text/css">
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				&nbsp;&nbsp;
+				项目考核得分详情
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		
+		<div class="table_div">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" class="table">
+			   <tr class="tr1">
+				<th><div align="center">序号</div></th>
+				<th><div align="center">项目名称</div></th>
+				<th><div align="center">打分人</div></th>
+				<th><div align="center">指标名称</div></th>
+				<th><div align="center">指标分值</div></th>
+				<th><div align="center">实际得分</div></th>
+				<th><div align="center">评分时间</div></th>
+  				<th><div align="center">描述</div></th>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in dataList">
+				<td><div align="center">{{$index+1}}</div></td>
+				<td><div align="center">{{item.proName}}</div></td>
+				<td><div align="center">{{item.employeeName}}</div></td>
+				<td><div align="center">{{item.kpiName}}</div></td>
+				<td><div align="center">{{item.kpiScore}}</div></td>
+				<td><div align="center">{{item.checkScore}}</div></td>
+				<td><div align="center">{{item.checkTime}}</div></td>
+				<td><div align="center">{{item.checkDesc}}</div></td>
+			  </tr>
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+var cond_proNo="";
+var proName="";
+
+var ngScope;
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.dataList=[];
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	var params = getUrlParams();
+	cond_proNo = params.proNo;
+	var dormCode=params.dormCode;
+	proName=params.proName;
+	
+	var proNo="";
+	if(params.proNo){
+		proNo=params.proNo;
+	}
+	var kpiCode="";
+	if(params.kpiCode){
+		kpiCode=params.kpiCode;
+	}
+	var fromDate="";
+	if(params.fromDate){
+		fromDate=params.fromDate;
+	}
+	var toDate="";
+	if(params.toDate){
+		toDate=params.toDate;
+	}
+	
+
+	/* 加载数据 */
+	$scope.loadProjects=function(){
+		$http.get(serviceBasePath+"eap/pmsServices/pm/assessment/assessmentStatistics/kpiScore?fromDate="+fromDate+"&toDate="+toDate+"&proNo="+proNo+"&kpiCode="
+				+kpiCode+"&companyCode="+userData.companyCode).success(function(res){
+					
+			if(res.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../login.html";
+				return;
+			}
+			$scope.dataList=res.list;
+		});
+
+	};
+	
+	$scope.loadProjects();
+	
+	
+});
+</script>
+</body>
+</html>

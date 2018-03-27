@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.opsAppMapper">
+	
+	<select id="getEmployeeInfo" parameterType="java.lang.String" resultType="map">
+		
+		select c.EMPLOYEECODE,c.EMPLOYEENAME,ifnull(c.NICKNAME,'') NICKNAME,SEX,ifnull(c.MARITAL,3) MARITAL,
+		ifnull(c.ADDR,'') ADDR,ifnull(c.MOBILEPHONE1,'') MOBILEPHONE1,ifnull(c.MAIL,'') MAIL,
+		ifnull(c.EMERGENCY_CONTACTOR_NAME,'') EMERGENCY_CONTACTOR_NAME,ifnull(c.EMERGENCY_CONTACTOR_PHONE,'') EMERGENCY_CONTACTOR_PHONE,
+		ifnull(c.EMERGENCY_CONTACTOR_RELATION,'') EMERGENCY_CONTACTOR_RELATION 
+		from pf_account a  
+		join md_employee c on a.EMPLOYEECODE=c.EMPLOYEECODE 
+		where account_code=#{accountCode}
+		
+	</select>
+	
+	<select id="updateEmployeeField" parameterType="map" statementType="STATEMENT">
+		
+		update md_employee set ${field}=${fieldValue} where employeecode='${employeeCode}'
+		
+	</select>
+	
+	<select id="getProcessDocTypes" resultType="map">
+		select DOC_TYPELIB_CODE docTypeLibCode,DOC_TYPELIB_NAME docTypeLibName from PM_DOCUMENT_TYPELIB where DOC_CLASS=2 and SYS_PROCESS_FLAG='1'
+	</select>
+	
+	<select id="getProcessDocCount" parameterType="map" resultType="int" statementType="STATEMENT">
+	
+		select count(*)
+		from PM_DOCUMENT_LIB a
+		join PM_DOCUMENT_TYPELIB b on a.DOC_TYPELIB_CODE=b.DOC_TYPELIB_CODE
+		join PM_BASE c on a.PRO_NO=c.PRO_NO
+		where a.sys_process_flag='1' and b.DOC_CLASS=2 and a.SUFFIX_NAME='jpg'
+		<if test="companyCode != null and companyCode != ''">
+		and a.COMPANY_CODE='${companyCode}'
+		</if>
+		<if test="proNo != null and proNo != ''">
+			and find_in_set(a.PRO_NO, '${proNo}') > 0
+		</if>
+		<if test="docTypeLibCode != null and docTypeLibCode != ''">
+			and find_in_set(a.DOC_TYPELIB_CODE, '${docTypeLibCode}') > 0
+		</if>
+		<if test="accountCode != null and accountCode != ''">
+			and c.ACCOUNT_CODE='${accountCode}'
+		</if>
+		<if test="title != null and title != ''">
+			and a.TITLE like '%${title}%'
+		</if>
+		
+	</select>
+	
+	<select id="getProcessDoc" parameterType="map" resultType="map" statementType="STATEMENT">
+		select a.PRO_NO proNo,c.PRO_NAME proName,a.DOC_TYPELIB_CODE docTypeLibCode,b.DOC_TYPELIB_NAME docTypeLibName,
+		a.TITLE title,a.FILE_NAME fileName,a.SUFFIX_NAME suffixName,a.RE_VISITID reVisitid,a.DL_VISITID dlVisitid,
+		a.UPLOAD_DATE uploadDate,ifnull(a.RE_COUNT, 0) reCount,ifnull(a.DL_COUNT,0) dlCount,a.REMARKS remarks
+		from PM_DOCUMENT_LIB a
+		join PM_DOCUMENT_TYPELIB b on a.DOC_TYPELIB_CODE=b.DOC_TYPELIB_CODE
+		join PM_BASE c on a.PRO_NO=c.PRO_NO
+		where a.sys_process_flag='1' and b.DOC_CLASS=2 and a.SUFFIX_NAME='jpg'
+		<if test="companyCode != null and companyCode != ''">
+		and a.COMPANY_CODE='${companyCode}'
+		</if>
+		<if test="proNo != null and proNo != ''">
+			and find_in_set(a.PRO_NO, '${proNo}') > 0
+		</if>
+		<if test="docTypeLibCode != null and docTypeLibCode != ''">
+			and find_in_set(a.DOC_TYPELIB_CODE, '${docTypeLibCode}') > 0
+		</if>
+		<if test="title != null and title != ''">
+			and a.TITLE like '%${title}%'
+		</if>
+		<if test="accountCode != null and accountCode != ''">
+			and c.ACCOUNT_CODE='${accountCode}'
+		</if>
+		<if test="orderField != null and orderField != ''">
+			${orderField}
+		</if>
+		
+		limit ${firstResult},${maxResult}
+	</select>
+	
+	<insert id="batchInsertProcessDoc" parameterType="java.util.List">
+		insert into PM_DOCUMENT_LIB(COMPANY_CODE,PRO_NO,DOC_TYPELIB_CODE,TITLE,FILE_NAME,SUFFIX_NAME,
+		RE_VISITID,DL_VISITID,UPLOAD_DATE,FILE_SIZE,SYS_CREATE_TIME,SYS_PROCESS_FLAG, REMARKS, DOC_NO) values
+		<foreach collection="list" item="item" index="index" separator=",">
+		(#{item.companyCode},#{item.proNo},#{item.docTypeLibCode},#{item.title},#{item.fileName},#{item.suffixName},
+		#{item.reVisitid},#{item.dlVisitid},#{item.uploadDate},#{item.fileSize},now(),'1',#{item.remarks},#{item.docNo})
+		</foreach>
+	</insert>
+	
+	<update id="updateUserPsw" parameterType="java.util.HashMap">
+		update pf_account set ACCOUNT_PASSWORD=#{psw} where ACCOUNT_CODE=#{accountCode}
+	</update>
+	
+	<select id="getLastMobileVersion" resultType="map">
+		select VERSION_CODE versionCode,VERSION_TYPE versionType,APK_NAME apkName from SM_MOBILE_VERSION 
+		where IS_PUBLISH=1 and APP_TYPE=2 and SYS_PROCESS_FLAG='1'
+	</select>
+	<!-- 查询通讯录 -->
+	<select id="getMailList" resultType="map" parameterType="map">
+		select e.EMPLOYEENAME name,u.UNIT_NAME unitname,e.MOBILEPHONE1 phone,UPPER(left(to_pinyin(e.EMPLOYEENAME),1))  code from md_employee e
+		left join md_org_unit u on e.UNIT_CODE=u.UNIT_CODE
+		where u.COMPANY_CODE=#{companyCode}
+		ORDER BY 
+		UPPER(left(to_pinyin(e.EMPLOYEENAME),1)),convert(e.EMPLOYEENAME USING gbk) COLLATE gbk_chinese_ci asc 
+	</select>
+</mapper>

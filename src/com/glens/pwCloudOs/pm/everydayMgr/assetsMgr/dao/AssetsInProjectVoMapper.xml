@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glens.pwCloudOs.pm.everydayMgr.assetsMgr.dao.pmTmVehicleFuelchargeVoMapper">
+  
+  
+  <select id="getAssetsInProjectCount" parameterType="map" resultType="int">
+    <!-- 
+    	项目下资产借用情况(记录数)
+    	
+    	参数列表：
+    	companyCode 公司编号（必填）
+    	accountCode 项目负责人（当角色为项目负责人时必填）
+    	proNo 项目编号（非必填，不填时查出所有项目下的资产借用情况）
+     -->
+    select count(*)
+	from gm_asset_rent t1 
+	left join gm_asset_base t2 on t2.ASSET_CODE = t1.ASSET_CODE
+	left join gm_asset_type t3 on t3.ASSET_TYPE_CODE = t2.ASSET_TYPE_CODE
+	left join gm_asset_class t4 on t4.ASSET_CLASS_CODE = t3.ASSET_CLASS_CODE
+	join (select PRO_NO,PRO_NAME from PM_BASE 
+			where COMPANY_CODE=#{companyCode} and SYS_PROCESS_FLAG='1' and PRO_STATUS=2
+			<if test="accountCode != null and accountCode != ''">
+			and ACCOUNT_CODE=#{accountCode}
+			</if>
+			<if test="districtManager != null and districtManager != ''">
+			and DISTRICT_MANAGER=#{districtManager}
+			</if>
+			<if test="deptCode != null and deptCode != ''">
+				and MANAGE_DEPT=#{deptCode}
+   		    </if>
+	) t5 on t5.PRO_NO = t1.LOAN_PRO_NO
+	where 1=1
+	<if test="proNo != null and proNo != ''">
+	and t1.LOAN_PRO_NO = #{proNo}
+	</if>
+	<if test="assetClassCode != null and assetClassCode != ''">
+	and t3.ASSET_CLASS_CODE = #{assetClassCode}
+	</if>
+	<if test="loanEmployeename != null and loanEmployeename != ''">
+	and t1.LOAN_EMPLOYEENAME like "%"#{loanEmployeename}"%"
+	</if>
+  </select>
+  
+  
+  <select id="selectAssetsInProject" parameterType="map" resultType="com.glens.pwCloudOs.pm.everydayMgr.assetsMgr.vo.AssetsInProjectVo">
+    <!-- 
+    	项目下资产借用情况
+    	
+    	参数列表：
+    	companyCode 公司编号（必填）
+    	accountCode 项目负责人（当角色为项目负责人时必填）
+    	proNo 项目编号（非必填，不填时查出所有项目下的资产借用情况）
+     -->
+    select t1.rowid, t2.ASSET_CODE as assetCode, t4.asset_class_code as assetClassCode, t4.asset_class_name as assetClassName, 
+    	t3.ASSET_TYPE_NAME as assetTypeName, 
+    	t3.BRAND as brand, t3.MODEL_NO as modelNo, 
+		t1.LOAN_EMPLOYEENAME as loanEmployeename, t1.LOAN_UNIT_NAME as loanUnitName, 
+		t1.LOAN_PRO_NO as loanProNo,t1.LOAN_PRO_NAME as loanProName, 
+		t1.RENT_DATE as rentDate, t1.ESTIMATE_RETURN_DATE as estimateReturnDate,t2.VA_NO as vaNo,
+		t1.RENT_STATUS as rentStatus,t1.FLOW_STATUS as flowStatus
+	from gm_asset_rent t1 
+	left join gm_asset_base t2 on t2.ASSET_CODE = t1.ASSET_CODE
+	left join gm_asset_type t3 on t3.ASSET_TYPE_CODE = t2.ASSET_TYPE_CODE
+	left join gm_asset_class t4 on t4.ASSET_CLASS_CODE = t3.ASSET_CLASS_CODE
+	join (select PRO_NO,PRO_NAME from PM_BASE 
+			where COMPANY_CODE=#{companyCode} and SYS_PROCESS_FLAG='1' and PRO_STATUS=2
+			<if test="accountCode != null and accountCode != ''">
+			and ACCOUNT_CODE=#{accountCode}
+			</if>
+			<if test="districtManager != null and districtManager != ''">
+			and DISTRICT_MANAGER=#{districtManager}
+			</if>
+			<if test="deptCode != null and deptCode != ''">
+				and MANAGE_DEPT=#{deptCode}
+   		    </if>
+	
+	) t5 on t5.PRO_NO = t1.LOAN_PRO_NO
+	where 1=1
+	<if test="proNo != null and proNo != ''">
+	and t1.LOAN_PRO_NO = #{proNo}
+	</if>
+	<if test="assetClassCode != null and assetClassCode != ''">
+	and t3.ASSET_CLASS_CODE = #{assetClassCode}
+	</if>
+	<if test="loanEmployeename != null and loanEmployeename != ''">
+	and t1.LOAN_EMPLOYEENAME like "%"#{loanEmployeename}"%"
+	</if>
+	order by t1.RENT_STATUS, t1.RENT_DATE DESC, t1.rowid
+	limit #{firstResult},#{maxResult}
+  </select>
+  
+</mapper>

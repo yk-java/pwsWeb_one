@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.fm.rpaymentbase.dao.RpaymentVoMapper" >
+				   
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.fm.rpaymentbase.vo.RpaymentBaseVo" >
+    <result column="rowid" property="rowid"  />
+    <result column="PRO_NO" property="proNo" jdbcType="VARCHAR" />
+    <result column="PRO_NAME" property="proName" jdbcType="VARCHAR" />
+    <result column="PRO_CODE" property="proCode" jdbcType="VARCHAR" />
+    <result column="CONTRACT_NO" property="contractNo" jdbcType="VARCHAR" />
+    
+    <result column="RPAYMENT_DATE" property="rpaymentDate" jdbcType="VARCHAR" />
+    <result column="INVOICE_NOS" property="invoiceNos" jdbcType="VARCHAR" />
+    <result column="CG_UNIT" property="cgUnit" jdbcType="VARCHAR" />
+   
+    <result column="AMOUNT" property="amount" />
+    <result column="REMARKS" property="remarks" jdbcType="VARCHAR" />
+    <result column="IS_ACCEPT" property="isAccept" jdbcType="VARCHAR" />
+   
+  </resultMap>
+  <sql id="Base_Column_List" >
+     a.rowid,a.PRO_NO pno,p.PRO_NO,p.PRO_STATUS,p.PRO_NAME,p.PRO_CODE,a.PRO_NAME pname,a.RPAYMENT_DATE,
+     a.INVOICE_NOS,a.CG_UNIT,a.CONTRACT_NO,a.AMOUNT,
+     a.REMARKS,ifnull(IS_ACCEPT,0) IS_ACCEPT,p.province,p.city,p.district
+  </sql>
+  
+ <select id="queryForCount" parameterType="java.util.HashMap" resultType="int">
+ 	select count(*) from (select * from (
+ 	select DISTINCT 
+    <include refid="Base_Column_List" />
+    from FM_RPAYMENT_BASE a 
+    left join pm_base p on a.pro_no=p.pro_no
+    where a.sys_process_flag='1'
+ 	) t
+ 	where 1=1
+ 	 <if test="proNo != null and proNo !=''">
+ 		and PRO_NO=#{proNo}
+ 	</if>
+ 	<if test="proStatus != null and proStatus == 2">
+ 		and PRO_STATUS=#{proStatus}
+ 	</if>
+ 	<if test="proStatus != null and proStatus == 3">
+ 		and PRO_STATUS=#{proStatus}
+ 	</if>
+ 	<if test="proStatus != null and proStatus == 4">
+ 		and PRO_NO is null
+ 	</if>
+ 	
+ 	<if test="invoiceNos != null and invoiceNos !=''">
+ 		and ( INVOICE_NOS like concat('%',#{invoiceNos},'%')  or PROVINCE like  concat('%',#{invoiceNos},'%') or CITY like concat('%',#{invoiceNos},'%')  or DISTRICT like  concat('%',#{invoiceNos},'%'))
+ 	</if>
+ 	
+ 	<if test="fromDate!=null and fromDate!=''">
+ 		and RPAYMENT_DATE>=#{fromDate}
+ 	</if>
+ 	
+ 	<if test="toDate!=null and toDate!=''">
+ 		and RPAYMENT_DATE &lt;=#{toDate}
+ 	</if>
+ 	<if test="isZero==0">
+ 		and AMOUNT>0
+ 	</if>
+ 	
+ 	<if test="isAccept!=null and isAccept!=''">
+ 		<if test="isAccept==0">
+ 			and (IS_ACCEPT='0' or IS_ACCEPT is null or IS_ACCEPT='' or PRO_NO is null or PRO_NO='')
+ 		</if>
+ 		<if test="isAccept==1">
+ 			and IS_ACCEPT='1'
+ 		</if>
+ 	</if>
+ 	) t2
+ </select>
+ 
+ <select id="queryForList" parameterType="map" resultType="map">
+ 	select * from (
+ 	select DISTINCT 
+     a.rowid,a.PRO_NO pno,p.PRO_NO proNo,p.PRO_STATUS,p.PRO_NAME proName,a.PRO_NAME pname,a.RPAYMENT_DATE rpaymentDate,
+     a.INVOICE_NOS invoiceNos,a.CG_UNIT cgUnit,a.CONTRACT_NO contractNo,format(a.AMOUNT,2) amount,
+     a.REMARKS ,p.province,p.city,p.district
+    from FM_RPAYMENT_BASE a 
+    left join pm_base p on a.pro_no=p.pro_no
+    where a.sys_process_flag='1'
+ 	) t
+ 	where 1=1
+ 	 <if test="proNo != null and proNo !=''">
+ 		and PRO_NO=#{proNo}
+ 	</if>
+ 	<if test="proStatus != null and proStatus == 2">
+ 		and PRO_STATUS=#{proStatus}
+ 	</if>
+ 	<if test="proStatus != null and proStatus == 3">
+ 		and PRO_STATUS=#{proStatus}
+ 	</if>
+ 	<if test="proStatus != null and proStatus == 4">
+ 		and PRO_NO is null
+ 	</if>
+ 	<if test="invoiceNos != null and invoiceNos !=''">
+ 		and (invoiceNos like concat('%',#{invoiceNos},'%')  or PROVINCE like  concat('%',#{invoiceNos},'%') or CITY like concat('%',#{invoiceNos},'%')  or DISTRICT like  concat('%',#{invoiceNos},'%'))
+ 	</if>
+ 	
+ 	<if test="fromDate!=null and fromDate!=''">
+ 		and RPAYMENT_DATE>=#{fromDate}
+ 	</if>
+ 	
+ 	<if test="toDate!=null and toDate!=''">
+ 		and RPAYMENT_DATE &lt;=#{toDate}
+ 	</if>
+ 	<if test="isZero==0">
+ 		and AMOUNT>0
+ 	</if>
+ 	
+ </select>
+ 
+ <select id="queryForPage" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+ 	select * from (
+ 	select DISTINCT 
+    <include refid="Base_Column_List" />
+    from FM_RPAYMENT_BASE a 
+    left join pm_base p on a.pro_no=p.pro_no
+    where a.sys_process_flag='1'
+ 	) t
+ 	where 1=1
+ 	 <if test="proNo != null and proNo !=''">
+ 		and PRO_NO=#{proNo}
+ 	</if>
+ 	<if test="proStatus != null and proStatus == 2">
+ 		and PRO_STATUS=#{proStatus}
+ 	</if>
+ 	<if test="proStatus != null and proStatus == 3">
+ 		and PRO_STATUS=#{proStatus}
+ 	</if>
+ 	<if test="proStatus != null and proStatus == 4">
+ 		and PRO_NO is null
+ 	</if>
+ 	
+ 	<if test="invoiceNos != null and invoiceNos !=''">
+ 		and (INVOICE_NOS like concat('%',#{invoiceNos},'%')  or PROVINCE like  concat('%',#{invoiceNos},'%') or CITY like concat('%',#{invoiceNos},'%')  or DISTRICT like  concat('%',#{invoiceNos},'%'))
+ 	</if>
+ 	
+ 	<if test="fromDate!=null and fromDate!=''">
+ 		and RPAYMENT_DATE>=#{fromDate}
+ 	</if>
+ 	
+ 	<if test="toDate!=null and toDate!=''">
+ 		and RPAYMENT_DATE &lt;=#{toDate}
+ 	</if>
+ 	<if test="isZero==0">
+ 		and AMOUNT>0
+ 	</if>
+ 	<if test="isAccept!=null and isAccept!=''">
+ 		<if test="isAccept==0">
+ 			and (IS_ACCEPT='0' or IS_ACCEPT is null or IS_ACCEPT='' or PRO_NO is null or PRO_NO='')
+ 		</if>
+ 		<if test="isAccept==1">
+ 			and IS_ACCEPT='1'
+ 		</if>
+ 	</if>
+ 	
+ 	limit #{firstResult},#{maxResult}
+ </select>
+  
+  <select id="findById" resultMap="BaseResultMap" parameterType="com.glens.pwCloudOs.fm.rpaymentbase.vo.RpaymentBaseVo" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+    -->
+    select 
+    <include refid="Base_Column_List" />
+    from FM_RPAYMENT_BASE a
+    left join pm_base p on a.pro_no=p.pro_no
+   
+    where a.rowid = #{rowid}
+  </select>
+  
+  <delete id="delete" parameterType="com.glens.pwCloudOs.fm.rpaymentbase.vo.RpaymentBaseVo" >
+    delete from FM_RPAYMENT_BASE
+    where rowid = #{rowid}
+  </delete>
+  
+  <insert id="insert" parameterType="com.glens.pwCloudOs.fm.rpaymentbase.vo.RpaymentBaseVo" >
+	insert into FM_RPAYMENT_BASE(PRO_NO,PRO_NAME,RPAYMENT_DATE,INVOICE_NOS,CG_UNIT,CONTRACT_NO,
+	AMOUNT,REMARKS,SYS_CREATE_TIME,SYS_PROCESS_FLAG,IS_ACCEPT) 
+	values(#{proNo},#{proName},#{rpaymentDate},#{invoiceNos},#{cgUnit},#{contractNo},
+	#{amount},#{remarks},now(),1,#{isAccept})
+  </insert>
+  
+  <update id="update" parameterType="com.glens.pwCloudOs.fm.rpaymentbase.vo.RpaymentBaseVo" >
+   update FM_RPAYMENT_BASE set 
+ 
+ 	<if test="proNo != null and proNo !=''">
+ 		PRO_NO=#{proNo},
+ 	</if>
+	<if test="proName != null and proName !=''">
+ 		PRO_NAME=#{proName},
+ 	</if>
+ 	<if test="rpaymentDate != null and rpaymentDate !=''">
+ 		RPAYMENT_DATE=#{rpaymentDate},
+ 	</if>
+	
+ 	<if test="invoiceNos != null and invoiceNos !=''">
+ 		INVOICE_NOS=#{invoiceNos},
+ 	</if>
+	<if test="cgUnit != null and cgUnit !=''">
+ 		CG_UNIT=#{cgUnit},
+ 	</if>
+	
+	<if test="contractNo != null and contractNo !=''">
+ 		CONTRACT_NO=#{contractNo},
+ 	</if>
+	
+	<if test="amount != null and amount !=''">
+ 		AMOUNT=#{amount},
+ 	</if>
+	
+	<if test="remarks != null and remarks !=''">
+ 		REMARKS=#{remarks},
+ 	</if>
+ 	
+ 	<if test="isAccept != null and isAccept !=''">
+ 		IS_ACCEPT=#{isAccept},
+ 	</if>
+ 	
+ 	SYS_UPDATE_TIME=NOW()
+ 	
+	where rowid=#{rowid}
+  </update>
+  
+  
+</mapper>

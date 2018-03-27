@@ -1,0 +1,204 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>照片管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<script src="../../../js/jquery-photo-gallery/jquery.photo.gallery.js"></script>
+
+<style type="text/css">
+	.dialog-viewcode{width:500px;height:400px;}
+    .dialog-viewcyle{width:1100px;height:710px;}
+    
+    .imgitem {
+		height: 600px;
+		width: 450px;
+		border: 1px #ccc solid;
+		float: left;
+		margin-right: 1px;
+		margin-left: 5px;
+		margin-top: 5px;
+		overflow:hidden;
+	}
+	
+	
+	.imgs {
+	width: 450px;
+	height: 600px;
+	z-index: -1;
+	transition: all 0.6s;
+}
+.imgs:HOVER {
+transform: scale(1.4);
+-webkit-transform: scale(1.4);
+
+}
+.eidtdiv {
+	margin-left: 155px;
+	text-align: center;
+	padding-top: 8px;
+	position: absolute;
+	font-family: '微软雅黑';
+	font-size: 12px;
+	height: 27px;
+	width: 80px;
+	filter: alpha(Opacity = 50);
+	-moz-opacity: 0.5;
+	opacity: 0.5;	
+	background-color: black;
+}
+.titlemess{
+	width:450px;
+	height:50px; 
+	position: absolute;
+	margin-top:-54px;
+	filter: alpha(Opacity = 50);
+	-moz-opacity: 0.5;
+	opacity: 0.5;
+    color: #ffffff;
+	text-align: center;
+	background-color: black;
+	font-family: '微软雅黑';
+	font-size:18px;
+	
+}
+.eidtdiv a {
+	color: #fff;
+	cursor: pointer;
+}
+
+.eidtdiv a:HOVER {
+	color: #3385FF;
+}
+
+.imgitem:HOVER {
+/* 	border: 1px red solid; */
+	cursor: pointer;
+}
+
+</style>
+</head>
+
+<body ng-app="mdu" ng-controller="ctrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">照片查看</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			 <a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;返回
+			</a>
+		</div>
+		  
+		
+		<div class="form_div" >
+			<div class="imgitem gallerys" ng-repeat="item in imgList">
+				<!-- <div class="eidtdiv">
+					<a ng-click="showdiv($index,item.picTitle)">放大</a>
+				</div> -->
+				<img src="{{item.url}}" id="pic_{{$index}}" onerror="javascript:this.src='../../../img/defaultImg02.png';" class="imgs gallery-pic"
+					ng-click="showdiv($index,item.picTitle)" />
+				<div class="titlemess">
+					<p>{{item.picTitle}}</p>
+				</div>
+				
+			</div>
+			<div style="clear: both;"></div>
+		</div>
+		
+		<div class="form_bottom">
+ 
+		</div>
+ 
+	</div>
+</div>
+
+<script type="text/javascript">
+  
+
+var ngScope;
+var app = angular.module("mdu", []);
+app.controller("ctrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.imgList=[];
+/* 	$scope.imgList=[{url:"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521783934488&di=523ecb356ae47e932591920a0333d848&imgtype=0&src=http%3A%2F%2Fimg3.3lian.com%2F2013%2Fc1%2F91%2Fd%2F29.jpg",picTitle:"标题1"},
+	{url:"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521783934487&di=04af2c61e2ee3d1faf889cc61a93db1f&imgtype=0&src=http%3A%2F%2Fup.enterdesk.com%2Fedpic%2F13%2Ff4%2Fb7%2F13f4b7d9f1cb5649b6b1591b1b804e0e.jpg",picTitle:"标题2"},
+	{url:"http://imgsrc.baidu.com/image/c0%3Dpixel_huitu%2C0%2C0%2C294%2C40/sign=b360ab28790e0cf3b4fa46bb633e9773/e850352ac65c10387071c8f8b9119313b07e89f8.jpg",picTitle:"标题3"},
+	{url:"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521785345142&di=fb4a7ab30662fb222c5d941ebcb56447&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F279759ee3d6d55fb945b460267224f4a20a4dd70.jpg",picTitle:"标题4"}];
+  */
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	var params = getUrlParams();
+/* 	var item=$scope.imgList[0];
+	$.openPhotoGallery(item.url,item.picTitle); */
+	 
+ 
+	/* 数据加载 */
+	$scope.loadData=function(){ 
+		$http.get(serviceBasePath+"eap/pmsServices/cj/base/cjAttachment/listAll?attachmentAttachId="
+			+params.collectId+"&ticket="+ticket).success(function(response){
+			if(response.statusCode==401){
+				alert("用户凭据过期！请重新登录！");
+				window.top.location.href="../../../login.html";
+				return;
+			}
+			if(response.statusCode!=200){
+				alert("请求服务器失败！");
+				return;
+			} 
+			for(var item in response.list){
+				$scope.imgList.push({url:serviceBasePath+"/fileUpload/zycj/bdzLineDevice/"+item.attachmentName,picTitle:item.attachmentAttachRange});
+			} 
+			
+		});
+	};
+	/* 初始加载 */
+ 	$scope.loadData();
+	
+	/* 取消 */
+	$scope.onCancel = function(){ 
+ 		history.go(-1);
+	};
+	
+ 
+	$scope.showdiv=function(index, title){
+		//alert(index);
+		var img1=$("#pic_"+index);
+		$.openPhotoGallery(img1, 'gallery.html?picTitle='+title); 
+	 
+	};
+	
+	 
+	
+});
+</script>
+</body>
+</html>

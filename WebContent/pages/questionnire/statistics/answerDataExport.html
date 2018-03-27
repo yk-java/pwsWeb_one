@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html ng-app="moduleName">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<title> 答卷数据导出 </title>
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/ng-base.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/ViewState.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/echarts-all.js"></script>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css" />
+
+<style type="text/css">
+ul,li{margin:0;padding:0;}
+	
+	.title_save{display:inline-block;width:70px;height:28px;background: url(../../../img/btn_save.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:10px;margin-top:5px;color:#fff;cursor: pointer;}
+	.title_save:hover{background: url(../../../img/btn_save.png) no-repeat 0 -29px;}
+	.title_cancel{display:inline-block;width:70px;height:28px;background: url(../../../img/btn_cancel.png) no-repeat 0 0;line-height:28px;text-align:center;margin-left:10px;margin-top:5px;color:#666;cursor: pointer;}
+	.title_cancel:hover{background: url(../../../img/btn_cancel.png) no-repeat 0 -29px;}
+	
+	.bottom_space{float:left;width:100%;height:80px; }
+</style>
+
+</head>
+<body ng-controller="controllerName" storagekey="questionnire.questionnireMgr.questionnireStatistic.export">
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">答卷数据导出</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+			&nbsp;&nbsp;
+		</div>
+		
+		<form id="saveForm" class="required-validate">
+		<div class="form_div questionnire" id="lay1">
+			<div class="questionnire_info">
+				<table>
+					<tr>
+						<th>题目类型</th>
+						<td>
+							<input type="text" name="subTypeName" viewstate="subTypeName" class="dropDownList"/>
+							<input type="hidden" name="subType" viewstate="subType"/>
+						</td>
+					</tr>
+					<tr>
+						<th>题目</th>
+						<td>
+							<input type="text" name="question" viewstate="question" class="dropDownList"/>
+							<input type="hidden" name="questionCode" viewstate="questionCode"/>
+						</td>
+					</tr>
+					<tr>
+						<th>作答人</th>
+						<td>
+							<input type="text" name="submitUserName" viewstate="submitUserName" class="dropDownList" ng-click="chooseUser()"/>
+							<a href="javascript:" ng-click="clearSubmitUser()">清空</a>
+							<input type="hidden" name="submitUser" viewstate="submitUser"/>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="bottom_space">
+			<a href="javascript:" ng-click="doExport()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;导出
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+simpleController({
+	init:function($scope, $http){
+		var urlParams = getUrlParams();
+		var viewState = new ViewState();
+		
+		new DropDownList().init({
+			renderTo:"input[name=subTypeName]",
+			data:[{code:"", name:"（全部）"},{code:"radio", name:"单选题"},{code:"checkbox", name:"多选题"},{code:"text", name:"填空题"}],
+			textField:'name',
+			onSelected:function(item){
+				$("input[name=subTypeName]").val(item.name);
+				$("input[name=subType]").val(item.code);
+			}
+		});
+		
+		/* 加载数据 */
+		(function(){
+			viewState.collect();
+			new ShowDlog().prompt({
+				icon:"waitting",
+				msg:"正在查询...",
+				done:function(){},
+				t:20*60*1000
+			});
+			$scope.httpExecute({
+				url:"eap/pmsServices/questionnireStatistic/get",
+				method:"GET",
+				data:{questionnireCode:urlParams.questionnireCode},
+				success:function(res){
+					$dlog.close();
+					if(res.statusCode==200){
+						var list=[{questionCode:"", title:"（全部）"}];
+						for(var i in res.data.questions){
+							var question = res.data.questions[i];
+							if(question.type=="question"){
+								list.push(question);
+							}
+						}
+						
+						new DropDownList().init({
+							renderTo:"input[name=question]",
+							data:list,
+							textField:"title",
+							height:"300px",
+							onSelected:function(item){
+								$("input[name=question]").val(item.title);
+								$("input[name=questionCode]").val(item.questionCode);
+							}
+						});
+					}
+				},
+				error:function(){
+					$dlog.close();
+					new ShowDlog().prompt({
+						msg:"网络异常！",
+						done:function(){},
+						t:1500
+					});
+				}
+			});
+		})();
+		
+		$scope.chooseUser = function(){
+			/* 选择员工 */
+			new ShowDlog().showFrameFull("../../component/chooseUser.html", function(data){
+				if(data && data.length>0){
+					$("input[name=submitUserName]").val(data[0].employeename);
+					$("input[name=submitUser]").val(data[0].employeecode);
+				}
+			});
+		};
+		
+		$scope.clearSubmitUser=function(){
+			$("input[name=submitUserName]").val("");
+			$("input[name=submitUser]").val("");
+		};
+		
+		$scope.onCancel=function(){
+			parent.$dlog.close();
+		};
+		
+		$scope.doExport=function(){
+			viewState.collect();
+			location.href=serviceBasePath+"eap/pmsServices/questionnireStatistic/exportAnswerData?"+
+					"questionnireCode="+urlParams.questionnireCode+
+					"&questionCode="+viewState.get("questionCode")+
+					"&subType="+viewState.get("subType")+
+					"&submitUser="+viewState.get("submitUser");
+		};
+		
+	}
+});
+</script>
+</body>
+</html>

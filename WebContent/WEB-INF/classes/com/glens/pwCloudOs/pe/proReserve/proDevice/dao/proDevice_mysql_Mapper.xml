@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.pe.proReserve.proDevice.deviceMapper">
+	
+	<select id="getMctViewPros" parameterType="map" resultType="map">
+		select a.PRO_NOS proNos,a.PRO_NAMES proNames,a.PRO_MCT_CODES proMctCodes,a.PRO_MCT_NAMES proMctNames
+		from PM_MCT_VIEW a 
+		join PE_BS_RESERVE_PRO b on a.MCT_VIEW_CODE=b.MCT_VIEW_CODE
+		where a.COMPANY_CODE=#{companyCode} and a.SYS_PROCESS_FLAG='1' and b.RESERVE_PRO_NO=#{reserveProNo}
+	</select>
+	
+	<select id="getProDeviceMateriaInfo" parameterType="map" resultType="map">
+		select a.REMOULDSCHEME_CODE remouldSchemeCode,a.MATERIALTYPE_CODE materialTypeCode,a.NEED_COUNT needCount,
+		b.MATERIALTYPE_NAME materialTypeName,ifnull(b.MATERIALTYPE_COST,0) materialTypeCost,
+		a.NEED_COUNT*ifnull(b.MATERIALTYPE_COST,0) amount
+		from PE_BS_RP_RS_MT_GXB a
+		join PE_BS_RP_MATERIALTYPE b on a.MATERIALTYPE_CODE=b.MATERIALTYPE_CODE
+		where a.COMPANY_CODE=#{companyCode} and b.COMPANY_CODE=#{companyCode} and a.REMOULDSCHEME_CODE=#{remouldSchemeCode}
+	</select>
+	
+	<select id="getActivePro" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select PRO_NO proNo,PRO_NAME proName,CATEGORY_CODE categoryCode from PM_BASE 
+		where COMPANY_CODE=#{companyCode} and SYS_PROCESS_FLAG='1' and PRO_STATUS=2
+		<if test="accountCode != null and accountCode !=''">
+		and ACCOUNT_CODE=#{accountCode}
+		</if>
+		<if test="categoryCode != null and categoryCode != ''">
+		and CATEGORY_CODE=#{categoryCode}
+		</if>
+	</select>
+	
+</mapper>

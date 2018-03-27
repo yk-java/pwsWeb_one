@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glens.pwCloudOs.pm.baseMgr.pmBase.dao.PmProKpiMapper" >
+  <resultMap id="BaseResultMap" type="com.glens.pwCloudOs.pm.baseMgr.pmBase.vo.PmProKpi" >
+    <id column="rowid" property="rowid" jdbcType="BIGINT" />
+    <result column="PRO_NO" property="proNo" jdbcType="VARCHAR" />
+    <result column="KPI_TYPE" property="kpiType" jdbcType="INTEGER" />
+    <result column="KPI_CODE" property="kpiCode" jdbcType="VARCHAR" />
+    <result column="KPI_NAME" property="kpiName" jdbcType="VARCHAR" />
+    <result column="KPI_SYMBOL" property="kpiSymbol" jdbcType="VARCHAR" />
+    <result column="KPI_WEIGHT" property="kpiWeight" jdbcType="REAL" />
+    <result column="KPI_UNIT" property="kpiUnit" jdbcType="VARCHAR" />
+    <result column="KPI_DESC" property="kpiDesc" jdbcType="VARCHAR" />
+    <result column="KPI_SORT" property="kpiSort" jdbcType="INTEGER" />
+    <result column="UES_ATTACHED" property="uesAttached" jdbcType="INTEGER" />
+    <result column="ATTACHED_UNIT" property="attachedUnit" jdbcType="VARCHAR" />
+    <result column="MERGE_FLAG" property="mergeFlag" jdbcType="INTEGER" />
+    <result column="DAILY_INVISIBLE_FLAG" property="dailyInvisibleFlag" jdbcType="INTEGER" />
+    <result column="SYS_CREATE_TIME" property="sysCreateTime" jdbcType="TIMESTAMP" />
+    <result column="SYS_UPDATE_TIME" property="sysUpdateTime" jdbcType="TIMESTAMP" />
+    <result column="SYS_DELETE_TIME" property="sysDeleteTime" jdbcType="TIMESTAMP" />
+    <result column="SYS_PROCESS_FLAG" property="sysProcessFlag" jdbcType="CHAR" />
+    <result column="REMARKS" property="remarks" jdbcType="VARCHAR" />
+    <result column="KPI_TOTAL" property="kpiTotal" jdbcType="REAL" />
+    <result column="STANDARD" property="standard" jdbcType="REAL" />
+    <result column="IS_PER_CNT" property="isPersonCnt" jdbcType="INTEGER" />
+    
+  </resultMap>
+  
+  
+  <sql id="Base_Column_List" >
+    rowid, PRO_NO, KPI_TYPE, KPI_CODE, KPI_NAME, KPI_SYMBOL, KPI_WEIGHT, KPI_UNIT, KPI_DESC, 
+    KPI_SORT, UES_ATTACHED, ATTACHED_UNIT, MERGE_FLAG, DAILY_INVISIBLE_FLAG, SYS_CREATE_TIME, 
+    SYS_UPDATE_TIME, SYS_DELETE_TIME, SYS_PROCESS_FLAG, REMARKS, KPI_TOTAL, STANDARD,IS_PER_CNT
+  </sql>
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from pm_pro_kpi
+    where rowid = #{rowid,jdbcType=BIGINT}
+  </select>
+  <select id="selectByKpiCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from pm_pro_kpi
+    where kpi_code = #{kpiCode,jdbcType=VARCHAR}
+  </select>
+  
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from pm_pro_kpi
+    where rowid = #{rowid,jdbcType=BIGINT}
+  </delete>
+  
+  
+  <insert id="insert" parameterType="com.glens.pwCloudOs.pm.baseMgr.pmBase.vo.PmProKpi" >
+    insert into pm_pro_kpi
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="proNo != null" >
+        PRO_NO,
+      </if>
+      <if test="kpiType != null" >
+        KPI_TYPE,
+      </if>
+      <if test="kpiCode != null" >
+        KPI_CODE,
+      </if>
+      <if test="kpiName != null" >
+        KPI_NAME,
+      </if>
+      <if test="kpiSymbol != null" >
+        KPI_SYMBOL,
+      </if>
+      <if test="kpiWeight != null" >
+        KPI_WEIGHT,
+      </if>
+      <if test="kpiUnit != null" >
+        KPI_UNIT,
+      </if>
+      <if test="kpiDesc != null" >
+        KPI_DESC,
+      </if>
+      <if test="kpiSort != null" >
+        KPI_SORT,
+      </if>
+      <if test="uesAttached != null" >
+        UES_ATTACHED,
+      </if>
+      <if test="attachedUnit != null" >
+        ATTACHED_UNIT,
+      </if>
+      <if test="mergeFlag != null" >
+        MERGE_FLAG,
+      </if>
+      <if test="dailyInvisibleFlag != null" >
+        DAILY_INVISIBLE_FLAG,
+      </if>
+      <if test="sysCreateTime != null" >
+        SYS_CREATE_TIME,
+      </if>
+      <if test="sysUpdateTime != null" >
+        SYS_UPDATE_TIME,
+      </if>
+      <if test="sysDeleteTime != null" >
+        SYS_DELETE_TIME,
+      </if>
+      <if test="sysProcessFlag != null" >
+        SYS_PROCESS_FLAG,
+      </if>
+      <if test="remarks != null" >
+        REMARKS,
+      </if>
+      <if test="kpiTotal != null" >
+        KPI_TOTAL,
+      </if>
+      <if test="standard != null" >
+        STANDARD,
+      </if>
+       <if test="isPersonCnt != null" >
+        IS_PER_CNT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="proNo != null" >
+        #{proNo,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiType != null" >
+        #{kpiType,jdbcType=INTEGER},
+      </if>
+      <if test="kpiCode != null" >
+        #{kpiCode,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiName != null" >
+        #{kpiName,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiSymbol != null" >
+        #{kpiSymbol,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiWeight != null" >
+        #{kpiWeight,jdbcType=REAL},
+      </if>
+      <if test="kpiUnit != null" >
+        #{kpiUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiDesc != null" >
+        #{kpiDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiSort != null" >
+        #{kpiSort,jdbcType=INTEGER},
+      </if>
+      <if test="uesAttached != null" >
+        #{uesAttached,jdbcType=BIT},
+      </if>
+      <if test="attachedUnit != null" >
+        #{attachedUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="mergeFlag != null" >
+        #{mergeFlag,jdbcType=INTEGER},
+      </if>
+      <if test="dailyInvisibleFlag != null" >
+        #{dailyInvisibleFlag,jdbcType=INTEGER},
+      </if>
+      <if test="sysCreateTime != null" >
+        #{sysCreateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sysUpdateTime != null" >
+        #{sysUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sysDeleteTime != null" >
+        #{sysDeleteTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sysProcessFlag != null" >
+        #{sysProcessFlag,jdbcType=CHAR},
+      </if>
+      <if test="remarks != null" >
+        #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiTotal != null" >
+        #{kpiTotal,jdbcType=REAL},
+      </if>
+      <if test="standard != null" >
+        #{standard,jdbcType=REAL},
+      </if>
+       <if test="isPersonCnt != null" >
+        #{isPersonCnt,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  
+  
+  <update id="update" parameterType="com.glens.pwCloudOs.pm.baseMgr.pmBase.vo.PmProKpi" >
+    update pm_pro_kpi
+    <set >
+      <if test="proNo != null" >
+        PRO_NO = #{proNo,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiType != null" >
+        KPI_TYPE = #{kpiType,jdbcType=INTEGER},
+      </if>
+      <if test="kpiCode != null" >
+        KPI_CODE = #{kpiCode,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiName != null" >
+        KPI_NAME = #{kpiName,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiSymbol != null" >
+        KPI_SYMBOL = #{kpiSymbol,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiWeight != null" >
+        KPI_WEIGHT = #{kpiWeight,jdbcType=REAL},
+      </if>
+      <if test="kpiUnit != null" >
+        KPI_UNIT = #{kpiUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiDesc != null" >
+        KPI_DESC = #{kpiDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiSort != null" >
+        KPI_SORT = #{kpiSort,jdbcType=INTEGER},
+      </if>
+      <if test="uesAttached != null" >
+        UES_ATTACHED = #{uesAttached,jdbcType=BIT},
+      </if>
+      <if test="attachedUnit != null" >
+        ATTACHED_UNIT = #{attachedUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="mergeFlag != null" >
+        MERGE_FLAG = #{mergeFlag,jdbcType=INTEGER},
+      </if>
+      <if test="dailyInvisibleFlag != null" >
+        DAILY_INVISIBLE_FLAG = #{dailyInvisibleFlag,jdbcType=INTEGER},
+      </if>
+      <if test="sysCreateTime != null" >
+        SYS_CREATE_TIME = #{sysCreateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sysUpdateTime != null" >
+        SYS_UPDATE_TIME = #{sysUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sysDeleteTime != null" >
+        SYS_DELETE_TIME = #{sysDeleteTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sysProcessFlag != null" >
+        SYS_PROCESS_FLAG = #{sysProcessFlag,jdbcType=CHAR},
+      </if>
+      <if test="remarks != null" >
+        REMARKS = #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiTotal != null" >
+        KPI_TOTAL = #{kpiTotal,jdbcType=REAL},
+      </if>
+      <if test="standard != null" >
+        STANDARD = #{standard,jdbcType=REAL},
+      </if>
+       <if test="isPersonCnt != null" >
+        IS_PER_CNT = #{isPersonCnt,jdbcType=INTEGER},
+      </if>
+    </set>
+    where rowid = #{rowid,jdbcType=BIGINT}
+  </update>
+  
+   <select id="queryForCount" parameterType="map" resultType="int">
+  	select count(*) from pm_pro_kpi
+  	where 1=1
+  	<if test="proNo != null and proNo != ''">
+  	and pro_no = #{proNo}
+  	</if>
+  	<if test="kpiType != null" >
+    and KPI_TYPE = #{kpiType,jdbcType=INTEGER},
+    </if>
+  </select>
+  
+   <select id="queryPmProKpiInWorkList" parameterType="java.lang.Long"  resultType="int">
+	SELECT
+		count(1)
+	FROM
+		pm_work_list c
+	WHERE
+		c.WORK_TYPE IN (
+			SELECT
+				b.KPI_CODE
+			FROM
+				pm_pro_kpi b
+			WHERE
+				b.SYS_PROCESS_FLAG = '1'
+			AND b.rowid = #{rowid,jdbcType=BIGINT}
+		)
+  </select>
+  
+  
+  
+  <select id="queryForPage" parameterType="map" resultMap="BaseResultMap">
+  	select 
+  	<include refid="Base_Column_List" />
+  	from pm_pro_kpi
+  	where 1=1
+  	<if test="proNo != null and proNo != ''">
+  	and pro_no = #{proNo}
+  	</if>
+  	<if test="kpiType != null" >
+    and KPI_TYPE = #{kpiType,jdbcType=INTEGER}
+    </if>
+    order by kpi_sort
+	limit #{firstResult},#{maxResult}
+  </select>
+  
+  
+  <select id="queryForList" parameterType="map" resultMap="BaseResultMap">
+  	select 
+  	<include refid="Base_Column_List" />
+  	from pm_pro_kpi
+  	where 1=1
+  	<if test="proNo != null and proNo != ''">
+  	and pro_no = #{proNo}
+  	</if>
+  	<if test="kpiType != null" >
+    and KPI_TYPE = #{kpiType,jdbcType=INTEGER}
+    </if>
+    order by rowid
+  </select>
+  
+   <select id="queryByProNoAndKpiName" parameterType="map" resultMap="BaseResultMap">
+  	select 
+  	<include refid="Base_Column_List" />
+  	from pm_pro_kpi
+  	where pro_no = #{proNo}
+    and KPI_NAME = #{kpiName,jdbcType=VARCHAR}
+    order by kpi_sort
+  </select>
+</mapper>

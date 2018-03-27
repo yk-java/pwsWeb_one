@@ -1,0 +1,359 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>开票申请单</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../bootstrap-3.3.5-dist/js/bootstrap.min.js"></script></head>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css"/>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+
+<script type="text/javascript" src="../../../js/eapJs/core/eap.core.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.tip.js" ></script>
+<script type="text/javascript" src="../../../js/eapJs/plugins/eap.validate.js"></script>
+<script type="text/javascript" src="../../../js/eapJs/local/eap.lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../css/validate.css"/>
+<link rel="stylesheet" type="text/css" href="../../../css/edit.css"/>
+
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<style type="text/css">
+	.chooseUser{width:1000px;height:530px;}
+	.sgreen{background:#EDF4FF;border:dashed 1px #72BBFF;}
+	.sred{background:#FFFF99;border:dashed 1px #FF9900;}
+	.wordLike{ width: 70%;outline: none;text-indent:15px;list-style: none;border: none;border-bottom: 1px solid #999;height:29px !important}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">创建申请单</label>
+			</div>
+			<img src="../../../img/list_Header2-.png">
+		</div>
+		<form id="saveForm" class="required-validate">
+		<div class="form_div" id="lay1"  style="width:50%;margin:0 auto">
+			  <div style="margin:30px 0">
+			  	<div style=" text-align:center;font-size:20px">开票申请单 
+			  		<span style="float:right;font-size:14px">申请单编号：
+						<input type="text" name="applyCode"   class="required readonly"  readonly="readonly" style="    width: 200px;border: none;background: none;"/>
+					</span>
+			  	</div>
+			  
+			  </div>
+					
+			  <div style="margin:15px 0">
+				开票项目：
+						<input type="text" name="proName" class="required dropDownList wordLike"/>
+			  </div>
+			  <div style="margin:15px 0">
+				项目编码：
+						<input type="text" name="proCode" class="required wordLike readonly"  readonly="readonly"  maxlength="50"/>
+			  </div>
+			  <div style="margin:15px 0">
+				合同名称：
+						<input type="text" name="contractName" readonly="readonly"  class="dropDownList wordLike" maxlength="50"/>
+			  </div>
+			   <div style="margin:15px 0">
+					合同编码：
+						<input type="text"  name="contractCode" readonly="readonly"  class="wordLike"/>
+			   </div>
+			   
+			     <div style="margin:15px 0">
+					开票内容：
+						<input type="text" name="appContent" class="required wordLike" maxlength="100"/>
+				   </div>
+				  <div style="margin:15px 0">
+					开票类型：
+						<input type="hidden" name="appType"/>
+						<input type="text"   name="appTypeName" class="required dropDownList wordLike"/>
+					</div>
+					<div style="margin:15px 0">
+						开票金额：<input type="text" name="money" class="number wordLike" onkeyup="DX(this,'money2')" style="width:15%"/>&nbsp;&nbsp;(元)</td>					
+						金额大写：<input type="text" name="money2"  id="money2" class="required readonly wordLike" style="width:40%;"  readonly="readonly"/>
+					</div>
+					<div style="margin:15px 0">
+						开票单位：<input type="text" name="company"  class="required dropDownList wordLike" maxlength="100"/></td>
+					</div>
+					<div>开票信息</div>
+					<div style="margin:15px 0 0 20px">
+						单&nbsp;&nbsp;&nbsp;&nbsp;位：<input type="text" name="company1" class="required wordLike" maxlength="50"/>
+					</div>
+					<div style="margin:15px 0 0 20px">
+						税&nbsp;&nbsp;&nbsp;&nbsp;号：<input type="text" name="taxNo" class="required wordLike" maxlength="50"/>
+					</div>
+					<div style="margin:15px 0 0 20px">
+						开户行：<input type="text" name="bank" class="required wordLike" maxlength="50"/>
+					</div>
+					<div style="margin:15px 0 0 20px">
+						帐&nbsp;&nbsp;&nbsp;&nbsp;号：<input type="text" name="bankAccount" class="required wordLike" maxlength="50"/>
+					</div>
+					<div style="margin:15px 0 0 20px">
+						地&nbsp;&nbsp;&nbsp;&nbsp;址：<input type="text" name="address" class="required wordLike" maxlength="50"/>
+					</div>
+					<div style="margin:15px 0 0 20px">
+						电&nbsp;&nbsp;&nbsp;&nbsp;话：<input type="text" name="mobile" class="required wordLike" maxlength="50"/>
+					</div>
+					<div style="margin:30px 0 0 20px;overflow:hidden">
+						<p style="float:right;width:250px;text-align:left" id="p1">申请人:</p>
+					</div>
+					<div style="overflow:hidden">
+						<p style="float:right;width:250px;text-align:left" id="p2">申请部门：</p>
+					</div>
+					<div style="overflow:hidden">
+						<p style="float:right;width:250px;text-align:left" id="p3">申请日期：<input id="date" type="text" name="applyDate" placeholder="请选择日期" onclick="new Calendar().show(this)" class="dateComponent" style="border:none;border-bottom:1px solid #ccc"></p>
+					</div>
+		</div>
+		
+		<div class="form_bottom" style="width:50%;margin:30px auto">
+			<a href="javascript:" ng-click="onSave()" class="title_save">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存
+			</a>
+			<a href="javascript:" ng-click="onCancel()" class="title_cancel">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消
+			</a>
+		</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+var validator;
+var ngScope;
+var userData;
+var proCode="";
+var app = angular.module("userMgr", []);
+
+//初始化时间
+	var today = new SimpleDateFormat({formatString:"yyyy-MM-dd"}).format(new Date());
+	$("#date").val(today);
+	
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	$scope.curUnit={};
+	$scope.userList=[];
+	$scope.kpiList=[];
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	
+	
+	/* 表单验证 */
+	validator = $("#saveForm").validate({
+		onsubmit: false,
+		focusInvalid: false,
+		focusCleanup: true,
+		errorElement: "span",
+		ignore:".ignore",
+		invalidHandler: function(form, validator) {
+			var errors = validator.numberOfInvalids();
+			if (errors) {
+				
+			} 
+		}
+	});
+	
+	/* 项目分类 */
+	new DropDownList().init({
+		renderTo:"input[name=proName]",
+		url:"../../component/projectResponse.html?ticket="+ticket,
+		height:"200px",
+		onSelected:function(result){
+			$("input[name=proName]").val(result.proName);
+			$("input[name=proCode]").val(result.proCode);
+			proCode=result.proCode;
+			$("input[name=proName]").focus();
+			contractList.setConfig("url", "../../component/contractResponse.html?ticket="+ticket+"&proNo="+proCode);
+		}
+	});
+	
+	
+	/* 合同 */
+	var contractList = new DropDownList();
+	contractList.init({
+		renderTo:"input[name='contractName']",
+		url:"../../component/contractResponse.html?ticket="+ticket+"&proNo="+proCode,
+		height:"200px",
+		onSelected:function(result){
+			$("input[name=contractCode]").val(result.contractNo);
+			$("input[name=contractName]").val(result.contractName);
+			$("input[name=contractCode]").focus();
+		}
+	});
+	
+	//单位
+	new DropDownList().init({
+		renderTo:"input[name='company']",
+		url:"../../component/companyResponse.html?ticket="+ticket,
+		height:"200px",
+		editEnabled:true,
+		onSelected:function(result){
+			$("input[name=company]").val(result.company1);
+			$("input[name=company1]").val(result.company1);
+			$("input[name=taxNo]").val(result.taxNo);
+			$("input[name=bank]").val(result.bank);
+			$("input[name=bankAccount]").val(result.bankAccount);
+			$("input[name=address]").val(result.address);
+			$("input[name=mobile]").val(result.mobile);
+		}
+	});
+	
+	
+	/* HTTP GET */
+	$scope.httpGet = function(_conf){
+		var commonParams = "currentPage="+$scope.currentPage+"&ticket="+$scope.ticket;
+		var params = "";
+		if(_conf.data){
+			params = toUrlParams(_conf.data);
+		}
+		if(_conf.url.indexOf("?")==-1){
+			if(params.length>0){
+				params="?"+params;
+				commonParams="&"+commonParams;
+			}else{
+				commonParams="?"+commonParams;
+			}
+		}else{
+			params="&"+params;
+			commonParams="&"+commonParams;
+		}
+		
+		
+		$http.get(serviceBasePath+_conf.url+params+commonParams).success(function(response){
+				if(response.statusCode==401){
+					new ShowDlog().prompt({
+						icon:"warning",
+						msg:"用户登录过期！请重新登录！",
+						done:function(){
+							window.noLogin(location.href);
+						},
+						t:2800
+					});
+					return;
+				}
+				_conf.success(response);
+				if(_conf.pageChange){
+					$scope.createPageBar(response.totalPage, response.currentPage, _conf.pageChange);
+				}
+			});
+	};
+	
+	$scope.filterPerCnt=function(arr){
+		var arrN=[];
+		for(var i=0; i<arr.length; i++){
+			var item = arr[i];
+			if(item.isPerCnt==1){
+				continue;
+			}
+			arrN.push(item);
+		}
+		return arrN;
+	};
+	
+	/* 发票各类 */
+	new DropDownList().init({
+		renderTo:"input[name=appTypeName]",
+		url:"../../component/invoiceType.html?required=false",
+		height:"200px",
+		onSelected:function(result){
+			if(result.classname!=""){
+				$("input[name=appTypeName]").val(result.classname+"("+result.rate+")%");
+				$("input[name=appType]").val(result.classcode);
+				$("input[name=appType]").focus();
+			}else{
+				$("input[name=appTypeName]").val("");
+				$("input[name=appType]").val("");
+			}
+		}
+	});
+	
+	
+	/* 保存 */
+	$scope.onSave = function(){
+		$("input[name=companyCode]").val(userData.companyCode);
+		// Kpi
+		var kpiData = "";
+		$("input[group=kpi]").each(function(){
+			var k = $(this).attr("name");
+			var v = $(this).val();
+			if(kpiData.length>0){
+				kpiData+="&";
+			}
+			kpiData+=k+"="+v;
+		});
+		$("input[name=kpiData]").val(kpiData);
+		//
+		var formData = $("#saveForm").serialize();
+		if($("#saveForm").valid()){
+			$.ajax({
+				url:serviceBasePath+"eap/pmsServices/fm/billApply/add",
+				cache:false,
+				method:"POST",
+				data:formData,
+				success:function(res){
+					if(res.statusCode==200){
+						new ShowDlog().prompt({msg:"添加成功！",
+							done:function(){
+								location.href="billApplyList.html";
+							},
+							t:1500
+						});
+					}else{
+						//
+					}
+				},
+				error:function(){
+					
+				}
+			});
+		}else{
+			new ShowDlog().prompt({msg:"表单未填写完整！",
+				done:function(){
+				},
+				t:1500
+			});
+		}
+	};
+	
+	/* 取消 */
+	$scope.onCancel = function(){
+		//history.go(-1);
+		location.href="billApplyList.html";
+	};
+
+	
+	$scope.generateBh=function()
+	{
+		$http.get(serviceBasePath+"eap/pmsServices/fm/billApply/getBh").success(function(response){
+			console.log(response);
+			$("input[name=applyCode]").val(response.data.code);	
+			$("#p1").text("申请人："+response.data.user);	
+			$("#p2").text("申请部门："+response.data.dept);	
+		});
+	}
+	
+	$scope.generateBh();
+});
+</script>
+</body>
+</html>

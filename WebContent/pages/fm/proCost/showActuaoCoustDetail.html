@@ -1,0 +1,282 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title> 耗材管理</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<link rel="stylesheet" type="text/css" href="../../../js/showDlog/showDlog-blue.css" />
+
+<script type="text/javascript" src="../../../js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../angular-1.4.6/angular.min.js"></script>
+<script type="text/javascript" src="../../../js/PageBar.js"></script>
+<script type="text/javascript" src="../../../js/util.js"></script>
+<script type="text/javascript" src="../../../js/time.js"></script>
+<script type="text/javascript" src="../../../js/Calendar.js"></script>
+<script type="text/javascript" src="../../../js/ExportExcel.js"></script>
+<script type="text/javascript" src="../../../js/DropDownList-1.2/DropDownList-v1.2.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../js/DropDownList-1.2/DropDownList.css" />
+<script type="text/javascript" src="../../../js/config.js"></script>
+<script type="text/javascript" src="../../../js/SimpleDateFormat.js"></script>
+<script type="text/javascript" src="../../../js/showDlog/showDlog.js"></script>
+<script type="text/javascript" src="../../../js/laydate/laydate.js"></script>
+
+<style type="text/css">
+	.dropDownArea{background-image:url(../../../img/flag.png);background-repeat: no-repeat;background-position:right;background-position:185px;cursor:pointer;}
+	
+	.btn{display:inline-block;padding:1px 4px;border:solid 1px #f4f4f4; border-radius:4px;}
+	.btn.toactive{color:#fff;background:green;}
+	.btn.toclose{color:#fff;background:#ED7798;}
+	.ck{border:1px #fff solid;background:#fff;margin-top:5px}
+	.cks{float:left;height:20px;}
+	.cks .ck{float:left;margin-top:15px;margin-left:10px;}
+	.cks span{float:left}
+    .dialog-viewcode{width:500px;height:400px;}
+    .dialog-viewcyle{width:900px;height:500px;}
+    .dialog-scrap{width:480px;height:320px;}
+.dialog-bedRent{width:900px; height:500px;}
+    .zhende{background:#eee}
+</style>
+</head>
+
+<body ng-app="userMgr" ng-controller="userMgrCtrl">
+
+<div class="list">
+	<div class="list_content">
+		<div class="title_div">
+			<div class="title_left">
+				<label class="title">&nbsp;&nbsp;&nbsp;&nbsp;单项目实际成本明细&nbsp;&nbsp;</label>
+				<div class="query_div" ng-click="doBack()">
+					返回
+				</div>
+				
+			</div>
+			
+			
+			
+			<img src="../../../img/list_Header2-.png">
+			
+			
+		</div>
+		
+		
+		
+		<div class="table_div">
+			
+			<table id="dataTable" width="70%" border="0" cellspacing="0" cellpadding="0" class="table" style="margin-top:20px;display:none">
+			   <tr class="tr2">
+				<th class="tr1"><div align="center">项目年份</div></th>
+				<td><div align="center">{{dailyList.PRO_YEAR}}</div></td>
+				<th class="tr1"><div align="center">开始时间</div></th>
+				<td><div align="center">{{dailyList.S_DATE}}</div></td>
+			  </tr>
+			   <tr class="tr2">
+				<th class="tr1"><div align="center">项目类别</div></th>
+				<td><div align="center">{{dailyList.CATEGORY_NAME}}</div></td>
+				<th class="tr1"><div align="center">结束时间</div></th>
+				<td><div align="center">{{dailyList.E_DATE}}</div></td>
+			  </tr>
+			   <tr class="tr2">
+				<th class="tr1"><div align="center">项目名称</div></th>
+				<td><div align="center">{{dailyList.PRO_NAME}}</div></td>
+				<th class="tr1"><div align="center">项目编号</div></th>
+				<td><div align="center">{{dailyList.PRO_CODE}}</div></td>
+			  </tr>
+			   <tr class="tr2">
+				<th class="tr1"><div align="center">负责人</div></th>
+				<td><div align="center">{{dailyList.PRO_MANAGER}}</div></td>
+				<th class="tr1"><div align="center">概算利润率</div></th>
+				<td><div align="center">{{decim(dailyList.BUDGET_RATE*100,2)}}%</div></td>
+			  </tr>
+			  <tr class="tr2">
+				<th><div align="center">合同总价</div></th>
+				<td colspan="3"><div align="center">{{fmoney(dailyList.T_PRICE,2)}}</div></td>
+			  </tr>
+			<tr class="tr2">
+			  	<th><div align="center">项目时间进度(%)</div></th>
+				<td colspan="3"><div align="center">{{dailyList.timeProcess}}</div></td>
+			  </tr>
+			  <tr class="tr2">
+			  	<th><div align="center">完工进度(%)</div></th>
+				<td colspan="3"><div align="center">{{dailyList.COMPLETION}}</div></td>
+			  </tr>
+			  <tr class="tr2">
+				<th><div align="center">当前项目进度利润率</div></th>
+				<td colspan="3"><div align="center">{{dailyList.CURRENT_RATE}}</div></td>
+			  </tr>
+			  <tr class="tr2">
+				<th><div align="center">实际成本</div></th>
+				<td colspan="3"><div align="center">{{fmoney(dailyList.TOTAL_COST,2)}}</div></td>
+			  </tr>
+			 <tr class="tr2 zhende" ng-if="dailyList.COST_LIST.length>0">
+				<th><div align="center">序号</div></th>
+				<td ><div align="center">成本项</div></td>
+				<td colspan="2"><div align="center">实际成本</div></td>
+			  </tr>
+			  <tr class="tr2" ng-repeat="item in dailyList.COST_LIST"  ng-class="{true:'zhende',false:'jiade'}[item.itemIndex=='A4' || item.itemIndex=='A4.4']">
+			  	<td><div align="center">{{item.itemIndex}}</div></td>
+				<td><div align="center">{{item.ITEM_NAME}}</div></td>
+				<td colspan="2"><div align="center">{{item.COST_VALUE}}</div></td>
+			  </tr>
+			</table>
+		</div>
+
+		<div id="page_bar" class="list_bottom" align="center">
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript">
+
+
+
+
+
+var cond_categoryCode="";
+var proNo="";
+var category="";//指标类别
+var categoryName="";
+var categoryCode="";
+var fromDate="";
+var toDate="";
+var _currentPage=1;
+var cycleName="";
+var cycleCode="";
+var kpiCode="";
+var kpiName="";
+var ngScope;
+
+
+var app = angular.module("userMgr", []);
+app.controller("userMgrCtrl", function($scope, $http){
+	/* init */
+	ngScope = $scope;
+	
+	var userDataStr = $.cookie("pmsWeb_user_data");
+	if(!userDataStr){
+		
+		noLogin(location.href);
+		return;
+	}
+	var userData = jQuery.parseJSON(userDataStr);
+	ticket = $.cookie("pmsWeb_ticket");
+	var params=getUrlParams();
+	
+	
+	fromDate=params.fromDate;
+	toDate=params.toDate;
+	proNo=params.proNo;
+    var proUrl="../../component/projectListCheck.html";
+
+ 
+    /* 项目分类 */
+	new DropDownList().init({
+		mode:"page",
+		renderTo:"#category",
+		url:"../../component/projectType.html?ticket="+$scope.ticket,
+		height:"200px",
+		onSelected:function(result){
+			$scope.cond_category=result.categoryCode;
+			categoryCode=result.categoryCode;
+			$("#category").val(result.categoryName);
+			proNameList.setConfig("url", "../../component/projectList.html?categoryCode="+result.categoryCode+"&ticket="+$scope.ticket);
+		}
+	});
+
+	
+	/* 项目名称 */
+	var proNameList = new DropDownList();
+	proNameList.init({
+		mode:"page",
+		renderTo:"#projectList",
+		url:"../../component/projectList.html?required=true",
+		height:"200px",
+		onSelected:function(result){
+			$("#projectList").val(result.proName);
+			proNo=result.proNo;
+		}
+	});
+
+	/* 获取四舍五入的方法 */
+	$scope.decim=function(a,b){
+		return decim(a,b);
+	};
+
+	/* 加载数据 */
+	
+	$scope.loadProjects=function(toDate){//alert(unitCode);
+		new ShowDlog().prompt({
+			icon:"waitting",
+			msg:"正在查询...",
+			done:function(){},
+			t:60*1000
+		});
+		$http.get(serviceBasePath+"eap/pmsServices/fm/proCost/get?companyCode="
+				+userData.companyCode+"&ticket="+ticket+"&proNo="+proNo+"&fromDate="+fromDate+"&toDate="+toDate+"&categoryCode="+categoryCode).success(function(response){
+					$dlog.close();
+					if(response.statusCode==401){
+					new parent.ShowDlog().prompt({
+						icon:"warning",
+						msg:"用户登录过期！请重新登录！",
+						done:function(){
+							window.noLogin(location.href);
+						},
+						t:2800
+					});
+					return;
+				}
+				if(response.statusCode==200){
+					$scope.dailyList = response.data;
+					$(".table").show();
+					$(".tip").hide();
+				}else{
+					$scope.dailyList = [];
+					$(".table").hide();
+					$(".tip").show();
+				}
+			});
+	};
+	
+	
+	
+	/* 千位逗号分隔 */
+	$scope.fmoney=function(s,n){
+		 if(s==undefined || s=="undefined"){
+			 return "";
+		 }else{
+			 if(!isNaN(s)){
+				 n = n > 0 && n <= 20 ? n : 2;
+		         s = parseFloat((s + '').replace(/[^\d\.-]/g, '')).toFixed(n) + '';
+		         var l = s.split('.') [0].split('').reverse(),
+		             r = s.split('.') [1];
+		         var  t = '';
+		         for (var i = 0; i < l.length; i++)
+		         {
+		             t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? ',' : '');
+		         }
+		         return t.split('').reverse().join('') + '.' + r;
+				}else{
+					  return s;
+				}
+		 }
+	};
+	/* 导出 */
+	$scope.doExport=function(){
+		excelExport("dataTable");
+	};
+
+
+	/* 查询 */
+	$scope.doQuery=function(){
+		
+		$scope.loadProjects(toDate);
+	};
+	$scope.doBack=function(){
+		
+		history.go(-1);
+	};
+	$scope.doQuery();
+});
+</script>
+</body>
+</html>
